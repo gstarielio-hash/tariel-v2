@@ -28,6 +28,7 @@ if (!appSession) {
 
 const searchTerm = String(Astro.url.searchParams.get("q") ?? "").trim().toLowerCase();
 const historyFilter = String(Astro.url.searchParams.get("hist") ?? "todos").trim().toLowerCase();
+const requestedView = String(Astro.url.searchParams.get("view") ?? "conversa").trim().toLowerCase();
 const requestedLaudoId = Number(Astro.url.searchParams.get("laudo") ?? 0);
 const requestedReferenceMessageId = Number(Astro.url.searchParams.get("ref") ?? 0);
 const workspace = await getAppWorkspace(appSession, {
@@ -83,6 +84,7 @@ const filteredHistoryItems = canonicalHistoryItems.filter((message) => {
   }
   return true;
 });
+const currentView = ["conversa", "historico", "contexto"].includes(requestedView) ? requestedView : "conversa";
 const historyFilterOptions = [
   { key: "todos", label: "Todos", count: canonicalHistoryItems.length },
   {
@@ -134,12 +136,14 @@ function buildMesaPath(input: {
   selectedLaudoId?: number | null;
   selectedReferenceMessageId?: number | null;
   historyFilter?: string | null;
+  view?: string | null;
 }) {
   const params = new URLSearchParams();
   const nextSearch = String(input.searchTerm ?? currentSearch).trim();
   const nextLaudoId = input.selectedLaudoId ?? null;
   const nextReferenceId = input.selectedReferenceMessageId ?? null;
   const nextHistoryFilter = String(input.historyFilter ?? normalizedHistoryFilter).trim();
+  const nextView = String(input.view ?? currentView).trim();
 
   if (nextSearch) {
     params.set("q", nextSearch);
@@ -152,6 +156,9 @@ function buildMesaPath(input: {
   }
   if (nextHistoryFilter && nextHistoryFilter !== "todos") {
     params.set("hist", nextHistoryFilter);
+  }
+  if (nextView && nextView !== "conversa") {
+    params.set("view", nextView);
   }
 
   const query = params.toString();
@@ -257,6 +264,29 @@ function formatBytes(value: number | undefined) {
     ))}
   </section>
 
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-4 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+    <div class="flex flex-wrap gap-3">
+      {[
+        { key: "conversa", label: "Conversa", detail: `${threadPreview.length} itens visiveis na thread.` },
+        { key: "historico", label: "Historico", detail: `${filteredHistoryItems.length} itens no filtro atual.` },
+        { key: "contexto", label: "Contexto", detail: `${recentAttachmentItems.length} anexos recentes e auditoria.` },
+      ].map((tab) => (
+        <a
+          href={buildMesaPath({ selectedLaudoId: selectedReport?.id ?? null, view: tab.key })}
+          class:list={[
+            "min-w-[220px] flex-1 rounded-[24px] border px-4 py-4 transition",
+            currentView === tab.key
+              ? "border-sky-500/30 bg-sky-500/10 shadow-[0_18px_40px_rgba(14,165,233,0.08)]"
+              : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white",
+          ]}
+        >
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{tab.label}</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">{tab.detail}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
   <section class="mt-8 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
     <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
       <div class="flex items-center justify-between gap-4">
@@ -324,7 +354,12 @@ function formatBytes(value: number | undefined) {
     </article>
 
     <div class="space-y-6">
-      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <article
+        class:list={[
+          "rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]",
+          currentView === "contexto" ? "" : "hidden",
+        ]}
+      >
         <div class="flex items-center justify-between gap-4">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Contexto do laudo</p>
@@ -389,7 +424,12 @@ function formatBytes(value: number | undefined) {
         </div>
       </article>
 
-      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <article
+        class:list={[
+          "rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]",
+          currentView === "conversa" ? "" : "hidden",
+        ]}
+      >
         <div class="flex items-center justify-between gap-4">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Contexto lateral</p>
@@ -497,7 +537,12 @@ function formatBytes(value: number | undefined) {
         </div>
       </article>
 
-      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <article
+        class:list={[
+          "rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]",
+          currentView === "historico" ? "" : "hidden",
+        ]}
+      >
         <div class="flex items-center justify-between gap-4">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Thread da mesa</p>
@@ -761,6 +806,7 @@ function formatBytes(value: number | undefined) {
                 selectedLaudoId: selectedReport?.id ?? null,
                 selectedReferenceMessageId: referencedMessage?.id ?? null,
                 historyFilter: option.key,
+                view: "historico",
               })}
               class:list={[
                 "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition",

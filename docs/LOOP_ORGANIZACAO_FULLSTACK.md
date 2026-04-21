@@ -4009,3 +4009,44 @@ Proximo passo imediato:
 - com a primeira leitura de historico ja dentro de `/app/mesa`, o proximo ganho util do inspetor e abrir uma navegacao explicita por estados de workspace no Astro, em vez de concentrar tudo em uma pagina longa;
 - depois disso, fica mais seguro migrar trechos de contexto tecnico e a trilha de operacao sem depender do `chat_index_page.js`;
 - seguir priorizando slices que reduzam a dependencia do template legado `index.html` sem inventar novos contratos no backend.
+
+## Ciclo 96 — navegacao explicita da workspace na mesa do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- `/app/mesa` ja reunia fila, contexto, thread e historico, mas tudo continuava empilhado na mesma pagina longa;
+- isso ainda ficava distante do comportamento da workspace legado, onde a operacao alterna entre estados de leitura, historico e contexto;
+- o corte seguro era introduzir navegacao explicita por query string, sem criar rotas novas nem contratos adicionais no backend.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/mesa.astro` passou a aceitar `view=` com os estados `conversa`, `historico` e `contexto`;
+- entrou uma barra de navegacao da workspace logo abaixo dos cards principais, expondo os estados de leitura do laudo ativo;
+- as secoes da mesa agora sao exibidas de forma explicita conforme a view escolhida, deixando a interface menos monolitica e mais proxima da navegacao do workspace legado;
+- a navegacao continua stateless e auditavel via URL, preservando o mesmo ownership do backend Python sobre thread, resumo e mutacoes.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a navegacao explicita da mesa ja aberta no Astro, o proximo ganho util do inspetor e introduzir a primeira view de contexto tecnico do laudo ativo, aproximando a superficie do workspace real;
+- isso prepara a migracao de mais estados operacionais sem continuar inflando um unico arquivo legado;
+- seguir reduzindo o papel do `chat_index_page.js` em fatias pequenas, validas e reversiveis.
