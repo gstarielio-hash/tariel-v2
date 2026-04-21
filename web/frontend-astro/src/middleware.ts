@@ -24,11 +24,21 @@ import {
   loadClientRequestSession,
   safeClientNextPath,
 } from "@/lib/server/client-auth";
+import {
+  buildReviewerLoginPath,
+  isPublicReviewerPath,
+  isReviewerPath,
+  loadReviewerPasswordResetSession,
+  loadReviewerRequestSession,
+  safeReviewerNextPath,
+} from "@/lib/server/reviewer-auth";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.adminSession = null;
   context.locals.clientSession = null;
   context.locals.clientPasswordResetSession = null;
+  context.locals.reviewerSession = null;
+  context.locals.reviewerPasswordResetSession = null;
 
   if (isClientPath(context.url.pathname)) {
     if (isStateChangingMethod(context.request.method) && !isSameOriginRequest(context.request, context.url)) {
@@ -125,6 +135,54 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     if (isAdminTransitionPath(context.url.pathname) && !isAdminReauthPath(context.url.pathname)) {
       return context.redirect("/admin/painel", 303);
+    }
+
+    return next();
+  }
+
+  if (isReviewerPath(context.url.pathname)) {
+    if (isStateChangingMethod(context.request.method) && !isSameOriginRequest(context.request, context.url)) {
+      return new Response("Forbidden", { status: 403 });
+    }
+
+    const reviewerSession = await loadReviewerRequestSession(context);
+    const reviewerPasswordResetSession = reviewerSession ? null : await loadReviewerPasswordResetSession(context);
+    context.locals.reviewerSession = reviewerSession;
+    context.locals.reviewerPasswordResetSession = reviewerPasswordResetSession;
+
+    const isReviewerPasswordChangePath =
+      context.url.pathname === "/revisao/trocar-senha"
+      || context.url.pathname === "/revisao/trocar-senha/salvar";
+    const isReviewerLogoutPath = context.url.pathname === "/revisao/logout";
+
+    if (reviewerPasswordResetSession) {
+      if (isReviewerPasswordChangePath || isReviewerLogoutPath) {
+        return next();
+      }
+
+      return context.redirect("/revisao/trocar-senha", 303);
+    }
+
+    if (!reviewerSession) {
+      if (isPublicReviewerPath(context.url.pathname)) {
+        return next();
+      }
+
+      const nextPath = `${context.url.pathname}${context.url.search}`;
+      return context.redirect(buildReviewerLoginPath(nextPath), 303);
+    }
+
+    if (isPublicReviewerPath(context.url.pathname)) {
+      if (context.url.pathname === "/revisao/login") {
+        const nextPath = safeReviewerNextPath(context.url.searchParams.get("next"), "/revisao/painel");
+        return context.redirect(nextPath, 303);
+      }
+
+      return context.redirect("/revisao/painel", 303);
+    }
+
+    if (isReviewerPasswordChangePath) {
+      return context.redirect("/revisao/painel", 303);
     }
 
     return next();

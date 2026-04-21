@@ -1,0 +1,152 @@
+---
+import {
+  ClipboardList,
+  Fingerprint,
+  LogOut,
+  MessageSquareReply,
+  ShieldCheck,
+  Workflow,
+} from "lucide-react";
+
+import StudioLayout from "@/layouts/studio-layout.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  userName?: string;
+  companyName?: string;
+  activeItem?: "dashboard";
+}
+
+const {
+  title = "Mesa Avaliadora | Tariel Astro",
+  description = "Portal revisor migrado para Astro SSR.",
+  userName = "Revisor",
+  companyName = "Empresa",
+  activeItem = "dashboard",
+} = Astro.props;
+
+const sessionUserName = Astro.locals.reviewerSession?.user.name ?? userName;
+const sessionCompanyName = Astro.locals.reviewerSession?.user.companyName ?? companyName;
+
+const menuItems = [
+  {
+    href: "/revisao/painel",
+    label: "Fila",
+    icon: ClipboardList,
+    current: activeItem === "dashboard",
+  },
+  {
+    href: "/revisao/login",
+    label: "Tela de login",
+    icon: Fingerprint,
+  },
+];
+---
+
+<StudioLayout title={title} description={description}>
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_28%),radial-gradient(circle_at_90%_0%,rgba(15,23,42,0.08),transparent_24%)] px-4 py-4 sm:px-6 sm:py-6">
+    <div class="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1600px] overflow-hidden rounded-[34px] border border-slate-950/10 bg-white/78 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur lg:grid-cols-[280px_minmax(0,1fr)]">
+      <aside class="border-b border-slate-950/8 bg-slate-950 px-6 py-8 text-white lg:border-b-0 lg:border-r">
+        <div class="rounded-[28px] border border-white/10 bg-white/6 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.26em] text-emerald-200">Tariel Astro</p>
+          <h1 class="mt-3 font-display text-3xl tracking-tight">Mesa Avaliadora</h1>
+          <p class="mt-3 text-sm leading-6 text-slate-300">
+            Entrada oficial do portal revisor em Astro SSR, preservando a fila e as regras da mesa no backend Python.
+          </p>
+        </div>
+
+        <nav class="mt-8 space-y-2" aria-label="Menu do portal revisor">
+          {menuItems.map(({ href, label, icon: Icon, current }) => (
+            <a
+              href={href}
+              class:list={[
+                "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition",
+                current
+                  ? "bg-white text-slate-950 shadow-[0_12px_30px_rgba(255,255,255,0.12)]"
+                  : "text-slate-300 hover:bg-white/8 hover:text-white",
+              ]}
+              aria-current={current ? "page" : undefined}
+            >
+              <Icon className="size-4" />
+              <span>{label}</span>
+            </a>
+          ))}
+        </nav>
+
+        <div class="mt-8 rounded-[28px] border border-white/10 bg-white/6 p-5">
+          <div class="flex items-start gap-3">
+            <div class="rounded-2xl bg-white/10 p-3 text-white">
+              <Workflow className="size-5" />
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">Corte atual</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">
+                Este slice fecha auth real e leitura inicial da fila. Thread detalhada, exportacao e emissao oficial
+                continuam em fatias seguintes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 rounded-[28px] border border-white/10 bg-white/6 p-5">
+          <div class="flex items-start gap-3">
+            <div class="rounded-2xl bg-white/10 p-3 text-white">
+              <MessageSquareReply className="size-5" />
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Empresa</p>
+              <p class="mt-2 font-medium text-white">{sessionCompanyName}</p>
+              <p class="mt-1 text-sm leading-6 text-slate-300">{sessionUserName}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex items-center justify-between rounded-[28px] border border-white/10 bg-white/6 p-5">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Sessao</p>
+            <p class="mt-2 font-medium text-white">Ativa no portal revisor</p>
+          </div>
+
+          <form method="POST" action="/revisao/logout">
+            <button
+              type="submit"
+              class="inline-flex items-center gap-2 rounded-full border border-white/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-white/28 hover:bg-white/8"
+            >
+              <LogOut className="size-4" />
+              Sair
+            </button>
+          </form>
+        </div>
+
+        <div class="mt-8 rounded-[28px] border border-white/10 bg-white/6 p-5">
+          <div class="flex items-start gap-3">
+            <div class="rounded-2xl bg-white/10 p-3 text-white">
+              <ShieldCheck className="size-5" />
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Ownership</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">
+                Astro fica com shell, sessao e SSR. Python continua dono de fila, policy, auditoria e mutacoes da mesa.
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="min-w-0">
+        <div class="border-b border-slate-950/8 px-6 py-6 sm:px-8">
+          <slot name="header" />
+        </div>
+
+        <div class="px-6 py-6 sm:px-8 sm:py-8">
+          <slot />
+        </div>
+      </section>
+    </div>
+  </main>
+</StudioLayout>
+

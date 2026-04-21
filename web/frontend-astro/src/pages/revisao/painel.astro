@@ -1,0 +1,328 @@
+---
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ClipboardList,
+  FileStack,
+  MessageSquareReply,
+  Search,
+  ShieldCheck,
+  Workflow,
+} from "lucide-react";
+
+import ReviewerShellLayout from "@/layouts/reviewer-shell-layout.astro";
+import {
+  fetchReviewerPanelSnapshot,
+  type ReviewQueueItemPayload,
+} from "@/lib/server/reviewer-panel-bridge";
+
+export const prerender = false;
+
+const reviewerSession = Astro.locals.reviewerSession;
+if (!reviewerSession) {
+  return Astro.redirect("/revisao/login", 303);
+}
+
+const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const searchTerm = String(Astro.url.searchParams.get("q") ?? "").trim();
+const operationFilter = String(Astro.url.searchParams.get("operacao") ?? "").trim().toLowerCase();
+const learningFilter = String(Astro.url.searchParams.get("aprendizados") ?? "").trim().toLowerCase();
+
+const snapshotParams = new URLSearchParams();
+if (searchTerm) snapshotParams.set("q", searchTerm);
+if (operationFilter) snapshotParams.set("operacao", operationFilter);
+if (learningFilter) snapshotParams.set("aprendizados", learningFilter);
+
+const projection = await fetchReviewerPanelSnapshot(reviewerSession, snapshotParams);
+const payload = projection.payload;
+
+const statCards = [
+  {
+    label: "Em andamento",
+    value: payload.queue_summary.in_field_count,
+    detail: "Casos em campo ou acompanhamento da mesa.",
+    icon: Workflow,
+  },
+  {
+    label: "Aguardando mesa",
+    value: payload.queue_summary.awaiting_review_count,
+    detail: "Casos prontos para decisao ou triagem final.",
+    icon: ClipboardList,
+  },
+  {
+    label: "Whispers pendentes",
+    value: payload.queue_summary.whisper_pending_count,
+    detail: "Mensagens do campo aguardando retorno da mesa.",
+    icon: MessageSquareReply,
+  },
+  {
+    label: "Pendencias abertas",
+    value: payload.queue_summary.total_open_pendencies,
+    detail: "Pendencias operacionais ainda sem fechamento.",
+    icon: ShieldCheck,
+  },
+] as const;
+
+const operationCards = [
+  { label: "Responder agora", key: "responder_agora", value: payload.operation_totals.responder_agora },
+  { label: "Validar aprendizado", key: "validar_aprendizado", value: payload.operation_totals.validar_aprendizado },
+  { label: "Aguardando campo", key: "aguardando_inspetor", value: payload.operation_totals.aguardando_inspetor },
+  { label: "Fechamento", key: "fechamento_mesa", value: payload.operation_totals.fechamento_mesa },
+  { label: "Acompanhamento", key: "acompanhamento", value: payload.operation_totals.acompanhamento },
+] as const;
+
+function sectionPath(input: { q?: string; operacao?: string; aprendizados?: string }) {
+  const params = new URLSearchParams();
+  if (input.q?.trim()) params.set("q", input.q.trim());
+  if (input.operacao?.trim()) params.set("operacao", input.operacao.trim());
+  if (input.aprendizados?.trim()) params.set("aprendizados", input.aprendizados.trim());
+  const query = params.toString();
+  return query ? `/revisao/painel?${query}` : "/revisao/painel";
+}
+
+function statusTone(item: ReviewQueueItemPayload) {
+  if (item.prioridade_operacional === "critica") return "border-red-200 bg-red-50";
+  if (item.prioridade_operacional === "alta") return "border-amber-200 bg-amber-50";
+  if (item.queue_section === "historico") return "border-slate-200 bg-slate-50";
+  return "border-emerald-200 bg-emerald-50";
+}
+---
+
+<ReviewerShellLayout
+  title={`Mesa Avaliadora | ${reviewerSession.user.companyName} | Tariel Astro`}
+  description="Fila inicial da mesa avaliadora em Astro SSR sobre o contrato canonico de review queue."
+  userName={reviewerSession.user.name}
+  companyName={reviewerSession.user.companyName}
+  activeItem="dashboard"
+>
+  <Fragment slot="header">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-600">Mesa Avaliadora</p>
+        <h1 class="mt-3 font-display text-3xl tracking-tight text-slate-950 sm:text-4xl">
+          Fila governada da revisao no V2
+        </h1>
+        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          Este corte abre a entrada oficial do portal revisor no Astro e consome a fila pelo contrato canonicamente
+          owned pelo backend Python. A thread detalhada continua na proxima fatia.
+        </p>
+      </div>
+
+      <div class="rounded-[28px] border border-emerald-500/16 bg-emerald-500/6 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">Estado atual</p>
+        <p class="mt-2 text-lg font-semibold text-slate-950">{payload.queue_summary.observed_case_ids.length} casos observados</p>
+        <p class="mt-1 text-sm leading-6 text-slate-600">
+          {payload.queue_summary.total_pending_whispers} whispers pendentes, {payload.queue_summary.total_pending_learning}
+          {" "}aprendizados e {payload.queue_summary.total_open_pendencies} pendencias abertas.
+        </p>
+      </div>
+    </div>
+  </Fragment>
+
+  {successMessage ? (
+    <section class="mb-6 rounded-[30px] border border-emerald-500/16 bg-emerald-500/10 p-5 text-emerald-950">
+      <p class="text-xs font-semibold uppercase tracking-[0.22em]">Operacao concluida</p>
+      <p class="mt-3 text-sm leading-7">{successMessage}</p>
+    </section>
+  ) : null}
+
+  <section class="grid gap-4 xl:grid-cols-4">
+    {statCards.map(({ label, value, detail, icon: Icon }) => (
+      <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</p>
+          <div class="rounded-2xl bg-emerald-500/10 p-3 text-emerald-700">
+            <Icon className="size-5" />
+          </div>
+        </div>
+        <p class="mt-5 font-display text-3xl tracking-tight text-slate-950">{value}</p>
+        <p class="mt-3 text-sm leading-6 text-slate-600">{detail}</p>
+      </article>
+    ))}
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[0.94fr_1.06fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Filtros da fila</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Recorte operacional</h2>
+        </div>
+        <div class="rounded-2xl bg-emerald-500/10 p-3 text-emerald-700">
+          <Search className="size-5" />
+        </div>
+      </div>
+
+      <form method="GET" action="/revisao/painel" class="mt-6 space-y-4">
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Buscar na fila</span>
+          <input
+            type="text"
+            name="q"
+            value={searchTerm}
+            placeholder="Hash, setor, inspetor ou mensagem inicial"
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500"
+          />
+        </label>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="block space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Operacao</span>
+            <select
+              name="operacao"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500"
+            >
+              <option value="">Todas</option>
+              <option value="responder_agora" selected={operationFilter === "responder_agora"}>Responder agora</option>
+              <option value="validar_aprendizado" selected={operationFilter === "validar_aprendizado"}>Validar aprendizado</option>
+              <option value="aguardando_inspetor" selected={operationFilter === "aguardando_inspetor"}>Aguardando campo</option>
+              <option value="fechamento_mesa" selected={operationFilter === "fechamento_mesa"}>Fechamento</option>
+              <option value="acompanhamento" selected={operationFilter === "acompanhamento"}>Acompanhamento</option>
+            </select>
+          </label>
+
+          <label class="block space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Aprendizados</span>
+            <select
+              name="aprendizados"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500"
+            >
+              <option value="">Todos</option>
+              <option value="pendentes" selected={learningFilter === "pendentes"}>Somente pendentes</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            type="submit"
+            class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Aplicar filtros
+          </button>
+          <a
+            href="/revisao/painel"
+            class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            Limpar
+          </a>
+        </div>
+      </form>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {operationCards.map((card) => (
+          <a
+            href={sectionPath({ q: searchTerm, operacao: card.key, aprendizados: learningFilter })}
+            class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300 hover:bg-white"
+          >
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{card.label}</p>
+            <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{card.value}</p>
+          </a>
+        ))}
+      </div>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Whispers</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Retornos recentes do campo</h2>
+        </div>
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          {payload.pending_whispers_preview.length} itens
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        {payload.pending_whispers_preview.length > 0 ? payload.pending_whispers_preview.map((item) => (
+          <article class="rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p class="font-semibold text-slate-950">Laudo {item.hash}</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.status_visual_label}</p>
+            </div>
+            <p class="mt-2 text-sm leading-6 text-slate-700">{item.texto}</p>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              {item.collaboration_summary?.unread_whisper_count ?? 0} nao lidos • {item.collaboration_summary?.open_pendency_count ?? 0} pendencias abertas
+            </p>
+          </article>
+        )) : (
+          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+            Nenhum whisper pendente apareceu no recorte atual da fila.
+          </div>
+        )}
+      </div>
+    </article>
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-3">
+    {[
+      { title: "Em andamento", items: payload.queue_sections.em_andamento, icon: Workflow },
+      { title: "Aguardando avaliacao", items: payload.queue_sections.aguardando_avaliacao, icon: FileStack },
+      { title: "Historico recente", items: payload.queue_sections.historico, icon: CheckCircle2 },
+    ].map(({ title, items, icon: Icon }) => (
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fila</p>
+            <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">{title}</h2>
+          </div>
+          <div class="rounded-2xl bg-emerald-500/10 p-3 text-emerald-700">
+            <Icon className="size-5" />
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-3">
+          {items.length > 0 ? items.map((item) => (
+            <article class:list={["rounded-[24px] border px-4 py-4", statusTone(item)]}>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p class="font-semibold text-slate-950">{item.setor_industrial || `Laudo ${item.hash_curto}`}</p>
+                  <p class="mt-1 text-sm leading-6 text-slate-600">{item.primeira_mensagem}</p>
+                  <p class="mt-1 text-sm leading-6 text-slate-500">
+                    {item.inspetor_nome} • {item.tempo_em_campo} • {item.proxima_acao}
+                  </p>
+                </div>
+
+                <div class="flex flex-col items-start gap-2 sm:items-end">
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                    {item.status_visual_label}
+                  </span>
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                    {item.fila_operacional_label}
+                  </span>
+                </div>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.hash_curto}</span>
+                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.whispers_nao_lidos} whispers</span>
+                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.pendencias_abertas} pendencias</span>
+                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.aprendizados_pendentes} aprendizados</span>
+              </div>
+            </article>
+          )) : (
+            <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+              Nenhum caso encontrado nesta secao para o filtro atual.
+            </div>
+          )}
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+    <div class="flex items-center gap-3">
+      <div class="rounded-2xl bg-amber-500/10 p-3 text-amber-700">
+        <AlertTriangle className="size-5" />
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Proxima fatia</p>
+        <h2 class="mt-1 font-display text-2xl tracking-tight text-slate-950">Thread detalhada e mutacoes da mesa</h2>
+      </div>
+    </div>
+    <p class="mt-4 text-sm leading-7 text-slate-600">
+      Este painel fecha autenticacao e leitura inicial da fila no Astro. A proxima rodada reaproveita o mesmo token
+      e o mesmo ownership Python para abrir a thread detalhada, pendencias, respostas e exportacoes do revisor.
+    </p>
+  </section>
+</ReviewerShellLayout>

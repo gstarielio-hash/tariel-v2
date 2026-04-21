@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 
 from fastapi import Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 
 from app.domains.revisor.base import roteador_revisor, templates
@@ -96,4 +97,28 @@ async def painel_revisor(
         )
 
 
-__all__ = ["painel_revisor"]
+@roteador_revisor.get("/api/painel/snapshot")
+async def painel_revisor_snapshot(
+    request: Request,
+    usuario: Usuario = Depends(exigir_revisor),
+    banco: Session = Depends(obter_banco),
+):
+    panel_state = build_review_panel_state(
+        request=request,
+        usuario=usuario,
+        banco=banco,
+    )
+    shadow_result = registrar_shadow_review_queue_dashboard(
+        request=request,
+        usuario=usuario,
+        panel_state=panel_state,
+    )
+    projection = (
+        shadow_result.projection
+        if shadow_result is not None and isinstance(getattr(shadow_result, "projection", None), dict)
+        else {}
+    )
+    return JSONResponse(content=jsonable_encoder(projection))
+
+
+__all__ = ["painel_revisor", "painel_revisor_snapshot"]

@@ -5,6 +5,10 @@ import type {
   AuthenticatedClientPasswordResetRequest,
   AuthenticatedClientRequest,
 } from "@/lib/server/client-auth";
+import type {
+  AuthenticatedReviewerPasswordResetRequest,
+  AuthenticatedReviewerRequest,
+} from "@/lib/server/reviewer-auth";
 
 declare global {
   namespace App {
@@ -12,6 +16,8 @@ declare global {
       adminSession: AuthenticatedAdminRequest | null;
       clientSession: AuthenticatedClientRequest | null;
       clientPasswordResetSession: AuthenticatedClientPasswordResetRequest | null;
+      reviewerSession: AuthenticatedReviewerRequest | null;
+      reviewerPasswordResetSession: AuthenticatedReviewerPasswordResetRequest | null;
     }
   }
 }

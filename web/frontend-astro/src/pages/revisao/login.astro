@@ -1,23 +1,124 @@
 ---
+import { ArrowRight, LockKeyhole, ShieldCheck } from "lucide-react";
+
 import AuthShell from "@/components/app/auth/auth-shell.astro";
+import { safeReviewerNextPath } from "@/lib/server/reviewer-auth";
 
 export const prerender = false;
+
+const errorMessage = String(Astro.url.searchParams.get("erro") ?? "").trim();
+const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const prefillEmail = String(Astro.url.searchParams.get("email") ?? "").trim().toLowerCase();
+const firstAccess = new Set(["1", "true", "sim"]).has(
+  String(Astro.url.searchParams.get("primeiro_acesso") ?? "").trim().toLowerCase(),
+);
+const nextPath = safeReviewerNextPath(Astro.url.searchParams.get("next"), "/revisao/painel");
 ---
 
 <AuthShell
   title="Mesa Avaliadora | Tariel Astro"
-  description="Tela de autenticacao migrada para a mesa avaliadora."
+  description="Login do portal revisor com sessao Astro SSR persistida em Prisma."
   portalLabel="Mesa Avaliadora"
-  heroTitle="Entrada da mesa revisora pronta para a migracao por etapas."
-  heroCopy="A tela de autenticacao da mesa agora usa a mesma base moderna dos outros portais. Isso reduz retrabalho antes de atacar a parte mais complexa: fila, historico e resposta operacional."
+  heroTitle="Primeira entrada real da mesa avaliadora na stack oficial."
+  heroCopy="O portal revisor agora ganha autenticacao propria no Astro SSR com Prisma, sem depender da sessao HTML do legado para abrir a fila oficial da mesa."
   heroItems={[
-    "Shared auth shell para manter consistencia entre portais internos.",
-    "Componentes prontos para evoluir com regras de sessao e permissao.",
-    "Abre espaco para migrar a mesa revisora sem reescrever tudo de uma vez.",
-    "Mantem a interface atual reconhecivel enquanto a arquitetura muda por baixo.",
+    "Login password emitido em sessoes_ativas com cookie httpOnly proprio do portal revisor.",
+    "Primeiro acesso com senha temporaria agora segue para troca obrigatoria dentro da stack nova.",
+    "Fila inicial da mesa passa a abrir no Astro sobre o contrato canonico de review queue.",
+    "Thread detalhada, exportacao e emissao oficial entram como fatias seguintes sem reabrir ownership.",
   ]}
   supportText="Quer um acesso? Fale com o administrador."
   submitLabel="Acessar"
-  previewMessage="Layout pronto. A parte de autenticacao real da mesa avaliadora entra na proxima etapa de integracao."
+  previewMessage="Login pronto para integracao real."
   variant="mesa"
-/>
+  panelEyebrow="Mesa Avaliadora"
+  panelTitle="Entrar no portal revisor"
+  panelCopy="A autenticacao local do revisor agora usa Prisma e Astro. O painel inicial da fila entra sobre o contrato de review queue, mantendo a mesa no backend Python."
+>
+  <Fragment slot="form">
+    <div class="space-y-5">
+      <div class="rounded-[28px] border border-emerald-500/15 bg-emerald-500/6 p-4 text-emerald-950">
+        <div class="flex items-start gap-3">
+          <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+            <ShieldCheck className="size-4" />
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]">Sessao propria da mesa</p>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+              Este login ja valida a senha do <strong>revisor</strong> em <strong>Astro + Prisma</strong> e abre o
+              caminho oficial da fila da mesa na V2.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {firstAccess ? (
+        <div class="rounded-[24px] border border-amber-500/18 bg-amber-500/8 px-4 py-3 text-sm leading-6 text-amber-950">
+          Primeiro acesso: entre com o e-mail informado no provisionamento da equipe e com a senha temporaria recebida
+          em canal seguro. A nova senha sera definida no proximo passo.
+        </div>
+      ) : null}
+
+      {successMessage ? (
+        <div class="rounded-[24px] border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm leading-6 text-emerald-900">
+          {successMessage}
+        </div>
+      ) : null}
+
+      {errorMessage ? (
+        <div class="rounded-[24px] border border-rose-500/18 bg-rose-500/8 px-4 py-3 text-sm leading-6 text-rose-900">
+          {errorMessage}
+        </div>
+      ) : null}
+
+      <form class="space-y-4" method="POST" action="/revisao/login/entrar" novalidate>
+        <input type="hidden" name="next" value={nextPath} />
+        <input type="hidden" name="primeiro_acesso" value={firstAccess ? "1" : ""} />
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">E-mail</span>
+          <input
+            type="email"
+            name="email"
+            placeholder="voce@empresa.com"
+            autocomplete="username"
+            value={prefillEmail}
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-emerald-500"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Senha</span>
+          <div class="relative">
+            <input
+              type="password"
+              name="senha"
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              required
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-emerald-500"
+            />
+            <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
+              <LockKeyhole className="size-4" />
+            </span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+          <input type="checkbox" name="lembrar" value="1" class="size-4 rounded border-slate-300 text-emerald-500" />
+          <span>Manter esta sessao neste navegador</span>
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Acessar
+          <ArrowRight className="size-4" />
+        </button>
+      </form>
+    </div>
+  </Fragment>
+</AuthShell>

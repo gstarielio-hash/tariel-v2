@@ -3167,3 +3167,64 @@ Proximo passo imediato:
 - consolidar a issue `#14` decidindo se ainda resta alguma mutacao de mesa especifica do tenant fora do boundary novo;
 - em seguida, reaproveitar o mesmo pacote de bridge e contratos para abrir `Mesa Avaliadora` em Astro sem duplicar command handlers ou policy no frontend;
 - manter `Inspetor` fora da frente principal ate `cliente/mesa` e `revisao` estarem fechados com ownership claro e rollout honesto.
+
+## Ciclo 78 — `Mesa Avaliadora` com auth real e fila inicial no Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a vertical `/revisao` ainda estava parada em uma tela de login de preview no Astro, sem sessao real nem leitura oficial da fila da mesa;
+- isso mantinha o portal revisor dependente do SSR legado para a porta de entrada mais basica da operacao;
+- depois de fechar `/cliente/mesa`, o menor slice seguro era abrir a autenticacao do revisor e a leitura inicial da fila sem puxar ainda a thread completa, exportacoes e emissao oficial.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/reviewer-auth.ts`, espelhando no portal revisor o mesmo padrao de autenticacao local usado em `admin` e `cliente`, com login por senha, primeiro acesso com troca obrigatoria, sessao em `sessoes_ativas` e logout;
+- `web/frontend-astro/src/middleware.ts` e `src/env.d.ts` passaram a carregar `reviewerSession` e `reviewerPasswordResetSession`, protegendo `/revisao/*` no Astro com a mesma disciplina de sessao dos outros portais;
+- `web/app/domains/revisor/panel.py` ganhou `GET /revisao/api/painel/snapshot`, expondo para o Astro a projection canonica da fila da mesa sem depender de template HTML legado;
+- entrou `web/frontend-astro/src/lib/server/reviewer-panel-bridge.ts` para consumir o snapshot via bearer da sessao oficial do revisor;
+- `web/frontend-astro/src/pages/revisao/login.astro`, `login/entrar.ts`, `trocar-senha.astro`, `trocar-senha/salvar.ts`, `logout.ts` e `index.ts` fecharam a porta de entrada real do portal revisor na stack nova;
+- foi criada `web/frontend-astro/src/layouts/reviewer-shell-layout.astro` e entrou `web/frontend-astro/src/pages/revisao/painel.astro`, abrindo a primeira superficie oficial da mesa avaliadora no Astro com cards de fila, whispers pendentes, filtros e listas de casos por secao.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/app/domains/revisor/panel.py`
+- `web/frontend-astro/src/env.d.ts`
+- `web/frontend-astro/src/layouts/reviewer-shell-layout.astro`
+- `web/frontend-astro/src/lib/server/reviewer-auth.ts`
+- `web/frontend-astro/src/lib/server/reviewer-panel-bridge.ts`
+- `web/frontend-astro/src/middleware.ts`
+- `web/frontend-astro/src/pages/revisao/index.ts`
+- `web/frontend-astro/src/pages/revisao/login.astro`
+- `web/frontend-astro/src/pages/revisao/login/entrar.ts`
+- `web/frontend-astro/src/pages/revisao/logout.ts`
+- `web/frontend-astro/src/pages/revisao/painel.astro`
+- `web/frontend-astro/src/pages/revisao/trocar-senha.astro`
+- `web/frontend-astro/src/pages/revisao/trocar-senha/salvar.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `python3 -m py_compile web/app/domains/revisor/panel.py`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `py_compile`: concluido sem erros
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Validacao complementar:
+
+- `python3 -m pytest tests/test_v2_review_queue_projection.py -q` foi iniciado e exibiu progresso sem falha imediata, mas nao devolveu sumario final em tempo util desta rodada; o pacote foi mantido com base nos checks de frontend, no `py_compile` e no fato de a projection canonica ja possuir cobertura dedicada no repo.
+
+Proximo passo imediato:
+
+- abrir a thread detalhada de `/revisao` no Astro reaproveitando o mesmo token do revisor e os endpoints canonicos de mesa ja existentes em `web/app/domains/revisor/mesa_api.py`;
+- depois ligar resposta, pendencias, exportacao de pacote e emissao oficial em slices separados para manter a vertical deployavel;
+- manter `Inspetor` fora da frente principal ate `revisao` ganhar leitura detalhada e mutacoes principais com ownership claro.
