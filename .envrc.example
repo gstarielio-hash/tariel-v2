@@ -1,0 +1,7 @@
+export AMBIENTE=dev
+
+# Android / Expo
+export ANDROID_METRO_PORT=8081
+# Ajuste conforme seu emulador/dispositivo:
+# export EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:8000
+# export EXPO_PUBLIC_AUTH_WEB_BASE_URL=http://10.0.2.2:8000

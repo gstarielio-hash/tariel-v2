@@ -1,0 +1,1034 @@
+{
+  "family_key": "nr13_inspecao_caldeira",
+  "nome_exibicao": "NR13 - Inspecao de Caldeira",
+  "macro_categoria": "NR13",
+  "descricao": "Familia tecnica para inspecao de caldeiras, com foco em identificacao do equipamento, condicoes visuais aparentes, dispositivos de seguranca, painel e comandos, entorno de instalacao, registros disponiveis e conclusao tecnica estruturada para revisao da Mesa.",
+  "schema_version": 1,
+  "scope": {
+    "family_lock": true,
+    "allowed_nrs": [
+      "nr13"
+    ],
+    "allowed_contexts": [
+      "inspecao_tecnica_de_caldeira_em_operacao",
+      "inspecao_tecnica_de_caldeira_em_parada",
+      "avaliacao_de_componentes_diretamente_associados_a_caldeira"
+    ],
+    "scope_signals": [
+      "equipamento_principal_identificado_como_caldeira",
+      "coleta_de_dados_identificadores_da_caldeira",
+      "coleta_de_evidencias_visuais_da_caldeira_e_componentes_associados",
+      "avaliacao_visual_de_dispositivos_de_seguranca_painel_e_comandos_associados",
+      "registro_de_condicoes_aparentes_do_entorno_e_dos_registros_disponiveis_no_local"
+    ],
+    "out_of_scope_examples": [
+      "vaso_de_pressao_como_caso_principal",
+      "tubulacao_como_caso_principal",
+      "spda",
+      "nr10_rti",
+      "linha_de_vida_nr35",
+      "maquinas_nr12",
+      "laudo_civil_geral",
+      "avcb",
+      "inspecao_que_exija_troca_silenciosa_da_familia_principal"
+    ],
+    "review_required": [
+      "quando_o_ativo_principal_nao_estiver_claro_entre_caldeira_vaso_de_pressao_ou_tubulacao",
+      "quando_houver_escopo_misto_com_outros_temas_tecnicos_que_possam_induzir_troca_de_familia",
+      "quando_o_caso_indicar_troca_silenciosa_da_familia_principal"
+    ]
+  },
+  "evidence_policy": {
+    "minimum_evidence": {
+      "fotos": 5,
+      "documentos": 0,
+      "textos": 1
+    },
+    "required_slots": [
+      {
+        "slot_id": "placa_identificacao",
+        "label": "Placa de identificacao",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "identificacao.placa_identificacao",
+        "purpose": "Vincular evidencia da identificacao da caldeira por placa ou documento equivalente disponivel."
+      },
+      {
+        "slot_id": "vista_geral_caldeira",
+        "label": "Vista geral da caldeira",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "caracterizacao_do_equipamento.vista_geral_caldeira",
+        "purpose": "Registrar a vista geral da caldeira e sua implantacao imediata."
+      },
+      {
+        "slot_id": "dispositivos_de_seguranca",
+        "label": "Dispositivos de seguranca",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "dispositivos_e_controles.dispositivos_de_seguranca",
+        "purpose": "Registrar visualmente pelo menos um dispositivo de seguranca associado."
+      },
+      {
+        "slot_id": "painel_e_comandos",
+        "label": "Painel e comandos",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "dispositivos_e_controles.painel_e_comandos",
+        "purpose": "Registrar o painel, comandos ou frente operacional visivel da caldeira."
+      },
+      {
+        "slot_id": "condicao_geral",
+        "label": "Condicao geral",
+        "accepted_types": [
+          "texto",
+          "foto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "inspecao_visual.condicao_geral",
+        "purpose": "Registrar a leitura da condicao geral por texto e ou evidencia visual."
+      },
+      {
+        "slot_id": "conclusao_inspecao",
+        "label": "Conclusao da inspecao",
+        "accepted_types": [
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "conclusao.conclusao_tecnica",
+        "purpose": "Registrar a conclusao tecnica estruturada para revisao."
+      }
+    ],
+    "optional_slots": [
+      {
+        "slot_id": "manometro",
+        "label": "Manometro",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "dispositivos_e_controles.manometro",
+        "purpose": "Registrar o manometro quando existente."
+      },
+      {
+        "slot_id": "indicador_nivel",
+        "label": "Indicador de nivel",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "dispositivos_e_controles.indicador_nivel",
+        "purpose": "Registrar o indicador de nivel quando existente."
+      },
+      {
+        "slot_id": "queimador_ou_sistema_termico",
+        "label": "Queimador ou sistema termico",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "dispositivos_e_controles.queimador_ou_sistema_termico",
+        "purpose": "Registrar o queimador, frente de combustao ou sistema termico aparente quando aplicavel."
+      },
+      {
+        "slot_id": "area_instalacao",
+        "label": "Area de instalacao",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "inspecao_visual.area_instalacao",
+        "purpose": "Registrar a area de instalacao e entorno imediato quando util."
+      },
+      {
+        "slot_id": "pontos_de_vazamento_ou_fuligem",
+        "label": "Pontos de vazamento ou fuligem",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "inspecao_visual.pontos_de_vazamento_ou_fuligem",
+        "purpose": "Registrar sinais aparentes de vazamento, fuligem ou marcas termicas quando observados."
+      },
+      {
+        "slot_id": "chamine_ou_exaustao",
+        "label": "Chamine ou exaustao",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "inspecao_visual.chamine_ou_exaustao",
+        "purpose": "Registrar a exaustao aparente, quando visivel e relevante."
+      },
+      {
+        "slot_id": "isolamento_termico",
+        "label": "Isolamento termico",
+        "accepted_types": [
+          "foto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "inspecao_visual.isolamento_termico",
+        "purpose": "Registrar o isolamento termico quando existente."
+      },
+      {
+        "slot_id": "prontuario",
+        "label": "Prontuario",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "documentacao_e_registros.prontuario",
+        "purpose": "Vincular prontuario quando disponivel."
+      },
+      {
+        "slot_id": "certificado",
+        "label": "Certificado",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "documentacao_e_registros.certificado",
+        "purpose": "Vincular certificado quando disponivel."
+      },
+      {
+        "slot_id": "relatorio_anterior",
+        "label": "Relatorio anterior",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "documentacao_e_registros.relatorio_anterior",
+        "purpose": "Vincular relatorio anterior quando disponivel."
+      },
+      {
+        "slot_id": "tag_patrimonial",
+        "label": "Tag patrimonial",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "identificacao.tag_patrimonial",
+        "purpose": "Registrar tag patrimonial quando existente."
+      }
+    ],
+    "checklist_groups": [
+      {
+        "group_id": "identificacao_da_caldeira",
+        "title": "Identificacao da caldeira",
+        "required": true,
+        "items": [
+          {
+            "item_id": "identificacao_da_caldeira_presente",
+            "label": "Identificacao minima da caldeira registrada",
+            "critical": true
+          },
+          {
+            "item_id": "localizacao_registrada",
+            "label": "Localizacao registrada",
+            "critical": true
+          },
+          {
+            "item_id": "placa_ou_identificador_vinculado",
+            "label": "Placa ou identificador vinculado a evidencia",
+            "critical": true
+          },
+          {
+            "item_id": "tag_patrimonial_registrada_quando_existente",
+            "label": "Tag patrimonial registrada quando existente",
+            "critical": false
+          }
+        ]
+      },
+      {
+        "group_id": "condicao_fisica_aparente",
+        "title": "Condicao fisica aparente",
+        "required": true,
+        "items": [
+          {
+            "item_id": "condicao_geral_registrada",
+            "label": "Condicao geral registrada",
+            "critical": true
+          },
+          {
+            "item_id": "integridade_aparente_registrada",
+            "label": "Integridade aparente registrada",
+            "critical": false
+          },
+          {
+            "item_id": "pontos_de_vazamento_ou_fuligem_registrados_quando_existentes",
+            "label": "Pontos de vazamento ou fuligem registrados quando existentes",
+            "critical": false
+          },
+          {
+            "item_id": "isolamento_termico_registrado_quando_existente",
+            "label": "Isolamento termico registrado quando existente",
+            "critical": false
+          }
+        ]
+      },
+      {
+        "group_id": "dispositivos_e_controles",
+        "title": "Dispositivos e controles",
+        "required": true,
+        "items": [
+          {
+            "item_id": "dispositivos_de_seguranca_registrados",
+            "label": "Dispositivos de seguranca registrados",
+            "critical": true
+          },
+          {
+            "item_id": "painel_e_comandos_registrados",
+            "label": "Painel e comandos registrados",
+            "critical": true
+          },
+          {
+            "item_id": "leitura_dos_dispositivos_registrada",
+            "label": "Leitura dos dispositivos e comandos registrada",
+            "critical": true
+          },
+          {
+            "item_id": "manometro_registrado_quando_existente",
+            "label": "Manometro registrado quando existente",
+            "critical": false
+          },
+          {
+            "item_id": "indicador_nivel_registrado_quando_existente",
+            "label": "Indicador de nivel registrado quando existente",
+            "critical": false
+          }
+        ]
+      },
+      {
+        "group_id": "instalacao_e_entorno",
+        "title": "Instalacao e entorno",
+        "required": true,
+        "items": [
+          {
+            "item_id": "area_de_instalacao_registrada",
+            "label": "Area de instalacao registrada",
+            "critical": false
+          },
+          {
+            "item_id": "acessibilidade_para_inspecao_registrada",
+            "label": "Acessibilidade para inspecao registrada",
+            "critical": false
+          },
+          {
+            "item_id": "chamine_ou_exaustao_registrada_quando_visivel",
+            "label": "Chamine ou exaustao registrada quando visivel",
+            "critical": false
+          }
+        ]
+      },
+      {
+        "group_id": "documentacao_disponivel",
+        "title": "Documentacao disponivel",
+        "required": true,
+        "items": [
+          {
+            "item_id": "disponibilidade_de_prontuario_registrada",
+            "label": "Disponibilidade de prontuario registrada",
+            "critical": false
+          },
+          {
+            "item_id": "disponibilidade_de_certificado_registrada",
+            "label": "Disponibilidade de certificado registrada",
+            "critical": false
+          },
+          {
+            "item_id": "disponibilidade_de_relatorio_anterior_registrada",
+            "label": "Disponibilidade de relatorio anterior registrada",
+            "critical": false
+          },
+          {
+            "item_id": "registros_disponiveis_no_local_registrados",
+            "label": "Registros disponiveis no local registrados",
+            "critical": false
+          }
+        ]
+      },
+      {
+        "group_id": "conclusao_e_recomendacoes",
+        "title": "Conclusao e recomendacoes",
+        "required": true,
+        "items": [
+          {
+            "item_id": "conclusao_tecnica_registrada",
+            "label": "Conclusao tecnica registrada",
+            "critical": true
+          },
+          {
+            "item_id": "nao_conformidades_registradas_ou_ausencia_declarada",
+            "label": "Nao conformidades registradas ou ausencia declarada",
+            "critical": true
+          },
+          {
+            "item_id": "recomendacoes_registradas_quando_necessarias",
+            "label": "Recomendacoes registradas quando necessarias",
+            "critical": false
+          }
+        ]
+      }
+    ],
+    "review_required": [
+      "quando_houver_menos_de_cinco_fotos_totais_mesmo_com_slots_obrigatorios_preenchidos",
+      "quando_a_placa_identificacao_estiver_ilegivel_e_nao_houver_documento_equivalente",
+      "quando_houver_duvida_se_documentos_disponiveis_devem_ser_tratados_como_obrigatorios_no_caso"
+    ]
+  },
+  "review_policy": {
+    "requires_family_lock": true,
+    "block_on_scope_mismatch": true,
+    "block_on_missing_required_evidence": true,
+    "block_on_critical_field_absent": true,
+    "allow_override_with_reason": true,
+    "allowed_override_cases": [
+      "documentos_opcionais_nao_disponiveis_mas_ausencia_foi_registrada",
+      "limitacao_de_acesso_a_item_nao_critico_com_justificativa_sem_impacto_nos_campos_criticos",
+      "evidencia_opcional_substituida_por_registro_textual_justificado_sem_perda_da_rastreabilidade"
+    ],
+    "blocking_conditions": [
+      "escopo_principal_diferente_de_caldeira",
+      "troca_silenciosa_da_familia_principal",
+      "ausencia_de_identificacao_da_caldeira",
+      "ausencia_de_localizacao",
+      "ausencia_de_slot_obrigatorio",
+      "quantidade_total_de_fotos_abaixo_do_minimo",
+      "quantidade_total_de_textos_abaixo_do_minimo",
+      "ausencia_de_registro_da_condicao_geral",
+      "ausencia_de_leitura_ou_evidencia_dos_dispositivos_de_seguranca",
+      "ausencia_de_registro_visual_de_painel_ou_comandos",
+      "ausencia_de_conclusao_tecnica"
+    ],
+    "non_blocking_conditions": [
+      "documentos_opcionais_nao_disponiveis_no_local",
+      "tag_patrimonial_nao_localizada",
+      "ausencia_de_evidencia_opcional_de_item_nao_critico",
+      "qualidade_parcial_de_evidencia_opcional_sem_impacto_na_conclusao"
+    ],
+    "preferred_pendencia_types": [
+      "solicitar_foto",
+      "solicitar_documento",
+      "pedir_confirmacao",
+      "apontar_inconsistencia",
+      "corrigir_familia",
+      "evidencia_insuficiente",
+      "campo_critico_ausente",
+      "revisao_conclusao",
+      "aprovacao_com_ressalva"
+    ],
+    "review_required": [
+      "qualquer_pedido_de_override_deve_ser_justificado_e_revisado_pela_mesa",
+      "casos_com_inconsistencia_entre_evidencia_visual_e_registro_textual_devem_ir_para_revisao",
+      "casos_com_duvida_de_enquadramento_familiar_devem_ser_bloqueados_para_revisao"
+    ]
+  },
+  "document_blueprint": {
+    "opening_statement": "Template governado para inspecao de caldeira, estruturado para integridade aparente, dispositivos de seguranca, registros tecnicos e conclusao auditavel.",
+    "section_order": [
+      "controle_documental_sumario",
+      "resumo_executivo",
+      "objeto_escopo_base_normativa",
+      "identificacao_tecnica_do_objeto",
+      "metodologia_instrumentos_equipe",
+      "checklist_tecnico",
+      "evidencias_registros_fotograficos",
+      "nao_conformidades_criticidade",
+      "conclusao",
+      "assinaturas_responsabilidade_tecnica"
+    ],
+    "signature_roles": [
+      {
+        "role": "Responsavel tecnico",
+        "name_paths": [
+          "tokens.engenheiro_responsavel",
+          "tenant_branding.contact_name"
+        ],
+        "detail_paths": [
+          "tokens.crea_art"
+        ],
+        "date_paths": [
+          "case_context.data_emissao",
+          "document_control.issue_date"
+        ]
+      },
+      {
+        "role": "Representante da operacao",
+        "name_paths": [
+          "tenant_branding.contact_name",
+          "tokens.cliente_responsavel"
+        ],
+        "detail_paths": [
+          "tenant_branding.display_name",
+          "tenant_branding.cnpj"
+        ],
+        "date_paths": [
+          "case_context.data_emissao"
+        ]
+      }
+    ],
+    "blank_row_targets": {
+      "checklist": 7,
+      "evidence": 6,
+      "findings": 4
+    },
+    "section_intros": {
+      "checklist_tecnico": "Quadro-base para corpo principal, queimador, painel, valvulas, manometros e demais dispositivos da caldeira."
+    },
+    "field_semantics": {
+      "checklist_componentes": "instance_fill",
+      "documentacao_e_registros": "instance_fill"
+    }
+  },
+  "output_schema_seed": {
+    "sections": [
+      {
+        "section_id": "identificacao",
+        "title": "Identificacao",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "identificacao_da_caldeira",
+            "label": "Identificacao da caldeira",
+            "type": "text",
+            "required": true,
+            "critical": true,
+            "binding_path": "identificacao.identificacao_da_caldeira",
+            "source_hint": "Placa de identificacao, documento equivalente ou registro textual do inspetor."
+          },
+          {
+            "field_id": "localizacao",
+            "label": "Localizacao",
+            "type": "text",
+            "required": true,
+            "critical": true,
+            "binding_path": "identificacao.localizacao",
+            "source_hint": "Registro textual do inspetor."
+          },
+          {
+            "field_id": "placa_identificacao_ref",
+            "label": "Referencia da placa de identificacao",
+            "type": "document_ref",
+            "required": false,
+            "critical": false,
+            "binding_path": "identificacao.placa_identificacao",
+            "source_hint": "Slot placa_identificacao com foto ou documento."
+          },
+          {
+            "field_id": "tag_patrimonial",
+            "label": "Tag patrimonial",
+            "type": "text",
+            "required": false,
+            "critical": false,
+            "binding_path": "identificacao.tag_patrimonial",
+            "source_hint": "Slot tag_patrimonial quando existente."
+          }
+        ]
+      },
+      {
+        "section_id": "caracterizacao_do_equipamento",
+        "title": "Caracterizacao do equipamento",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "vista_geral_caldeira",
+            "label": "Vista geral da caldeira",
+            "type": "image_slot",
+            "required": true,
+            "critical": false,
+            "binding_path": "caracterizacao_do_equipamento.vista_geral_caldeira",
+            "source_hint": "Slot vista_geral_caldeira."
+          },
+          {
+            "field_id": "descricao_sumaria_do_equipamento",
+            "label": "Descricao sumaria do equipamento",
+            "type": "textarea",
+            "required": false,
+            "critical": false,
+            "binding_path": "caracterizacao_do_equipamento.descricao_sumaria",
+            "source_hint": "Registro textual do inspetor sobre o equipamento observado."
+          },
+          {
+            "field_id": "condicao_de_operacao_no_momento",
+            "label": "Condicao de operacao no momento",
+            "type": "enum",
+            "required": false,
+            "critical": false,
+            "binding_path": "caracterizacao_do_equipamento.condicao_de_operacao_no_momento",
+            "source_hint": "Registro textual do inspetor indicando se a caldeira estava em operacao ou parada."
+          }
+        ]
+      },
+      {
+        "section_id": "inspecao_visual",
+        "title": "Inspecao visual",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "condicao_geral",
+            "label": "Condicao geral",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "inspecao_visual.condicao_geral",
+            "source_hint": "Slot condicao_geral e registro textual do inspetor."
+          },
+          {
+            "field_id": "integridade_aparente",
+            "label": "Integridade aparente",
+            "type": "textarea",
+            "required": false,
+            "critical": false,
+            "binding_path": "inspecao_visual.integridade_aparente",
+            "source_hint": "Registro textual do inspetor sem detalhamento normativo fino."
+          },
+          {
+            "field_id": "area_instalacao",
+            "label": "Area de instalacao",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "inspecao_visual.area_instalacao",
+            "source_hint": "Slot area_instalacao quando disponivel."
+          },
+          {
+            "field_id": "acessibilidade_para_inspecao",
+            "label": "Acessibilidade para inspecao",
+            "type": "textarea",
+            "required": false,
+            "critical": false,
+            "binding_path": "inspecao_visual.acessibilidade_para_inspecao",
+            "source_hint": "Registro textual do inspetor sobre acessos observados."
+          },
+          {
+            "field_id": "pontos_de_vazamento_ou_fuligem",
+            "label": "Pontos de vazamento ou fuligem",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "inspecao_visual.pontos_de_vazamento_ou_fuligem",
+            "source_hint": "Slot pontos_de_vazamento_ou_fuligem quando aplicavel."
+          },
+          {
+            "field_id": "isolamento_termico",
+            "label": "Isolamento termico",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "inspecao_visual.isolamento_termico",
+            "source_hint": "Slot isolamento_termico quando existente."
+          },
+          {
+            "field_id": "chamine_ou_exaustao",
+            "label": "Chamine ou exaustao",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "inspecao_visual.chamine_ou_exaustao",
+            "source_hint": "Slot chamine_ou_exaustao quando visivel."
+          }
+        ]
+      },
+      {
+        "section_id": "dispositivos_e_controles",
+        "title": "Dispositivos e controles",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "dispositivos_de_seguranca",
+            "label": "Dispositivos de seguranca",
+            "type": "image_slot",
+            "required": true,
+            "critical": true,
+            "binding_path": "dispositivos_e_controles.dispositivos_de_seguranca",
+            "source_hint": "Slot dispositivos_de_seguranca."
+          },
+          {
+            "field_id": "leitura_dos_dispositivos_de_seguranca",
+            "label": "Leitura dos dispositivos de seguranca",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "dispositivos_e_controles.leitura_dos_dispositivos_de_seguranca",
+            "source_hint": "Registro textual do inspetor apoiado pelas evidencias do slot dispositivos_de_seguranca."
+          },
+          {
+            "field_id": "painel_e_comandos",
+            "label": "Painel e comandos",
+            "type": "image_slot",
+            "required": true,
+            "critical": true,
+            "binding_path": "dispositivos_e_controles.painel_e_comandos",
+            "source_hint": "Slot painel_e_comandos."
+          },
+          {
+            "field_id": "leitura_dos_comandos_e_indicadores",
+            "label": "Leitura dos comandos e indicadores",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "dispositivos_e_controles.leitura_dos_comandos_e_indicadores",
+            "source_hint": "Registro textual do inspetor associado ao painel e comandos observados."
+          },
+          {
+            "field_id": "manometro",
+            "label": "Manometro",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "dispositivos_e_controles.manometro",
+            "source_hint": "Slot manometro quando existente."
+          },
+          {
+            "field_id": "indicador_nivel",
+            "label": "Indicador de nivel",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "dispositivos_e_controles.indicador_nivel",
+            "source_hint": "Slot indicador_nivel quando existente."
+          },
+          {
+            "field_id": "queimador_ou_sistema_termico",
+            "label": "Queimador ou sistema termico",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "dispositivos_e_controles.queimador_ou_sistema_termico",
+            "source_hint": "Slot queimador_ou_sistema_termico quando aplicavel."
+          }
+        ]
+      },
+      {
+        "section_id": "documentacao_e_registros",
+        "title": "Documentacao e registros",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "registros_disponiveis_no_local",
+            "label": "Registros disponiveis no local",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "documentacao_e_registros.registros_disponiveis_no_local",
+            "source_hint": "Registro textual do inspetor, incluindo ausencia quando nada estiver disponivel."
+          },
+          {
+            "field_id": "prontuario_ref",
+            "label": "Referencia de prontuario",
+            "type": "document_ref",
+            "required": false,
+            "critical": false,
+            "binding_path": "documentacao_e_registros.prontuario",
+            "source_hint": "Slot prontuario quando disponivel."
+          },
+          {
+            "field_id": "certificado_ref",
+            "label": "Referencia de certificado",
+            "type": "document_ref",
+            "required": false,
+            "critical": false,
+            "binding_path": "documentacao_e_registros.certificado",
+            "source_hint": "Slot certificado quando disponivel."
+          },
+          {
+            "field_id": "relatorio_anterior_ref",
+            "label": "Referencia de relatorio anterior",
+            "type": "document_ref",
+            "required": false,
+            "critical": false,
+            "binding_path": "documentacao_e_registros.relatorio_anterior",
+            "source_hint": "Slot relatorio_anterior quando disponivel."
+          }
+        ]
+      },
+      {
+        "section_id": "nao_conformidades",
+        "title": "Nao conformidades",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "ha_nao_conformidades",
+            "label": "Ha nao conformidades",
+            "type": "boolean",
+            "required": true,
+            "critical": false,
+            "binding_path": "nao_conformidades.ha_nao_conformidades",
+            "source_hint": "Registro do inspetor com base na inspecao visual."
+          },
+          {
+            "field_id": "descricao_das_nao_conformidades",
+            "label": "Descricao das nao conformidades",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "nao_conformidades.descricao",
+            "source_hint": "Descrever as nao conformidades observadas ou declarar explicitamente sua ausencia."
+          },
+          {
+            "field_id": "evidencias_relacionadas",
+            "label": "Evidencias relacionadas",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "nao_conformidades.evidencias",
+            "source_hint": "Vincular fotos de fuligem, vazamentos ou outras evidencias relacionadas quando houver."
+          }
+        ]
+      },
+      {
+        "section_id": "recomendacoes",
+        "title": "Recomendacoes",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "recomendacoes",
+            "label": "Recomendacoes",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "recomendacoes.texto",
+            "source_hint": "Registrar recomendacoes, ressalvas ou informar quando nao houver recomendacoes adicionais."
+          }
+        ]
+      },
+      {
+        "section_id": "conclusao",
+        "title": "Conclusao",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "status",
+            "label": "Status",
+            "type": "enum",
+            "required": true,
+            "critical": false,
+            "binding_path": "conclusao.status",
+            "source_hint": "Selecionar status conforme modelo de conclusao da familia."
+          },
+          {
+            "field_id": "conclusao_tecnica",
+            "label": "Conclusao tecnica",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "conclusao.conclusao_tecnica",
+            "source_hint": "Slot conclusao_inspecao."
+          },
+          {
+            "field_id": "justificativa_da_conclusao",
+            "label": "Justificativa da conclusao",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "conclusao.justificativa",
+            "source_hint": "Sintese baseada em identificacao minima, evidencias obrigatorias, condicao geral, dispositivos de seguranca, painel e nao conformidades."
+          }
+        ]
+      }
+    ],
+    "conclusion_model": {
+      "required_inputs": [
+        "identificacao.identificacao_da_caldeira",
+        "identificacao.localizacao",
+        "identificacao.placa_identificacao",
+        "caracterizacao_do_equipamento.vista_geral_caldeira",
+        "inspecao_visual.condicao_geral",
+        "dispositivos_e_controles.dispositivos_de_seguranca",
+        "dispositivos_e_controles.painel_e_comandos",
+        "dispositivos_e_controles.leitura_dos_comandos_e_indicadores",
+        "nao_conformidades.descricao",
+        "minimum_evidence_complete"
+      ],
+      "status_options": [
+        "conforme",
+        "nao_conforme",
+        "ajuste",
+        "pendente"
+      ],
+      "notes": "A conclusao deve depender da identificacao minima, da completude das evidencias obrigatorias, da leitura da condicao geral, da leitura dos dispositivos de seguranca, do painel e comandos e do registro objetivo das nao conformidades ou da ausencia delas. Sem esses insumos, usar status pendente."
+    },
+    "review_required": [
+      "confirmar_no_template_final_se_placa_identificacao_aceita_referencia_hibrida_de_foto_ou_documento",
+      "validar_os_bindings_definitivos_entre_slots_de_evidencia_e_campos_do_template_da_mesa",
+      "confirmar_se_ha_enums_fechados_para_condicao_de_operacao_no_momento_e_status_da_conclusao",
+      "confirmar_se_ha_necessidade_de_slot_dedicado_para_registro_operacional_da_sala_de_caldeiras"
+    ]
+  },
+  "template_binding_hints": {
+    "preferred_template_codes": [
+      "nr13_caldeira",
+      "nr13_inspecao_caldeira"
+    ],
+    "suggested_binding_paths": [
+      "identificacao.identificacao_da_caldeira",
+      "identificacao.localizacao",
+      "identificacao.placa_identificacao",
+      "identificacao.tag_patrimonial",
+      "caracterizacao_do_equipamento.vista_geral_caldeira",
+      "caracterizacao_do_equipamento.condicao_de_operacao_no_momento",
+      "inspecao_visual.condicao_geral",
+      "inspecao_visual.acessibilidade_para_inspecao",
+      "inspecao_visual.pontos_de_vazamento_ou_fuligem",
+      "inspecao_visual.isolamento_termico",
+      "inspecao_visual.chamine_ou_exaustao",
+      "dispositivos_e_controles.dispositivos_de_seguranca",
+      "dispositivos_e_controles.leitura_dos_dispositivos_de_seguranca",
+      "dispositivos_e_controles.painel_e_comandos",
+      "dispositivos_e_controles.leitura_dos_comandos_e_indicadores",
+      "dispositivos_e_controles.manometro",
+      "dispositivos_e_controles.indicador_nivel",
+      "dispositivos_e_controles.queimador_ou_sistema_termico",
+      "documentacao_e_registros.prontuario",
+      "documentacao_e_registros.certificado",
+      "documentacao_e_registros.relatorio_anterior",
+      "documentacao_e_registros.registros_disponiveis_no_local",
+      "nao_conformidades.ha_nao_conformidades",
+      "nao_conformidades.descricao",
+      "recomendacoes.texto",
+      "conclusao.status",
+      "conclusao.conclusao_tecnica"
+    ],
+    "expected_image_slots": [
+      "placa_identificacao",
+      "vista_geral_caldeira",
+      "dispositivos_de_seguranca",
+      "painel_e_comandos",
+      "manometro",
+      "indicador_nivel",
+      "queimador_ou_sistema_termico",
+      "area_instalacao",
+      "pontos_de_vazamento_ou_fuligem",
+      "chamine_ou_exaustao",
+      "isolamento_termico",
+      "tag_patrimonial"
+    ]
+  },
+  "notes": {
+    "assumptions": [
+      "A familia cobre apenas caldeira como ativo principal e componentes diretamente associados.",
+      "Documentos sao coletados e vinculados quando estiverem disponiveis no local, sem presumir obrigatoriedade normativa por tipo documental.",
+      "Checklist, campos e conclusao foram mantidos em nivel declarativo e visual, sem detalhamento normativo fino."
+    ],
+    "open_questions": [
+      "Quando houver prontuario, certificado, relatorio anterior ou registro operacional disponivel, a ausencia de algum deles deve gerar apenas apontamento ou tambem bloqueio adicional? O briefing de familia nao fixa obrigatoriedade por tipo documental.",
+      "O template final da Mesa possui suporte nativo para um unico campo de evidencia hibrida que aceite foto ou documento para placa_identificacao?",
+      "Deve existir slot especifico para registro_operacional_da_sala_de_caldeiras, ou o registro textual em documentacao_e_registros e suficiente para esta familia?"
+    ]
+  },
+  "normative_basis": {
+    "policy_version": 1,
+    "status": "official_basis_family_mapped",
+    "nr_code": "nr13",
+    "nr_title": "Caldeiras, Vasos de Pressao e Tubulacoes e Tanques Metalicos de Armazenamento",
+    "editorial_inference_notice": "A norma oficial define os requisitos de referencia; headings, ordem, linguagem editorial e acabamento visual do template sao decisoes de produto da Tariel.",
+    "implementation_note": "Retrofit oficial aplicado para inspecao de caldeira, com anchors granulares da NR-13 para identificacao, dispositivos obrigatorios, documentacao, operacao, inspecao periodica e conclusao de integridade.",
+    "sources": [
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Normas Regulamentadoras - NR",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+        "used_for": "Ponto de entrada oficial do projeto para localizar textos vigentes, anexos e atualizacoes das NRs."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Caldeiras, Vasos de Pressao e Tubulacoes e Tanques Metalicos de Armazenamento",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-13.pdf",
+        "anchors": [
+          {
+            "item_ref": "13.1.1 / 13.2.1(a) / 13.3.2",
+            "used_for": "Fixar o escopo da familia em gestao de integridade estrutural de caldeiras e sob responsabilidade tecnica de PH."
+          },
+          {
+            "item_ref": "13.4.1.3 / 13.4.1.4 / 13.4.1.6 / 13.4.1.7 / 13.4.1.9 / 13.4.1.11",
+            "used_for": "Cobrir dispositivos obrigatorios, placa de identificacao, prontuario, registro de seguranca e reconstituicao documental da caldeira."
+          },
+          {
+            "item_ref": "13.4.2.1 / 13.4.2.3 / 13.4.3.1 / 13.4.3.2 / 13.4.3.4",
+            "used_for": "Amarrar instalacao, manual de operacao, calibracao de instrumentos e exigencia de operador de caldeira."
+          },
+          {
+            "item_ref": "13.4.4.1 / 13.4.4.2 / 13.4.4.3 / 13.4.4.8 / 13.4.4.9 / 13.4.4.12 / 13.4.4.14 / 13.4.4.16 / 13.4.4.17",
+            "used_for": "Estruturar inspecoes inicial, periodica e extraordinaria, teste hidrostatico, avaliacao de integridade e conteudo minimo do relatorio."
+          }
+        ],
+        "used_for": "Texto oficial vigente da NR-13 usado como base normativa primaria desta familia."
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "identification_and_required_devices",
+        "source_refs": [
+          "NR13 13.4.1.3",
+          "NR13 13.4.1.4"
+        ],
+        "maps_to": [
+          "identificacao.placa_identificacao",
+          "dispositivos_e_controles.dispositivos_de_seguranca",
+          "checklist_groups.identificacao_da_caldeira"
+        ],
+        "application_note": "A familia deve provar placa de identificacao e ao menos os dispositivos essenciais de seguranca previstos na NR-13."
+      },
+      {
+        "requirement_id": "prontuario_and_safety_records",
+        "source_refs": [
+          "NR13 13.4.1.6",
+          "NR13 13.4.1.7",
+          "NR13 13.4.1.9",
+          "NR13 13.4.1.11"
+        ],
+        "maps_to": [
+          "documentacao_e_registros.prontuario",
+          "documentacao_e_registros.relatorio_anterior",
+          "documentacao_e_registros.certificado",
+          "document_blueprint.documentacao_e_registros"
+        ],
+        "application_note": "Prontuario, relatorios, calibracoes e registro de seguranca precisam aparecer como base documental rastreavel ou como lacuna formalizada."
+      },
+      {
+        "requirement_id": "inspection_cycle_and_integrity_conclusion",
+        "source_refs": [
+          "NR13 13.4.4.1",
+          "NR13 13.4.4.3",
+          "NR13 13.4.4.8",
+          "NR13 13.4.4.16",
+          "NR13 13.4.4.17"
+        ],
+        "maps_to": [
+          "inspecao_visual.condicao_geral",
+          "conclusao.conclusao_tecnica",
+          "document_blueprint.checklist_tecnico",
+          "document_blueprint.conclusao"
+        ],
+        "application_note": "O parecer final deve conectar condicao visual, historico de testes/inspecoes e recomendacoes de integridade ate a proxima intervencao."
+      }
+    ]
+  }
+}

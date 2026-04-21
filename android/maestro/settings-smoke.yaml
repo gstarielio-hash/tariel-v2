@@ -1,0 +1,122 @@
+appId: com.tarielia.inspetor
+tags:
+  - smoke
+  - settings
+env:
+  LOGIN_EMAIL: ${MAESTRO_LOGIN_EMAIL}
+  LOGIN_PASSWORD: ${MAESTRO_LOGIN_PASSWORD}
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: login-email-input
+    timeout: 30000
+
+- tapOn:
+    id: login-email-input
+
+- inputText: ${LOGIN_EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-password-input
+
+- inputText: ${LOGIN_PASSWORD}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-submit-button
+
+- extendedWaitUntil:
+    visible:
+      id: open-settings-button
+    timeout: 20000
+
+- tapOn:
+    id: open-settings-button
+
+- assertVisible:
+    id: settings-drawer
+
+- assertVisible:
+    id: settings-overview-summary-card
+
+- assertVisible:
+    id: settings-overview-account-card
+
+- assertVisible:
+    id: settings-overview-plan-card
+
+- assertVisible:
+    id: settings-overview-experience-card
+
+- assertVisible:
+    id: settings-overview-security-card
+
+- tapOn:
+    id: settings-overview-experience-card
+
+- extendedWaitUntil:
+    visible:
+      id: settings-section-link-preferenciasIa
+    timeout: 10000
+
+- tapOn:
+    id: settings-section-link-preferenciasIa
+
+- extendedWaitUntil:
+    visible:
+      id: settings-ai-model-row
+    timeout: 10000
+
+- tapOn:
+    id: settings-ai-model-row
+
+- extendedWaitUntil:
+    visible:
+      id: settings-sheet-modal
+    timeout: 10000
+
+- assertVisible:
+    id: settings-ai-model-option-avancado
+
+- scrollUntilVisible:
+    element:
+      id: settings-ai-model-option-avancado
+    direction: DOWN
+    visibilityPercentage: 100
+    timeout: 10000
+
+- tapOn:
+    id: settings-ai-model-option-avancado
+
+- extendedWaitUntil:
+    visible:
+      id: settings-ai-model-row
+    timeout: 10000
+
+- tapOn:
+    id: settings-drawer-back-button
+
+- extendedWaitUntil:
+    visible:
+      id: settings-section-link-preferenciasIa
+    timeout: 10000
+
+- tapOn:
+    id: settings-drawer-back-button
+
+- extendedWaitUntil:
+    visible:
+      id: settings-overview-summary-card
+    timeout: 10000
+
+- tapOn:
+    id: close-settings-drawer-button
+
+- assertVisible:
+    id: free-chat-start-button

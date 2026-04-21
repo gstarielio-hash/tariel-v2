@@ -1,0 +1,355 @@
+{
+  "family_key": "nr10_inspecao_spda",
+  "nome_exibicao": "NR10 - Inspecao de SPDA",
+  "macro_categoria": "NR10",
+  "descricao": "Inspecao tecnica de sistema de protecao contra descargas atmosfericas com evidencias de captacao, descidas, aterramento e conclusao auditavel.",
+  "schema_version": 1,
+  "scope": {
+    "family_lock": true,
+    "allowed_nrs": [
+      "nr10"
+    ],
+    "allowed_contexts": [
+      "nr10_inspecao_spda",
+      "spda",
+      "inspection",
+      "wave_1",
+      "nr10"
+    ],
+    "scope_signals": [
+      "captacao_registrada",
+      "descidas_registradas",
+      "aterramento_ou_equipotencializacao_registrados",
+      "conclusao_tecnica_formalizada"
+    ],
+    "out_of_scope_examples": [
+      "prontuario_eletrico_sem_spda",
+      "troca_silenciosa_para_rti",
+      "ausencia_de_rastreabilidade_do_sistema"
+    ],
+    "review_required": [
+      "quando_o_sistema_inspecionado_nao_estiver_claro",
+      "quando_nao_houver_registro_das_descidas_ou_do_aterramento",
+      "quando_as_medicoes_ou_testes_estiverem_inconclusivos"
+    ]
+  },
+  "evidence_policy": {
+    "minimum_evidence": {
+      "fotos": 4,
+      "documentos": 0,
+      "textos": 1
+    },
+    "required_slots": [
+      {
+        "slot_id": "referencia_principal",
+        "label": "Referencia principal",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "identificacao.referencia_principal",
+        "purpose": "Ancorar o sistema SPDA, a estrutura ou o ponto principal inspecionado."
+      },
+      {
+        "slot_id": "evidencia_execucao",
+        "label": "Evidencia de execucao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "execucao_servico.evidencia_execucao",
+        "purpose": "Registrar a execucao da vistoria e os pontos efetivamente avaliados."
+      },
+      {
+        "slot_id": "evidencia_principal",
+        "label": "Evidencia principal",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.evidencia_principal",
+        "purpose": "Consolidar a principal evidencia da condicao do SPDA."
+      },
+      {
+        "slot_id": "conclusao_servico",
+        "label": "Conclusao do servico",
+        "accepted_types": [
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "conclusao.conclusao_tecnica",
+        "purpose": "Registrar o status tecnico do sistema e as acoes recomendadas."
+      }
+    ],
+    "optional_slots": [
+      {
+        "slot_id": "evidencia_complementar",
+        "label": "Evidencia complementar",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.evidencia_complementar",
+        "purpose": "Complementar o caso com conexoes, barramentos, medicoes ou croquis."
+      },
+      {
+        "slot_id": "documento_base",
+        "label": "Documento base",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.documento_base",
+        "purpose": "Vincular relatorios anteriores, medicoes ou projeto do sistema quando disponiveis."
+      }
+    ],
+    "checklist_groups": [
+      {
+        "group_id": "identificacao_e_escopo",
+        "title": "Identificacao e escopo",
+        "required": true,
+        "items": [
+          {
+            "item_id": "objeto_registrado",
+            "label": "Sistema ou frente registrada",
+            "critical": true
+          },
+          {
+            "item_id": "localizacao_registrada",
+            "label": "Localizacao registrada",
+            "critical": true
+          },
+          {
+            "item_id": "escopo_registrado",
+            "label": "Escopo da vistoria registrado",
+            "critical": true
+          }
+        ]
+      },
+      {
+        "group_id": "subsistemas_spda",
+        "title": "Subsistemas do SPDA",
+        "required": true,
+        "items": [
+          {
+            "item_id": "captacao_registrada",
+            "label": "Captacao registrada",
+            "critical": true
+          },
+          {
+            "item_id": "descidas_registradas",
+            "label": "Descidas registradas",
+            "critical": true
+          },
+          {
+            "item_id": "aterramento_registrado",
+            "label": "Aterramento e equipotencializacao registrados",
+            "critical": true
+          }
+        ]
+      }
+    ],
+    "review_required": [
+      "quando_houver_incerteza_sobre_continuidade_do_sistema",
+      "quando_as_evidencias_da_captacao_ou_descidas_estiverem_insuficientes"
+    ]
+  },
+  "review_policy": {
+    "requires_family_lock": true,
+    "block_on_scope_mismatch": true,
+    "block_on_missing_required_evidence": true,
+    "block_on_critical_field_absent": true,
+    "allow_override_with_reason": true,
+    "allowed_override_cases": [
+      "documento_opcional_ausente_com_justificativa_registrada",
+      "evidencia_complementar_substituida_por_registro_textual_com_rastreabilidade",
+      "limitacao_controlada_sem_impacto_na_conclusao_critica"
+    ],
+    "blocking_conditions": [
+      "ausencia_de_registro_da_captacao",
+      "ausencia_de_registro_das_descidas",
+      "ausencia_de_conclusao_tecnica"
+    ]
+  },
+  "document_blueprint": {
+    "opening_statement": "Template governado para inspecao de SPDA com foco em captacao, descidas, aterramento/equipotencializacao, medicoes e relatorio tecnico rastreavel.",
+    "section_order": [
+      "controle_documental_sumario",
+      "resumo_executivo",
+      "objeto_escopo_base_normativa",
+      "identificacao_tecnica_do_objeto",
+      "metodologia_instrumentos_equipe",
+      "checklist_tecnico",
+      "evidencias_registros_fotograficos",
+      "nao_conformidades_criticidade",
+      "conclusao",
+      "assinaturas_responsabilidade_tecnica"
+    ],
+    "signature_roles": [
+      {
+        "role": "Responsavel tecnico",
+        "name_paths": [
+          "tokens.engenheiro_responsavel",
+          "tenant_branding.contact_name"
+        ],
+        "detail_paths": [
+          "tokens.crea_art"
+        ],
+        "date_paths": [
+          "case_context.data_emissao",
+          "document_control.issue_date"
+        ]
+      },
+      {
+        "role": "Representante da empresa",
+        "name_paths": [
+          "tenant_branding.contact_name",
+          "tokens.cliente_responsavel"
+        ],
+        "detail_paths": [
+          "tenant_branding.display_name",
+          "tenant_branding.cnpj"
+        ],
+        "date_paths": [
+          "case_context.data_emissao"
+        ]
+      }
+    ],
+    "section_intros": {
+      "identificacao_e_escopo": "Identifique a estrutura, o escopo e o contexto da vistoria.",
+      "sistema_spda": "Consolide captacao, descidas, aterramento, equipotencializacao e medicoes disponiveis.",
+      "evidencias_e_documentos": "Amarre fotos, registros complementares e documentos de apoio.",
+      "conclusao_e_assinaturas": "Feche restricoes, recomendacoes e responsabilidade tecnica.",
+      "checklist_tecnico": "Quadro-base para captacao, descidas, aterramento/equipotencializacao e medicoes ou testes que sustentam a leitura do SPDA."
+    },
+    "blank_row_targets": {
+      "checklist": 4,
+      "evidence": 5,
+      "findings": 4
+    },
+    "field_semantics": {
+      "checklist_componentes": "instance_fill",
+      "documentacao_e_registros": "instance_fill"
+    }
+  },
+  "compatible_runtime_templates": [
+    "spda"
+  ],
+  "compatible_template_codes": [
+    "nr10_inspecao_spda",
+    "spda"
+  ],
+  "normative_basis": {
+    "policy_version": 1,
+    "status": "official_basis_family_mapped",
+    "nr_code": "nr10",
+    "nr_title": "Seguranca em Instalacoes e Servicos em Eletricidade",
+    "editorial_inference_notice": "A NR10 exige documentos e inspecoes minimas; a composicao em checklist de captacao, descidas, aterramento e medicoes e decisao editorial da Tariel para tornar o laudo auditavel.",
+    "implementation_note": "Retrofit oficial aplicado para inspecao de SPDA, com anchors granulares da NR-10 e do manual oficial para prontuario, medicoes, aterramento, relatorio tecnico e rastreabilidade documental.",
+    "sources": [
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Normas Regulamentadoras - NR",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+        "used_for": "Ponto de entrada oficial do projeto para localizar textos vigentes, anexos e atualizacoes das NRs."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "NR 10 - Seguranca em Instalacoes e Servicos em Eletricidade",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-10.pdf",
+        "anchors": [
+          {
+            "item_ref": "10.2.3 / 10.2.4.b / 10.2.4.g",
+            "used_for": "Cobrir esquema unifilar, documentacao das inspecoes e medicoes do SPDA e aterramentos, e relatorio tecnico atualizado com recomendacoes e cronograma."
+          },
+          {
+            "item_ref": "10.2.6 / 10.2.7",
+            "used_for": "Amarrar a atualizacao permanente do prontuario e a responsabilidade tecnica pelos documentos e registros da instalacao."
+          },
+          {
+            "item_ref": "10.2.8.3",
+            "used_for": "Vincular a verificacao do aterramento aos criterios regulamentares e ao papel do aterramento funcional e de protecao."
+          },
+          {
+            "item_ref": "10.11.2 / 10.11.3",
+            "used_for": "Exigir procedimento e ordem de servico quando a inspecao envolver intervencoes, medicoes e acessos tecnicos na instalacao."
+          }
+        ],
+        "used_for": "Texto oficial vigente da NR-10 usado como base normativa primaria desta familia."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Manual de Auxilio na Interpretacao e Aplicacao da NR10",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/manual_de_auxilio_na_interpretacao_e_aplicacao_da_nr_10.pdf",
+        "anchors": [
+          {
+            "item_ref": "Comentarios 10.2.4",
+            "used_for": "Apoiar a leitura oficial do PIE como memoria dinamica da instalacao, incluindo o acervo de SPDA, aterramentos e relatorios tecnicos."
+          },
+          {
+            "item_ref": "Comentarios 10.2.8.3",
+            "used_for": "Apoiar a interpretacao oficial sobre aterramento e sua relacao com finalidades funcionais e de protecao como o SPDA."
+          }
+        ],
+        "used_for": "Fonte oficial interpretativa de apoio para detalhar a relacao entre prontuario, medicoes, aterramento e rastreabilidade do SPDA."
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "spda_measurements_and_records",
+        "source_refs": [
+          "NR10 10.2.4.b",
+          "NR10 10.2.4.g",
+          "NR10 10.2.6"
+        ],
+        "maps_to": [
+          "documentacao_e_registros",
+          "evidencias_e_anexos.documento_base",
+          "checklist_componentes.medicoes_ou_testes"
+        ],
+        "application_note": "A inspecao precisa reunir registros de medicao, relatorios atualizados e referencia clara ao acervo documental do SPDA e dos aterramentos."
+      },
+      {
+        "requirement_id": "grounding_and_protection_integrity",
+        "source_refs": [
+          "NR10 10.2.3",
+          "NR10 10.2.8.3",
+          "NR10 10.2.7"
+        ],
+        "maps_to": [
+          "checklist_componentes",
+          "execucao_servico.condicoes_observadas",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "O parecer final deve indicar se o arranjo de captacao, descidas, conexoes e aterramento observado esta coerente com a documentacao tecnica e com a finalidade de protecao."
+      },
+      {
+        "requirement_id": "technical_procedure_and_action_plan",
+        "source_refs": [
+          "NR10 10.11.2",
+          "NR10 10.11.3",
+          "NR10 10.2.4.g"
+        ],
+        "maps_to": [
+          "documentacao_e_registros.documentos_emitidos",
+          "recomendacoes.texto",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "Nao conformidades e intervencoes sugeridas devem sair com procedimento, responsabilidade tecnica e cronograma de adequacao documentado."
+      }
+    ]
+  }
+}

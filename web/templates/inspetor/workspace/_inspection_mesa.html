@@ -1,0 +1,117 @@
+<section id="workspace-mesa-stage" class="workspace-mesa-stage" aria-label="Mesa avaliadora">
+    <div class="workspace-channel-stage workspace-channel-stage--mesa">
+        <div class="workspace-channel-toolbar">
+            <div class="workspace-channel-toolbar__start">
+                <div class="workspace-channel-switch" role="tablist" aria-label="Canais da conversa">
+                    <button
+                        type="button"
+                        class="workspace-channel-tab"
+                        data-workspace-channel-tab="conversa"
+                        role="tab"
+                        aria-selected="false"
+                    >
+                        Assistente
+                    </button>
+                    <button
+                        type="button"
+                        class="workspace-channel-tab is-active"
+                        data-workspace-channel-tab="mesa"
+                        role="tab"
+                        aria-selected="true"
+                    >
+                        Mesa Avaliadora
+                    </button>
+                </div>
+                <a
+                    href="/app/?home=1"
+                    class="technical-record-back workspace-channel-back"
+                    data-action="go-home"
+                    data-home-destino="/app/?home=1"
+                    aria-label="Voltar para o Portal do Inspetor"
+                >
+                    <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                    <span>Portal</span>
+                </a>
+            </div>
+            <p class="workspace-channel-note">
+                Acompanhe o estado da revisão, o que ainda falta no caso e toda a conversa com a mesa no mesmo fluxo.
+            </p>
+        </div>
+
+        <div class="workspace-mesa-stage-shell">
+            <section class="workspace-mesa-overview" aria-label="Resumo da revisão">
+                <article class="workspace-mesa-overview-card workspace-mesa-overview-card--status">
+                    <span>Status da mesa</span>
+                    <strong id="workspace-mesa-stage-status">Canal disponível</strong>
+                    <p id="workspace-mesa-stage-summary">Abra o canal para alinhar dúvidas, pendências e evidências com a mesa.</p>
+                </article>
+                <article class="workspace-mesa-overview-card">
+                    <span>Pendências abertas</span>
+                    <strong id="workspace-mesa-stage-pendencias">0</strong>
+                    <p>Pontos que ainda precisam de retorno antes da conclusão.</p>
+                </article>
+                <article class="workspace-mesa-overview-card">
+                    <span>Evidências registradas</span>
+                    <strong id="workspace-mesa-stage-evidencias">0</strong>
+                    <p>Volume atual de material anexado ou consolidado no laudo.</p>
+                </article>
+                <article class="workspace-mesa-overview-card">
+                    <span>Retornos novos</span>
+                    <strong id="workspace-mesa-stage-unread">0</strong>
+                    <p>Mensagens ou retornos da mesa que ainda pedem leitura.</p>
+                </article>
+            </section>
+
+            <div class="workspace-mesa-content">
+                <div class="workspace-mesa-main">
+                    <section class="workspace-mesa-panel workspace-mesa-panel--focus" aria-label="Próximo passo da revisão">
+                        <div class="workspace-mesa-panel__head">
+                            <span class="workspace-mesa-panel__eyebrow">Próxima ação</span>
+                            <strong id="workspace-mesa-stage-next-step">Use o canal para alinhar dúvidas ou anexar novas evidências.</strong>
+                        </div>
+                        <p class="workspace-mesa-panel__description">
+                            A conversa abaixo reúne pedidos da mesa, respostas já enviadas e o histórico recente deste caso.
+                        </p>
+                    </section>
+
+                    <div id="workspace-mesa-widget-host" class="workspace-mesa-widget-host"></div>
+                </div>
+
+                <aside class="workspace-mesa-sidebar" aria-label="Contexto do caso">
+                    <section class="workspace-mesa-panel">
+                        <div class="workspace-mesa-panel__head">
+                            <span class="workspace-mesa-panel__eyebrow">Caso atual</span>
+                            <strong id="workspace-mesa-stage-equipment">Registro técnico</strong>
+                        </div>
+                        <dl class="workspace-mesa-facts">
+                            <div>
+                                <dt>Modelo</dt>
+                                <dd id="workspace-mesa-stage-template">Padrão</dd>
+                            </div>
+                            <div>
+                                <dt>Operação</dt>
+                                <dd id="workspace-mesa-stage-operation">Operação não identificada</dd>
+                            </div>
+                            <div>
+                                <dt>Último movimento</dt>
+                                <dd id="workspace-mesa-stage-last-movement">Sem atualização recente.</dd>
+                            </div>
+                        </dl>
+                    </section>
+
+                    <section class="workspace-mesa-panel">
+                        <div class="workspace-mesa-panel__head">
+                            <span class="workspace-mesa-panel__eyebrow">Leitura rápida</span>
+                            <strong>O que observar neste canal</strong>
+                        </div>
+                        <ul class="workspace-mesa-checklist">
+                            <li>Pedidos de ajuste ou evidência feitos pela mesa.</li>
+                            <li>Retornos novos que ainda não foram lidos.</li>
+                            <li>Próximo passo mais seguro antes de concluir o laudo.</li>
+                        </ul>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </div>
+</section>

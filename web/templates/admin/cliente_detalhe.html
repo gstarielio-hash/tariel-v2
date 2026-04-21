@@ -1,0 +1,232 @@
+{% from "admin/_help_macros.html" import help_icon %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <title>{{ empresa.nome_fantasia | e }} • Tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+
+    <link rel="stylesheet" href="/static/css/admin/admin_client_detail.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+
+<body class="admin-body">
+    {% set _status = status_admin or {} %}
+    {% set _saude = saude_admin or {} %}
+    {% set _seguranca = seguranca or {} %}
+    {% set _resumo = resumo_operacional or {} %}
+    {% set _plano_preview = plano_preview or {} %}
+    {% set _portfolio = portfolio_catalogo or {} %}
+    {% set _suporte_excepcional = suporte_excepcional or {} %}
+    {% set _policy = visibility_policy or {} %}
+    {% set _admin_cliente_policy = admin_cliente_policy or {} %}
+    {% set _primeiro_acesso = primeiro_acesso_empresa or {} %}
+    {% set _empresa_bloqueada = _status.get('value') == 'bloqueado' %}
+
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Navegação administrativa">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+
+                <a href="/admin/clientes" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+
+                <a href="/admin/catalogo-laudos" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+
+                <a href="/admin/novo-cliente" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <a href="/admin/clientes" class="voltar">
+                <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                Empresas assinantes
+            </a>
+
+            <header class="topbar topbar-detalhe">
+                <div class="titulo-pagina">
+                    <h1>{{ empresa.nome_fantasia | e }}</h1>
+                    <p>
+                        Empresa #{{ empresa.id | int }} • CNPJ {{ empresa.cnpj | e }}
+                        {% if empresa.criado_em %}
+                        • Cadastro {{ empresa.criado_em.strftime('%d/%m/%Y') }}
+                        {% endif %}
+                    </p>
+                </div>
+
+                <span class="badge status-empresa {{ _status.get('badge_class', 'info') | e }}"
+                    aria-label="Status: {{ _status.get('label', 'Sem status') | e }}">
+                    {{ _status.get("label", "Sem status") | e }}
+                </span>
+            </header>
+
+            {% for msg in mensagens_flash %}
+            {% set _tipo_alerta = 'success' if msg.tipo == 'success' else 'error' %}
+            <div class="alert alert-{{ _tipo_alerta }}" role="alert" aria-live="assertive">
+                <span class="material-symbols-rounded" aria-hidden="true">{{ 'check_circle' if _tipo_alerta == 'success' else 'error' }}</span>
+                {{ msg.texto | e }}
+                <button type="button" class="alert-fechar" aria-label="Fechar alerta">×</button>
+            </div>
+            {% endfor %}
+
+            <section class="info-grid" aria-label="Indicadores da empresa">
+                <div class="info-card">
+                    <div class="label">Status</div>
+                    <div class="valor">{{ _status.get("label", "—") | e }}</div>
+                    <div class="valor-auxiliar">
+                        {% if _status.get("motivo_bloqueio") %}
+                        {{ _status.get("motivo_bloqueio", "") | e }}
+                        {% else %}
+                        Sem bloqueio vigente
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="label">Saúde operacional</div>
+                    <div class="valor">{{ _saude.get("label", "—") | e }}</div>
+                    <div class="valor-auxiliar">{{ _saude.get("razao", "Sem diagnóstico") | e }}</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="label">Plano ativo</div>
+                    <div class="valor">{{ empresa.plano_ativo | e }}</div>
+                    <div class="valor-auxiliar">{{ _resumo.get("limite_laudos_label", "—") | e }} laudos/mês</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="label">Usuários gerenciáveis</div>
+                    <div class="valor">{{ _resumo.get("usuarios_total", 0) | int }}</div>
+                    <div class="valor-auxiliar">{{ _resumo.get("limite_usuarios_label", "—") | e }} no plano</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="label">Uso resumido</div>
+                    <div class="valor">{{ _resumo.get("uso_label", "—") | e }}</div>
+                    <div class="valor-auxiliar">{{ total_laudos | int }} laudos • R$ {{ "%.2f" | format(custo_total | float) }}</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="label">Segurança</div>
+                    <div class="valor">{{ _seguranca.get("total_sessoes_ativas", 0) | int }} sessões</div>
+                    <div class="valor-auxiliar">{{ _seguranca.get("ultimo_acesso_label", "Sem atividade") | e }}</div>
+                </div>
+            </section>
+
+            <div class="acoes-empresa">
+                <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/bloquear"
+                    class="js-company-block-form" data-empresa="{{ empresa.nome_fantasia | e }}"
+                    data-blocked="{{ 'true' if _empresa_bloqueada else 'false' }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="motivo" value="">
+                    <input type="hidden" name="confirmar_desbloqueio" value="{{ '1' if _empresa_bloqueada else '' }}">
+                    <button type="submit"
+                        class="btn-acao-tariel {{ 'btn-unblock' if _empresa_bloqueada else 'btn-block' }}"
+                        aria-label="{{ 'Desbloquear acesso da empresa' if _empresa_bloqueada else 'Bloquear acesso da empresa' }}">
+                        <span class="material-symbols-rounded" aria-hidden="true">
+                            {{ 'lock_open' if _empresa_bloqueada else 'block' }}
+                        </span>
+                        {{ 'Desbloquear empresa' if _empresa_bloqueada else 'Bloquear empresa' }}
+                    </button>
+                </form>
+
+                <button type="button" class="btn-acao-tariel btn-plano" id="btn-abrir-modal-plano"
+                    aria-haspopup="dialog" aria-controls="modal-plano" aria-expanded="false">
+                    <span class="material-symbols-rounded" aria-hidden="true">swap_horiz</span>
+                    Alterar plano
+                </button>
+
+                <a href="/admin/clientes/{{ empresa.id | int }}/diagnostico" class="btn-acao-tariel btn-plano">
+                    <span class="material-symbols-rounded" aria-hidden="true">download</span>
+                    Exportar diagnóstico
+                </a>
+            </div>
+
+            <div class="admin-tabs" role="tablist" aria-label="Seções administrativas da empresa">
+                <button type="button" class="admin-tab" id="tab-resumo" data-admin-tab-target="resumo" aria-selected="true">
+                    Resumo
+                </button>
+                <button type="button" class="admin-tab" id="tab-seguranca" data-admin-tab-target="seguranca" aria-selected="false">
+                    Segurança
+                </button>
+                <button type="button" class="admin-tab" id="tab-plano" data-admin-tab-target="plano" aria-selected="false">
+                    Plano e limites
+                </button>
+                <button type="button" class="admin-tab" id="tab-usuarios" data-admin-tab-target="usuarios" aria-selected="false">
+                    Usuários
+                </button>
+                <button type="button" class="admin-tab" id="tab-auditoria" data-admin-tab-target="auditoria" aria-selected="false">
+                    Auditoria
+                </button>
+                <button type="button" class="admin-tab" id="tab-acoes" data-admin-tab-target="acoes" aria-selected="false">
+                    Ações críticas
+                </button>
+            </div>
+
+            <div class="tab-panels admin-tab-panels">
+                {# Smoke anchors kept in the shell template after partialization:
+                   Administradores da empresa (
+                   Equipe operacional privada da empresa
+                #}
+                {% include "admin/cliente_detalhe/_tab_resumo.html" %}
+                {% include "admin/cliente_detalhe/_tab_seguranca.html" %}
+                {% include "admin/cliente_detalhe/_tab_plano.html" %}
+                {% include "admin/cliente_detalhe/_tab_usuarios.html" %}
+                {% include "admin/cliente_detalhe/_tab_auditoria.html" %}
+                {% include "admin/cliente_detalhe/_tab_acoes.html" %}
+            </div>
+        </main>
+    </div>
+
+    {% include "admin/cliente_detalhe/_modals.html" %}
+    <script src="/static/js/admin/admin_client_detail_page.js" defer nonce="{{ csp_nonce }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+name: nr-official-watch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Check official NR sources
+        run: python3 scripts/check_nr_official_updates.py
+
+      - name: Upload NR official watch artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nr-official-watch
+          path: artifacts/nr_official_watch/

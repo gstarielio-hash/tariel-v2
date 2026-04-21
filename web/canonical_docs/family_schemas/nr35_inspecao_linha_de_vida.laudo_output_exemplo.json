@@ -1,0 +1,164 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr35_inspecao_linha_de_vida",
+  "template_code": "nr35_inspecao_linha_de_vida",
+  "tokens": {
+    "cliente_nome": "Caramuru Alimentos S/A",
+    "unidade_nome": "Usina Orizona",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 2026-00077",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "AT-IN-OZ-001-01-26",
+    "empresa_nome": "Caramuru Alimentos S/A",
+    "unidade_nome": "Usina Orizona",
+    "data_execucao": "2026-01-29",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva",
+    "wave_portfolio": 1,
+    "modalidade_laudo": "inspecao_tecnica"
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Pendencias documentais secundarias foram registradas e tratadas pela Mesa.",
+    "observacoes_mesa": "Caso mantido em nr35_inspecao_linha_de_vida com rastreabilidade de escopo e evidencias."
+  },
+  "resumo_executivo": "Linha de vida vertical com corrosao inicial no cabo de aco proximo ao topo, rastreabilidade fotografica suficiente e necessidade de bloqueio para correcao antes da liberacao.",
+  "identificacao": {
+    "objeto_principal": "MC-CRMRSS-0977 Escada de acesso ao elevador 01",
+    "localizacao": "Orizona - GO | Escada de acesso ao elevador 01",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_701",
+        "DOC_001"
+      ],
+      "referencias_texto": "IMG_701 - vista_geral.png; DOC_001 - ficha_tecnica.pdf",
+      "descricao": "Vista geral da linha de vida vertical e documento-base de apoio ao sistema inspecionado.",
+      "observacao": "A referencia principal identifica o ativo e ancora a rastreabilidade do laudo."
+    },
+    "codigo_interno": "AT-IN-OZ-001-01-26",
+    "tipo_ativo": "Vertical",
+    "contratante": "Caramuru Alimentos S/A",
+    "contratada": "ATY Service LTDA",
+    "inspetor_lider": "Marcel Renato Silva",
+    "numero_laudo_inspecao": "AT-IN-OZ-001-01-26",
+    "numero_laudo_fabricante": "MC-CRMR-0032",
+    "art_numero": "ART 2026-00077",
+    "data_vistoria": "2026-01-29"
+  },
+  "escopo_servico": {
+    "tipo_entrega": "inspecao_tecnica",
+    "modo_execucao": "in_loco",
+    "ativo_tipo": "linha_de_vida_vertical",
+    "resumo_escopo": "Diagnostico visual e funcional da linha de vida vertical da escada de acesso ao elevador 01, com verificacao de componentes, registros fotograficos e parecer conclusivo."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Inspecao visual em altura com checklist dos componentes, confirmacao de identificacao do ativo e registros fotograficos dos pontos criticos.",
+    "condicoes_observadas": "Sistema acessivel na data da vistoria, com corrosao inicial localizada no cabo de aco proximo ao ponto superior e demais componentes sem deformacao aparente.",
+    "parametros_relevantes": "Tipo: Vertical; Fixacao: C (Fixacao integra.); Cabo de aco: NC (Corrosao inicial proxima ao ponto superior.); Esticador: C (Tensionamento adequado.); Sapatilha: C (Montagem integra.); Olhal: C (Sem deformacao aparente.); Grampos: C (Aperto visivel regular.)",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_702",
+        "IMG_703"
+      ],
+      "referencias_texto": "IMG_702 - ponto_superior.png; IMG_703 - ponto_inferior.png",
+      "descricao": "Registros da vistoria principal cobrindo o ponto superior com corrosao inicial e o terminal inferior do sistema.",
+      "observacao": "As fotos de execucao suportam o checklist tecnico da linha de vida."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_702"
+      ],
+      "referencias_texto": "IMG_702 - ponto_superior.png",
+      "descricao": "Corrosao inicial no cabo de aco proximo ao topo da linha de vida.",
+      "observacao": "Evidencia principal vinculada ao componente nao conforme."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_701",
+        "IMG_703"
+      ],
+      "referencias_texto": "IMG_701 - vista_geral.png; IMG_703 - ponto_inferior.png",
+      "descricao": "Vista geral da linha de vida e registro complementar do terminal inferior durante a vistoria.",
+      "observacao": "As evidencias complementares contextualizam o sistema e a extensao da avaliacao."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "AT-IN-OZ-001-01-26",
+        "MC-CRMR-0032",
+        "ART 2026-00077"
+      ],
+      "referencias_texto": "AT-IN-OZ-001-01-26; MC-CRMR-0032; ART 2026-00077",
+      "descricao": "Laudo de inspecao, referencia do fabricante e ART considerados no fechamento do documento.",
+      "observacao": "Documento base utilizado para ancorar a emissao controlada da familia."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Laudo inspecao: AT-IN-OZ-001-01-26; Laudo fabricante: MC-CRMR-0032; ART: ART 2026-00077; Proxima inspecao: 2026-07",
+    "documentos_emitidos": "Laudo tecnico NR35 de inspecao de linha de vida com bloqueio operacional e recomendacao de correcao do cabo de aco.",
+    "observacoes_documentais": "A familia exige rastreabilidade fotografica, identificacao do sistema, numero do laudo e registro da proxima inspecao periodica."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Corrosao inicial localizada no cabo de aco proximo ao ponto superior, exigindo bloqueio do sistema ate correcao e reinspecao.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_702"
+      ],
+      "referencias_texto": "IMG_702 - ponto_superior.png",
+      "descricao": "Registro fotografico da nao conformidade principal do sistema.",
+      "observacao": "A evidencia suporta o bloqueio operacional declarado na conclusao."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Substituir o trecho comprometido do cabo de aco, reinspecionar o sistema apos a intervencao e revalidar a liberacao operacional antes do retorno ao uso."
+  },
+  "conclusao": {
+    "status": "bloqueio",
+    "conclusao_tecnica": "A linha de vida vertical nao deve permanecer liberada para uso ate a substituicao do trecho comprometido do cabo de aco e a reinspecao formal do sistema.",
+    "justificativa": "A conclusao considera a nao conformidade localizada no cabo de aco, a evidencia fotografica principal, o contexto de trabalho em altura e a necessidade de rastreabilidade tecnica sem lacunas criticas.",
+    "proxima_inspecao_periodica": "2026-07",
+    "observacoes": "Substituir o trecho comprometido do cabo e reinspecionar o sistema antes da liberacao."
+  },
+  "checklist_componentes": {
+    "fixacao_dos_pontos": {
+      "condicao": "C",
+      "observacao": "Fixacao integra."
+    },
+    "condicao_cabo_aco": {
+      "condicao": "NC",
+      "observacao": "Corrosao inicial proxima ao ponto superior."
+    },
+    "condicao_esticador": {
+      "condicao": "C",
+      "observacao": "Tensionamento adequado."
+    },
+    "condicao_sapatilha": {
+      "condicao": "C",
+      "observacao": "Montagem integra."
+    },
+    "condicao_olhal": {
+      "condicao": "C",
+      "observacao": "Sem deformacao aparente."
+    },
+    "condicao_grampos": {
+      "condicao": "C",
+      "observacao": "Aperto visivel regular."
+    }
+  }
+}

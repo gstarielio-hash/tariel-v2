@@ -1,0 +1,94 @@
+<section class="workspace-channel-stage workspace-channel-stage--ia" aria-label="Canal do assistente">
+    <div class="workspace-channel-toolbar">
+        <div class="workspace-channel-toolbar__start">
+            <div class="workspace-channel-switch" role="tablist" aria-label="Canais da conversa">
+                <button
+                    type="button"
+                    class="workspace-channel-tab is-active"
+                    data-workspace-channel-tab="conversa"
+                    role="tab"
+                    aria-selected="true"
+                >
+                    Assistente
+                </button>
+                <button
+                    type="button"
+                    class="workspace-channel-tab"
+                    data-workspace-channel-tab="mesa"
+                    role="tab"
+                    aria-selected="false"
+                >
+                    Mesa Avaliadora
+                </button>
+            </div>
+            <a
+                href="/app/?home=1"
+                class="technical-record-back workspace-channel-back"
+                data-action="go-home"
+                data-home-destino="/app/?home=1"
+                aria-label="Voltar para o Portal do Inspetor"
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                <span>Portal</span>
+            </a>
+        </div>
+        <p class="workspace-channel-note">
+            O assistente continua como canal principal. Use a mesa apenas quando precisar de validacao tecnica ou retorno operacional.
+        </p>
+    </div>
+
+    <div
+        id="area-mensagens"
+        class="area-mensagens workspace-conversation-thread"
+        data-conversation-thread="messages"
+        data-conversation-variant="technical"
+        role="log"
+        aria-relevant="additions text"
+        aria-label="Conversa com o assistente"
+    >
+        <div
+            id="workspace-conversation-empty"
+            class="technical-chat-empty technical-chat-empty--conversation"
+            aria-live="polite"
+            aria-hidden="true"
+            hidden
+        >
+            <span class="material-symbols-rounded" aria-hidden="true">chat</span>
+            <strong>A conversa aparecerá aqui</strong>
+            <p>Envie a primeira mensagem para abrir a conversa com o assistente ou continue um historico ja existente.</p>
+        </div>
+
+        <div
+            id="indicador-digitando"
+            class="indicador-digitando linha-mensagem mensagem-ia workspace-message-row workspace-message-row--assistant workspace-message-row--typing"
+            role="status"
+            aria-label="Assistente digitando"
+            aria-hidden="true"
+        >
+            <div class="conteudo-mensagem workspace-message-shell">
+                <div class="avatar avatar-digitando workspace-message-avatar" aria-hidden="true">
+                    <span class="workspace-message-avatar__brand" aria-hidden="true">T</span>
+                </div>
+                <div class="bolha-digitando corpo-texto workspace-message-card" aria-hidden="true">
+                    <span class="bolha-digitando__dots" aria-hidden="true">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </span>
+                    <span class="bolha-digitando__label" data-typing-label>Assistente analisando evidências e contexto...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button
+        type="button"
+        id="btn-ir-fim-chat"
+        class="btn-ir-fim-chat"
+        aria-label="Ir para última mensagem"
+        title="Ir para última mensagem"
+        hidden
+    >
+        <span class="material-symbols-rounded" aria-hidden="true">arrow_downward</span>
+    </button>
+</section>

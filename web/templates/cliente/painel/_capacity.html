@@ -1,0 +1,60 @@
+<section
+    id="admin-capacity"
+    class="admin-stage admin-tab-panel"
+    data-admin-stage="capacity"
+    data-admin-panel="capacity"
+    data-stage-state="idle"
+    role="tabpanel"
+    aria-labelledby="admin-section-tab-capacity"
+    {% if (cliente_admin_section_inicial | default('overview')) != 'capacity' %}hidden{% endif %}
+>
+    <div class="admin-stage-head">
+        <div class="admin-stage-copy">
+            <span class="admin-stage-kicker">Trilha comercial</span>
+            <h3>Plano em uso, impacto e solicitacao</h3>
+            <p class="box-subtitle">A empresa avalia impacto e registra interesse. A alteracao comercial efetiva continua sendo concluida pela Tariel.</p>
+        </div>
+
+        <div class="admin-stage-meta">
+            <span class="hero-chip">Resumo de impacto</span>
+            <span class="hero-chip">Solicitacao guiada</span>
+            <span class="hero-chip">Historico comercial</span>
+        </div>
+    </div>
+
+    <div id="admin-capacity-brief" class="admin-stage-brief"></div>
+
+    <div class="admin-stage-grid admin-stage-grid--split">
+        <article class="box" id="admin-planos-box">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3>Plano, capacidade e solicitacao</h3>
+                    <p class="box-subtitle">Compare o impacto comercial dos planos e registre interesse para a Tariel concluir a mudanca.</p>
+                </div>
+            </div>
+
+            <div id="empresa-resumo-detalhado"></div>
+            <div id="empresa-alerta-capacidade"></div>
+            <div id="plano-impacto-preview"></div>
+
+            <form id="form-plano" class="stack form-stack">
+                <label>
+                    Plano para avaliacao
+                    <select id="empresa-plano"></select>
+                </label>
+                <button id="btn-plano-registrar" class="btn primary" type="submit">Registrar interesse comercial</button>
+            </form>
+        </article>
+
+        <article class="box" id="admin-planos-historico-box">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3>Historico de solicitacoes</h3>
+                    <p class="box-subtitle">Consulte rapidamente o que ja foi sinalizado ao time comercial e qual impacto foi descrito em cada pedido.</p>
+                </div>
+            </div>
+
+            <div id="admin-planos-historico" class="activity-list"></div>
+        </article>
+    </div>
+</section>

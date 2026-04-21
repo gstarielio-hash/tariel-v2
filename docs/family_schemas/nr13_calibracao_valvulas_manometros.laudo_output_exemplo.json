@@ -1,0 +1,117 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr13_calibracao_valvulas_manometros",
+  "template_code": "nr13_calibracao_valvulas_manometros",
+  "tokens": {
+    "cliente_nome": "Unidade Piloto NR13",
+    "unidade_nome": "Casa de Caldeiras",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 2026-00112",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "CAL-2026-018",
+    "empresa_nome": "Unidade Piloto NR13",
+    "unidade_nome": "Casa de Caldeiras",
+    "data_execucao": "2026-04-14",
+    "data_emissao": "2026-04-14",
+    "status_mesa": "rascunho",
+    "wave_portfolio": 1,
+    "modalidade_laudo": "calibracao_instrumentos"
+  },
+  "mesa_review": {
+    "status": "rascunho",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": null,
+    "observacoes_mesa": "Familia de calibracao mantida com rastreabilidade dos certificados e instrumentos."
+  },
+  "resumo_executivo": "Foram calibrados dois manometros e uma valvula de seguranca da caldeira CAL-01, com rastreabilidade de bancada e certificado emitido para os instrumentos aprovados.",
+  "identificacao": {
+    "objeto_principal": "Instrumentacao da caldeira CAL-01",
+    "localizacao": "Casa de caldeiras - linha principal",
+    "codigo_interno": "CAL-01",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": ["IMG_920", "DOC_610"],
+      "referencias_texto": "IMG_920 - bancada de calibracao; DOC_610 - procedimento_bancada.pdf",
+      "descricao": "Bancada e procedimento de calibracao utilizados na atividade.",
+      "observacao": "A referencia principal identifica o contexto e o metodo aplicado."
+    }
+  },
+  "escopo_servico": {
+    "tipo_entrega": "calibracao",
+    "modo_execucao": "in_loco",
+    "ativo_tipo": "instrumentacao_nr13",
+    "resumo_escopo": "Calibracao de manometros e valvula de seguranca vinculados a caldeira CAL-01."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Conferencia em bancada, ajuste de set point e emissao de certificado dos instrumentos aprovados.",
+    "condicoes_observadas": "Manometros sem danos aparentes; valvula com necessidade de ajuste fino no fechamento.",
+    "parametros_relevantes": "Faixa de 0 a 16 bar; set point da valvula ajustado para 12 bar; padrao rastreavel utilizado.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": ["IMG_921"],
+      "referencias_texto": "IMG_921 - ajuste na bancada",
+      "descricao": "Registro da etapa de ajuste e conferencia dos instrumentos.",
+      "observacao": "A imagem ancora a execucao da calibracao."
+    }
+  },
+  "equipamentos_calibrados": {
+    "instrumentos_ou_componentes": "Manometros M-01 e M-02; valvula de seguranca VS-01.",
+    "parametros_ajuste": "Faixa operacional de 0 a 16 bar; set point nominal em 12 bar.",
+    "resultado_da_calibracao": "M-01 e M-02 aprovados; VS-01 aprovada apos ajuste fino do assento.",
+    "certificados_emitidos": "Certificados CERT-2026-114 e CERT-2026-115 emitidos; relatorio da valvula anexado."
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": ["IMG_921"],
+      "referencias_texto": "IMG_921 - ajuste na bancada",
+      "descricao": "Principal evidencia da calibracao em execucao.",
+      "observacao": "Complementada por certificado final."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": ["IMG_922"],
+      "referencias_texto": "IMG_922 - identificacao da valvula VS-01",
+      "descricao": "Foto complementar da identificacao do componente calibrado.",
+      "observacao": "Confirma a rastreabilidade do ativo."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": ["DOC_611"],
+      "referencias_texto": "DOC_611 - certificados_calibracao_2026.pdf",
+      "descricao": "Pacote de certificados e procedimento de bancada usado no fechamento.",
+      "observacao": "Documento base obrigatorio da familia."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Procedimento de bancada, certificados de calibracao e historico anterior da instrumentacao.",
+    "documentos_emitidos": "Pacote de certificados 2026 e relatorio tecnico de calibracao dos instrumentos.",
+    "observacoes_documentais": "Manter os certificados vinculados ao prontuario da caldeira CAL-01."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": false,
+    "ha_pontos_de_atencao_texto": "Nao",
+    "descricao": "Nao foram registradas nao conformidades criticas apos os ajustes executados.",
+    "evidencias": {
+      "disponivel": false,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "recomendacoes": {
+    "texto": "Arquivar certificados no prontuario da caldeira e repetir a calibracao conforme periodicidade estabelecida."
+  },
+  "conclusao": {
+    "status": "aprovado",
+    "conclusao_tecnica": "A calibracao dos instrumentos vinculados a CAL-01 foi concluida com rastreabilidade tecnica e certificados emitidos.",
+    "justificativa": "Os parametros ajustados ficaram dentro dos criterios definidos para a instrumentacao inspecionada."
+  }
+}

@@ -1,0 +1,365 @@
+import { colors, radii, shadows, spacing } from "../../theme/tokens";
+
+export const chatThreadSurfaceStyles = {
+  threadEmptyState: {
+    flex: 1,
+    minHeight: 220,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+  },
+  threadEmptyStateKeyboardVisible: {
+    minHeight: 148,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  threadScroll: {
+    flex: 1,
+  },
+  threadEmptyBrandStage: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.md,
+  },
+  threadEmptyBrandHalo: {
+    position: "absolute",
+    top: -12,
+    width: 122,
+    height: 122,
+    borderRadius: 61,
+    backgroundColor: "rgba(244,123,32,0.08)",
+  },
+  threadEmptyBrandMark: {
+    width: 88,
+    height: 88,
+    borderRadius: 28,
+    shadowColor: colors.ink900,
+    shadowOpacity: 0.16,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
+  },
+  threadEmptyBrand: {
+    color: colors.accent,
+    fontSize: 13,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 1.4,
+    marginTop: -2,
+  },
+  threadEmptyTitle: {
+    color: colors.textPrimary,
+    fontSize: 23,
+    fontWeight: "800",
+    textAlign: "center",
+    lineHeight: 31,
+    maxWidth: 300,
+  },
+  threadEmptyText: {
+    color: colors.textSecondary,
+    fontSize: 15,
+    lineHeight: 23,
+    textAlign: "center",
+    maxWidth: 300,
+  },
+  threadEmptySuggestionRail: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  threadEmptySuggestion: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: "#FFD9BC",
+    backgroundColor: "#FFF8F1",
+  },
+  threadEmptySuggestionText: {
+    color: colors.accent,
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  threadContent: {
+    flexGrow: 1,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.md,
+    gap: spacing.md,
+  },
+  threadContentEntryChooser: {
+    justifyContent: "flex-start",
+    paddingTop: spacing.xxxl,
+    paddingBottom: spacing.xl,
+  },
+  threadReviewCard: {
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: 22,
+    backgroundColor: colors.surfacePanelRaised,
+    borderWidth: 1,
+    borderColor: colors.surfaceStrokeStrong,
+    ...shadows.soft,
+  },
+  threadReviewEyebrow: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.7,
+  },
+  threadReviewTitle: {
+    color: colors.textPrimary,
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: "800",
+  },
+  threadReviewDescription: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  threadReviewChipRail: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+  },
+  threadReviewChip: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 7,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+  },
+  threadReviewChipAccent: {
+    backgroundColor: colors.accentWash,
+    borderColor: colors.accentMuted,
+  },
+  threadReviewChipSuccess: {
+    backgroundColor: colors.successWash,
+    borderColor: colors.successSoft,
+  },
+  threadReviewChipDanger: {
+    backgroundColor: colors.dangerWash,
+    borderColor: colors.dangerSoft,
+  },
+  threadReviewChipText: {
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  threadReviewChipTextAccent: {
+    color: colors.accent,
+  },
+  threadReviewChipTextSuccess: {
+    color: colors.success,
+  },
+  threadReviewChipTextDanger: {
+    color: colors.danger,
+  },
+  threadReviewMetaGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+  threadReviewMetaItem: {
+    minWidth: 96,
+    flexGrow: 1,
+    gap: 2,
+    padding: spacing.sm,
+    borderRadius: 16,
+    backgroundColor: colors.surfaceCanvas,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+  },
+  threadReviewMetaLabel: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  threadReviewMetaValue: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  threadReviewFootnote: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 17,
+  },
+  threadReviewEntitlement: {
+    color: colors.accent,
+    fontSize: 11,
+    lineHeight: 17,
+    fontWeight: "700",
+  },
+  threadReviewSectionTitle: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  threadReviewVerificationShell: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: 16,
+    backgroundColor: colors.surfaceCanvas,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+  },
+  threadReviewVerificationCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  threadReviewVerificationQr: {
+    width: 72,
+    height: 72,
+    borderRadius: 16,
+    backgroundColor: colors.white,
+  },
+  threadReviewWarnings: {
+    gap: spacing.xs,
+  },
+  threadReviewWarningItem: {
+    gap: 2,
+    padding: spacing.sm,
+    borderRadius: 16,
+    backgroundColor: colors.dangerWash,
+    borderWidth: 1,
+    borderColor: colors.dangerSoft,
+  },
+  threadReviewWarningTitle: {
+    color: colors.danger,
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  threadReviewWarningText: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  threadReviewActionsRail: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+  },
+  threadReviewActionButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  threadReviewActionButtonAccent: {
+    backgroundColor: colors.accentWash,
+    borderColor: colors.accentMuted,
+  },
+  threadReviewActionButtonSuccess: {
+    backgroundColor: colors.successWash,
+    borderColor: colors.successSoft,
+  },
+  threadReviewActionButtonDanger: {
+    backgroundColor: colors.dangerWash,
+    borderColor: colors.dangerSoft,
+  },
+  threadReviewActionButtonDisabled: {
+    opacity: 0.55,
+  },
+  threadReviewActionButtonText: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  threadReviewActionButtonTextAccent: {
+    color: colors.accent,
+  },
+  threadReviewActionButtonTextSuccess: {
+    color: colors.success,
+  },
+  threadReviewActionButtonTextDanger: {
+    color: colors.danger,
+  },
+  threadReviewList: {
+    gap: spacing.xs,
+  },
+  threadReviewListItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: 16,
+    backgroundColor: colors.surfaceCanvas,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+  },
+  threadReviewStatusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+  },
+  threadReviewStatusBadgeAccent: {
+    backgroundColor: colors.accentWash,
+    borderColor: colors.accentMuted,
+  },
+  threadReviewStatusBadgeSuccess: {
+    backgroundColor: colors.successWash,
+    borderColor: colors.successSoft,
+  },
+  threadReviewStatusBadgeDanger: {
+    backgroundColor: colors.dangerWash,
+    borderColor: colors.dangerSoft,
+  },
+  threadReviewStatusBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  threadReviewStatusBadgeTextAccent: {
+    color: colors.accent,
+  },
+  threadReviewStatusBadgeTextSuccess: {
+    color: colors.success,
+  },
+  threadReviewStatusBadgeTextDanger: {
+    color: colors.danger,
+  },
+  threadReviewListCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  threadReviewListTitle: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  threadReviewListText: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  threadReviewInlineAction: {
+    alignSelf: "flex-start",
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 7,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    backgroundColor: colors.accentWash,
+  },
+  threadReviewInlineActionDisabled: {
+    opacity: 0.55,
+  },
+  threadReviewInlineActionText: {
+    color: colors.accent,
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  threadContentKeyboard: {
+    paddingTop: 2,
+    paddingBottom: spacing.sm,
+    gap: spacing.sm,
+  },
+} as const;

@@ -1,0 +1,216 @@
+                <section class="catalog-tab-panel" id="catalog-panel-liberacao">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Empresas</p>
+                                <h2>Acesso das empresas</h2>
+                                <p class="catalog-panel__description">As empresas liberadas aparecem primeiro com status, data, modelo principal e escopo. O formulário fica recolhido.</p>
+                            </div>
+                            <button type="button" class="catalog-btn catalog-btn--primary" data-catalog-open-disclosure="release-form">Liberar para empresa</button>
+                        </div>
+
+                        <div class="catalog-state-grid">
+                            <article class="catalog-card">
+                                <h3>Empresas ativas</h3>
+                                <p>
+                                    {% if family.active_release_count %}
+                                    {{ family.active_release_count | int }} empresa(s) com uso ativo.
+                                    {% else %}
+                                    Nenhuma empresa está usando esta família neste momento.
+                                    {% endif %}
+                                </p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Modelo principal</h3>
+                                <p>{{ offer_model_label | e }}</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Como a empresa recebe</h3>
+                                <p>A empresa não muda o catálogo principal. Ela usa apenas modos, opções e modelos que foram liberados.</p>
+                            </article>
+                        </div>
+
+                        <div class="catalog-record-table">
+                            <div class="catalog-record-table__header catalog-record-table__header--grid">
+                                <span>Empresa</span>
+                                <span>Status</span>
+                                <span>Modelo principal</span>
+                                <span>Escopo liberado</span>
+                                <span>Atualizacao</span>
+                            </div>
+                            <div class="catalog-record-table__body">
+                                {% for item in tenant_releases %}
+                                <article class="catalog-record-row catalog-record-row--five">
+                                    <div>
+                                        <strong>{{ item.tenant_label | e }}</strong>
+                                        <span>{{ item.actor_label | e }}</span>
+                                        {% if item.governance.has_overrides %}
+                                        <span>{{ item.governance.effective_cap.label | e }}</span>
+                                        {% endif %}
+                                        <span>{{ item.effective_release_channel.label | e }}</span>
+                                    </div>
+                                    <div>{{ catalogo.status_badge(item.release_status) }}</div>
+                                    <div>{{ item.default_template_label | e }}</div>
+                                    <div>
+                                        {{ item.scope_summary | default('Escopo herdado', true) | e }}
+                                        {% if item.governance.has_overrides %}
+                                        <span>{{ item.governance.force_review_mode.label | e }} • {{ item.governance.mobile_review_override.label | e }} • {{ item.governance.release_channel_override.label | e }}</span>
+                                        {% endif %}
+                                        {% if item.contract_entitlements.has_data %}
+                                        <span>{{ item.contract_entitlements.limit_count | int }} limite(s) em uso</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        {{ item.updated_at_label | e }}
+                                        {% if item.governance.has_overrides %}
+                                        <span>{{ item.governance.mobile_autonomous_override.label | e }}</span>
+                                        {% endif %}
+                                    </div>
+                                </article>
+                                {% else %}
+                                <article class="catalog-empty-card">
+                                    <strong>Nenhum cliente liberado ainda.</strong>
+                                    <p>A tabela cresce quando houver clientes usando esta familia.</p>
+                                </article>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <details class="catalog-disclosure" id="release-form">
+                            <summary>Nova liberação para empresa</summary>
+                            <form class="catalog-form" method="POST" action="/admin/catalogo-laudos/familias/{{ family.family_key | e }}/liberacao-tenant">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="return_to" value="{{ family_detail_base }}?tab=liberacao#liberacao">
+                                <div class="catalog-form__grid">
+                                    <label>
+                                        <span>Empresa</span>
+                                        <select name="tenant_id" required>
+                                            {% for item in tenants %}
+                                            <option value="{{ item.id }}">{{ item.label | e }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Status da liberação</span>
+                                        <select name="release_status">
+                                            <option value="draft">Em preparo</option>
+                                            <option value="active">Liberada</option>
+                                            <option value="paused">Pausada</option>
+                                            <option value="expired">Encerrada</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Modelo principal</span>
+                                        <input type="text" name="default_template_code" maxlength="120" value="{{ offer.template_default_code | default('', true) | e }}">
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Observações</span>
+                                        <textarea name="observacoes" rows="4" placeholder="Explique restricoes, janela de ativacao ou motivo da liberacao."></textarea>
+                                    </label>
+                                    <label>
+                                        <span>Fluxo de revisão</span>
+                                        <select name="force_review_mode">
+                                            <option value="">Usar configuração padrão</option>
+                                            <option value="mesa_required">Análise interna obrigatória</option>
+                                            <option value="mobile_review_allowed">Aplicativo com apoio da análise</option>
+                                            <option value="mobile_autonomous">Aplicativo com autonomia</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Limite de autonomia</span>
+                                        <select name="max_review_mode">
+                                            <option value="">Sem limite extra</option>
+                                            <option value="mesa_required">Análise interna obrigatória</option>
+                                            <option value="mobile_review_allowed">Aplicativo com apoio da análise</option>
+                                            <option value="mobile_autonomous">Aplicativo com autonomia</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Revisão no app</span>
+                                        <select name="mobile_review_override">
+                                            <option value="">Usar configuração padrão</option>
+                                            <option value="allow">Permitir</option>
+                                            <option value="deny">Bloquear</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Autonomia no app</span>
+                                        <select name="mobile_autonomous_override">
+                                            <option value="">Usar configuração padrão</option>
+                                            <option value="allow">Permitir</option>
+                                            <option value="deny">Bloquear</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Canal de liberação</span>
+                                        <select name="release_channel_override">
+                                            <option value="">Herdar oferta</option>
+                                            <option value="pilot">Piloto</option>
+                                            <option value="limited_release">Liberação controlada</option>
+                                            <option value="general_release">Liberação ampla</option>
+                                        </select>
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Recursos extras para o cliente</span>
+                                        {{ catalogo.string_list_editor('included_features', [], 'Recurso extra', 'Adicionar recurso') }}
+                                    </label>
+                                    <label>
+                                        <span>Emissões/mês</span>
+                                        <input type="number" name="entitlement_monthly_issues" min="0" step="1">
+                                    </label>
+                                    <label>
+                                        <span>Administradores da empresa</span>
+                                        <input type="number" name="entitlement_max_admin_clients" min="0" step="1">
+                                    </label>
+                                    <label>
+                                        <span>Equipe de campo</span>
+                                        <input type="number" name="entitlement_max_inspectors" min="0" step="1">
+                                    </label>
+                                    <label>
+                                        <span>Equipe de analise</span>
+                                        <input type="number" name="entitlement_max_reviewers" min="0" step="1">
+                                    </label>
+                                    <label>
+                                        <span>Versoes ativas do servico</span>
+                                        <input type="number" name="entitlement_max_active_variants" min="0" step="1">
+                                    </label>
+                                    <label>
+                                        <span>Integrações</span>
+                                        <input type="number" name="entitlement_max_integrations" min="0" step="1">
+                                    </label>
+                                </div>
+                                <div class="catalog-checkbox-grid">
+                                    {% for item in technical_modes %}
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="allowed_modes" value="{{ item.mode_key | e }}">
+                                        <span>{{ item.display_name | e }}</span>
+                                    </label>
+                                    {% endfor %}
+                                    {% if offer %}
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="allowed_offers" value="{{ offer.offer_key | e }}" checked>
+                                        <span>{{ offer.offer_name | e }}</span>
+                                    </label>
+                                    {% endif %}
+                                    {% if offer and offer.variants %}
+                                        {% for item in offer.variants %}
+                                        {% if item.template_code %}
+                                        <label class="catalog-check">
+                                            <input type="checkbox" name="allowed_templates" value="{{ item.template_code | e }}">
+                                            <span>Modelo visual {{ item.template_code | e }}</span>
+                                        </label>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% for token in available_variant_tokens %}
+                                        <label class="catalog-check">
+                                            <input type="checkbox" name="allowed_variants" value="{{ token | e }}">
+                                            <span>{{ token | e }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <button type="submit" class="catalog-btn catalog-btn--primary">Salvar liberação para empresa</button>
+                            </form>
+                        </details>
+                    </div>
+                </section>

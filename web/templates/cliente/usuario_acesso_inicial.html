@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Acesso inicial • {{ usuario_alvo.nome | e }} • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_new_client.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+<body class="admin-body">
+    <main class="conteudo-principal">
+        <header class="topbar">
+            <div class="titulo-pagina">
+                <h1>Acesso inicial do usuário</h1>
+                <p>{{ usuario_alvo.nome | e }} foi preparado para entrar na operação de {{ empresa.nome_fantasia | e }}.</p>
+            </div>
+
+            <a href="{{ url_retorno_equipe | e }}" class="btn-admin secundario">Voltar para equipe</a>
+        </header>
+
+        {% if acesso_inicial_disponivel %}
+        <section class="setup-shell" aria-label="Credencial inicial do usuário operacional">
+            <article class="setup-card">
+                <div class="setup-summary">
+                    <strong>Credencial pronta para entrega segura</strong>
+                    <p>Esta senha aparece apenas nesta confirmação. No primeiro login, o usuário precisará trocá-la antes de continuar.</p>
+                </div>
+
+                <div class="setup-grid">
+                    <div class="campo-form">
+                        <label for="usuario-operacional-nome">Usuário</label>
+                        <input id="usuario-operacional-nome" type="text" value="{{ usuario_alvo.nome | e }}" readonly onclick="this.select();">
+                    </div>
+
+                    <div class="campo-form">
+                        <label for="usuario-operacional-papel">Papel operacional</label>
+                        <input id="usuario-operacional-papel" type="text" value="{{ usuario_alvo.papel | e }}" readonly onclick="this.select();">
+                    </div>
+
+                    <div class="campo-form">
+                        <label for="usuario-operacional-login">Login</label>
+                        <input id="usuario-operacional-login" type="text" value="{{ credencial_onboarding.login | e }}" readonly onclick="this.select();">
+                    </div>
+
+                    <div class="campo-form">
+                        <label for="usuario-operacional-senha">Senha temporária</label>
+                        <input id="usuario-operacional-senha" type="text" value="{{ credencial_onboarding.senha | e }}" readonly onclick="this.select();">
+                    </div>
+
+                    {% for portal in credencial_onboarding.portais %}
+                    <div class="campo-form">
+                        <label for="portal-login-{{ loop.index }}">Login em {{ portal.label | e }}</label>
+                        <input id="portal-login-{{ loop.index }}" type="text" value="{{ portal.login_url | e }}" readonly onclick="this.select();">
+                    </div>
+                    {% endfor %}
+
+                    <div class="campo-form campo-form--full">
+                        <label for="usuario-operacional-orientacao">Orientação operacional</label>
+                        <textarea id="usuario-operacional-orientacao" rows="4" readonly>{{ credencial_onboarding.orientacao | e }}</textarea>
+                    </div>
+                </div>
+
+                <div class="setup-actions">
+                    {% for portal in credencial_onboarding.portais %}
+                    <a href="{{ portal.login_url | e }}" class="btn-admin {% if loop.first %}primario{% else %}secundario{% endif %}">Abrir {{ portal.label | e }}</a>
+                    {% endfor %}
+                    <a href="{{ url_retorno_equipe | e }}" class="btn-admin secundario">Voltar para equipe</a>
+                </div>
+            </article>
+        </section>
+        {% else %}
+        <div class="alert alert-error" role="alert" aria-live="assertive">
+            <span class="material-symbols-rounded" aria-hidden="true">error</span>
+            A credencial inicial não está mais disponível nesta tela. Gere uma nova senha temporária na seção de equipe para abrir outro acesso inicial.
+        </div>
+
+        <section class="setup-shell" aria-label="Resumo do usuário operacional">
+            <article class="setup-card">
+                <div class="setup-summary">
+                    <strong>Resumo do cadastro operacional</strong>
+                    <p>O usuário continua existente, mas a senha temporária não pode mais ser reexibida depois do consumo.</p>
+                </div>
+
+                <div class="setup-grid">
+                    <div class="campo-form">
+                        <label for="usuario-operacional-nome-resumo">Usuário</label>
+                        <input id="usuario-operacional-nome-resumo" type="text" value="{{ usuario_alvo.nome | e }}" readonly onclick="this.select();">
+                    </div>
+
+                    <div class="campo-form">
+                        <label for="usuario-operacional-papel-resumo">Papel operacional</label>
+                        <input id="usuario-operacional-papel-resumo" type="text" value="{{ usuario_alvo.papel | e }}" readonly onclick="this.select();">
+                    </div>
+
+                    <div class="campo-form campo-form--full">
+                        <label for="usuario-operacional-login-resumo">Login</label>
+                        <input id="usuario-operacional-login-resumo" type="text" value="{{ usuario_alvo.email | e }}" readonly onclick="this.select();">
+                    </div>
+                </div>
+
+                <div class="setup-actions">
+                    <a href="{{ url_retorno_equipe | e }}" class="btn-admin primario">Ir para equipe</a>
+                </div>
+            </article>
+        </section>
+        {% endif %}
+    </main>
+</body>
+</html>

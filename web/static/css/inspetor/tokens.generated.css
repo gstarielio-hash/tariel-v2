@@ -1,0 +1,84 @@
+/* Auto-generated from design_tokens/inspetor.tokens.json by scripts/build_design_tokens.py. */
+
+/* Do not edit manually. */
+
+:root {
+  --bg-app: #f5f8fc;
+  --bg-subtle: #edf3fa;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f3f7fc;
+  --border-subtle: rgba(36, 92, 147, 0.14);
+  --border-medium: rgba(36, 92, 147, 0.2);
+  --border-strong: rgba(36, 92, 147, 0.3);
+  --text-primary: #16212d;
+  --text-secondary: #42556a;
+  --text-muted: #6c7d90;
+  --text-strong: #091019;
+  --primary: #245C93;
+  --primary-hover: #1E4D7A;
+  --primary-active: #183F63;
+  --accent-cyan: #6e9bc7;
+  --accent-violet: #7fa6cb;
+  --success: #2FB979;
+  --warning: #6E9BC7;
+  --danger: #E75A5A;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --shadow-soft: 0 8px 24px rgba(18, 35, 60, 0.1);
+  --shadow-card: 0 10px 30px rgba(18, 35, 60, 0.12);
+  --shadow-panel: 0 18px 40px rgba(18, 35, 60, 0.16);
+  --font-sans: var(--font-base);
+  --font-display: var(--font-heading);
+  --font-mono-ui: var(--font-mono);
+  --type-scale-page: clamp(2rem, 2.8vw, 2.25rem);
+  --type-scale-hero: clamp(2.25rem, 3.2vw, 2.5rem);
+  --type-scale-section: 20px;
+  --type-scale-modal: 28px;
+  --surface-panel-border: var(--border-subtle);
+  --surface-panel-radius: 18px;
+  --surface-panel-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 247, 252, 0.98));
+  --surface-panel-shadow: 0 18px 40px rgba(18, 35, 60, 0.12);
+  --control-font-size: 13px;
+  --control-radius: var(--radius-sm);
+  --header-h: 64px;
+  --sidebar-w: 340px;
+  --chat-max-w: 920px;
+  --chat-content-max: 980px;
+  --content-gap: 24px;
+  --input-min-h: 76px;
+  --button-h: 40px;
+  --button-h-sm: 36px;
+  --chip-h: 32px;
+  --icon-btn: 36px;
+}
+
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  --bg-app: #091019;
+  --bg-subtle: #12233c;
+  --bg-surface: #16293d;
+  --bg-surface-2: #1d334a;
+  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --text-primary: #f8f4ee;
+  --text-secondary: #c8d1da;
+  --text-muted: #9ca8b4;
+  --text-strong: #fffdf9;
+  --shadow-soft: 0 8px 24px rgba(9, 16, 25, 0.24);
+  --shadow-card: 0 10px 30px rgba(9, 16, 25, 0.22);
+  --shadow-panel: 0 18px 40px rgba(9, 16, 25, 0.3);
+  --surface-panel-bg: linear-gradient(180deg, rgba(18, 35, 60, 0.92), rgba(9, 16, 25, 0.96));
+  --surface-panel-shadow: 0 18px 40px rgba(9, 16, 25, 0.28);
+}

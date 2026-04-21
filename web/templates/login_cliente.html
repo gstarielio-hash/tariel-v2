@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>Portal da empresa • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_auth_shell.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/cliente_auth.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app }}">
+</head>
+<body class="auth-shell auth-shell--cliente">
+    <main class="auth-layout auth-layout--split">
+        <section class="auth-hero" aria-hidden="true">
+            <div class="auth-hero-placeholder"></div>
+            <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+            <span class="auth-hero-label">Portal da empresa</span>
+        </section>
+
+        <section class="auth-card">
+            <div class="auth-card-shell">
+                <div class="auth-intro">
+                    <strong class="auth-intro__title">Portal da empresa</strong>
+                    <p class="auth-intro__copy">Use o e-mail e a senha da empresa para entrar. No primeiro acesso, o sistema vai pedir a definicao de uma nova senha.</p>
+                </div>
+
+                {% if primeiro_acesso %}
+                <div class="auth-inline-banner" role="status" aria-live="polite">
+                    Primeiro acesso: entre com o e-mail informado no cadastro da empresa e com a senha temporaria recebida em canal seguro.
+                </div>
+                {% endif %}
+
+                {% if erro %}
+                <div class="auth-error" role="alert" aria-live="assertive">{{ erro }}</div>
+                {% endif %}
+
+                <form class="auth-form auth-form--minimal" method="post" action="/cliente/login" data-auth-form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="primeiro_acesso" value="{{ '1' if primeiro_acesso else '' }}">
+
+                    <div class="auth-field">
+                        <input id="email" type="email" name="email" autocomplete="username" placeholder="E-mail" value="{{ email_prefill | default('', true) | e }}" required aria-label="E-mail corporativo">
+                    </div>
+
+                    <div class="auth-field">
+                        <input id="senha" type="password" name="senha" autocomplete="current-password" placeholder="Senha" required aria-label="Senha">
+                    </div>
+
+                    <button class="auth-button" type="submit">Acessar</button>
+                </form>
+
+                <p class="auth-access-note">Precisa de acesso ou apoio no primeiro login? Fale com a Tariel.</p>
+                <p class="auth-access-note"><a href="/revisao/login">Acessar Mesa Avaliadora</a></p>
+            </div>
+        </section>
+    </main>
+
+    <script nonce="{{ csp_nonce }}">
+        (() => {
+            "use strict";
+
+            document.querySelectorAll("[data-auth-form]").forEach((form) => {
+                form.addEventListener("submit", () => {
+                    const botao = form.querySelector(".auth-button");
+                    if (!botao) return;
+                    botao.disabled = true;
+                    botao.innerHTML = "<span>Entrando...</span>";
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

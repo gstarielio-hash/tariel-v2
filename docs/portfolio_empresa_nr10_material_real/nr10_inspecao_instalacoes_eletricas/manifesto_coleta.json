@@ -1,0 +1,101 @@
+{
+  "family_key": "nr10_inspecao_instalacoes_eletricas",
+  "nome_exibicao": "NR10 - Inspecao instalacoes eletricas",
+  "macro_categoria": "NR10",
+  "kind": "inspection",
+  "wave": 1,
+  "template_codes": [
+    "nr10_inspecao_instalacoes_eletricas"
+  ],
+  "required_slots_snapshot": [
+    {
+      "item_id": "slot_referencia_principal",
+      "label": "Referencia principal do objeto",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento"
+      ],
+      "purpose": "Vincular o quadro, painel, sala eletrica ou instalacao principal inspecionada.",
+      "binding_path": "identificacao.referencia_principal",
+      "drop_folder": "coleta_entrada/slots_reais/referencia_principal"
+    },
+    {
+      "item_id": "slot_evidencia_execucao",
+      "label": "Evidencia de execucao",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento",
+        "texto"
+      ],
+      "purpose": "Registrar a execucao principal da vistoria em campo.",
+      "binding_path": "execucao_servico.evidencia_execucao",
+      "drop_folder": "coleta_entrada/slots_reais/evidencia_execucao"
+    },
+    {
+      "item_id": "slot_evidencia_principal",
+      "label": "Evidencia principal",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento",
+        "texto"
+      ],
+      "purpose": "Consolidar a evidencia principal que sustenta a conclusao do servico.",
+      "binding_path": "evidencias_e_anexos.evidencia_principal",
+      "drop_folder": "coleta_entrada/slots_reais/evidencia_principal"
+    },
+    {
+      "item_id": "slot_documento_base",
+      "label": "Documento base",
+      "required": false,
+      "min_items": 0,
+      "accepted_examples": [
+        "documento"
+      ],
+      "purpose": "Ancorar RTI, diagrama unifilar, relatorio anterior ou prontuario eletrico quando disponiveis.",
+      "binding_path": "evidencias_e_anexos.documento_base",
+      "drop_folder": "coleta_entrada/slots_reais/documento_base"
+    },
+    {
+      "item_id": "slot_conclusao_servico",
+      "label": "Conclusao da inspecao",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "texto"
+      ],
+      "purpose": "Registrar a conclusao tecnica estruturada para revisao.",
+      "binding_path": "conclusao.conclusao_tecnica",
+      "drop_folder": "coleta_entrada/slots_reais/conclusao_servico"
+    }
+  ],
+  "output_sections_snapshot": [
+    "Identificacao",
+    "Escopo do servico",
+    "Execucao do servico",
+    "Evidencias e anexos",
+    "Documentacao e registros",
+    "Nao conformidades ou lacunas",
+    "Recomendacoes",
+    "Conclusao"
+  ],
+  "review_blocking_snapshot": [
+    "escopo_principal_divergente_da_familia",
+    "troca_silenciosa_da_familia_principal",
+    "ausencia_de_objeto_principal",
+    "ausencia_de_localizacao",
+    "ausencia_de_slot_obrigatorio",
+    "ausencia_de_conclusao_tecnica"
+  ],
+  "ingest_layout": {
+    "raw_input_dir": "coleta_entrada",
+    "reference_package_dir": "pacote_referencia",
+    "status_file": "status_refino.json",
+    "briefing_file": "briefing_real.md"
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "schema_type": "tariel_filled_reference_bundle",
+  "schema_version": 1,
+  "family_key": "nr13_inspecao_tubulacao",
+  "template_code": "nr13_inspecao_tubulacao",
+  "reference_id": "nr13_inspecao_tubulacao.synthetic.internal.v1",
+  "source_kind": "synthetic_repo_baseline",
+  "reference_summary": {
+    "title": "Baseline sintetica interna - NR13 - Inspecao de Tubulacao",
+    "document_code": "SYN-NR13_INSPECAO_TUBULACAO-001",
+    "status_final": "ajuste",
+    "pdf_file": "pdf/nr13_inspecao_tubulacao_referencia_sintetica.pdf",
+    "asset_files": [
+      "assets/IMG_001_visao_geral.png",
+      "assets/IMG_002_referencia_principal.png",
+      "assets/IMG_003_evidencia_de_execucao.png",
+      "assets/IMG_004_evidencia_principal.png",
+      "assets/IMG_005_conclusao_do_servico.png"
+    ],
+    "resumo": "Foi executado o servico nr13 - inspecao de tubulacao com registro estruturado do objeto principal, evidencias vinculadas, documentacao de apoio e conclusao tecnica consolidada para a Mesa."
+  },
+  "required_slots_snapshot": {
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_001",
+        "DOC_001"
+      ],
+      "referencias_texto": "IMG_001; DOC_001",
+      "descricao": "Referencia principal do objeto identificada com apoio de evidencia visual e documento associado.",
+      "observacao": "Rastreabilidade principal confirmada para o servico."
+    },
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_010",
+        "DOC_010"
+      ],
+      "referencias_texto": "IMG_010; DOC_010",
+      "descricao": "Evidencia da execucao principal do servico.",
+      "observacao": "Registros principais consolidados."
+    },
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_020"
+      ],
+      "referencias_texto": "IMG_020",
+      "descricao": "Evidencia principal que suporta a conclusao tecnica.",
+      "observacao": "Material principal vinculado ao caso."
+    },
+    "conclusao_servico": "O servico nr13 - inspecao de tubulacao foi consolidado com rastreabilidade suficiente, evidencias principais vinculadas e conclusao tecnica formalizada.",
+    "objeto_principal": "Tubulacao de vapor linha TV-203",
+    "localizacao": "Rack norte da unidade de utilidades",
+    "status_final": "ajuste"
+  },
+  "documental_sections_snapshot": [
+    "Identificacao do Ativo",
+    "Escopo da Inspecao",
+    "Execucao em Campo",
+    "Evidencias Principais",
+    "Documentacao e Registros",
+    "Nao Conformidades ou Lacunas",
+    "Recomendacoes",
+    "Conclusao"
+  ],
+  "notes": [
+    "Conteudo integralmente sintetico, produzido internamente para bootstrap da familia.",
+    "Nao substitui material real nem documento emitido pelo cliente.",
+    "Serve para calibrar template mestre, overlay, PDF final e revisao guiada por Mesa/mobile."
+  ],
+  "laudo_output_snapshot": {
+    "schema_type": "laudo_output",
+    "schema_version": 1,
+    "family_key": "nr13_inspecao_tubulacao",
+    "template_code": "nr13_inspecao_tubulacao",
+    "tokens": {
+      "cliente_nome": "Empresa Teste NR13",
+      "unidade_nome": "Unidade Piloto NR13",
+      "engenheiro_responsavel": "Gabriel Santos",
+      "crea_art": "CREA 123456/D | ART 922024900",
+      "revisao_template": "v1"
+    },
+    "case_context": {
+      "laudo_id": "NR13_INSPECAO_TUBULACAO-2026-001",
+      "empresa_nome": "Empresa Teste NR13",
+      "unidade_nome": "Unidade Piloto NR13",
+      "data_execucao": "2026-04-08",
+      "data_emissao": "2026-04-08",
+      "status_mesa": "aprovado_com_ressalva",
+      "wave_portfolio": 1
+    },
+    "mesa_review": {
+      "status": "aprovado_com_ressalva",
+      "family_lock": true,
+      "scope_mismatch": false,
+      "bloqueios": [],
+      "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+      "pendencias_resolvidas_texto": "Pendencias documentais secundarias foram registradas e tratadas pela Mesa.",
+      "observacoes_mesa": "Caso mantido em nr13_inspecao_tubulacao com rastreabilidade de escopo e evidencias."
+    },
+    "resumo_executivo": "Foi executado o servico nr13 - inspecao de tubulacao com registro estruturado do objeto principal, evidencias vinculadas, documentacao de apoio e conclusao tecnica consolidada para a Mesa.",
+    "identificacao": {
+      "objeto_principal": "Tubulacao de vapor linha TV-203",
+      "localizacao": "Rack norte da unidade de utilidades",
+      "referencia_principal": {
+        "disponivel": true,
+        "referencias": [
+          "IMG_001",
+          "DOC_001"
+        ],
+        "referencias_texto": "IMG_001; DOC_001",
+        "descricao": "Referencia principal do objeto identificada com apoio de evidencia visual e documento associado.",
+        "observacao": "Rastreabilidade principal confirmada para o servico."
+      },
+      "codigo_interno": "NR13_INSPECAO_TUBULACAO-001"
+    },
+    "escopo_servico": {
+      "tipo_entrega": "inspecao_tecnica",
+      "modo_execucao": "in_loco",
+      "ativo_tipo": "NR13",
+      "resumo_escopo": "Inspecao de seguranca periodica em tubulacao abrangida pela NR13, com foco em identificacao, suportacao, acessorios aparentes, sinais visuais e registros disponiveis."
+    },
+    "execucao_servico": {
+      "metodo_aplicado": "Inspecao visual da linha, suportes, identificacao e acessorios aparentes, com consolidacao textual das condicoes observadas.",
+      "condicoes_observadas": "Servico executado dentro do escopo previsto, com registros suficientes para revisao da Mesa e consolidacao do documento final.",
+      "parametros_relevantes": "Fluxograma das linhas e relatorio anterior da tubulacao.",
+      "evidencia_execucao": {
+        "disponivel": true,
+        "referencias": [
+          "IMG_010",
+          "DOC_010"
+        ],
+        "referencias_texto": "IMG_010; DOC_010",
+        "descricao": "Evidencia da execucao principal do servico.",
+        "observacao": "Registros principais consolidados."
+      }
+    },
+    "evidencias_e_anexos": {
+      "evidencia_principal": {
+        "disponivel": true,
+        "referencias": [
+          "IMG_020"
+        ],
+        "referencias_texto": "IMG_020",
+        "descricao": "Evidencia principal que suporta a conclusao tecnica.",
+        "observacao": "Material principal vinculado ao caso."
+      },
+      "evidencia_complementar": {
+        "disponivel": true,
+        "referencias": [
+          "IMG_021"
+        ],
+        "referencias_texto": "IMG_021",
+        "descricao": "Evidencia complementar para contextualizacao do servico.",
+        "observacao": "Registro complementar sem impacto critico."
+      },
+      "documento_base": {
+        "disponivel": true,
+        "referencias": [
+          "DOC_001"
+        ],
+        "referencias_texto": "Fluxograma das linhas e relatorio anterior da tubulacao.",
+        "descricao": "Documento base ou ancora principal do servico.",
+        "observacao": "Documento vinculado ao pacote final."
+      }
+    },
+    "documentacao_e_registros": {
+      "documentos_disponiveis": "Fluxograma das linhas e relatorio anterior da tubulacao.",
+      "documentos_emitidos": "Pacote tecnico de nr13 - inspecao de tubulacao consolidado para entrega.",
+      "observacoes_documentais": "Documentacao complementar registrada e vinculada ao caso."
+    },
+    "nao_conformidades_ou_lacunas": {
+      "ha_pontos_de_atencao": true,
+      "ha_pontos_de_atencao_texto": "Sim",
+      "descricao": "Oxidacao superficial localizada em suporte secundario e necessidade de reforcar identificacao visual da linha.",
+      "evidencias": {
+        "disponivel": true,
+        "referencias": [
+          "IMG_030"
+        ],
+        "referencias_texto": "IMG_030",
+        "descricao": "Registro relacionado aos pontos de atencao ou a ausencia declarada deles.",
+        "observacao": "Evidencia vinculada ao fechamento da analise."
+      }
+    },
+    "recomendacoes": {
+      "texto": "Atualizar identificacao visual da linha e acompanhar o ponto de oxidacao em proxima rodada de inspecao."
+    },
+    "conclusao": {
+      "status": "ajuste",
+      "conclusao_tecnica": "O servico nr13 - inspecao de tubulacao foi consolidado com rastreabilidade suficiente, evidencias principais vinculadas e conclusao tecnica formalizada.",
+      "justificativa": "A conclusao considera o escopo registrado, o metodo aplicado, a documentacao disponivel, a evidencia principal e os pontos de atencao ou sua ausencia declarada."
+    }
+  }
+}

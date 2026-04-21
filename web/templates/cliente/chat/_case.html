@@ -1,0 +1,69 @@
+<section
+    id="chat-case"
+    class="surface-stage"
+    data-chat-panel="case"
+    role="tabpanel"
+    aria-labelledby="chat-section-tab-case"
+    {% if (cliente_chat_section_inicial | default('overview')) != 'case' %}hidden{% endif %}
+>
+    <div class="surface-stage-head">
+        <div>
+            <span class="surface-stage-kicker">Caso ativo</span>
+            <h3>Contexto e conversa do laudo selecionado</h3>
+            <p class="box-subtitle">Quando um caso estiver ativo, a conversa precisa dominar a tela e o contexto fica como apoio lateral.</p>
+        </div>
+    </div>
+
+    <div class="workspace-columns workspace-columns--chat workspace-columns--chat-focus">
+        <div class="workspace-context-stack">
+            <article class="box workspace-box workspace-box--context">
+                <div class="toolbar">
+                    <div class="toolbar-copy">
+                        <h3>Contexto do laudo</h3>
+                        <p class="box-subtitle">Status, prioridade e sinais do caso selecionado antes de continuar a conversa.</p>
+                    </div>
+                </div>
+
+                <div id="chat-contexto"></div>
+            </article>
+        </div>
+
+        <article class="box workspace-box workspace-box--thread">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3 id="chat-titulo">Selecione um laudo</h3>
+                    <p class="box-subtitle">Finalize, reabra e mantenha o historico sob controle com contexto visivel.</p>
+                    <div id="chat-case-policy-hint" class="toolbar-meta"></div>
+                </div>
+                <div class="hero-actions">
+                    <button id="btn-chat-finalizar" class="btn" type="button">Finalizar</button>
+                    <button id="btn-chat-reabrir" class="btn" type="button">Reabrir</button>
+                </div>
+            </div>
+            <div id="chat-case-policy-note" class="composer-status" hidden></div>
+
+            <div id="chat-mensagens" class="msgs"></div>
+
+            <form id="form-chat-msg" class="stack form-stack">
+                <div class="composer-toolbar">
+                    <button id="btn-chat-upload-doc" class="btn" type="button">Importar PDF/DOCX</button>
+                    <input
+                        id="chat-upload-doc"
+                        type="file"
+                        accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+                        hidden
+                        aria-hidden="true"
+                        tabindex="-1"
+                    >
+                </div>
+                <div id="chat-message-policy-note" class="composer-status" hidden></div>
+                <div id="chat-upload-status" class="composer-status" hidden></div>
+                <label>
+                    Mensagem
+                    <textarea id="chat-mensagem" placeholder="Escreva a proxima orientacao, contexto ou pergunta da empresa."></textarea>
+                </label>
+                <button id="btn-chat-msg-enviar" class="btn primary" type="submit">Enviar no chat</button>
+            </form>
+        </article>
+    </div>
+</section>

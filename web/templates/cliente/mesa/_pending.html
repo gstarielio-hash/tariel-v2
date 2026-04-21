@@ -1,0 +1,31 @@
+<section
+    id="mesa-pending"
+    class="surface-stage"
+    data-mesa-panel="pending"
+    role="tabpanel"
+    aria-labelledby="mesa-section-tab-pending"
+    {% if (cliente_mesa_section_inicial | default('overview')) != 'pending' %}hidden{% endif %}
+>
+    <div class="surface-stage-head">
+        <div>
+            <span class="surface-stage-kicker">Pendencias</span>
+            <h3>Chamados, triagem e movimentos recentes</h3>
+            <p class="box-subtitle">Pendencias abertas e movimentos recentes da mesa.</p>
+        </div>
+    </div>
+
+    <article class="box workspace-box workspace-box--radar">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Radar da mesa</h3>
+                <p class="box-subtitle">Alertas, triagem e movimentos antes da decisao tecnica.</p>
+            </div>
+        </div>
+
+        <div class="workspace-radar-grid workspace-radar-grid--mesa">
+            <div id="mesa-alertas-operacionais" class="stack workspace-radar-stack"></div>
+            <div id="mesa-triagem" class="activity-list workspace-radar-stack"></div>
+            <div id="mesa-movimentos" class="activity-list workspace-radar-stack"></div>
+        </div>
+    </article>
+</section>

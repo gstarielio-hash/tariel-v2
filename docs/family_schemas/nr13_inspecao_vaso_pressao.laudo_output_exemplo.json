@@ -1,0 +1,174 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr13_inspecao_vaso_pressao",
+  "template_code": "nr13_vaso_pressao",
+  "tokens": {
+    "cliente_nome": "Empresa Teste NR13",
+    "unidade_nome": "Unidade de Utilidades - Bloco B",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 922024001",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "NR13-VP-2026-001",
+    "empresa_nome": "Empresa Teste NR13",
+    "unidade_nome": "Unidade de Utilidades - Bloco B",
+    "data_inspecao": "2026-04-08",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva"
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Legibilidade parcial da placa foi compensada por prontuario vinculado e revisado pela Mesa.",
+    "observacoes_mesa": "Caso mantido em NR13 | vaso de pressao, sem troca de familia."
+  },
+  "resumo_executivo": "Foi realizada inspecao visual em vaso de pressao vertical localizado na casa de utilidades. A identificacao minima do equipamento foi validada com apoio de placa e prontuario, os dispositivos de seguranca foram registrados e a emissao do laudo foi aprovada com ressalva para acompanhamento de pontos iniciais de corrosao superficial.",
+  "identificacao": {
+    "identificacao_do_vaso": "Vaso de pressao vertical VP-204",
+    "localizacao": "Casa de utilidades, linha de ar comprimido, bloco B",
+    "placa_identificacao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_001",
+        "DOC_014"
+      ],
+      "referencias_texto": "IMG_001; DOC_014",
+      "descricao": "Placa parcialmente legivel com confirmacao complementar no prontuario.",
+      "observacao": "Numero de serie e fabricante confirmados pela documentacao vinculada."
+    },
+    "tag_patrimonial": "TAG-VP-204"
+  },
+  "caracterizacao_do_equipamento": {
+    "vista_geral_equipamento": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_002",
+        "IMG_003"
+      ],
+      "referencias_texto": "IMG_002; IMG_003",
+      "descricao": "Vista frontal e lateral do vaso de pressao instalado em base metalica."
+    },
+    "descricao_sumaria": "Equipamento vertical de medio porte, instalado em area coberta, com identificacao patrimonial e acesso frontal para leitura dos acessorios.",
+    "condicao_de_operacao_no_momento": "em_operacao"
+  },
+  "inspecao_visual": {
+    "condicao_geral": "Estrutura geral sem deformacoes aparentes, com pintura desgastada em pontos localizados e sem sinais de impacto estrutural recente.",
+    "integridade_aparente": "Integridade aparente preservada nas superficies visiveis observadas durante a coleta.",
+    "area_instalacao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_004"
+      ],
+      "referencias_texto": "IMG_004",
+      "descricao": "Area de instalacao limpa, com espaco suficiente para inspecao frontal."
+    },
+    "acessibilidade_para_inspecao": "Acesso frontal adequado e lateral parcialmente restrita por tubulacao secundaria.",
+    "pontos_de_corrosao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_005"
+      ],
+      "referencias_texto": "IMG_005",
+      "descricao": "Ponto inicial de corrosao superficial proximo ao suporte inferior."
+    },
+    "vazamentos": {
+      "disponivel": false,
+      "referencias": [],
+      "referencias_texto": "Nao observados",
+      "descricao": "Nao foram observados sinais aparentes de vazamento no momento da inspecao."
+    },
+    "isolamento_termico": {
+      "disponivel": false,
+      "referencias": [],
+      "referencias_texto": "Nao aplicavel",
+      "descricao": "Equipamento inspecionado sem isolamento termico externo."
+    }
+  },
+  "dispositivos_e_acessorios": {
+    "dispositivos_de_seguranca": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_006",
+        "IMG_007"
+      ],
+      "referencias_texto": "IMG_006; IMG_007",
+      "descricao": "Registro visual de valvula de seguranca e conjunto de instrumentos associados."
+    },
+    "leitura_dos_dispositivos_de_seguranca": "Valvula de seguranca visivelmente instalada, manometro presente e acessivel para leitura local.",
+    "manometro": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_008"
+      ],
+      "referencias_texto": "IMG_008",
+      "descricao": "Manometro com visor legivel durante a inspecao."
+    },
+    "valvula_seguranca_detalhe": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_009"
+      ],
+      "referencias_texto": "IMG_009",
+      "descricao": "Detalhe da valvula de seguranca e conexoes adjacentes."
+    },
+    "suportes_e_fixacao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_010"
+      ],
+      "referencias_texto": "IMG_010",
+      "descricao": "Base e suportes aparentam estabilidade visual adequada."
+    }
+  },
+  "documentacao_e_registros": {
+    "registros_disponiveis_no_local": "Prontuario e relatorio anterior estavam disponiveis digitalmente no momento da revisao. Nao houve certificado adicional apresentado em campo.",
+    "prontuario": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_014"
+      ],
+      "referencias_texto": "DOC_014 - prontuario_vp204.pdf",
+      "observacao": "Usado para complementar a identificacao da placa."
+    },
+    "certificado": {
+      "disponivel": false,
+      "referencias": [],
+      "referencias_texto": "Nao apresentado",
+      "observacao": "Ausencia registrada sem bloqueio adicional."
+    },
+    "relatorio_anterior": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_015"
+      ],
+      "referencias_texto": "DOC_015 - relatorio_anterior_2025.pdf",
+      "observacao": "Usado como referencia historica, sem prevalecer sobre a inspecao atual."
+    }
+  },
+  "nao_conformidades": {
+    "ha_nao_conformidades": true,
+    "ha_nao_conformidades_texto": "Sim",
+    "descricao": "Foi observada corrosao superficial localizada em ponto inferior do costado, sem indicios imediatos de vazamento no momento da coleta.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_005"
+      ],
+      "referencias_texto": "IMG_005",
+      "descricao": "Registro fotografico do ponto de corrosao superficial."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Manter acompanhamento do ponto de corrosao identificado, revisar protecao superficial e registrar nova verificacao fotografica na proxima rodada de inspecao."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "O vaso de pressao apresenta identificacao minima validada, evidencias obrigatorias suficientes e dispositivos de seguranca registrados, com necessidade de ajuste corretivo localizado associado a corrosao superficial observada.",
+    "justificativa": "A conclusao considera a evidencia visual coletada, a leitura dos dispositivos de seguranca, a ausencia de vazamentos aparentes e o registro de nao conformidade localizada sem comprometimento visual generalizado."
+  }
+}

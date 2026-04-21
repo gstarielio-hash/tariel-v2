@@ -1,0 +1,125 @@
+<header class="cliente-hero cliente-hero--compact">
+    <section class="hero-card hero-card--primary hero-card--executive hero-card--shell">
+        <div class="hero-brand" aria-hidden="true">
+            <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+        </div>
+
+        <div class="hero-banner hero-banner--compact">
+            <div class="hero-banner__copy">
+                <p class="hero-eyebrow">Portal da empresa</p>
+                <h1 class="hero-title">{{ empresa.nome_fantasia | e }}</h1>
+                <p class="hero-description">
+                    {{ usuario.nome_completo | e }} acompanha equipe, operacao e pendencias da empresa sem trocar de ambiente.
+                </p>
+            </div>
+
+            <div id="hero-focus" class="hero-focus" aria-live="polite">
+                <span class="hero-focus__label">Resumo rapido</span>
+                <strong id="hero-focus-title">A operacao da empresa esta pronta para acompanhamento</strong>
+                <p id="hero-focus-meta">Abra a aba principal acima e siga direto para o bloco que precisa de atencao.</p>
+            </div>
+        </div>
+
+        <div class="hero-meta">
+            <span class="hero-chip">Responsavel {{ empresa.nome_responsavel | default('nao informado', true) | e }}</span>
+            <span class="hero-chip">Base {{ empresa.cidade_estado | default('nao informada', true) | e }}</span>
+            <span class="hero-chip">CNPJ {{ empresa.cnpj | default('nao informado', true) | e }}</span>
+        </div>
+    </section>
+
+    <aside class="hero-side hero-side--compact">
+        <section class="hero-card hero-card--compact-shell">
+            <div class="hero-plan">
+                <div>
+                    <p class="box-subtitle">Plano atual da empresa</p>
+                    <strong>{{ empresa.plano_ativo | e }}</strong>
+                </div>
+                <span class="plan-badge">Operando</span>
+            </div>
+
+            <div id="hero-executive-kpis" class="hero-kpi-strip hero-kpi-strip--compact" aria-live="polite">
+                <article class="hero-kpi-card">
+                    <small>Plano</small>
+                    <strong>{{ empresa.plano_ativo | e }}</strong>
+                    <span>Resumo do contrato ativo.</span>
+                </article>
+                <article class="hero-kpi-card">
+                    <small>Equipe</small>
+                    <strong>Portal da empresa</strong>
+                    <span>Controles administrativos e operacionais no mesmo acesso.</span>
+                </article>
+            </div>
+
+            <div id="hero-plan-health" class="hero-status-list hero-status-list--compact" aria-live="polite"></div>
+
+            <div id="hero-command" class="hero-command hero-command--compact">
+                <div class="hero-command__copy">
+                    <span class="hero-command__eyebrow">Proximo movimento</span>
+                    <strong id="hero-command-title">Abrir o bloco prioritario</strong>
+                    <p id="hero-command-meta">Use a navegacao do topo para entrar direto no ponto que precisa de ajuste.</p>
+                </div>
+
+                <div class="hero-command__actions">
+                    <button
+                        id="hero-command-action"
+                        class="btn primary"
+                        type="button"
+                        data-act="abrir-prioridade"
+                        data-kind="admin-section"
+                        data-canal="admin"
+                        data-target="admin-resumo-geral"
+                        data-origem="admin"
+                    >Abrir prioridade</button>
+                    <a class="btn ghost" href="{{ cliente_surface_routes.admin | default('/cliente/painel') | e }}?sec=support">Suporte e auditoria</a>
+                </div>
+            </div>
+
+            <div class="stack stack--compact">
+                <div>
+                    <h2>Prioridades da empresa</h2>
+                    <p>Veja primeiro o que pede acao imediata e depois aprofunde na aba correspondente.</p>
+                </div>
+
+                <div id="hero-prioridades" class="priority-list"></div>
+            </div>
+
+            <div class="stack stack--compact">
+                <div>
+                    <h2>Acesso atual</h2>
+                    <p>Este login administra a empresa e segue pelas abas do topo.</p>
+                </div>
+
+                <div class="hero-access-grid">
+                    <div class="context-block">
+                        <small>Perfil logado</small>
+                        <strong>Administrador da empresa</strong>
+                    </div>
+                    <div class="context-block">
+                        <small>Escopo</small>
+                        <strong>Empresa logada</strong>
+                    </div>
+                </div>
+            </div>
+
+            {% if portal_switch_links | default([], true) %}
+            <div class="hero-side-meta">
+                {% for item in portal_switch_links %}
+                <a class="hero-chip" href="{{ item.url | e }}">Abrir {{ item.label | e }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="hero-side-meta hero-side-meta--spaced">
+                <span class="hero-chip">{{ usuario.email | e }}</span>
+                <span class="hero-chip">Portal administrativo da empresa</span>
+            </div>
+
+            <form method="post" action="/cliente/logout">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="hero-actions hero-actions--compact">
+                    <button class="btn ghost" id="btn-logout-cliente" type="submit">Sair do portal</button>
+                </div>
+            </form>
+        </section>
+    </aside>
+</header>

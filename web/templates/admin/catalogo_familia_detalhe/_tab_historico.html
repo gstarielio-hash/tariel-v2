@@ -1,0 +1,32 @@
+                <section class="catalog-tab-panel" id="catalog-panel-historico">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Linha do tempo</p>
+                                <h2>Historico</h2>
+                                <p class="catalog-panel__description">Linha do tempo com quem fez a mudanca, quando ela aconteceu e um resumo curto.</p>
+                            </div>
+                        </div>
+                        <div class="catalog-timeline">
+                            {% for item in history %}
+                            <article class="catalog-timeline__item catalog-timeline__item--{{ item.tipo | e }}">
+                                <div class="catalog-timeline__meta">
+                                    <span class="catalog-chip">{{ item.tipo_label | e }}</span>
+                                    <span>{{ item.quando_label | e }}</span>
+                                </div>
+                                <strong>{{ item.titulo | e }}</strong>
+                                <p>{{ item.detalhe | e }}</p>
+                                <p class="catalog-timeline__actor">Responsavel: {{ item.actor_label | e }}</p>
+                                {% if item.diff_summary %}
+                                <p class="catalog-timeline__diff">Resumo da mudanca: {{ item.diff_summary | e }}</p>
+                                {% endif %}
+                            </article>
+                            {% else %}
+                            <article class="catalog-empty-card">
+                                <strong>Nenhum evento relevante registrado ainda.</strong>
+                                <p>A linha do tempo aparece quando houver mudancas na familia, na oferta, na validacao ou na liberacao.</p>
+                            </article>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>

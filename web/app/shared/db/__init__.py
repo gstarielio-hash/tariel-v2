@@ -1,0 +1,46 @@
+"""Pacote de runtime e utilitários da camada de banco compartilhada."""
+
+from app.shared.db.contracts import (
+    EvidenceMesaStatus,
+    EvidenceOperationalStatus,
+    LIMITES_PADRAO,
+    LimitePlanoFallback,
+    ModoResposta,
+    NivelAcesso,
+    OperationalEventSource,
+    OperationalEventType,
+    OperationalIrregularityStatus,
+    OperationalResolutionMode,
+    OperationalSeverity,
+    PlanoEmpresa,
+    StatusAprendizadoIa,
+    StatusLaudo,
+    StatusRevisao,
+    TipoMensagem,
+    VereditoAprendizadoIa,
+)
+from app.shared.db.runtime import SessaoLocal, URL_BANCO, _normalizar_url_banco, motor_banco
+
+__all__ = [
+    "EvidenceMesaStatus",
+    "EvidenceOperationalStatus",
+    "LIMITES_PADRAO",
+    "LimitePlanoFallback",
+    "ModoResposta",
+    "NivelAcesso",
+    "OperationalEventSource",
+    "OperationalEventType",
+    "OperationalIrregularityStatus",
+    "OperationalResolutionMode",
+    "OperationalSeverity",
+    "PlanoEmpresa",
+    "SessaoLocal",
+    "StatusAprendizadoIa",
+    "StatusLaudo",
+    "StatusRevisao",
+    "TipoMensagem",
+    "URL_BANCO",
+    "VereditoAprendizadoIa",
+    "_normalizar_url_banco",
+    "motor_banco",
+]

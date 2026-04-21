@@ -1,0 +1,68 @@
+{% set home_forcado_inicial = home_forcado_inicial | default(false) %}
+{% set possui_contexto_ativo = status_relatorio_atual != "sem_relatorio" %}
+{% set modo_inspecao_inicial = "home" if home_forcado_inicial else "workspace" %}
+{% set workspace_stage_inicial = "inspection" if possui_contexto_ativo else "assistant" %}
+{% set inspector_screen_inicial = "portal_dashboard" if home_forcado_inicial else ("assistant_landing" if workspace_stage_inicial == "assistant" else "inspection_workspace") %}
+{% set thread_tab_inicial = "historico" if possui_contexto_ativo else "conversa" %}
+
+<main
+    class="painel-chat"
+    id="painel-chat"
+    data-inspector-shell="final"
+    data-inspecao-ui="{{ modo_inspecao_inicial }}"
+    data-workspace-stage="{{ workspace_stage_inicial }}"
+    data-inspector-screen="{{ inspector_screen_inicial }}"
+    data-thread-tab="{{ thread_tab_inicial }}"
+    data-laudo-atual-id="{{ laudo_selecionado_id if laudo_selecionado_id else '' }}"
+    data-estado-relatorio="{{ status_relatorio_atual }}"
+    data-entry-mode-preference-default="{{ entry_mode_preference_default | default('auto_recommended') }}"
+    data-entry-mode-remember-last-case-mode="{{ 'true' if entry_mode_remember_last_case_mode | default(false) else 'false' }}"
+    data-entry-mode-last-case-mode="{{ entry_mode_last_case_mode | default('') }}"
+    data-screen-controller="inspector"
+>
+    <div
+        id="banner-notificacao-engenharia"
+        class="banner-engenharia"
+        role="status"
+        aria-live="assertive"
+        aria-atomic="true"
+        hidden
+    >
+        <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+        <div class="banner-texto">
+            <strong>Mesa avaliadora respondeu</strong>
+            <span id="texto-previa-notificacao">Nova mensagem recebida...</span>
+        </div>
+        <button type="button" class="btn-fechar-banner" aria-label="Fechar notificação">
+            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+        </button>
+    </div>
+
+    <div class="inspetor-shell-grid">
+        {% include "inspetor/_sidebar.html" %}
+
+        <div class="inspetor-main" data-screen-host="inspector">
+            {% include "inspetor/_portal_home.html" %}
+            {% include "inspetor/_workspace.html" %}
+        </div>
+    </div>
+
+    <div id="camada-arraste" class="camada-arraste" aria-hidden="true">
+        <div class="box-arraste">
+            <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+            <h3>Solte o arquivo aqui</h3>
+            <p>Imagens (PNG, JPG, WebP) ou documentos (PDF, DOCX)</p>
+        </div>
+    </div>
+
+    <div
+        class="inspetor-screen-root inspetor-screen-root--mesa-widget"
+        data-screen-root="mesa-widget"
+        data-inspector-region="mesa-widget-root"
+        data-active="{{ 'false' if home_forcado_inicial else 'true' }}"
+        aria-hidden="{{ 'true' if home_forcado_inicial else 'false' }}"
+        {% if home_forcado_inicial %}hidden inert{% endif %}
+    >
+        {% include "inspetor/_mesa_widget.html" %}
+    </div>
+</main>

@@ -1,0 +1,5925 @@
+## 2026-04-04 21:25:00 -0300 - Execucao 5: componentizacao visual do /app e da Mesa por slices canonicos
+
+- Objetivo:
+  - transformar o rollout visual aprovado em ownership nativo por slices
+  - reduzir a responsabilidade visual de `reboot.css`, `workspace.css` e `chat_base.css`
+  - preservar os fluxos oficiais do inspetor e da Mesa sem abrir feature nova
+- Baseline before usado:
+  - `artifacts/final_visual_refactor/20260404_202709/visual_inventory_after.json`
+  - `artifacts/final_visual_refactor/20260404_202709/hotspots_matrix.json`
+  - `artifacts/final_visual_refactor/20260404_202709/legacy_reduction_report.md`
+- Slices extraidos:
+  - `web/static/css/inspetor/workspace_chrome.css`
+  - `web/static/css/inspetor/workspace_rail.css`
+  - `web/static/css/inspetor/workspace_states.css`
+- Implementacao principal:
+  - `web/templates/inspetor/base.html` passou a carregar os novos slices canonicos do `/app`
+  - `workspace_header`, `workspace_toolbar`, `inspection_history` e `workspace_context_rail` passaram a marcar ownership com `data-component-slice`
+  - `reboot.css` perdeu ownership de header, tabs, toolbar, hero strip, rail toggle e progress visuals
+  - `workspace.css` deixou de sustentar topo, rail principal e empty states canonicos, ficando como compatibilidade residual
+  - `chat_base.css` perdeu o bloco antigo do workspace do inspetor, explicitando que nao e entrypoint oficial do `/app`
+  - `chat_index_page.js` passou a expor estado visual por `data-expanded`, `data-progress-state` e `--workspace-progress-percent`
+- Deltas objetivos:
+  - `reboot.css`: `3818 -> 2856` linhas
+  - `workspace.css`: `2993 -> 2504` linhas
+  - `chat_base.css`: `5676 -> 5375` linhas
+  - diff dos arquivos tratados: `190 insertions`, `3162 deletions`
+- Artefatos principais:
+  - `artifacts/final_visual_componentization/20260404_211656/visual_inventory_after.json`
+  - `artifacts/final_visual_componentization/20260404_211656/screenshots_after/`
+  - `artifacts/final_visual_componentization/20260404_211656/component_slices_matrix.json`
+  - `artifacts/final_visual_componentization/20260404_211656/legacy_reduction_delta.md`
+  - `artifacts/final_visual_componentization/20260404_211656/source_index.txt`
+- Validacoes executadas:
+  - `python -m py_compile web/scripts/final_visual_audit.py` -> `ok`
+  - `make verify` -> `ok`
+  - `make mesa-smoke` -> `ok`
+  - `make mesa-acceptance` -> `ok`
+  - `web/scripts/final_visual_audit.py --stage after --output-root ../artifacts/final_visual_componentization/20260404_211656` -> `ok`
+- Risco remanescente:
+  - `reboot.css` ainda concentra parte do historico focado e detalhes estruturais do shell
+  - `workspace.css` e `chat_base.css` ainda existem como legado residual e precisam de desativacao controlada
+
+## 2026-04-04 20:35:00 -0300 - Execucao 4: refatoracao estrutural dos hotspots visuais legacy
+
+- Objetivo:
+  - reduzir a dependencia do visual novo em folhas legacy grandes
+  - mover semantica visual para tokens e componentes canonicos nativos
+  - preservar os fluxos oficiais de `/admin`, `/cliente`, `/app` e `/revisao`
+- Baseline before usado:
+  - `artifacts/final_visual_audit/20260404_191730/visual_inventory_after.json`
+  - `artifacts/final_visual_audit/20260404_191730/screenshots_after/`
+- Hotspots tratados:
+  - `web/static/css/chat/chat_base.css`
+  - `web/static/css/inspetor/reboot.css`
+  - `web/static/css/inspetor/workspace.css`
+  - `web/static/css/revisor/painel_revisor.css`
+  - `web/static/css/revisor/templates_biblioteca.css`
+  - `web/static/js/chat/chat_index_page.js`
+- Implementacao principal:
+  - `official_visual_system.css` promovido a fonte do contrato canonico do inspetor para header, tabs, toolbar, status, empty states, chips e progress bar
+  - `workspace.css` limpo de blocos duplicados de topo/tabs/toolbar/empty state/action
+  - `reboot.css` limpo de redefines concorrentes e reancorado em surfaces claras do sistema canonico
+  - `chat_base.css` retonalizado para superfices claras e tokens `--vf-*` no `/app`
+  - `painel_revisor.css` e `templates_biblioteca.css` convertidos de token systems paralelos para aliases do sistema canonico
+  - `chat_index_page.js` passou a expor `data-mesa-status` e `--workspace-progress-percent`, removendo metadado visual morto
+- Deltas objetivos:
+  - `workspace.css`: `3897 -> 2993` linhas
+  - `reboot.css`: `4132 -> 3818`
+  - `painel_revisor.css`: `# 138 -> 110`
+  - `templates_biblioteca.css`: `# 51 -> 29`
+  - `chat_index_page.js`: remocao de `CONFIG_STATUS_MESA.classe` e fim do `width` inline direto da barra final
+- Artefatos principais:
+  - `artifacts/final_visual_refactor/20260404_202709/visual_inventory_before.json`
+  - `artifacts/final_visual_refactor/20260404_202709/visual_inventory_after.json`
+  - `artifacts/final_visual_refactor/20260404_202709/visual_inventory.json`
+  - `artifacts/final_visual_refactor/20260404_202709/hotspots_matrix.json`
+  - `artifacts/final_visual_refactor/20260404_202709/legacy_reduction_report.md`
+  - `artifacts/final_visual_refactor/20260404_202709/style_tokens.json`
+- Validacoes executadas:
+  - `python -m py_compile web/scripts/final_visual_audit.py` -> `ok`
+  - `make verify` -> `ok`
+  - `make mesa-smoke` -> `ok`
+  - `make mesa-acceptance` -> `ok`
+  - `web/scripts/final_visual_audit.py --stage after --output-root ../artifacts/final_visual_refactor/20260404_202709` -> `ok`
+- Risco remanescente:
+  - `chat_base.css` ainda segue muito extenso e merece componentizacao adicional
+  - `reboot.css` e `workspace.css` ainda concentram bastante layout estrutural do `/app`
+
+## 2026-04-04 19:55:00 -0300 - Execucao 3: auditoria visual completa e padronizacao canonica do produto oficial
+
+- Objetivo:
+  - executar uma auditoria visual real das superficies oficiais web
+  - definir um novo sistema visual canonico
+  - aplicar padronizacao real sem abrir nova feature nem frontend paralelo
+- Escopo oficial auditado:
+  - `/admin`
+  - `/cliente`
+  - `/app`
+  - `/revisao`
+  - biblioteca e editor de templates da mesa
+- Decisao visual da fase:
+  - linguagem enterprise clara, sobria e de baixa saturacao
+  - benchmark principal em `Carbon Design System`
+  - benchmark secundario em `Atlassian Design System`
+  - `Material 3` usado apenas como referencia de organizacao de tokens/estados
+  - `/cliente` escolhido como base estrutural do rollout
+- Implementacao principal:
+  - criacao de `web/static/css/shared/official_visual_system.css`
+  - injecao do sistema visual canonico nos templates oficiais de `admin`, `cliente`, `app`, `revisao` e auth pages
+  - ajuste de microcopy e CTA em shells, heads e estados vazios
+  - padronizacao de cards, tabs, badges, formularios, tabelas e superficies
+  - criacao do runner `web/scripts/final_visual_audit.py` para capturar screenshots e inventarios before/after
+- Artefatos principais:
+  - `artifacts/final_visual_audit/20260404_191730/visual_inventory_before.json`
+  - `artifacts/final_visual_audit/20260404_191730/visual_inventory_after.json`
+  - `artifacts/final_visual_audit/20260404_191730/visual_inventory.json`
+  - `artifacts/final_visual_audit/20260404_191730/style_tokens.json`
+  - `artifacts/final_visual_audit/20260404_191730/screenshots_before/`
+  - `artifacts/final_visual_audit/20260404_191730/screenshots_after/`
+- Validacoes executadas:
+  - `python -m py_compile web/scripts/final_visual_audit.py` -> `ok`
+  - `make verify` -> `ok`
+  - `make mesa-smoke` -> `ok`
+  - `make mesa-acceptance` -> `ok`
+- Deltas observaveis:
+  - `cliente_login`: `206 -> 178` palavras principais
+  - `cliente_chat`: `251 -> 208`
+  - `cliente_mesa`: `164 -> 139`
+  - `app_login`: `141 -> 123`
+  - `revisao_templates_biblioteca`: `202 -> 183`
+  - `revisao_templates_editor`: `350 -> 327`
+- Riscos remanescentes:
+  - parte do ganho visual ainda depende de overrides sobre CSS legacy grande
+  - a proxima fase ideal deve converter hotspots antigos para composicao baseada em tokens sem crescer novos estilos locais
+
+## 2026-04-04 13:20:00 -0300 - Execucao 2: estabilizacao do smoke-mobile e canonizacao do gate de release
+
+- Objetivo:
+  - fechar os dois maiores gaps operacionais apontados pela auditoria final:
+    - estabilizacao do `make smoke-mobile`
+    - definicao do gate canonico de release/CI do produto
+- Diagnostico real desta fase:
+  - o fluxo funcional do app continua comprovadamente executavel em artifact verde anterior
+  - o principal fator de falha atual segue sendo o host Android/emulador
+  - `adb shell` podia ficar pendurado mesmo quando o runner ja deveria ter retornado erro
+  - o probe `service list` era pesado demais para a lane e foi removido do caminho critico
+  - o Package Manager do emulador ainda pode degradar durante o `android:preview`
+- Implementacao principal:
+  - `scripts/run_mobile_pilot_runner.py` endurecido para:
+    - matar grupos de processo em timeout
+    - mover screenshot/UI dump para `/data/local/tmp`
+    - tratar `force-stop` e preparo do device como best-effort
+    - reiniciar o AVD com `adb emu kill` + espera pelo desaparecimento do serial
+    - separar recovery ambiental de regressao funcional
+  - `android/scripts/run-android-preview.cjs` passou a esperar Package Manager pronto antes do install
+  - `android/maestro/mobile-v2-pilot-run.yaml` recebeu tolerancia maior na espera inicial do login
+  - `Makefile` passou a expor:
+    - `make release-gate-hosted`
+    - `make release-gate-real`
+    - `make release-gate`
+  - `.github/workflows/ci.yml` passou a incluir:
+    - `document-acceptance`
+    - `observability-acceptance`
+    - `release-gate-hosted` como job agregador
+  - nova documentacao:
+    - `docs/final-project-audit/05_release_gate_canonico.md`
+    - `docs/developer-experience/04_mobile_smoke_and_release_gate.md`
+- Validacoes executadas:
+  - `make verify` -> ok
+  - `make mesa-smoke` -> ok
+  - `make mesa-acceptance` -> ok
+  - `make document-acceptance` -> ok
+  - `make observability-acceptance` -> ok
+  - `make release-gate-hosted` -> ok
+  - `make smoke-mobile` -> fail honesto / ainda flakey
+- Conclusao desta fase:
+  - o gate hospedado do produto ficou canonizado e verde
+  - o gate real ficou formalizado e continua exigindo mobile real
+  - o runner mobile ficou mais confiavel em diagnostico e menos propenso a ficar pendurado
+  - o principal bloqueador remanescente de finalizacao real continua sendo a lane Android do host atual
+
+# Execution Journal
+
+## 2026-03-30 18:48:03 -0300 - FE-V10 fechamento oficial da frontend paralelo da Mesa e promoção da Fase 06
+
+- Objetivo:
+  - fechar a decisão entre `SSR` e `frontend paralelo da Mesa`, sem deixar o fluxo do revisor em estado híbrido permanente.
+- Decisão oficial:
+  - `frontend paralelo da Mesa` promovida como superfície primária da Mesa
+  - `SSR` mantido como rollback explícito e fonte legacy de paridade
+- Implementação principal:
+  - `/revisao/painel` passa a redirecionar para o shell novo quando a superfície oficial está ativa
+  - `?surface=ssr` preserva bypass/rollback do HTML legacy
+  - o BFF do `frontend paralelo da Mesa` passou a preferir a `Cookie` do request do navegador, com fallback em `MESA_BACKEND_COOKIE`
+  - o fetch canônico do painel legacy foi travado em `/revisao/painel?surface=ssr`, eliminando a recursão entre Next e backend quando o rollout oficial está ligado
+  - novos filtros operacionais da fila em `frontend paralelo da Mesa` cobrem `validar_aprendizado`, `aguardando_inspetor` e `acompanhamento`
+  - `make verify` passou a integrar `make mesa-smoke`
+- Validações executadas:
+  - `PYTHONPATH=. ./.venv-linux/bin/python -m pytest -q tests/test_reviewer_panel_boot_hotfix.py` em `web/` -> `8 passed`
+  - `PYTHONPATH=. ./.venv-linux/bin/python -m pytest -q tests/test_smoke.py tests/test_reviewer_panel_boot_hotfix.py` em `web/` -> `34 passed`
+  - `./scripts/dev/check_frontend.sh --with-e2e-mock` -> `ok`
+- Artifact principal:
+- Evidência objetiva:
+  - `status=ok`
+  - `redirectStatus=307`
+  - `rollbackStatus=200`
+  - `legacyCount=73`
+  - `nextCount=73`
+  - `sharedCount=73`
+  - `missingInNext=[]`
+  - `extraInNext=[]`
+  - `mismatches=[]`
+- Resultado:
+  - `FE-V10` fechado
+  - `Fase 06 - Mesa` promovida
+  - frente principal do plano mestre passa para `Fase 07 - Cliente e admin`
+
+## 2026-03-29 08:32:00 -0300 - DevKit-V3E lane oficial de Android Emulator no Linux
+
+- Objetivo:
+  substituir a dependência de device físico por uma lane oficial de Android Emulator no Linux, integrada ao DevKit atual e sem reescrever o app Android.
+- Fontes de verdade auditadas:
+  - `docs/developer-experience/00_codex_cli_linux_high_level.md`
+  - `docs/developer-experience/01_repo_operating_model.md`
+  - `docs/developer-experience/02_android_baseline_and_ci.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `artifacts/devkit_codex_cli_linux/20260329_065527/devkit_summary.json`
+  - `artifacts/devkit_codex_cli_linux_v2/20260329_071730/devkit_summary.json`
+  - `artifacts/devkit_codex_cli_linux_v2/20260329_071730/android_baseline_matrix.md`
+  - `artifacts/devkit_codex_cli_linux_v2/20260329_071730/source_index.txt`
+  - `android/package.json`
+  - `android/README.md`
+  - `android/scripts/`
+  - `android/maestro/`
+  - `scripts/dev/lib.sh`
+  - `scripts/dev/check_android.sh`
+  - `scripts/dev/check_all.sh`
+  - `scripts/dev/check_ci_baseline.sh`
+  - `scripts/dev/status.sh`
+  - `scripts/dev/run_android_stack.sh`
+- Auditoria real do host Linux:
+  - `ANDROID_SDK_ROOT=/home/gabriel/.local/share/android-sdk`
+  - `ANDROID_HOME` nao definido
+  - `JAVA_HOME=/home/gabriel/.local/opt/jdk-17`
+  - `adb`, `emulator`, `avdmanager` e `sdkmanager` encontrados
+  - Android Studio nao encontrado no host desta fase, mas o SDK estava funcional
+  - AVD encontrado:
+    - `Tariel_API_35`
+  - `/dev/kvm` presente com acesso de leitura e escrita para o usuario
+- Decisao oficial do modelo Android:
+  - modo A para uso diario:
+    - emulador + build dev nativa
+    - runner oficial: `scripts/dev/run_android_emulator_stack.sh --mode dev --with-api`
+  - modo B para instalacao reprodutivel:
+    - emulador + APK local
+    - runner oficial: `scripts/dev/run_android_emulator_stack.sh --mode apk --with-api`
+  - baseline obrigatoria permaneceu intacta:
+    - `typecheck`
+    - `lint`
+    - `test:baseline`
+- Implementacao principal:
+  - extensao de `scripts/dev/lib.sh` para descoberta de SDK, tools Android, AVD, serial do emulador, boot completo e `adb reverse`
+  - criacao de:
+    - `scripts/dev/check_android_emulator.sh`
+    - `scripts/dev/android_wait_for_boot.sh`
+    - `scripts/dev/run_android_emulator.sh`
+    - `scripts/dev/install_android_apk.sh`
+    - `scripts/dev/run_android_emulator_stack.sh`
+  - integracao em:
+    - `scripts/dev/check_android.sh`
+    - `scripts/dev/check_all.sh`
+    - `scripts/dev/check_ci_baseline.sh`
+    - `scripts/dev/status.sh`
+    - `scripts/dev/run_android_stack.sh`
+  - documentacao nova:
+    - `docs/developer-experience/03_android_emulator_lane.md`
+- Ajustes operacionais relevantes:
+  - o launcher do app no install de APK deixou de usar `adb shell monkey` e passou a usar `am start -W -n com.tarielia.inspetor/.MainActivity`
+  - a instalacao de APK passou a usar `adb install --no-streaming -r`
+  - o criterio de boot completo ficou mais estrito:
+    - propriedades `sys.boot_completed` e `dev.bootcomplete`
+    - `bootanim` parado
+    - service `package` disponivel
+  - o resultado do Maestro passou a ficar persistido em arquivo proprio para nao ser sobrescrito por uma lane posterior de boot
+- Validacoes executadas:
+  - `scripts/dev/check_android_emulator.sh` -> `ok`
+  - `scripts/dev/run_android_emulator_stack.sh --mode boot --headless --boot-timeout 420` -> `ok`
+  - `scripts/dev/install_android_apk.sh --serial emulator-5554` -> `ok`
+  - `adb reverse --list` -> `ok`, portas `8000` e `8081` visiveis conforme a lane
+  - `adb shell dumpsys activity activities | rg com.tarielia.inspetor` -> `ok`, `MainActivity` no topo
+  - `scripts/dev/check_backend.sh` -> `ok`
+  - `scripts/dev/check_frontend.sh` -> `ok`
+  - `scripts/dev/check_android.sh` -> `ok`
+  - `scripts/dev/check_all.sh --with-android-emulator-lane --android-emulator-mode boot` -> `ok`
+  - `scripts/dev/status.sh` -> `ok`
+  - `scripts/dev/run_android_emulator_stack.sh --mode maestro-smoke --with-api` -> `fail` honesto
+- Resultado real do Maestro:
+  - o smoke executou no `emulator-5554`
+  - o app abriu com clear state
+  - o fluxo falhou no assert `id: chat-tab-button is visible`
+  - debug artifacts ficaram em `~/.maestro/tests/2026-03-29_083110`
+- Riscos remanescentes:
+  - o smoke Maestro ainda depende de estabilizacao de seletor/estado inicial da tela apos o launch no emulador
+  - a lane `dev` ficou implementada e integrada, mas nesta fase a validacao forte foi feita sobre `boot`, `apk` e `maestro-smoke`
+- Proximo passo recomendado:
+  - DevKit-V3F com estabilizacao do smoke Maestro no emulador e revisao dos seletores do login/app shell
+
+## 2026-03-29 06:46:39 -0300 - DevKit de alto nível para Codex CLI no Linux no projeto atual
+
+- Objetivo:
+  entregar uma camada operacional de alto nível para backend Python, frontend frontend paralelo da Mesa e Android, sem reescrever o produto e sem trocar a stack central do repositório.
+- Auditoria do ambiente:
+- Toolchain encontrado na máquina desta fase:
+  `python3`, `node`, `npm`, `ruff`, `adb`, `maestro`, `git`, `curl`, `jq`;
+  `tmux`, `direnv`, `uv`, `docker` e binário global de `eas` não estavam disponíveis no host.
+- Decisão pragmática de kit:
+  `tmux` como multiplexador oficial suportado pelo repo, mas opcional por máquina;
+  `direnv` e `uv` como opcionais progressivos;
+  `venv` + `pip` continuam compatíveis com o backend atual;
+  `adb`, Expo, Maestro e `npx eas` seguem o eixo do mobile.
+- Implementação principal:
+  criação de `scripts/dev/` com wrappers de run/check/status e coordenação do repo;
+  criação de `.envrc.example` como suporte opcional a `direnv`;
+  documentação nova em `docs/developer-experience/`;
+  preservação dos runners já existentes da Mesa e da stack Android.
+- Scripts entregues:
+  `scripts/dev/run_web_backend.sh`
+  `scripts/dev/run_android_stack.sh`
+  `scripts/dev/check_backend.sh`
+  `scripts/dev/check_frontend.sh`
+  `scripts/dev/check_android.sh`
+  `scripts/dev/check_all.sh`
+  `scripts/dev/status.sh`
+  `scripts/dev/run_repo_stack.sh`
+  `scripts/dev/open_codex_workspace_tmux.sh`
+- Status centralizado:
+  `scripts/dev/status.sh` passou a consolidar ferramentas, `GET /ready`, BFF real/mock da Mesa, `adb` e presença do `.env` do Android; `--json` e `--strict` ficaram disponíveis para automação.
+- Workspace:
+  `scripts/dev/open_codex_workspace_tmux.sh` materializa o layout oficial `backend | mesa-real | mesa-mock | checks | android | codex`;
+  na máquina desta fase o script pôde ser validado em `--plan`, mas a criação real da sessão depende da instalação do binário `tmux`.
+- Validações executadas:
+  `scripts/dev/check_backend.sh`
+  `scripts/dev/check_frontend.sh`
+  `scripts/dev/check_android.sh`
+  `scripts/dev/check_all.sh`
+  `scripts/dev/status.sh`
+  `scripts/dev/status.sh --json`
+  `scripts/dev/run_web_backend.sh`
+  `scripts/dev/run_android_stack.sh --mode metro --dry-run`
+  `scripts/dev/open_codex_workspace_tmux.sh --plan`
+- Risco remanescente principal:
+  a máquina Linux usada nesta fase não tinha `tmux`; o workspace ficou pronto no repo, mas a sessão real depende da instalação local do binário.
+- Próximo passo recomendado:
+  DevKit v2 com bootstrap opcional de ferramentas Linux (`tmux`, `direnv`, `uv`) e CI dedicado para o DevKit.
+
+## 2026-03-28 12:58:26 -0300 - FE6 coordenacao read-only entre caso da Mesa e trilha documental do laudo
+
+- Objetivo:
+  - aprofundar o FE5 com um painel documental read-only dentro do mesmo shell do caso, conectando pacote, timeline, template e readiness documental sem trocar o backend Python nem abrir acao mutavel nova.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do recorte; o trabalho ficou restrito ao frontend novo, docs e artifacts do FE6
+  - FE1, FE2, FE3, FE4 e FE5 revisados em:
+    - `docs/restructuring-roadmap/96_mesa_templates_frontend_slice.md`
+    - `docs/restructuring-roadmap/97_mesa_templates_code_detail_slice.md`
+    - `docs/restructuring-roadmap/98_mesa_templates_version_detail_slice.md`
+    - `docs/restructuring-roadmap/100_mesa_queue_frontend_slice.md`
+    - `docs/restructuring-roadmap/101_mesa_case_detail_frontend_slice.md`
+  - auditoria do backend revisada em:
+    - `web/app/domains/revisor/mesa_api.py`
+    - `web/app/domains/revisor/service_package.py`
+    - `web/app/domains/revisor/base.py`
+    - `web/app/domains/chat/laudo.py`
+    - `web/app/domains/chat/chat_aux_routes.py`
+- Decisao de implementacao:
+  - fonte canonica do estado documental:
+    - `GET /revisao/api/laudo/{laudo_id}/pacote`
+    - `GET /revisao/api/laudo/{laudo_id}/completo?incluir_historico=true`
+  - artefato documental read-only mantido como link:
+    - `GET /revisao/api/laudo/{laudo_id}/pacote/exportar-pdf`
+  - rotas auditadas e descartadas para este shell:
+    - `GET /app/api/laudo/{laudo_id}/status_relatorio`
+    - `GET /app/api/gerar_pdf`
+    - `GET /revisao/api/templates-laudo/{template_id}/preview`
+  - motivo para descarte:
+    - contrato do eixo inspetor/sessao
+    - ou semantica de biblioteca/template, e nao do caso documental do revisor
+  - novo BFF local:
+    - `GET /api/mesa/caso/[laudoId]/documento`
+  - rota existente aprofundada:
+    - `/mesa/caso/[laudoId]`
+- Slice entregue:
+  - estado documental derivado do caso em foco
+  - checks operacionais read-only da trilha documento/template
+  - links locais para pacote JSON, completo e PDF do pacote
+  - integracao explicita entre:
+    - caso
+    - pacote tecnico
+    - timeline
+    - template/codigo/base recomendada
+  - limitacao honesta no modo real:
+    - materializacao final do laudo continua fora do payload publico do revisor
+- Modos real e emulado:
+  - modo real validado em sequencia com:
+    - `GET http://127.0.0.1:8000/ready` -> `status=ok`
+    - `GET http://127.0.0.1:3001/api/mesa/templates` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/fila` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/caso/6` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/caso/6/documento` -> `source=real`
+    - `HEAD http://127.0.0.1:3001/mesa/caso/6?code=padrao&queueFilter=missing_template` -> `200`
+  - modo mock validado em sequencia com:
+    - `GET http://127.0.0.1:3002/api/mesa/templates` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/fila` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/caso/9101` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/caso/9101/documento` -> `source=mock`
+    - `HEAD http://127.0.0.1:3002/mesa/templates?code=spda_aterramento&filter=missing_active_operational` -> `200`
+    - `HEAD http://127.0.0.1:3002/mesa/fila?code=spda_aterramento&queueFilter=code_without_active&laudoId=9101` -> `200`
+    - `HEAD http://127.0.0.1:3002/mesa/caso/9101?code=spda_aterramento&queueFilter=code_without_active` -> `200`
+  - restricao mantida:
+    - `Next 16.2.1` continua exigindo validacao sequencial de real e mock no mesmo diretorio; o FE6 foi validado com restart controlado do frontend
+- Validacoes:
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Artefatos gerados:
+  - `docs/restructuring-roadmap/102_mesa_case_document_status_frontend_slice.md`
+- Proximo passo recomendado:
+  - FE7 com preview read-only do pacote/documento da Mesa e historico paginado no mesmo shell
+
+## 2026-03-28 12:19:40 -0300 - FE5 detalhe coordenado do caso da Mesa com timeline read-only
+
+- Objetivo:
+  - aprofundar o FE4 com uma leitura coordenada do caso em foco, trazendo contexto técnico mais rico e timeline read-only sem trocar o backend Python nem abrir outro frontend.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do recorte; o trabalho ficou restrito ao frontend novo, docs e artifacts do FE5
+  - FE1, FE2, FE3 e FE4 revisados em:
+    - `docs/restructuring-roadmap/96_mesa_templates_frontend_slice.md`
+    - `docs/restructuring-roadmap/97_mesa_templates_code_detail_slice.md`
+    - `docs/restructuring-roadmap/98_mesa_templates_version_detail_slice.md`
+    - `docs/restructuring-roadmap/100_mesa_queue_frontend_slice.md`
+  - auditoria do backend revisada em:
+    - `web/app/domains/revisor/mesa_api.py`
+    - `web/app/domains/revisor/service_package.py`
+    - `web/app/domains/revisor/base.py`
+    - `web/app/domains/chat/mesa.py`
+- Decisão de implementação:
+  - fonte canônica do detalhe:
+    - `GET /revisao/painel`
+    - `GET /revisao/api/laudo/{laudo_id}/pacote`
+    - `GET /revisao/api/laudo/{laudo_id}/completo?incluir_historico=true`
+  - fonte real da timeline read-only:
+    - `GET /revisao/api/laudo/{laudo_id}/completo?incluir_historico=true`
+  - rota auditada e descartada para este shell:
+    - `GET /app/api/laudo/{laudo_id}/mesa/mensagens`
+  - motivo para descarte:
+    - contrato do eixo inspetor/mobile
+    - nao canônico para o revisor
+  - novo BFF local:
+    - `GET /api/mesa/caso/[laudoId]`
+  - nova rota do frontend:
+    - `/mesa/caso/[laudoId]`
+- Slice entregue:
+  - detalhe coordenado do laudo em foco
+  - pacote técnico read-only no mesmo shell
+  - timeline read-only do histórico do revisor
+  - aprendizados visuais e sinais operacionais do caso
+  - deep links claros:
+    - fila -> caso
+    - caso -> templates
+    - caso -> fila
+- Modos local e emulado:
+  - modo real validado em sequência com:
+    - `GET http://127.0.0.1:8000/ready` -> `status=ok`
+    - `GET http://127.0.0.1:3001/api/mesa/templates` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/fila` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/caso/6` -> `source=real`
+    - `HEAD http://127.0.0.1:3001/mesa/templates?code=padrao` -> `200`
+    - `HEAD http://127.0.0.1:3001/mesa/fila?code=padrao&queueFilter=missing_template&laudoId=6` -> `200`
+    - `HEAD http://127.0.0.1:3001/mesa/caso/6?code=padrao&queueFilter=missing_template` -> `200`
+  - modo mock validado em sequência com:
+    - `GET http://127.0.0.1:3002/api/mesa/templates` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/fila` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/caso/9101` -> `source=mock`
+    - `HEAD http://127.0.0.1:3002/mesa/templates?code=spda_aterramento&filter=missing_active_operational` -> `200`
+    - `HEAD http://127.0.0.1:3002/mesa/fila?code=spda_aterramento&queueFilter=code_without_active&laudoId=9101` -> `200`
+    - `HEAD http://127.0.0.1:3002/mesa/caso/9101?code=spda_aterramento&queueFilter=code_without_active` -> `200`
+  - restrição mantida:
+    - `Next 16.2.1` continua exigindo validação sequencial de real e mock no mesmo diretório
+- Validações:
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+- Artefatos gerados:
+- Próximo passo recomendado:
+  - FE6 com coordenação read-only entre caso da Mesa e trilha documental/materialização do laudo no mesmo shell
+
+## 2026-03-28 11:31:55 -0300 - FE4 conexão controlada entre templates e fila operacional da Mesa
+
+- Objetivo:
+  - ligar o eixo já entregue de templates ao trabalho real da Mesa no mesmo frontend novo, sem trocar o backend Python e sem abrir outro shell.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do recorte; o trabalho ficou restrito ao frontend novo, docs e artifacts do FE4
+  - FE1, FE2 e FE3 revisados em:
+    - `docs/restructuring-roadmap/96_mesa_templates_frontend_slice.md`
+    - `docs/restructuring-roadmap/97_mesa_templates_code_detail_slice.md`
+    - `docs/restructuring-roadmap/98_mesa_templates_version_detail_slice.md`
+  - auditoria do backend revisada em:
+    - `web/app/domains/revisor/panel.py`
+    - `web/app/domains/revisor/mesa_api.py`
+    - `web/app/domains/revisor/service_package.py`
+    - `web/templates/painel_revisor.html`
+- Decisao de implementacao:
+  - fonte canônica da lista da fila:
+    - `GET /revisao/painel`
+  - complemento read-only por laudo:
+    - `GET /revisao/api/laudo/{laudo_id}/completo`
+    - `GET /revisao/api/laudo/{laudo_id}/pacote`
+  - motivo:
+    - nao existe rota JSON do revisor em `/revisao/api/*` que replique a mesma classificacao operacional do painel
+    - `GET /cliente/api/mesa/laudos` foi auditada, mas ficou descartada como fonte principal por ser orientada ao admin-cliente e mais pobre semanticamente
+  - novo BFF local:
+    - `GET /api/mesa/fila`
+  - nova rota do frontend:
+    - `/mesa/fila`
+- Slice entregue:
+  - lista inicial de casos/laudos operacionais da Mesa
+  - foco por `laudoId`
+  - conexão com o código/template do laudo
+  - painel read-only do pacote técnico do caso
+  - filtros iniciais:
+    - `all`
+    - `responder_agora`
+    - `awaiting_review`
+    - `missing_template`
+    - `code_without_active`
+  - deep links bidirecionais:
+    - `/mesa/templates -> /mesa/fila?code=<codigo>`
+    - `/mesa/fila -> /mesa/templates?code=<codigo>`
+- Modos local e emulado:
+  - modo mock validado em sequência com:
+    - `GET http://127.0.0.1:3002/api/mesa/templates` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/fila` -> `source=mock`
+    - `HEAD http://127.0.0.1:3002/mesa/templates?code=spda_aterramento&queueFilter=code_without_active` -> `200`
+    - `HEAD http://127.0.0.1:3002/mesa/fila?code=spda_aterramento&queueFilter=code_without_active&laudoId=9101` -> `200`
+  - modo real validado em sequência com:
+    - `GET http://127.0.0.1:8000/ready` -> `status=ok`
+    - `GET http://127.0.0.1:3001/api/mesa/templates` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/fila` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/fila?laudoId=6` -> `focusedCase.laudoId=6`
+    - `HEAD http://127.0.0.1:3001/mesa/templates?code=live_demo_8be193c1&templateId=3` -> `200`
+    - `HEAD http://127.0.0.1:3001/mesa/fila?code=padrao&laudoId=6` -> `200`
+  - restricao mantida:
+    - `Next 16.2.1` continua exigindo validacao sequencial de real e mock no mesmo diretorio
+- Validacoes:
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+- Artefatos gerados:
+- Proximo passo recomendado:
+  - FE5 com detalhe coordenado do caso da Mesa e leitura read-only mais profunda do historico/mensagens no mesmo shell
+
+## 2026-03-28 10:58:17 -0300 - FE3 drill-down por versão/template no frontend novo da Mesa
+
+- Objetivo:
+  - aprofundar a vertical `/mesa/templates` além do foco por código, adicionando drill-down por `templateId` sem trocar o backend Python nem abrir outro grande slice.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do recorte; o trabalho ficou restrito ao frontend novo, docs e artifacts do FE3
+  - FE1 e FE2 revisados em:
+    - `docs/restructuring-roadmap/96_mesa_templates_frontend_slice.md`
+    - `docs/restructuring-roadmap/97_mesa_templates_code_detail_slice.md`
+  - artifacts base revisados em:
+- Decisão de implementação:
+  - manter a rota única:
+    - `/mesa/templates`
+  - manter a URL como fonte de estado:
+    - `code`
+    - `filter`
+    - `q`
+    - `templateId`
+  - derivar localmente:
+    - auditoria da versão por `template_id`
+    - origem de versão
+    - relacionamento entre versão, base recomendada e código
+- Slice entregue:
+  - timeline do código agora abre drill-down por versão
+  - painel dedicado da versão mostra:
+    - `templateId`
+    - status
+    - origem
+    - publicação
+    - última mudança
+    - observações
+    - auditoria da versão
+  - navegação entregue:
+    - voltar para visão por código
+    - versão mais nova
+    - versão mais antiga
+- Modos local e emulado:
+  - modo real validado em sequência com:
+    - `GET http://127.0.0.1:3000/api/mesa/templates` -> `source=real`
+    - `HEAD http://127.0.0.1:3000/mesa/templates?code=live_demo_8be193c1&templateId=3` -> `200`
+    - `HEAD http://127.0.0.1:3000/mesa/templates?code=live_demo_max_e09907f7&templateId=5` -> `200`
+  - modo mock validado com:
+    - `GET http://127.0.0.1:3000/api/mesa/templates` -> `source=mock`
+    - `HEAD http://127.0.0.1:3000/mesa/templates?filter=missing_active_operational&code=spda_aterramento&templateId=203` -> `200`
+    - `HEAD http://127.0.0.1:3000/mesa/templates?code=nr13_vaso_pressao&templateId=98` -> `200`
+  - restrição mantida:
+    - `Next 16.2.1` continua exigindo validação sequencial de real e mock
+- Validações:
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+- Artefatos gerados:
+- Próximo passo recomendado:
+  - FE4 com conexão controlada entre templates e fila operacional da Mesa no mesmo frontend novo
+
+## 2026-03-28 10:26:22 -0300 - FE2 detalhe operacional por codigo de template no frontend novo da Mesa
+
+- Objetivo:
+  - aprofundar a vertical `/mesa/templates` sem reescrever o frontend inteiro, entregando foco operacional por codigo e um filtro guiado para codigos sem versao ativa.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do recorte; o trabalho ficou restrito ao frontend novo, docs e artifacts do FE2
+  - frontend novo revisado:
+  - docs e artifacts de base revisados:
+    - `docs/restructuring-roadmap/96_mesa_templates_frontend_slice.md`
+- Decisao de implementacao:
+  - manter o BFF `GET /api/mesa/templates` sem mudar payload publico do backend Python
+  - derivar o FE2 por transformacao local:
+    - `statusBreakdown`
+    - `codeAudit`
+    - `isOperationalWithoutActive`
+  - usar a URL como estado de navegacao:
+    - `code`
+    - `filter`
+    - `q`
+- Slice entregue:
+  - detalhe operacional por codigo no painel lateral principal
+  - alertas explicitos para codigo em operacao sem versao ativa
+  - filtros guiados:
+    - `all`
+    - `missing_active_operational`
+    - `missing_active`
+    - `testing`
+    - `stable`
+  - navegacao interna:
+    - limpar foco
+    - codigo anterior
+    - proximo codigo
+    - foco persistido por query param
+  - auditoria recente filtrada por codigo
+- Modos local e emulado:
+  - modo real validado em sequencia com:
+    - `GET http://127.0.0.1:3000/api/mesa/templates` -> `source=real`
+    - `HEAD http://127.0.0.1:3000/mesa/templates?filter=missing_active_operational&code=spda_aterramento` -> `200`
+  - modo mock validado com:
+    - `GET http://127.0.0.1:3000/api/mesa/templates` -> `source=mock`
+    - `HEAD http://127.0.0.1:3000/mesa/templates?filter=missing_active_operational&code=spda_aterramento` -> `200`
+  - restricao mantida:
+    - `Next 16.2.1` nao permite duas instancias simultaneas de `next dev` no mesmo diretorio
+    - real e mock continuam suportados, mas a validacao ocorre em sequencia
+- Validacoes:
+- Artefatos gerados:
+- Proximo passo recomendado:
+  - FE3 com drill-down por versao ou conexao controlada da fila operacional da Mesa ao mesmo shell do frontend novo
+
+## 2026-03-28 09:56:48 -0300 - FE1 fundacao do frontend novo da Mesa com vertical inicial de templates
+
+- Objetivo:
+  - abrir uma frente paralela em Next.js + TypeScript para a Mesa Avaliadora sem quebrar o web SSR atual e entregar a primeira vertical funcional ligada a templates.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do recorte; o trabalho ficou restrito ao frontend novo, scripts locais, docs e artifacts
+  - `web/PROJECT_MAP.md`, `web/README.md`, `web/docs/frontend_mapa.md` e `web/docs/mesa_avaliadora.md` revisados
+  - auditoria anterior revisada:
+    - `docs/restructuring-roadmap/93_web_service_functional_audit.md`
+    - `docs/restructuring-roadmap/94_mesa_template_first_slice.md`
+    - `artifacts/web_service_audit/20260328_090546/route_inventory.json`
+    - `artifacts/web_service_audit/20260328_090546/portal_matrix.md`
+    - `artifacts/web_service_audit/20260328_090546/mesa_template_focus.md`
+- Decisao de arquitetura:
+  - novo frontend criado em:
+  - stack:
+    - `Next.js 16.2.1`
+    - `React 19.2.4`
+    - `TypeScript`
+    - `App Router`
+    - `Tailwind CSS 4`
+    - `TanStack Query 5`
+  - integracao com backend:
+    - frontend chama apenas o BFF local `GET /api/mesa/templates`
+    - o route handler do Next consulta o backend Python em:
+      - `GET /revisao/api/templates-laudo`
+      - `GET /revisao/api/templates-laudo/auditoria`
+  - autenticacao inicial de dev:
+    - `MESA_BACKEND_COOKIE`
+    - ou login automatico do revisor por `scripts/mesa_frontend_login.py`
+  - modos entregues:
+    - `real`
+    - `mock`
+- Slice entregue:
+  - rota principal:
+    - `/mesa/templates`
+  - entrega funcional:
+    - resumo operacional de templates
+    - busca por nome/codigo
+    - agrupamento por codigo
+    - timeline de versoes do codigo em foco
+    - auditoria recente
+    - atalhos para biblioteca e editor Word existentes no backend
+  - fixtures locais:
+- Boot local validado:
+  - backend:
+    - `cd web && python3 -m uvicorn main:app --host 127.0.0.1 --port 8000`
+    - `GET /ready` -> `status=ok`
+  - frontend real:
+    - `GET http://127.0.0.1:3000/api/mesa/templates` -> `source=real`
+    - `HEAD http://127.0.0.1:3000/mesa/templates` -> `200`
+  - frontend mock:
+    - `GET http://127.0.0.1:3000/api/mesa/templates` -> `source=mock`
+    - `HEAD http://127.0.0.1:3000/mesa/templates` -> `200`
+  - restricao observada:
+    - `Next 16` nao aceita dois `next dev` simultaneos no mesmo diretorio
+    - modo real e mock foram validados em sequencia
+- Validacoes:
+  - `python3 -m py_compile scripts/mesa_frontend_login.py` -> `ok`
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+- Artefatos gerados:
+- Proximo passo recomendado:
+  - segundo slice pequeno do frontend novo da Mesa, ainda focado em templates, ou abertura controlada do eixo `mesa` alem de templates mantendo o backend Python como fonte de verdade
+
+## 2026-03-27 20:41:48 -0300 - Gate review formal do `report_finalize_stream` apos campanha ampliada de shadow
+
+- Objetivo:
+  - decidir formalmente, com evidencia real do codigo atual, da documentacao atual e da campanha ampliada, qual deve ser o proximo estado do slice `report_finalize_stream`.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do slice documental
+  - artifacts 10F mais recentes revisados:
+    - validacao:
+      - `artifacts/document_hard_gate_validation_10f/20260327_155813/`
+    - review anterior:
+      - `artifacts/document_hard_gate_review_10f/20260327_161354/`
+    - campanha ampliada:
+      - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/`
+  - tenant/host/operacao revisados:
+    - tenant `1`
+    - `Empresa A`
+    - host `testclient/local controlled`
+    - rota `POST /app/api/chat`
+    - `operation_kind=report_finalize_stream`
+  - flags revisadas:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=report_finalize_stream`
+- Evidencias revisadas:
+  - docs canonicos obrigatorios do V2 em `/home/gabriel/Area de trabalho/Tarie 2`
+  - `docs/restructuring-roadmap/67_epic10a_document_soft_gate.md`
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/69_epic10b_hard_gate_validation.md`
+  - `docs/restructuring-roadmap/70_epic10b_gate_review.md`
+  - `docs/restructuring-roadmap/71_epic10c_next_mutable_document_point.md`
+  - `docs/restructuring-roadmap/72_epic10c_gate_review.md`
+  - `docs/restructuring-roadmap/73_epic10d_candidate_selection.md`
+  - `docs/restructuring-roadmap/74_epic10d_review_reject_shadow.md`
+  - `docs/restructuring-roadmap/75_epic10d_gate_review.md`
+  - `docs/restructuring-roadmap/76_epic10e_review_reject_semantics.md`
+  - `docs/restructuring-roadmap/77_epic10f_strong_document_point_selection.md`
+  - `docs/restructuring-roadmap/78_epic10f_report_finalize_stream_shadow.md`
+  - `docs/restructuring-roadmap/79_epic10f_gate_review.md`
+  - `docs/restructuring-roadmap/80_epic10f_shadow_campaign.md`
+  - `artifacts/document_hard_gate_validation_10f/20260327_155813/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10f/20260327_155813/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10f/20260327_155813/final_report.md`
+  - `artifacts/document_hard_gate_review_10f/20260327_161354/review_summary.json`
+  - `artifacts/document_hard_gate_review_10f/20260327_161354/review_findings.md`
+  - `artifacts/document_hard_gate_review_10f/20260327_161354/decision.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/campaign_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/campaign_cases.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/campaign_findings.md`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/source_cases_index.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/boot_import_check.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/responses/admin_summary_response.json`
+  - `web/app/domains/chat/chat_stream_routes.py`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/v2/document/hard_gate_metrics.py`
+  - `web/tests/test_v2_document_hard_gate_10f.py`
+- Achados principais:
+  - o codigo atual confirmou que `report_finalize_stream` continua estritamente `shadow_only`:
+    - `enforce_enabled=false`
+    - `did_block=false`
+    - instrumentacao restrita a host local/controlado + tenant allowlisted + operation allowlisted
+  - a amostra combinada agora soma:
+    - `6` casos uteis
+    - `6` respostas `HTTP 200`
+    - `6` SSE preservados
+    - `3` casos com `would_block=true`
+    - `0` casos com `did_block=true`
+  - `template_not_bound` e `template_source_unknown` se repetiram de forma estavel nos 3 casos `template gap`
+  - os 3 casos `template ok` eliminaram esses blockers sem regressao funcional
+  - `materialization_disallowed_by_policy` e `no_active_report` seguem `nao_observado` neste slice:
+    - isso nao pesa contra a continuidade em shadow
+    - pesa contra qualquer escopo futuro de `enforce` que tente inclui-los
+  - a observabilidade atual basta para manter `shadow`, mas ainda nao para discutir `future_enforce`:
+    - summary continua volatil em memoria
+    - historico ainda depende dos artifacts exportados
+  - rollback continua simples:
+    - remover `report_finalize_stream` da allowlist
+    - ou desligar o hard gate
+- Validacoes rerodadas:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/chat/chat_stream_routes.py web/app/domains/chat/laudo_service.py web/app/v2/document/hard_gate.py web/app/v2/document/hard_gate_models.py web/app/v2/document/hard_gate_metrics.py web/app/v2/document/gate_models.py web/tests/test_v2_document_hard_gate_10f.py` -> `ok`
+- Decisao formal:
+  - `approved_for_shadow_continuation`
+  - isso significa manter `report_finalize_stream` explicitamente em `shadow_only`
+- Condicoes antes de qualquer discussao futura de `enforce`:
+  - limitar qualquer futuro escopo candidato, no maximo, a `template_not_bound` e `template_source_unknown`
+  - manter `materialization_disallowed_by_policy` e `no_active_report` fora de qualquer `enforce` enquanto nao houver observacao dedicada neste mesmo slice
+  - produzir nova evidencia controlada fora do unico harness atual, preservando SSE e exportando artifacts por execucao
+  - demonstrar isolamento estrutural mais forte do branch `eh_comando_finalizar` dentro de `POST /app/api/chat`
+  - manter boot/import check e trilha duravel de review enquanto o summary seguir volatil em memoria
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_review_10f_campaign/20260327_204148/review_summary.json`
+  - `artifacts/document_hard_gate_review_10f_campaign/20260327_204148/review_findings.md`
+  - `artifacts/document_hard_gate_review_10f_campaign/20260327_204148/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_review_10f_campaign/20260327_204148/decision.txt`
+- Proximo passo recomendado:
+  - nova rodada controlada de shadow do `report_finalize_stream` focada em isolamento estrutural e trilha duravel de evidencia, sem abrir `enforce`
+
+## 2026-03-27 16:40:31 -0300 - Campanha operacional ampliada de `shadow` do `report_finalize_stream`
+
+- Objetivo:
+  - ampliar a evidencia operacional do recorte `report_finalize_stream` antes de qualquer novo gate review de `enforce`.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo fora do slice documental
+  - boot/import check executado com:
+    - `AMBIENTE=dev PYTHONPATH=web python3 -c "import main; main.create_app(); print('boot_import_ok')"`
+  - resultado registrado em:
+    - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/boot_import_check.txt`
+  - flags usadas:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=report_finalize_stream`
+  - tenant/local-controlado:
+    - tenant `1`
+    - `Empresa A`
+    - host `testclient`
+- Descoberta de casos:
+  - casos uteis/seguros encontrados:
+    - `padrao` sem template ativo compativel
+    - `padrao` com template ativo compativel
+  - tentativa exploratoria descartada:
+    - `nr13`
+    - caiu no gate de qualidade do template antes de gerar avaliacao de `report_finalize_stream`
+  - blockers ainda `nao_observado`:
+    - `materialization_disallowed_by_policy`
+    - `no_active_report`
+  - razao:
+    - o slice real exige laudo ativo
+    - no policy engine atual, esse contexto mantem materializacao permitida
+- Campanha executada:
+  - 4 execucoes uteis novas por HTTP local/controlado no recorte `POST /app/api/chat`
+  - banco dedicado da campanha:
+    - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/campaign_10f.db`
+  - casos:
+    - `shadow_stream_gap_padrao_round_1`
+    - `shadow_stream_ok_padrao_round_1`
+    - `shadow_stream_gap_padrao_round_2`
+    - `shadow_stream_ok_padrao_round_2`
+- Resultado agregado:
+  - `evaluations=4`
+  - `would_block=2`
+  - `did_block=0`
+  - `shadow_only=4`
+  - execucoes funcionais com HTTP `200` e SSE preservado:
+    - `4`
+  - blockers observados:
+    - `template_not_bound`:
+      - `2`
+    - `template_source_unknown`:
+      - `2`
+  - blockers ainda nao observados:
+    - `materialization_disallowed_by_policy`
+    - `no_active_report`
+- Achados principais:
+  - `template_not_bound` e `template_source_unknown` se repetiram de forma estavel nas duas rodadas sem template ativo
+  - as duas rodadas com template ativo reduziram os blockers para zero
+  - `did_block` permaneceu `0`
+  - o laudo continuou chegando em `Aguardando Aval`
+  - o recorte seguiu contido ao tenant/operacao allowlisted, com rollback simples por flag/allowlist
+- Validacoes rerodadas:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `py_compile` omitido:
+    - nao houve alteracao de codigo de produto nem script persistente nesta fase
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/campaign_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/campaign_cases.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/campaign_findings.md`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/source_cases_index.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/boot_import_check.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10f/20260327_162958/responses/admin_summary_response.json`
+- Proximo passo recomendado:
+  - novo gate review formal do `report_finalize_stream` usando a amostra ampliada desta campanha
+
+## 2026-03-27 16:13:54 -0300 - Gate review formal do Epic 10F+ sobre `report_finalize_stream` shadow_only
+
+- Objetivo:
+  - revisar formalmente o 10F+ para decidir, com evidencia real, se `report_finalize_stream` pode avancar alem de `shadow_only`.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue muito amplo/sujo, com muitas mudancas nao relacionadas fora do slice documental
+  - artifact mais recente do 10F+ localizado em:
+    - `artifacts/document_hard_gate_validation_10f/20260327_155813/`
+  - tenant e alvo usados no 10F+:
+    - tenant `1`
+    - `Empresa A`
+    - host `testclient`
+    - casos:
+      - `shadow_report_finalize_stream_with_template_gap`
+      - `shadow_report_finalize_stream_with_active_template`
+  - flags revisadas:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=report_finalize_stream`
+- Evidencias revisadas:
+  - docs canonicos do V2 em `/home/gabriel/Area de trabalho/Tarie 2`
+  - `docs/restructuring-roadmap/67_epic10a_document_soft_gate.md`
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/69_epic10b_hard_gate_validation.md`
+  - `docs/restructuring-roadmap/70_epic10b_gate_review.md`
+  - `docs/restructuring-roadmap/71_epic10c_next_mutable_document_point.md`
+  - `docs/restructuring-roadmap/72_epic10c_gate_review.md`
+  - `docs/restructuring-roadmap/73_epic10d_candidate_selection.md`
+  - `docs/restructuring-roadmap/74_epic10d_review_reject_shadow.md`
+  - `docs/restructuring-roadmap/75_epic10d_gate_review.md`
+  - `docs/restructuring-roadmap/76_epic10e_review_reject_semantics.md`
+  - `docs/restructuring-roadmap/77_epic10f_strong_document_point_selection.md`
+  - `docs/restructuring-roadmap/78_epic10f_report_finalize_stream_shadow.md`
+  - `artifacts/document_hard_gate_validation_10f/20260327_155813/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10f/20260327_155813/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10f/20260327_155813/final_report.md`
+  - `artifacts/document_hard_gate_validation_10f/20260327_155813/boot_import_check.txt`
+  - `web/app/domains/chat/chat_stream_routes.py`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/v2/document/hard_gate_metrics.py`
+  - `web/tests/test_v2_document_hard_gate_10f.py`
+- Achados principais:
+  - `report_finalize_stream` foi um bom ponto para abrir em `shadow`
+  - o slice segue semanticamente forte:
+    - finalizacao documental real
+    - transicao para `Aguardando Aval`
+  - a restricao a `shadow_only` foi confirmada:
+    - `enforce_enabled=false`
+    - `did_block=0`
+    - `shadow_only=2`
+  - o recorte continua seguro para observacao, mas ainda esta embutido no endpoint principal de chat/SSE
+  - blockers observados:
+    - `template_not_bound`
+    - `template_source_unknown`
+  - esses blockers fazem sentido semanticamente, mas ainda estao apenas parcialmente maduros neste recorte
+  - `materialization_disallowed_by_policy` e `no_active_report` seguem sem prova operacional neste slice
+  - a observabilidade atual e suficiente para `shadow`, mas com restricoes:
+    - summary admin/local-only
+    - `recent_results` com metadados de rota
+    - artifacts por execucao
+    - historico ainda volatil em memoria
+  - rollback segue simples:
+    - remover `report_finalize_stream` da allowlist
+    - ou desligar o hard gate
+- Decisao formal:
+  - `hold_before_any_enforce`
+- Rationale:
+  - o 10F+ passou como shadow seguro e semanticamente defensavel
+  - mas ainda nao existe base suficiente para discutir `enforce`, por causa da amostra pequena, do summary volatil e do acoplamento ao endpoint principal de chat/SSE
+- Condicoes antes de qualquer discussao futura de `enforce`:
+  - ampliar a rodada de shadow com mais execucoes reais controladas
+  - observar explicitamente `materialization_disallowed_by_policy` e `no_active_report` neste recorte
+  - provar melhor isolamento estrutural do branch `eh_comando_finalizar`
+  - manter boot/import check e artifacts por execucao
+- Validacoes rerodadas nesta fase:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/chat/chat_stream_routes.py web/app/domains/chat/laudo_service.py web/app/v2/document/hard_gate.py web/app/v2/document/hard_gate_models.py web/app/v2/document/gate_models.py web/tests/test_v2_document_hard_gate_10f.py` -> `ok`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_review_10f/20260327_161354/review_summary.json`
+  - `artifacts/document_hard_gate_review_10f/20260327_161354/review_findings.md`
+  - `artifacts/document_hard_gate_review_10f/20260327_161354/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_review_10f/20260327_161354/decision.txt`
+- Proximo passo recomendado:
+  - manter `report_finalize_stream` em `shadow_only` e executar nova rodada controlada de observacao antes de qualquer novo gate review sobre `enforce`
+
+## 2026-03-27 15:59:15 -0300 - Epic 10F+ - abertura controlada de `report_finalize_stream` em `shadow_only`
+
+- Objetivo:
+  - abrir de verdade o bypass estrutural da finalizacao via stream no hard gate documental, sem bloquear a operacao real e sem alterar payload/UX.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo; trabalho limitado ao recorte documental do 10F+
+  - fontes obrigatorias relidas em `/home/gabriel/Area de trabalho/Tarie 2` e nos docs/artifacts dos epics 10A/10B/10C/10D/10E/10F
+  - confirmacao da selecao do 10F:
+    - candidato escolhido:
+      - `POST /app/api/chat`
+      - `web/app/domains/chat/chat_stream_routes.py::rota_chat`
+      - branch `eh_comando_finalizar`
+    - `operation_kind`:
+      - `report_finalize_stream`
+    - modo aprovado:
+      - `shadow_only`
+    - blockers em `enforce` na abertura:
+      - nenhum
+- Implementacao realizada:
+  - `web/app/v2/document/gate_models.py`
+    - adicionou `report_finalize_stream` ao contrato de `operation_kind`
+  - `web/app/v2/document/hard_gate_models.py`
+    - expôs `route_name`, `route_path`, `source_channel` e `legacy_pipeline_name` na decisao do hard gate
+  - `web/app/v2/document/hard_gate.py`
+    - marcou `report_finalize_stream` como operacao obrigatoriamente `shadow_only`
+    - reaproveitou somente blockers relevantes de materializacao
+    - manteve `did_block=false` mesmo com `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+  - `web/app/domains/chat/laudo_service.py`
+    - parametrizou `_avaliar_gate_documental_finalizacao` para reaproveitar o fluxo canônico no stream
+  - `web/app/domains/chat/chat_stream_routes.py`
+    - integrou o branch `eh_comando_finalizar` ao hard gate somente em host local/controlado + tenant allowlisted + operation allowlisted
+    - preservou o side effect funcional da finalizacao via SSE
+  - `web/tests/test_v2_document_hard_gate_10f.py`
+    - adicionou cobertura dedicada do novo recorte
+- Invariantes garantidas:
+  - `report_finalize_stream` nao entra em `enforce_controlled`
+  - `did_block` permaneceu `false` em todos os cenarios validados
+  - `POST /app/api/chat` continuou retornando `text/event-stream`
+  - o laudo continuou migrando para `Aguardando Aval`
+- Blockers observados na validacao real:
+  - `template_not_bound`
+  - `template_source_unknown`
+- Validacao operacional executada:
+  - artifacts:
+    - `artifacts/document_hard_gate_validation_10f/20260327_155813/runtime_summary.json`
+    - `artifacts/document_hard_gate_validation_10f/20260327_155813/validation_cases.json`
+    - `artifacts/document_hard_gate_validation_10f/20260327_155813/final_report.md`
+    - `artifacts/document_hard_gate_validation_10f/20260327_155813/boot_import_check.txt`
+  - casos por HTTP real com bearer local/controlado:
+    - `shadow_report_finalize_stream_with_template_gap`
+      - HTTP `200`
+      - `would_block=true`
+      - `did_block=false`
+      - status final `Aguardando Aval`
+    - `shadow_report_finalize_stream_with_active_template`
+      - HTTP `200`
+      - `would_block=false`
+      - `did_block=false`
+      - status final `Aguardando Aval`
+  - summary agregado:
+    - `evaluations=2`
+    - `would_block=1`
+    - `did_block=0`
+    - `shadow_only=2`
+  - boot/import check:
+    - `boot_import_ok`
+- Suite minima rerodada:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/v2/document/gate_models.py web/app/v2/document/hard_gate_models.py web/app/v2/document/hard_gate.py web/app/domains/chat/laudo_service.py web/app/domains/chat/chat_stream_routes.py web/tests/test_v2_document_hard_gate_10f.py` -> `ok`
+- Rollback:
+  - remover `report_finalize_stream` de `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS`
+  - ou desligar `TARIEL_V2_DOCUMENT_HARD_GATE`
+- Proximo passo recomendado:
+  - gate review formal do 10F+ sobre `report_finalize_stream` antes de qualquer discussao de `enforce`
+
+## 2026-03-27 15:23:41 -0300 - Selecao formal do proximo ponto mutavel documental com semantica forte
+
+- Objetivo:
+  - escolher formalmente o proximo ponto mutavel documental com semantica forte depois da decisao do 10E, sem implementar o proximo slice ainda.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` continua muito amplo/sujo, com mudancas nao relacionadas
+  - artifacts relevantes localizados:
+    - `artifacts/document_hard_gate_validation/20260327_092450/`
+    - `artifacts/document_hard_gate_review/20260327_100250/`
+    - `artifacts/document_hard_gate_validation_10c/20260327_104739/`
+    - `artifacts/document_hard_gate_review_10c/20260327_115916/`
+    - `artifacts/document_next_mutable_point_selection/20260327_124413/`
+    - `artifacts/document_hard_gate_validation_10d/20260327_141956/`
+    - `artifacts/document_hard_gate_review_10d/20260327_144154/`
+    - `artifacts/document_review_reject_semantics/20260327_150443/`
+  - pontos mutaveis ja cobertos:
+    - `report_finalize`
+    - `review_approve`
+  - confirmacao do 10E:
+    - `review_reject` saiu da trilha de futuros `enforce candidates`
+- Evidencias revisadas:
+  - docs canonicos do V2 em `/home/gabriel/Area de trabalho/Tarie 2`
+  - `docs/restructuring-roadmap/67_epic10a_document_soft_gate.md`
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/69_epic10b_hard_gate_validation.md`
+  - `docs/restructuring-roadmap/70_epic10b_gate_review.md`
+  - `docs/restructuring-roadmap/71_epic10c_next_mutable_document_point.md`
+  - `docs/restructuring-roadmap/72_epic10c_gate_review.md`
+  - `docs/restructuring-roadmap/73_epic10d_candidate_selection.md`
+  - `docs/restructuring-roadmap/74_epic10d_review_reject_shadow.md`
+  - `docs/restructuring-roadmap/75_epic10d_gate_review.md`
+  - `docs/restructuring-roadmap/76_epic10e_review_reject_semantics.md`
+  - `artifacts/document_hard_gate_validation/20260327_092450/runtime_summary.json`
+  - `artifacts/document_hard_gate_review/20260327_100250/review_summary.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/runtime_summary.json`
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/review_summary.json`
+  - `artifacts/document_next_mutable_point_selection/20260327_124413/candidate_matrix.json`
+  - `artifacts/document_review_reject_semantics/20260327_150443/semantics_review_summary.json`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/chat/chat_stream_routes.py`
+  - `web/app/domains/chat/template_helpers.py`
+  - `web/app/domains/cliente/chat_routes.py`
+  - `web/app/domains/cliente/portal_bridge.py`
+  - `web/app/domains/revisor/templates_laudo_management_routes.py`
+  - `web/app/v2/document/gate_models.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/v2/document/hard_gate_metrics.py`
+- Candidatos fortes auditados:
+  - melhor:
+    - `POST /app/api/chat`
+    - `web/app/domains/chat/chat_stream_routes.py::rota_chat`
+    - recorte `eh_comando_finalizar`
+    - `operation_kind` recomendado:
+      - `report_finalize_stream`
+  - aceitavel com condicoes pesadas:
+    - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+    - `POST /revisao/api/templates-laudo/editor/{template_id}/publicar`
+    - `operation_kind` provavel:
+      - `template_publish_activate`
+  - nao abrir agora:
+    - `POST /revisao/api/templates-laudo/lote/status`
+    - `POST /revisao/api/templates-laudo/lote/excluir`
+    - `operation_kind` provavel:
+      - `template_library_batch_mutation`
+- Operacoes auditadas e descartadas:
+  - `POST /app/api/laudo/{laudo_id}/finalizar`
+    - ja coberta no 10B
+  - `POST /cliente/api/chat/laudos/{laudo_id}/finalizar`
+    - usa o mesmo servico do 10B
+  - `review_issue`
+    - continua sem rota mutavel real encontrada
+  - `POST /revisao/api/templates-laudo/{template_id}/base-recomendada`
+    - hoje e mais curadoria de biblioteca do que mutacao documental forte do fluxo vivo
+- Achados principais:
+  - o melhor candidato real depois do 10E e o bypass de finalizacao em `web/app/domains/chat/chat_stream_routes.py`
+  - ele preserva a mesma semantica forte de `report_finalize`:
+    - `Rascunho -> Aguardando Aval`
+    - `encerrado_pelo_inspetor_em`
+    - efeito SSE visivel
+  - ele reaproveita melhor que os demais candidatos os blockers maduros do roadmap:
+    - `template_not_bound`
+    - `template_source_unknown`
+  - `materialization_disallowed_by_policy` e `no_active_report` continuam aderentes ao ponto, mas ainda com prova operacional mais fraca para promocao
+  - `template_publish_activate` e semanticamente forte, mas:
+    - tem blast radius tenant-wide
+    - nao reaproveita bem os blockers atuais
+    - exigiria familia nova de blockers de biblioteca/template
+  - mutacoes em lote da biblioteca seguem inapropriadas para proximo slice
+- Decisao formal:
+  - `approved_for_shadow_first_only`
+- Candidato escolhido:
+  - `POST /app/api/chat`
+  - `web/app/domains/chat/chat_stream_routes.py::rota_chat`
+  - recorte `eh_comando_finalizar`
+  - `operation_kind` recomendado:
+    - `report_finalize_stream`
+  - semantica:
+    - `finalizar`
+- Blockers recomendados:
+  - em `enforce` na abertura:
+    - nenhum
+  - em `shadow` na abertura:
+    - `template_not_bound`
+    - `template_source_unknown`
+    - `materialization_disallowed_by_policy`
+    - `no_active_report`
+- Validacoes rerodadas nesta fase:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10d.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/chat/chat_stream_routes.py web/app/domains/chat/laudo_service.py web/app/domains/revisor/templates_laudo_management_routes.py web/app/v2/document/hard_gate.py` -> `ok`
+- Artefatos gerados:
+  - `artifacts/document_strong_semantics_selection/20260327_152341/candidate_matrix.json`
+  - `artifacts/document_strong_semantics_selection/20260327_152341/candidate_ranking.md`
+  - `artifacts/document_strong_semantics_selection/20260327_152341/selection_decision.txt`
+  - `artifacts/document_strong_semantics_selection/20260327_152341/source_evidence_index.txt`
+- Proximo passo recomendado:
+  - Epic 10F+ - abertura controlada do recorte `report_finalize_stream` em `shadow_only` no endpoint `POST /app/api/chat`
+
+## 2026-03-27 15:04:43 -0300 - Epic 10E - decisao formal sobre o futuro semantico de review_reject
+
+- Objetivo:
+  - decidir formalmente, com evidencia de codigo, contrato e runtime, qual deve ser o futuro semantico de `review_reject` antes de qualquer discussao de `enforce`.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` segue amplo/sujo, com muitas mudancas nao relacionadas no repositorio
+  - artifacts mais recentes do 10D localizados:
+    - validacao:
+      - `artifacts/document_hard_gate_validation_10d/20260327_141956/`
+    - gate review:
+      - `artifacts/document_hard_gate_review_10d/20260327_144154/`
+  - tenant e alvo operacional revisados:
+    - tenant `2`
+    - `Tariel.ia Lab Carga Local`
+    - dois casos reais de `review_reject`
+  - flags revisadas:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=2`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=review_reject`
+- Evidencias revisadas:
+  - docs canonicos do V2 em `/home/gabriel/Area de trabalho/Tarie 2`
+  - `docs/restructuring-roadmap/67_epic10a_document_soft_gate.md`
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/69_epic10b_hard_gate_validation.md`
+  - `docs/restructuring-roadmap/70_epic10b_gate_review.md`
+  - `docs/restructuring-roadmap/71_epic10c_next_mutable_document_point.md`
+  - `docs/restructuring-roadmap/72_epic10c_gate_review.md`
+  - `docs/restructuring-roadmap/73_epic10d_candidate_selection.md`
+  - `docs/restructuring-roadmap/74_epic10d_review_reject_shadow.md`
+  - `docs/restructuring-roadmap/75_epic10d_gate_review.md`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/final_report.md`
+  - `artifacts/document_hard_gate_review_10d/20260327_144154/review_summary.json`
+  - `artifacts/document_hard_gate_review_10d/20260327_144154/review_findings.md`
+  - `web/app/domains/revisor/service_messaging.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/tests/test_v2_document_hard_gate_10d.py`
+- Achados principais:
+  - `review_reject` e semanticamente um caminho corretivo:
+    - grava motivo
+    - marca `REJEITADO`
+    - marca `reabertura_pendente_em`
+    - orienta `Corrija e reenvie`
+  - a validacao real do 10D reforca essa leitura:
+    - `evaluations=2`
+    - `would_block=2`
+    - `did_block=0`
+    - `HTTP 200` nos dois casos
+    - status final `Rejeitado` nos dois casos
+  - os blockers atuais pertencem a readiness de emissao/aprovacao e nao a permissao de rejeitar:
+    - apropriados apenas para observacao:
+      - `template_not_bound`
+      - `template_source_unknown`
+      - `issue_disallowed_by_policy`
+    - inadequados para rejeicao:
+      - `review_requirement_not_satisfied`
+      - `engineer_approval_requirement_not_satisfied`
+      - `engineer_approval_pending`
+      - `review_still_required_for_issue`
+    - potencialmente validos para rejeicao futura:
+      - nenhum, dentro do conjunto atual
+  - blockers hipoteticos proprios de rejeicao ate poderiam existir:
+    - `rejection_reason_missing`
+    - `actor_not_allowed_to_reject`
+    - `invalid_transition_to_rejected`
+    - `review_context_missing`
+  - mas esses exemplos pertencem a:
+    - validacao de negocio
+    - autorizacao
+    - maquina de estados da revisao
+    - nao ao hard gate documental
+- Decisao formal:
+  - `deprecate_review_reject_as_enforce_candidate`
+- Consequencia pratica:
+  - manter `review_reject` apenas como telemetria em `shadow_only`, se continuar sendo util
+  - retirar `review_reject` da trilha de futuros `enforce candidates`
+  - priorizar proximos estudos/epics em pontos com semantica documental mais forte:
+    - emitir
+    - publicar
+    - finalizar
+    - outra mutacao documental irreversivel
+- Validacoes rerodadas nesta fase:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10d.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/revisor/mesa_api.py web/app/v2/document/hard_gate.py web/tests/test_v2_document_hard_gate_10d.py` -> `ok`
+- Artefatos gerados:
+  - `artifacts/document_review_reject_semantics/20260327_150443/semantics_review_summary.json`
+  - `artifacts/document_review_reject_semantics/20260327_150443/semantics_findings.md`
+  - `artifacts/document_review_reject_semantics/20260327_150443/blockers_classification.txt`
+  - `artifacts/document_review_reject_semantics/20260327_150443/decision.txt`
+- Proximo passo recomendado:
+  - selecionar formalmente o proximo ponto mutavel documental com semantica forte de governanca para a trilha de endurecimento, deixando `review_reject` fora da discussao de `enforce`
+
+## 2026-03-27 14:41:58 -0300 - Gate review formal do Epic 10D sobre review_reject shadow_only
+
+- Objetivo:
+  - revisar formalmente o 10D para decidir se `review_reject` pode avancar alem de `shadow_only` sem implementar nenhum novo enforcement.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Area de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` continua amplo/sujo, com muitas mudancas nao relacionadas no repositorio
+  - artefato mais recente do 10D localizado em:
+    - `artifacts/document_hard_gate_validation_10d/20260327_141956/`
+  - tenant validado no 10D:
+    - `2`
+    - `Tariel.ia Lab Carga Local`
+  - alvos usados:
+    - laudo `1` -> `shadow_review_reject_with_template_gap`
+    - laudo `2` -> `shadow_review_reject_with_reduced_blockers`
+  - flags usadas:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=2`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=review_reject`
+  - alteracoes fora do recorte esperado:
+    - sim, ha diversas mudancas fora do slice 10D
+    - a revisao foi explicitamente limitada ao recorte documental da mesa e aos artifacts do 10D
+- Evidencias revisadas:
+  - docs canonicos do V2 em `/home/gabriel/Area de trabalho/Tarie 2`
+  - `docs/restructuring-roadmap/67_epic10a_document_soft_gate.md`
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/69_epic10b_hard_gate_validation.md`
+  - `docs/restructuring-roadmap/70_epic10b_gate_review.md`
+  - `docs/restructuring-roadmap/71_epic10c_next_mutable_document_point.md`
+  - `docs/restructuring-roadmap/72_epic10c_gate_review.md`
+  - `docs/restructuring-roadmap/73_epic10d_candidate_selection.md`
+  - `docs/restructuring-roadmap/74_epic10d_review_reject_shadow.md`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/prep_state.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/final_report.md`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/v2/document/hard_gate_metrics.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/app/domains/revisor/service_messaging.py`
+  - `web/app/domains/admin/routes.py`
+  - `web/tests/test_v2_document_hard_gate_10d.py`
+- Achados principais:
+  - `review_reject` foi um bom ponto para abrir em shadow:
+    - reusa o bounded context da mesa
+    - nao mudou payload nem UX
+    - manteve a rejeicao funcional intacta
+  - o 10D realmente ficou restrito a `shadow_only`:
+    - `review_reject` nunca entra em `enforce_enabled`
+    - todos os blockers ficam em `shadow_only`
+    - `did_block` permanece `false`
+    - a instrumentacao so roda em host local/controlado, tenant allowlisted e operation allowlisted
+  - a evidencia operacional confirma:
+    - `evaluations=2`
+    - `would_block=2`
+    - `did_block=0`
+    - `shadow_only=2`
+    - `enforce_controlled=0`
+    - os dois casos retornaram `HTTP 200` e terminaram em `Rejeitado`
+  - avaliacao semantica:
+    - rejeicao e um caminho corretivo
+    - bloquear rejeicao com blockers atuais seria semanticamente inadequado
+    - os blockers observados descrevem readiness de emissao/aprovacao documental, nao permissao legitima para rejeitar
+  - maturidade dos blockers:
+    - bons para observacao e telemetria
+    - nao maduros para `enforce` em `review_reject`
+    - nenhum blocker observado foi considerado apto para promocao futura com o conjunto atual
+  - observabilidade:
+    - suficiente para seguir em shadow
+    - insuficiente para discutir `future_enforce`
+    - o summary segue volatil em memoria e a amostra operacional do 10D ainda e pequena
+  - rollback:
+    - continua simples
+    - remover `review_reject` da allowlist ou desligar `TARIEL_V2_DOCUMENT_HARD_GATE`
+  - risco remanescente:
+    - o bypass `chat_stream_routes.py::finalizarlaudoagora` continua fora do recorte reconciliado do hard gate
+- Validacoes rerodadas nesta revisao:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10d.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/revisor/mesa_api.py web/app/v2/document/hard_gate.py web/tests/test_v2_document_hard_gate_10d.py` -> `ok`
+- Decisao formal:
+  - `hold_before_any_enforce`
+- Posicao operacional recomendada:
+  - `keep_shadow_only`
+- Condicoes para qualquer discussao futura de enforce:
+  - definir semantica e politica explicitas para quando rejeicao poderia ser bloqueada
+  - criar blockers especificos de `review_reject`, em vez de reaproveitar blockers de emissao/aprovacao
+  - produzir validacao operacional dedicada mostrando beneficio real de bloquear rejeicao
+  - ampliar observabilidade para historico persistente e amostra operacional maior
+  - reconciliar ou isolar caminhos paralelos de mutacao de revisao antes de endurecer o recorte
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_review_10d/20260327_144154/review_summary.json`
+  - `artifacts/document_hard_gate_review_10d/20260327_144154/review_findings.md`
+  - `artifacts/document_hard_gate_review_10d/20260327_144154/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_review_10d/20260327_144154/decision.txt`
+- Proximo passo recomendado:
+  - continuar `review_reject` em `shadow_only` e, separadamente, decidir se existe ou nao uma semantica propria de enforce para rejeicao antes de qualquer 10E
+
+## 2026-03-27 14:25:11 -0300 - Epic 10D - abertura de review_reject em shadow_only no recorte local/controlado
+
+- Objetivo:
+  - implementar de verdade o ponto mutavel `review_reject` no hard gate documental, apenas em `shadow_only`, sem bloquear a rejeicao real.
+- Fontes e contexto usados:
+  - docs canonicos do V2 em `/home/gabriel/Área de trabalho/Tarie 2`
+  - `docs/restructuring-roadmap/72_epic10c_gate_review.md`
+  - `docs/restructuring-roadmap/73_epic10d_candidate_selection.md`
+  - `artifacts/document_next_mutable_point_selection/20260327_124413/*`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/runtime_summary.json`
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/review_summary.json`
+- Implementacao realizada:
+  - `web/app/v2/document/gate_models.py`
+    - adiciona `review_reject` ao contrato de `operation_kind`
+  - `web/app/v2/document/hard_gate.py`
+    - reconhece `review_reject` como operacao relevante para blockers documentais da mesa
+    - fixa todos os blockers de `review_reject` em `shadow_only`
+    - calcula `would_block` sem nunca promover `did_block`
+    - impede `enforce_enabled` para `review_reject`, mesmo com `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+  - `web/app/domains/revisor/mesa_api.py`
+    - refatora o helper do hard gate da mesa para reuso por `review_approve` e `review_reject`
+    - integra `review_reject` no ponto real `avaliar_laudo`
+    - limita a nova instrumentacao ao recorte local/controlado por host, tenant allowlisted e operation allowlisted
+  - `web/tests/test_v2_document_hard_gate_10d.py`
+    - cobre o novo `operation_kind`, a integracao real, o summary e a invariancia de `did_block=false`
+- Garantias mantidas:
+  - a resposta publica de `POST /revisao/api/laudo/{laudo_id}/avaliar` nao mudou
+  - a regra funcional da rejeicao nao mudou
+  - `review_reject` nao bloqueia a mesa nesta fase
+  - nenhum blocker foi promovido para `enforce`
+- Validacao operacional real:
+  - ambiente isolado em `artifacts/document_hard_gate_validation_10d/20260327_141956/validation_10d.db`
+  - tenant allowlisted usado:
+    - `2`
+    - `Tariel.ia Lab Carga Local`
+  - flags chave validadas:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=2`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=review_reject`
+  - casos HTTP reais executados:
+    - `shadow_review_reject_with_template_gap`
+      - HTTP `200`
+      - laudo persistido em `Rejeitado`
+      - blockers observados:
+        - `template_not_bound`
+        - `template_source_unknown`
+        - `issue_disallowed_by_policy`
+        - `review_requirement_not_satisfied`
+        - `engineer_approval_requirement_not_satisfied`
+        - `engineer_approval_pending`
+        - `review_still_required_for_issue`
+    - `shadow_review_reject_with_reduced_blockers`
+      - HTTP `200`
+      - laudo persistido em `Rejeitado`
+      - blockers observados:
+        - `issue_disallowed_by_policy`
+        - `review_requirement_not_satisfied`
+        - `engineer_approval_requirement_not_satisfied`
+        - `engineer_approval_pending`
+        - `review_still_required_for_issue`
+  - summary real:
+    - `review_reject`
+      - `evaluations=2`
+      - `would_block=2`
+      - `did_block=0`
+      - `shadow_only=2`
+      - `enforce_controlled=0`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/prep_state.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/final_report.md`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/requests/shadow_review_reject_with_template_gap_request.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/requests/shadow_review_reject_with_reduced_blockers_request.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/responses/shadow_review_reject_with_template_gap_response.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/responses/shadow_review_reject_with_reduced_blockers_response.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/responses/revisor_login_meta.json`
+  - `artifacts/document_hard_gate_validation_10d/20260327_141956/responses/admin_login_meta.json`
+- Validacoes executadas:
+  - `cd web && DATABASE_URL=... TARIEL_V2_DOCUMENT_HARD_GATE=1 TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1 TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=2 TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=review_reject python3 -c "import main; app = main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+  - `python3 -m py_compile web/app/domains/revisor/mesa_api.py web/app/v2/document/hard_gate.py web/app/v2/document/gate_models.py web/tests/test_v2_document_hard_gate_10d.py` -> sem erro
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10c.py` -> `5 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10d.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Rollback operacional:
+  - remover `review_reject` de `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS`
+  - ou desligar `TARIEL_V2_DOCUMENT_HARD_GATE`
+- Riscos remanescentes:
+  - o bypass `finalizarlaudoagora` em `web/app/domains/chat/chat_stream_routes.py` continua fora do recorte reconciliado do hard gate
+  - o summary do hard gate continua volatil em memoria e depende dos artifacts exportados por execucao
+- Proximo passo recomendado:
+  - gate review do Epic 10D sobre `review_reject` com base nos artifacts reais antes de discutir qualquer enforce
+
+## 2026-03-27 12:44:13 -0300 - Selecao controlada do proximo ponto mutavel documental apos o gate review do 10C
+
+- Objetivo:
+  - escolher formalmente o melhor proximo ponto mutavel documental para o 10D, sem implementar o 10D ainda.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` continua amplo/sujo no repositorio, entao a selecao foi limitada ao recorte documental V2 e aos artifacts associados
+  - artefatos mais recentes localizados:
+    - 10B:
+      - `artifacts/document_hard_gate_validation/20260327_092450/`
+    - 10C:
+      - `artifacts/document_hard_gate_validation_10c/20260327_104739/`
+    - gate review do 10C:
+      - `artifacts/document_hard_gate_review_10c/20260327_115916/`
+  - pontos mutáveis já cobertos:
+    - `report_finalize`
+    - `review_approve`
+  - condições do gate review do 10C confirmadas:
+    - um único novo ponto mutável
+    - host local/controlado
+    - tenant allowlisted
+    - operation allowlisted
+    - blockers sensíveis sem promoção a enforce sem prova
+    - boot/import check
+    - artifacts por execução
+- Evidências auditadas:
+  - docs do 10A, 10B, validação do 10B, gate review do 10B, 10C e gate review do 10C
+  - `artifacts/document_hard_gate_validation/20260327_092450/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/final_report.md`
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/review_summary.json`
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/review_findings.md`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/chat/laudo.py`
+  - `web/app/domains/chat/chat_stream_routes.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/app/domains/revisor/service_messaging.py`
+  - `web/app/domains/revisor/templates_laudo_management_routes.py`
+  - `web/app/domains/cliente/portal_bridge.py`
+- Operacoes auditadas e excluidas do ranking mutavel:
+  - `POST /app/api/gerar_pdf`
+    - `preview_pdf` segue sendo apenas geracao temporaria de arquivo e ja esta coberto pelo soft gate
+  - `GET /revisao/api/laudo/{laudo_id}/pacote/exportar-pdf`
+    - `review_package_pdf_export` exporta PDF temporario do pacote e nao muta estado documental
+  - `review_issue`
+    - aparece no contrato de `operation_kind`, mas a auditoria nao encontrou rota mutavel real de emissao implementada no produto atual
+- Candidatos avaliados:
+  - melhor:
+    - `POST /revisao/api/laudo/{laudo_id}/avaliar` com `acao=rejeitar`
+    - `operation_kind` proposto:
+      - `review_reject`
+  - aceitável com restrições:
+    - `POST /app/api/laudo/{laudo_id}/reabrir`
+    - `POST /cliente/api/chat/laudos/{laudo_id}/reabrir`
+    - `operation_kind` proposto:
+      - `report_reopen`
+  - segurar:
+    - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+    - `operation_kind` proposto:
+      - `template_publish_activate`
+  - não abrir agora:
+    - mutações em lote da biblioteca de templates
+- Achados principais:
+  - `review_reject` ficou em primeiro porque:
+    - reaproveita o mesmo comando técnico do 10C
+    - reusa muito bem pacote da mesa, provenance, policy, facade e summary
+    - aceita allowlist simples por tenant e operação
+    - permanece em um único portal técnico
+  - `report_reopen` perdeu prioridade porque:
+    - o mesmo serviço é compartilhado por inspetor e admin-cliente
+    - a observabilidade documental é mais fraca
+    - bloquear reabertura por readiness seria semântica ruim
+  - `template_publish_activate` e mutações em lote de template ficaram fora:
+    - blast radius maior
+    - menor aderência ao hard gate documental case-level
+  - achado estrutural relevante:
+    - `web/app/domains/chat/chat_stream_routes.py` ainda possui `finalizarlaudoagora`
+    - esse caminho muta `status_revisao` para `Aguardando` fora de `finalizar_relatorio_resposta`
+    - isso não bloqueia um 10D `shadow_only` muito restrito
+    - mas vira risco claro antes de qualquer ampliação mais forte de enforcement
+  - Check de boot/import:
+  - `cd web && python3 -c "import main; app = main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+- Validacoes rerodadas nesta selecao:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10c.py` -> `5 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Decisão formal:
+  - `approved_for_10d_shadow_only`
+- Candidato escolhido:
+  - `POST /revisao/api/laudo/{laudo_id}/avaliar`
+  - recorte:
+    - `acao=rejeitar`
+  - `operation_kind` proposto:
+    - `review_reject`
+- Modo recomendado:
+  - `shadow_only`
+- Blockers recomendados:
+  - em `enforce`:
+    - nenhum
+  - em `shadow`:
+    - `no_active_report`
+    - `template_not_bound`
+    - `template_source_unknown`
+    - `materialization_disallowed_by_policy`
+    - `issue_disallowed_by_policy`
+    - `review_requirement_not_satisfied`
+    - `engineer_approval_requirement_not_satisfied`
+    - `engineer_approval_pending`
+    - `review_still_required_for_issue`
+    - `provenance_summary_unavailable`
+    - `document_source_insufficient`
+- Tenant e contexto recomendados:
+  - tenant allowlist:
+    - `2`
+    - `Tariel.ia Lab Carga Local`
+  - operation allowlist:
+    - `review_reject`
+  - host:
+    - local only (`127.0.0.1`, `::1`, `localhost`, `testclient`)
+- Rollback recomendado:
+  - remover `review_reject` de `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS`
+  - ou desligar `TARIEL_V2_DOCUMENT_HARD_GATE`
+- Artefatos gerados:
+  - `artifacts/document_next_mutable_point_selection/20260327_124413/candidate_matrix.json`
+  - `artifacts/document_next_mutable_point_selection/20260327_124413/candidate_ranking.md`
+  - `artifacts/document_next_mutable_point_selection/20260327_124413/selection_decision.txt`
+  - `artifacts/document_next_mutable_point_selection/20260327_124413/source_evidence_index.txt`
+- Próximo passo recomendado:
+  - definição do escopo do Epic 10D para `review_reject` em `shadow_only`, preservando host local, tenant 2 allowlisted e boot/import check
+
+## 2026-03-27 11:59:40 -0300 - Gate review formal do Epic 10C antes de qualquer novo ponto mutável documental
+
+- Objetivo:
+  - revisar formalmente o Epic 10C com base em código atual, docs atuais, artefatos reais do 10C e testes existentes para decidir se algum novo ponto mutável documental pode ser aberto.
+- Precheck da revisão:
+  - `pwd` confirmado em `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` continua muito amplo/sujo no repositório, então a revisão ficou limitada ao recorte do hard gate documental e aos artefatos associados
+  - artefato operacional mais recente do 10C localizado em `artifacts/document_hard_gate_validation_10c/20260327_104739/`
+  - tenant validado no 10C:
+    - `empresa_id=2`
+    - `Tariel.ia Lab Carga Local`
+  - operação validada no 10C:
+    - `POST /revisao/api/laudo/{laudo_id}/avaliar`
+    - apenas `acao=aprovar`
+  - flags usadas:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS`
+- Evidências revisadas:
+  - `docs/restructuring-roadmap/67_epic10a_document_soft_gate.md`
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/69_epic10b_hard_gate_validation.md`
+  - `docs/restructuring-roadmap/70_epic10b_gate_review.md`
+  - `docs/restructuring-roadmap/71_epic10c_next_mutable_document_point.md`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/final_report.md`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/summaries/hard_gate_summary_after_shadow.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/summaries/hard_gate_summary_after_enforce.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/summaries/hard_gate_summary_after_rollback.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/responses/enforce_blocked_review_approve_response.json`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/app/domains/revisor/service_messaging.py`
+  - `web/app/domains/chat/__init__.py`
+- Achados principais:
+  - o 10C continua com exatamente um único novo ponto mutável:
+    - além de `report_finalize`, o único recorte novo encontrado é `review_approve` em `avaliar_laudo`
+    - não há evidência de abertura paralela de outros pontos mutáveis no hard gate
+  - a avaliação do ponto mutável sobe para `risco_moderado`:
+    - a operação leva o laudo a `APROVADO`
+    - registra decisão da mesa
+    - dispara notificação ao inspetor
+  - a separação de blockers permaneceu conservadora e correta:
+    - blockers realmente provados em enforce:
+      - `template_not_bound`
+      - `template_source_unknown`
+    - blockers mantidos corretamente só em `shadow_only`:
+      - `issue_disallowed_by_policy`
+      - `review_requirement_not_satisfied`
+      - `engineer_approval_requirement_not_satisfied`
+      - `engineer_approval_pending`
+      - `review_still_required_for_issue`
+    - blockers ainda sem prova operacional equivalente no 10C:
+      - `materialization_disallowed_by_policy`
+      - `no_active_report`
+  - a observabilidade continua suficiente apenas com restrições:
+    - summary por operação, blocker e tenant continua útil
+    - a série segue volátil em memória e depende dos artefatos exportados por execução
+  - o rollback segue simples:
+    - desligar apenas `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE` continua devolvendo o ponto ao comportamento de shadow
+  - não foi encontrada evidência de bleed para tenant real:
+    - host local/controlado
+    - tenant allowlisted
+    - operation allowlisted
+    - validação operacional feita em `empresa_id=2`
+  - o ajuste em `web/app/domains/chat/__init__.py` continua aceitável e localizado:
+    - boot/import rerodado com `boot_import_ok`
+    - a fragilidade de fronteira de imports continua sendo condição para manter o check barato antes de novas rodadas
+- Validações rerodadas nesta revisão:
+  - `cd web && python3 -c "import main; app = main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10c.py` -> `5 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `py_compile` não foi rerodado nesta revisão:
+    - nenhuma alteração nova em código Python de produto foi feita nesta fase
+- Decisão formal:
+  - `approved_with_conditions`
+- Condições para o próximo ponto mutável:
+  - abrir no máximo um novo ponto mutável
+  - manter host local/controlado, tenant allowlisted e operation allowlisted
+  - não promover blockers hoje em `shadow_only` para `enforce` sem prova operacional dedicada no próprio novo ponto
+  - manter check barato de boot/import
+  - continuar exportando summaries, requests e responses por execução
+  - se o próximo candidato tiver blast radius maior que `review_approve`, começar em `shadow_only`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/review_summary.json`
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/review_findings.md`
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_review_10c/20260327_115916/decision.txt`
+- Riscos remanescentes:
+  - o summary do hard gate continua volátil em memória
+  - blockers sensíveis continuam sem trilha suficiente para enforcement fora do recorte atual
+- Próximo passo recomendado:
+  - avaliação de candidato único para próximo ponto mutável documental, ainda em recorte local/controlado e sujeito a novo gate review antes de qualquer ampliação
+
+## 2026-03-27 10:47:39 -0300 - Epic 10C - abertura condicionada do próximo ponto mutável documental
+
+- Objetivo:
+  - abrir exatamente um novo ponto mutável documental do V2 em recorte local/controlado, respeitando as condições do gate review do 10B.
+- Ponto mutável escolhido:
+  - `POST /revisao/api/laudo/{laudo_id}/avaliar`
+  - recorte exato:
+    - apenas `acao=aprovar`
+  - integração principal:
+    - `web/app/domains/revisor/mesa_api.py::avaliar_laudo`
+- Motivo da escolha:
+  - é a próxima mutação documental real centralizada após `finalizar_relatorio_resposta`
+  - aprovação da mesa representa o próximo degrau natural do pipeline sem abrir a rota inteira
+  - `rejeitar` ficou fora para não abrir um segundo ponto mutável nesta fase
+  - o recorte continuou seguro porque o enforcement ficou local/controlado e só para blockers já aceitos pelo gate review
+- Implementação:
+  - `review_approve` foi adicionado como novo `operation_kind`
+  - `DocumentHardGateBlockerV1` passou a distinguir `enforcement_scope` e `enforce_blocking`
+  - `hard_gate.py` passou a tratar blockers em dois grupos no novo ponto:
+    - em `enforce`:
+      - `template_not_bound`
+      - `template_source_unknown`
+      - `materialization_disallowed_by_policy`
+      - `no_active_report`
+    - apenas em `shadow_only`:
+      - `issue_disallowed_by_policy`
+      - `review_requirement_not_satisfied`
+      - `engineer_approval_requirement_not_satisfied`
+      - `engineer_approval_pending`
+      - `review_still_required_for_issue`
+  - a rota `avaliar_laudo` passou a avaliar o gate documental apenas quando `acao == "aprovar"`
+  - o summary do hard gate passou a contar por blocker:
+    - `enforce`
+    - `shadow_only`
+    - `did_block`
+- Check de boot/import:
+  - `cd web && python3 -c "import main; app = main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/document/gate_models.py web/app/v2/document/hard_gate_models.py web/app/v2/document/hard_gate.py web/app/v2/document/hard_gate_metrics.py web/app/domains/revisor/mesa_api.py web/tests/test_v2_document_hard_gate_10c.py` -> `ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10c.py` -> `5 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Validacao operacional real:
+  - artefatos:
+    - `artifacts/document_hard_gate_validation_10c/20260327_104739/`
+  - tenant validado:
+    - `empresa_id=2`
+    - `Tariel.ia Lab Carga Local`
+  - suporte local usado:
+    - `web/scripts/seed_usuario_uso_intenso.py`
+    - apenas para normalizar credenciais do tenant local antes dos logins HTTP reais
+  - shadow:
+    - alvo `laudo_id=85`
+    - `HTTP 200`
+    - summary depois:
+      - `evaluations=1`
+      - `would_block=1`
+      - `did_block=0`
+      - `shadow_only=1`
+  - enforce bloqueado:
+    - alvo `laudo_id=86`
+    - `HTTP 422`
+    - `codigo=DOCUMENT_HARD_GATE_BLOCKED`
+    - blockers reais em enforce:
+      - `template_not_bound`
+      - `template_source_unknown`
+    - laudo permaneceu em `Aguardando Aval`
+  - enforce permitido:
+    - alvo `laudo_id=88`
+    - `HTTP 200`
+    - laudo foi para `Aprovado`
+    - o summary provou blockers só em `shadow_only`:
+      - `issue_disallowed_by_policy`
+      - `review_requirement_not_satisfied`
+      - `engineer_approval_requirement_not_satisfied`
+      - `engineer_approval_pending`
+      - `review_still_required_for_issue`
+  - rollback:
+    - desligando apenas `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE`
+    - alvo `laudo_id=87`
+    - `HTTP 200`
+    - laudo foi para `Aprovado`
+    - summary voltou para:
+      - `evaluations=1`
+      - `would_block=1`
+      - `did_block=0`
+      - `shadow_only=1`
+- Classificacao honesta:
+  - validacao operacional completa para `shadow`, `enforce` bloqueado, `enforce` permitido e rollback no novo ponto `review_approve`
+- Artefatos principais:
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/final_report.md`
+  - `artifacts/document_hard_gate_validation_10c/20260327_104739/summaries/hard_gate_summary_after_enforce.json`
+- Riscos remanescentes:
+  - o summary continua em memória e zera a cada restart
+  - a promoção real de blockers de revisão/aprovação/provenance ainda não tem trilha operacional suficiente para sair de `shadow_only`
+- Próximo passo recomendado:
+  - revisão formal do 10C antes de qualquer nova ampliação de enforcement documental
+
+## 2026-03-27 10:02:50 -0300 - Gate review formal do Epic 10B antes do Epic 10C
+
+- Objetivo:
+  - revisar formalmente o Epic 10B com base em codigo atual, docs atuais, artefatos reais do 10B e testes existentes para decidir se o 10C pode abrir.
+- Precheck da revisao:
+  - `pwd` confirmado em `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` continua amplo/sujo no repositório, entao a revisao ficou estritamente limitada ao escopo do 10A/10B e aos artefatos associados
+  - artefato operacional mais recente localizado em `artifacts/document_hard_gate_validation/20260327_092450/`
+  - tenant validado no 10B:
+    - `empresa_id=2`
+    - `Tariel.ia Lab Carga Local`
+  - operacao validada no 10B:
+    - `POST /app/api/laudo/{laudo_id}/finalizar`
+  - flags usadas no 10B:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS`
+- Evidencias revisadas:
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/69_epic10b_hard_gate_validation.md`
+  - `artifacts/document_hard_gate_validation/20260327_092450/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation/20260327_092450/summaries/hard_gate_summary_after_shadow.json`
+  - `artifacts/document_hard_gate_validation/20260327_092450/summaries/hard_gate_summary_after_enforce.json`
+  - `artifacts/document_hard_gate_validation/20260327_092450/summaries/hard_gate_summary_after_rollback.json`
+  - `artifacts/document_hard_gate_validation/20260327_092450/responses/enforce_blocked_response.json`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/revisor/service_messaging.py`
+  - `web/app/domains/chat/__init__.py`
+- Achados principais:
+  - o ponto mutavel escolhido no 10B continua sendo o menor recorte util de risco baixo:
+    - `finalizar_relatorio_resposta` so move `Rascunho -> Aguardando Aval`
+    - a aprovacao da mesa em `revisor/service_messaging.py` segue com blast radius maior por levar o laudo a `APROVADO` e registrar notificacao final
+  - o modelo `shadow_only` / `enforce_controlled` / rollback foi comprovado de forma suficiente para seguir apenas em recorte igualmente restrito
+  - os blockers atuais sao razoaveis:
+    - fortes e operacionalmente provados:
+      - `template_not_bound`
+      - `template_source_unknown`
+    - bons para seguir em recorte restrito, mas ainda sem prova operacional equivalente:
+      - `materialization_disallowed_by_policy`
+    - presentes no codigo, porem ainda nao maduros para enforcement ampliado:
+      - `issue_disallowed_by_policy`
+      - `review_requirement_not_satisfied`
+      - `engineer_approval_requirement_not_satisfied`
+      - `document_source_insufficient`
+  - a observabilidade atual e suficiente apenas com restricoes:
+    - `request.state` + endpoint admin/local + artefatos de execucao bastam para 10C restrito
+    - a agregacao em memoria continua insuficiente para qualquer ampliacao mais larga
+  - o ajuste em `web/app/domains/chat/__init__.py` foi aceitavel e localizado, mas virou condicao:
+    - destravou o boot real
+    - revelou fragilidade de fronteira de imports entre `app.v2.document` e `app.domains.chat`
+- Validacoes rerodadas nesta revisao:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Decisao formal:
+  - `approved_for_10c_with_conditions`
+- Condicoes para abrir o 10C:
+  - manter o 10C em um unico novo ponto mutavel, ainda local/controlado e com allowlists explicitas
+  - manter novos blockers sensiveis em shadow ate haver trilha operacional controlada no novo ponto
+  - continuar exportando summaries e responses por execucao por causa da observabilidade em memoria
+  - manter um check barato de boot/import antes da proxima rodada operacional
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_review/20260327_100250/review_summary.json`
+  - `artifacts/document_hard_gate_review/20260327_100250/review_findings.md`
+  - `artifacts/document_hard_gate_review/20260327_100250/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_review/20260327_100250/decision.txt`
+- Riscos remanescentes:
+  - o summary continua em memoria e zera em restart
+  - os blockers de policy/revisao/aprovacao ainda nao tem prova operacional equivalente a `template_not_bound` / `template_source_unknown`
+- Proximo passo recomendado:
+  - Epic 10C apenas em modo de abertura condicionada, mantendo rollout local/controlado e novo recorte mutavel unico
+
+## 2026-03-27 09:34:06 -0300 - Validação operacional do Epic 10B - hard gate documental controlado
+
+- Objetivo:
+  - validar operacionalmente o hard gate do Epic 10B em `shadow_only`, `enforce_controlled` e rollback, com summary real, request/response real e tenant local/controlado.
+- Precheck:
+  - `pwd` confirmado em `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` salvo em artefato
+  - nao havia backend local rodando em `127.0.0.1:8000`
+  - flags do hard gate estavam ausentes no shell base
+- Tenant alvo validado:
+  - `empresa_id=2`
+  - `Tariel.ia Lab Carga Local`
+  - escolhido por ser local/controlado, sem bloqueio e sem templates ativos existentes
+- Operacao validada:
+  - `POST /app/api/laudo/{laudo_id}/finalizar`
+- Alvos criados:
+  - `laudo_id=81` -> shadow bloqueavel
+  - `laudo_id=82` -> enforce bloqueavel
+  - `laudo_id=83` -> rollback bloqueavel
+  - `laudo_id=84` -> enforce permitido
+- Ajuste minimo necessario:
+  - `web/app/domains/chat/__init__.py`
+  - causa:
+    - o backend local nao subia com `uvicorn` por import circular entre `app.v2.document` e `app.domains.chat`
+  - correcao:
+    - exports do pacote `app.domains.chat` passaram a ser lazy-loaded
+- Execucao shadow:
+  - backend iniciado com:
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=0`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=2`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=report_finalize`
+  - summary antes:
+    - `evaluations=0`, `would_block=0`, `did_block=0`
+  - request real:
+    - `POST /app/api/laudo/81/finalizar`
+  - resultado:
+    - `HTTP 200`
+    - laudo foi para `Aguardando Aval`
+  - summary depois:
+    - `evaluations=1`
+    - `would_block=1`
+    - `did_block=0`
+    - `shadow_only=1`
+- Execucao enforce:
+  - backend reiniciado com `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+  - summary antes:
+    - `evaluations=0`, `would_block=0`, `did_block=0`
+  - caso bloqueado:
+    - `POST /app/api/laudo/82/finalizar`
+    - `HTTP 422`
+    - payload:
+      - `codigo=DOCUMENT_HARD_GATE_BLOCKED`
+      - blockers reais:
+        - `template_not_bound`
+        - `template_source_unknown`
+    - laudo permaneceu em `Rascunho`
+  - caso permitido:
+    - `POST /app/api/laudo/84/finalizar`
+    - `HTTP 200`
+    - laudo foi para `Aguardando Aval`
+  - summary depois:
+    - `evaluations=2`
+    - `would_block=1`
+    - `would_allow=1`
+    - `did_block=1`
+    - `did_allow=1`
+    - `enforce_controlled=2`
+- Execucao rollback:
+  - backend reiniciado com `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=0`
+  - summary antes:
+    - `evaluations=0`, `would_block=0`, `did_block=0`
+  - request real:
+    - `POST /app/api/laudo/83/finalizar`
+  - resultado:
+    - `HTTP 200`
+    - laudo foi para `Aguardando Aval`
+  - summary depois:
+    - `evaluations=1`
+    - `would_block=1`
+    - `did_block=0`
+    - `shadow_only=1`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/domains/chat/__init__.py` -> `ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Artefatos principais:
+  - `artifacts/document_hard_gate_validation/20260327_092450/`
+  - `artifacts/document_hard_gate_validation/20260327_092450/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation/20260327_092450/final_report.md`
+- Classificacao honesta:
+  - validacao completa com `shadow`, `enforce` e `rollback` comprovados
+- Riscos remanescentes:
+  - summary continua em memoria e zera a cada restart de processo
+  - a validacao operacional desta fase ficou restrita ao tenant local `2`, nao ao tenant demo principal
+- Proximo passo recomendado:
+  - decidir criterio de abertura do Epic 10C com base nos artefatos desta validacao e na estabilidade do boot local
+- Rollback:
+  - desligar `TARIEL_V2_DOCUMENT_HARD_GATE`
+  - ou desligar `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE`
+  - ou remover tenant/operacao das allowlists
+
+## 2026-03-27 09:24:00 -0300 - Epic 10B - implementação real do primeiro hard gate documental controlado
+
+- Objetivo:
+  - implementar o primeiro hard gate documental real do V2 em um único ponto mutável, com shadow e enforce separados, rollout restrito e rollback imediato.
+- Tenant alvo:
+  - nenhum tenant real foi alterado
+  - enforcement permitido apenas em contexto local/controlado com tenant explicitamente allowlisted
+- Ponto mutável escolhido:
+  - `web/app/domains/chat/laudo_service.py::finalizar_relatorio_resposta`
+  - rota consumidora principal:
+    - `/app/api/laudo/{laudo_id}/finalizar`
+- Motivo da escolha:
+  - ponto mutável real, centralizado e de menor blast radius do que aprovação final da mesa
+  - já possui `gate_qualidade`, reduzindo risco operacional
+  - move `RASCUNHO -> AGUARDANDO`, sem emitir documento final nem liberar ART
+  - aproveita blockers de materialização sem antecipar enforcement de emissão final
+- Arquivos alterados:
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/document/__init__.py`
+  - `web/app/v2/document/hard_gate_models.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/v2/document/hard_gate_metrics.py`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/chat/laudo.py`
+  - `web/app/domains/admin/routes.py`
+  - `web/tests/test_v2_document_hard_gate.py`
+  - `web/tests/test_v2_document_hard_gate_enforce.py`
+  - `web/tests/test_v2_document_hard_gate_summary.py`
+  - `docs/restructuring-roadmap/68_epic10b_document_hard_gate.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Flags implementadas:
+  - `TARIEL_V2_DOCUMENT_HARD_GATE`
+  - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE`
+  - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS`
+  - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS`
+- Entregas principais:
+  - modelos canônicos do hard gate:
+    - `DocumentHardGateBlockerV1`
+    - `DocumentHardGateDecisionV1`
+    - `DocumentHardGateEnforcementResultV1`
+    - `DocumentHardGateSummaryV1`
+  - avaliador real em `web/app/v2/document/hard_gate.py`, reutilizando os sinais do soft gate
+  - observabilidade em memória em `web/app/v2/document/hard_gate_metrics.py`
+  - endpoint admin/local-only:
+    - `GET /admin/api/document-hard-gate/summary`
+  - integração real no fluxo mutável de finalização do laudo
+  - bloqueio real com `422` e `codigo=DOCUMENT_HARD_GATE_BLOCKED` apenas em `enforce_controlled`
+- Blockers canônicos reaproveitados para `report_finalize`:
+  - `no_active_report`
+  - `template_not_bound`
+  - `template_source_unknown`
+  - `materialization_disallowed_by_policy`
+- Garantias preservadas:
+  - nenhum tenant real entra em enforcement por padrão
+  - nenhuma rota pública fora da finalização controlada mudou
+  - nenhuma UX global foi alterada
+  - nenhum pipeline documental legado foi substituído
+  - nenhum código Android foi alterado
+- Validações rodadas:
+  - `python3 -m py_compile web/app/v2/runtime.py web/app/v2/document/__init__.py web/app/v2/document/hard_gate_models.py web/app/v2/document/hard_gate.py web/app/v2/document/hard_gate_metrics.py web/app/domains/chat/laudo_service.py web/app/domains/chat/laudo.py web/app/domains/admin/routes.py web/tests/test_v2_document_hard_gate.py web/tests/test_v2_document_hard_gate_enforce.py web/tests/test_v2_document_hard_gate_summary.py` -> `ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Resultado operacional:
+  - shadow e enforce controlado foram implementados de verdade
+  - apenas `report_finalize` foi conectado ao bloqueio real
+  - o bloqueio só acontece em host local, tenant allowlisted e operação allowlisted
+  - fora dessas condições o sistema permanece em shadow e não bloqueia
+- Classificação honesta:
+  - implementação concluída com enforcement controlado e reversível
+- Riscos remanescentes:
+  - a observabilidade do hard gate ainda é em memória e zera no restart
+  - apenas um ponto mutável foi coberto; a aprovação final da mesa continua fora do enforcement
+- Próximo passo recomendado:
+  - Epic 10C - ampliação cautelosa do hard gate para o próximo ponto mutável documental com a mesma disciplina de rollout
+- Rollback:
+  - desligar `TARIEL_V2_DOCUMENT_HARD_GATE`
+  - ou desligar `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE` para voltar a shadow
+  - ou remover tenant/operação das respectivas allowlists
+
+## 2026-03-27 09:02:00 -0300 - Epic 10A - implementação real do soft gate documental sobre materialização/emissão
+
+- Objetivo:
+  - implementar a primeira camada real de soft gate documental do V2, interna e observável, sem bloquear o usuário, sem mudar payload público e sem trocar o pipeline legado.
+- Tenant alvo:
+  - nenhum tenant real foi promovido ou alterado
+  - validação executada apenas em ambiente local/testes
+- Pontos reais escolhidos:
+  - `web/app/domains/chat/chat_aux_routes.py::rota_pdf`
+  - `web/app/domains/revisor/mesa_api.py::obter_pacote_mesa_laudo`
+- Motivo da escolha:
+  - ambos são pontos reais do pipeline documental
+  - ambos são de baixo risco e leitura/preview
+  - ambos oferecem sinais suficientes para policy/provenance/readiness sem enforcement
+- Arquivos alterados:
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/document/__init__.py`
+  - `web/app/v2/document/gate_models.py`
+  - `web/app/v2/document/gates.py`
+  - `web/app/v2/document/gate_metrics.py`
+  - `web/app/domains/chat/chat_aux_routes.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/app/domains/admin/routes.py`
+  - `web/tests/test_v2_document_soft_gate.py`
+  - `web/tests/test_v2_document_soft_gate_integration.py`
+  - `web/tests/test_v2_document_soft_gate_summary.py`
+  - `docs/restructuring-roadmap/67_epic10a_document_soft_gate.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Entregas principais:
+  - nova feature flag `TARIEL_V2_DOCUMENT_SOFT_GATE`
+  - modelos canônicos:
+    - `DocumentSoftGateRouteContextV1`
+    - `DocumentSoftGateBlockerV1`
+    - `DocumentSoftGateDecisionV1`
+    - `DocumentSoftGateTraceV1`
+    - `DocumentSoftGateSummaryV1`
+  - avaliador canônico em `web/app/v2/document/gates.py`
+  - observabilidade em memória em `web/app/v2/document/gate_metrics.py`
+  - endpoint admin/local-only:
+    - `GET /admin/api/document-soft-gate/summary`
+  - integração real no preview PDF do inspetor e na leitura do pacote da mesa
+- Blockers canônicos materializados:
+  - `no_active_report`
+  - `template_not_bound`
+  - `template_source_unknown`
+  - `materialization_disallowed_by_policy`
+  - `issue_disallowed_by_policy`
+  - `review_requirement_not_satisfied`
+  - `engineer_approval_requirement_not_satisfied`
+  - `provenance_summary_unavailable`
+  - `document_source_insufficient`
+- Garantias preservadas:
+  - nenhum payload público mudou
+  - nenhuma resposta pública mudou shape
+  - nenhum usuário passou a ser bloqueado
+  - nenhum pipeline PDF/DOCX legado foi substituído
+  - nenhuma mudança foi feita no Android
+- Validacoes rodadas:
+  - `PYTHONPATH=web python3 -m py_compile web/app/v2/runtime.py web/app/v2/document/gate_models.py web/app/v2/document/gates.py web/app/v2/document/gate_metrics.py web/app/v2/document/__init__.py web/app/domains/chat/chat_aux_routes.py web/app/domains/revisor/mesa_api.py web/app/domains/admin/routes.py web/tests/test_v2_document_soft_gate.py web/tests/test_v2_document_soft_gate_integration.py web/tests/test_v2_document_soft_gate_summary.py` -> `ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_facade.py` -> `5 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_shadow.py` -> `5 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_integration.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_soft_gate_summary.py` -> `1 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Resultado operacional:
+  - o soft gate documental passou a ser calculado de verdade nos dois pontos escolhidos
+  - a decisão fica em `request.state` e também em summary operacional local-only
+  - o produto segue com o mesmo comportamento público desta fase
+- Classificação honesta:
+  - implementação concluída com observabilidade e sem enforcement
+- Riscos remanescentes:
+  - a observabilidade ainda é em memória; reinício do processo zera o histórico recente
+  - o hard gate real em pontos mutáveis ainda precisa ser planejado e ativado em fase separada
+- Próximo passo recomendado:
+  - Epic 10B - primeiro hard gate controlado sobre ponto mutável do pipeline documental com rollout por flag
+- Rollback:
+  - desligar `TARIEL_V2_DOCUMENT_SOFT_GATE`
+
+## 2026-03-27 07:18:18 -0300 - Epic 09R - diagnóstico e correção da flag V2 no runtime do Android
+
+- Objetivo:
+  - descobrir onde a flag `EXPO_PUBLIC_ANDROID_V2_READ_CONTRACTS_ENABLED` se perdia no app Android em runtime e corrigir o desvio sem mexer em UX, payload público, tenant real ou regra de negócio.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - nenhum tenant real foi tocado
+- Arquivos alterados:
+  - `android/src/config/mobileV2Config.ts`
+  - `android/src/config/mobileV2Config.test.ts`
+  - `android/src/config/mobilePilotRequestTrace.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `android/scripts/run-android-preview.cjs`
+  - `android/scripts/run-android-dev.cjs`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.test.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `docs/restructuring-roadmap/66_epic09r_android_flag_runtime.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Causa real apurada:
+  - a flag V2 era lida em `android/src/config/mobileV2Config.ts` por acesso dinâmico:
+    - `process.env[ANDROID_V2_READ_CONTRACTS_FLAG]`
+  - em Expo/React Native, a substituição de `EXPO_PUBLIC_*` no bundle depende do acesso direto
+  - o valor não era materializado corretamente no runtime preview/release
+  - o parser então via a flag como ausente e devolvia `false`
+  - `mesaApi.ts` passava a decidir `legacy`, mesmo com `.env=1` e rollout remoto promovido
+- Entregas principais:
+  - leitura corrigida para `process.env.EXPO_PUBLIC_ANDROID_V2_READ_CONTRACTS_ENABLED`
+  - `getAndroidV2ReadContractsRuntimeSnapshot()` criado para materializar:
+    - `rawValue`
+    - `normalizedValue`
+    - `enabled`
+    - `source`
+  - trace da central enriquecido com:
+    - `contractFlagRawValue`
+    - `contractFlagSource`
+    - `decisionReason`
+    - `decisionSource`
+    - `fallbackReason`
+  - `pilot_selection_probe` expandido para persistir no dump final:
+    - `runtime_flag_enabled`
+    - `runtime_flag_raw_value`
+    - `runtime_flag_source`
+  - runner atualizado para parsear e salvar esses campos em:
+    - `ui_marker_summary.json`
+    - `request_trace_gap_summary.json`
+    - `final_report.md`
+  - scripts `android:preview` e `android:dev` endurecidos para carregar explicitamente `EXPO_PUBLIC_*` de `android/.env`
+- Validacoes rodadas:
+  - `cd android && npm test -- --runInBand src/config/mobileV2Config.test.ts src/config/mesaApi.test.ts src/features/common/mobilePilotAutomationDiagnostics.test.ts src/features/activity/monitorActivityFlow.test.ts src/features/activity/useActivityCenterController.test.ts` -> `30 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `python3 -m py_compile scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Rodadas reais executadas:
+  - `artifacts/mobile_pilot_run/20260327_070529`
+    - primeira rodada pós-correção
+    - já provou uso de V2 em feed e backend (`v2_served > 0`)
+    - ainda não preservava o valor bruto da flag no dump final
+  - `artifacts/mobile_pilot_run/20260327_071448`
+    - rodada autoritativa final da fase
+    - `android_install.log`:
+      - `Usando Android V2 preview flag=1`
+    - `ui_marker_summary.json`:
+      - `runtime_flag_enabled=true`
+      - `runtime_flag_raw_value=1`
+      - `runtime_flag_source=expo_public_env`
+      - `selection_probe.activity_center_delivery=v2`
+    - `maestro_run.txt`:
+      - `activity-center-feed-v2-served ... COMPLETED`
+      - `mesa-thread-surface ... COMPLETED`
+    - `backend_summary_after.json`:
+      - `v2_served=7`
+      - `legacy_fallbacks=0`
+      - `rollout_denied=0`
+      - `covered_surfaces=["feed","thread"]`
+      - `operator_run_outcome=completed_successfully`
+    - `final_report.md`:
+      - `result=success_human_confirmed`
+- Resultado operacional:
+  - o desvio da flag local foi eliminado
+  - a prova de runtime ficou persistida em artefato final
+  - o app entrou no caminho V2 elegível em execução real
+  - a rodada final fechou `feed` e `thread` com confirmação humana
+- Classificação honesta:
+  - `success_human_confirmed`
+- Riscos remanescentes:
+  - o trace detalhado da central ainda depende de ela estar aberta no último dump, embora a prova global da flag e da entrega V2 já esteja persistida
+  - a fase não altera rollout real nem promove tenant fora do ambiente demo
+- Próximo passo recomendado:
+  - seguir para a próxima execução operacional consumindo os artefatos de `20260327_071448` como baseline, sem reabrir a hipótese da flag local
+
+## 2026-03-26 20:24:13 -0300 - Epic 09Q - rastreabilidade ponta a ponta do request da central e fechamento da lacuna app/backend
+
+- Objetivo:
+  - descobrir em qual camada o request da central morria entre `request_dispatched=true` no app e ausencia total de evidencia no backend.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - nenhum tenant real foi tocado
+- Arquivos alterados:
+  - `android/src/config/apiCore.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `android/src/config/mobilePilotRequestTrace.ts`
+  - `android/src/config/mobilePilotRequestTrace.test.ts`
+  - `android/src/features/activity/monitorActivityFlow.ts`
+  - `android/src/features/activity/monitorActivityFlow.test.ts`
+  - `android/src/features/activity/useActivityCenterController.ts`
+  - `android/src/features/activity/useActivityCenterController.test.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.test.ts`
+  - `android/src/features/common/OperationalModals.test.tsx`
+  - `android/src/features/common/buildInspectorSessionModalsSections.test.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `web/app/domains/chat/mesa.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/tests/test_v2_android_request_trace_gap.py`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `docs/restructuring-roadmap/65_epic09q_request_trace_gap.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Causa real apurada no codigo:
+  - o caminho real da central era `runMonitorActivityFlow -> carregarFeedMesaMobile -> fetchComObservabilidade -> /app/api/mobile/v2/mesa/feed ou /app/api/mobile/mesa/feed`
+  - o diagnostico anterior parava cedo demais: o app so expunha `request_dispatched=true`, mas nao deixava prova automatizavel do `trace_id`, da rota efetiva, da fase do request nem da chegada ao backend
+  - o backend tambem nao mantinha um buffer correlacionavel de traces recentes da central
+- Entregas principais:
+  - trace canonico no app com:
+    - `traceId`
+    - `phase`
+    - `routeDecision`
+    - `actualRoute`
+    - `attemptSequence`
+    - `endpointPath`
+    - `responseStatus`
+    - `failureKind`
+    - `validationSessionId`
+    - `operatorRunId`
+    - `deliveryMode`
+    - `contractFlagEnabled`
+  - propagacao do header `X-Tariel-Mobile-Central-Trace`
+  - `pilot_activity_center_probe` expandido com o resumo do trace da central
+  - backend com `request_traces_recent` no summary operacional
+  - rotas reais do feed instrumentadas para registrar `received_route` e `counted` com o mesmo `trace_id`
+  - runner atualizado para salvar:
+    - `app_request_trace_summary.json`
+    - `backend_request_trace_summary_post_ui_wait.json`
+    - `backend_request_trace_summary_after.json`
+    - `request_trace_gap_summary.json`
+  - runner atualizado para classificar:
+    - `request_created_not_sent`
+    - `request_sent_not_received_backend`
+    - `request_received_backend_legacy_only`
+    - `request_received_backend_v2_but_no_metadata`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_rollout.py web/app/v2/mobile_rollout_metrics.py web/app/domains/chat/mesa.py scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `cd android && npm test -- --runInBand src/config/mobilePilotRequestTrace.test.ts src/config/mesaApi.test.ts src/features/activity/monitorActivityFlow.test.ts src/features/activity/useActivityCenterController.test.ts src/features/common/mobilePilotAutomationDiagnostics.test.ts src/features/common/OperationalModals.test.tsx src/features/common/buildInspectorSessionModalsSections.test.ts` -> `34 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `python3 -m pytest -q web/tests/test_v2_android_request_trace_gap.py web/tests/test_v2_android_rollout_metrics.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Rodada real executada:
+  - `artifacts/mobile_pilot_run/20260326_202310`
+    - o runner foi executado de verdade
+    - o preflight encontrou apenas:
+      - `RQCW20887GV unauthorized`
+    - tentativa de recuperacao executada:
+      - `adb kill-server`
+      - `adb start-server`
+      - `adb devices -l`
+    - o estado continuou `unauthorized`
+    - a rodada terminou antes de instalar o app ou abrir a central
+- Resultado operacional:
+  - a instrumentacao ponta a ponta ficou pronta e validada por testes
+  - a execucao real desta fase ficou bloqueada em ADB, antes do request da central
+- Classificacao honesta:
+  - `blocked_no_device`
+- Riscos remanescentes:
+  - ainda falta uma rodada valida com o device novamente em estado `device`
+  - a classificacao final da lacuna app/backend continua pendente porque a rodada real desta fase morreu no preflight ADB
+- Proximo passo recomendado:
+  - reautorizar o device fisico e rerodar a mesma 09Q para obter a primeira classificacao real do trace da central
+
+## 2026-03-26 19:47:38 -0300 - Epic 09P - materializacao dos estados terminais da central e diagnostico do feed vazio
+
+- Objetivo:
+  - materializar um estado terminal canonico dentro do modal da central de atividade e descobrir, com prova automatizavel, se o laudo `80` chegava a `no_request`, `empty`, `legacy`, `v2` ou `error`.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - nenhum tenant real foi tocado
+- Arquivos alterados:
+  - `android/src/features/activity/monitorActivityFlow.ts`
+  - `android/src/features/activity/monitorActivityFlow.test.ts`
+  - `android/src/features/activity/useActivityCenterController.ts`
+  - `android/src/features/activity/useActivityCenterController.test.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.test.ts`
+  - `android/src/features/common/OperationalModals.tsx`
+  - `android/src/features/common/OperationalModals.test.tsx`
+  - `android/src/features/common/SessionModalsStack.tsx`
+  - `android/src/features/common/buildInspectorSessionModalsSections.ts`
+  - `android/src/features/common/buildInspectorSessionModalsSections.test.ts`
+  - `android/src/features/common/buildSessionModalsStackProps.ts`
+  - `android/src/features/common/inspectorUiBuilderTypes.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `android/maestro/mobile-v2-pilot-run.yaml`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `docs/restructuring-roadmap/64_epic09p_activity_center_terminal_states.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Causa real apurada:
+  - a central ja tinha diagnostico interno suficiente no controller, mas esse diagnostico nao era renderizado no modal; por isso o Maestro via apenas `activity-center-empty-state` e nao conseguia provar um terminal canonico
+  - depois da selecao do laudo `80`, o bloqueio deixou de ser de navegacao e passou a ser de materializacao do estado terminal da central
+- Entregas principais:
+  - helper canonico para `no_request`, `empty`, `loaded_legacy`, `loaded_v2`, `loaded_unknown` e `error`
+  - `skipReason` explicito no monitoramento (`already_monitoring`, `network_blocked`, `no_target`)
+  - probe discreto do modal com:
+    - `activity-center-terminal-state`
+    - `activity-center-terminal-state-<kind>`
+    - `activity-center-request-dispatched`
+    - `activity-center-request-target-<id>`
+    - `pilot_activity_center_probe;...`
+  - runner atualizado para parsear o probe da central e classificar `central_no_request_fired`, `central_loaded_empty`, `central_loaded_legacy`, `central_loaded_v2` e `central_error`
+  - Maestro atualizado para parar na central quando `feed V2` nao aparece e so prosseguir para thread se `activity-center-feed-v2-served` estiver presente
+- Validacoes rodadas:
+  - `maestro check-syntax android/maestro/mobile-v2-pilot-run.yaml` -> `OK`
+  - `python3 -m py_compile scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `cd android && npm test -- --runInBand --runTestsByPath src/features/common/mobilePilotAutomationDiagnostics.test.ts src/features/common/OperationalModals.test.tsx src/features/common/buildInspectorSessionModalsSections.test.ts src/features/activity/monitorActivityFlow.test.ts src/features/activity/useActivityCenterController.test.ts` -> `18 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Rodadas reais executadas:
+  - `artifacts/mobile_pilot_run/20260326_193812`
+    - preflight bloqueado porque o device `RQCW20887GV` apareceu como `unauthorized`
+    - recuperado com `adb kill-server && adb start-server`
+  - `artifacts/mobile_pilot_run/20260326_193848`
+    - primeira rodada real apos o patch
+    - o dump final ja mostrou:
+      - `activity-center-terminal-state`
+      - `activity-center-terminal-state-empty`
+      - `activity-center-request-dispatched`
+      - `activity-center-request-target-80`
+    - o probe da central registrou:
+      - `terminal_state=empty`
+      - `request_dispatched=true`
+      - `requested_targets=80`
+      - `delivery=unknown`
+    - o Maestro ainda falhou na espera visual do terminal state por geometria insuficiente do probe
+    - o runner classificou corretamente `central_loaded_empty`
+  - `artifacts/mobile_pilot_run/20260326_194352`
+    - rodada autoritativa apos ajustar o probe do modal
+    - `Assert that id: activity-center-terminal-state is visible... COMPLETED`
+    - `Run flow when id: activity-center-feed-v2-served is visible... SKIPPED`
+    - `ui_marker_summary.json` final:
+      - `activity_center_terminal_state=empty`
+      - `activity_center_request_dispatched=true`
+      - `activity_center_requested_targets=[80]`
+      - `activity_center_delivery_mode=unknown`
+      - `activity_center_skip_reason=none`
+    - `operator_run_outcome=completed_inconclusive`
+    - `operator_run_reason=minimum_human_coverage_not_met`
+    - `backend_summary_after.json` seguiu com:
+      - `v2_served=0`
+      - `observed_requests=0`
+      - `human_ack_recent_events=[]`
+- Resultado operacional:
+  - a central agora materializa um terminal canonico e o Maestro consegue esperá-lo de forma confiavel
+  - o estado real da rodada autoritativa foi `central_loaded_empty`
+  - o app-side diagnostic declarou `request_dispatched=true` com `target 80`, mas nao houve metadata `v2/legacy` nem qualquer request observado no backend
+- Classificacao honesta:
+  - `central_loaded_empty`
+- Riscos remanescentes:
+  - ainda existe uma divergencia entre o estado local `request_dispatched=true` e a ausencia total de trafego/metadata no backend
+  - `feed/thread` continuam sem cobertura formal e sem `human_ack`
+- Proximo passo recomendado:
+  - Epic 09Q - diagnostico da divergencia entre `request_dispatched` local e ausencia de trafego backend/metadata da central
+
+## 2026-03-26 18:14:04 -0300 - Epic 09O - prova automatizavel de laudoSelecionadoId no shell autenticado
+
+- Objetivo:
+  - provar de forma automatizavel se o `tap` em `history-item-80` realmente chegava ao callback de selecao e se o `laudoSelecionadoId` subia ate o shell autenticado do app.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - nenhum tenant real foi tocado
+- Arquivos alterados:
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.test.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `android/maestro/mobile-v2-pilot-run.yaml`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `docs/restructuring-roadmap/63_epic09o_selected_laudo_proof.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Causa real apurada:
+  - o `laudoSelecionadoId` sempre dependeu de `conversa?.laudoId`, isto e, do `setConversation` disparado por `abrirLaudoPorId(...)`
+  - a selecao nao estava necessariamente falhando; a prova anterior falhava porque os markers eram ocultos/off-screen e o runner so observava o dump final, ja fora do shell
+- Entregas principais:
+  - diagnostico de selecao extraido para helpers puros (`tap`, `callback_completed`, `selection_lost`)
+  - probe real do shell autenticado materializado apenas em modo de automacao
+  - novos markers:
+    - `history-selection-callback-fired-<id>`
+    - `history-selection-callback-completed-<id>`
+    - `authenticated-shell-selected-laudo-id-<id>`
+    - `authenticated-shell-selection-ready-<id>`
+    - `authenticated-shell-selection-lost-<id>`
+  - Maestro atualizado para esperar explicitamente o callback e a selecao pronta no shell
+  - runner atualizado para classificar a selecao pela propria execucao do Maestro e para reconhecer `activity-center-empty-state`
+- Validacoes rodadas:
+  - `maestro check-syntax android/maestro/mobile-v2-pilot-run.yaml` -> `OK`
+  - `python3 -m py_compile scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `cd android && npm test -- --runInBand --runTestsByPath src/features/common/mobilePilotAutomationDiagnostics.test.ts` -> `7 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Rodadas reais executadas:
+  - `artifacts/mobile_pilot_run/20260326_180433`
+    - o Maestro confirmou o callback e a selecao pronta do laudo `80`
+    - a central abriu vazia
+    - o runner ainda classificou errado porque olhava apenas o dump final da central
+  - `artifacts/mobile_pilot_run/20260326_180956`
+    - run autoritativa apos corrigir a classificacao do runner
+    - o Maestro confirmou:
+      - `history-selection-callback-fired-80`
+      - `authenticated-shell-selection-ready-80`
+    - a central abriu e o dump final mostrou `activity-center-empty-state`
+    - o backend permaneceu com `v2_served=0` e `human_ack_recent_events=0`
+- Resultado operacional:
+  - a selecao do laudo `80` ficou provada de forma automatizavel no shell autenticado
+  - o bloqueio desta trilha migrou da selecao para a central de atividade vazia
+  - classificacao honesta:
+    - `selected_laudo_confirmed`
+- Riscos remanescentes:
+  - a central ainda nao materializa o marker terminal esperado `activity-center-terminal-state`
+  - `feed/thread` continuam sem cobertura formal no backend
+- Proximo passo recomendado:
+  - Epic 09P - materializacao canonica dos estados terminais da central e diagnostico do feed vazio com laudo 80 ja selecionado
+
+## 2026-03-26 15:29:27 -0300 - Epic 09L - estabilizacao conservadora da navegacao do historico alvo
+
+- Objetivo:
+  - estabilizar a rodada assistida do app Android no tenant demo para localizar o laudo `80`, abrir a thread `Mesa` de forma deterministica e rerodar o runner operacional com evidencia nova.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - nenhum tenant real foi tocado
+- Arquivos alterados:
+  - `android/src/features/common/useSidePanelsController.ts`
+  - `android/src/features/common/useSidePanelsController.test.ts`
+  - `android/src/features/common/inspectorUiBuilderTypes.ts`
+  - `android/src/features/common/buildAuthenticatedLayoutSections.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `android/src/features/history/HistoryDrawerPanel.tsx`
+  - `android/src/features/history/HistoryDrawerPanel.test.tsx`
+  - `android/src/features/chat/ThreadConversationPane.tsx`
+  - `android/src/features/chat/ThreadConversationPane.test.tsx`
+  - `android/maestro/mobile-v2-pilot-run.yaml`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `docs/restructuring-roadmap/60_epic09l_history_navigation_stabilization.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Causa real apurada nos artefatos:
+  - o `hideKeyboard` apos a busca do historico enviava `BACK` e derrubava o app para o launcher
+  - o laudo `80` podia ficar sem `history-item-80` quando era o primeiro item do drawer
+  - depois de corrigido isso, a thread `Mesa` ja abria, mas o flow ainda falhava porque esperava `mesa-composer-input`, que nao existe quando `mesaTemMensagens=false`
+- Entregas principais:
+  - o historico passou a manter contexto durante a busca com teclado aberto
+  - o target do historico passou a ter marker estavel mesmo quando ocupa a primeira posicao
+  - a superficie `Mesa` ganhou markers estaveis de loading/empty/loaded
+  - o Maestro passou a usar retry conservador no tap do laudo alvo e a esperar `mesa-thread-surface` em vez de `mesa-composer-input`
+  - o runner passou a classificar `thread_opened_but_no_human_ack`
+- Validacoes rodadas:
+  - `maestro check-syntax android/maestro/mobile-v2-pilot-run.yaml` -> `OK`
+  - `cd android && npm test -- --runInBand src/features/common/useSidePanelsController.test.ts src/features/history/HistoryDrawerPanel.test.tsx src/features/history/useHistoryController.test.ts src/features/chat/ThreadConversationPane.test.tsx` -> `12 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `python3 -m py_compile scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Rodadas reais executadas:
+  - `artifacts/mobile_pilot_run/20260326_151541`
+    - `history-item-80` foi encontrado e a tela `Mesa` abriu
+    - o bloqueio mudou para a espera invalida em `mesa-composer-input`
+  - `artifacts/mobile_pilot_run/20260326_152441`
+    - `maestro` concluiu com `returncode=0`
+    - o app abriu configuracoes, central de atividade, historico e thread `Mesa`
+    - `pilot-run-mesa-thread.png` foi gerada
+    - `operator_run_outcome=completed_inconclusive`
+    - `operator_run_reason=minimum_human_coverage_not_met`
+    - `final_report.md` classificou `thread_opened_but_no_human_ack`
+- Resultado operacional:
+  - a navegacao do historico alvo ficou estabilizada para o laudo `80`
+  - a thread `Mesa` abriu de forma automatizada e verificavel
+  - o backend ainda nao observou `v2_served` nem `human_confirmed`, portanto a cobertura formal de `feed/thread` continua ausente
+- Classificacao honesta:
+  - `thread_opened_but_no_human_ack`
+- Riscos remanescentes:
+  - a rodada ainda nao produz evidencia backend suficiente para contar cobertura humana minima
+  - `candidate_ready_for_real_tenant` continua `false`
+- Proximo passo recomendado:
+  - Epic 09M - confirmacao humana assistida e fechamento da trilha de evidencia V2 para `feed` e `thread`
+
+## 2026-03-26 14:25:05 -0300 - Reexecucao operacional do runner mobile V2 no tenant demo
+
+- Objetivo:
+  - reexecutar de verdade o runner operacional ja existente no workspace atual, coletando uma nova rodada completa de artefatos do piloto Android V2 no tenant demo.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - continua sendo o unico tenant seguro usado nesta trilha
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/59_mobile_pilot_runner_execution.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Ambiente encontrado:
+  - device fisico `RQCW20887GV / SM-S918B`
+  - `adb 37.0.0`
+  - `node v20.20.1`
+  - `npm 11.12.0`
+  - `python 3.12.3`
+  - `maestro 2.3.0`
+  - app `com.tarielia.inspetor` com activity `.MainActivity`
+- Execucao real desta fase:
+  - artefatos gerados em `artifacts/mobile_pilot_run/20260326_141933`
+  - `adb reverse` confirmado para `8000`, `8081`, `19000` e `19001`
+  - backend local confirmado em `http://127.0.0.1:8000/health`
+  - `operator run` iniciado com:
+    - `operator_run_id=oprv_b75587c2d930`
+    - `session_id=orgv_04a5acc2f99c`
+    - targets `feed/thread -> laudo 80`
+  - build e instalacao reais do app via `npm run android:preview`
+    - `BUILD SUCCESSFUL in 1m 57s`
+    - `Installed on 1 device`
+  - automacao Maestro executada de verdade:
+    - login concluido
+    - `open-settings-button` encontrado
+    - central de atividade aberta
+    - historico aberto
+    - busca por `80` digitada em `history-search-input`
+    - falha final em `Assert that id: history-item-80 is visible`
+  - evidencia de falha:
+    - `maestro_run.txt` registrou o erro no historico
+    - `ui_after_maestro_failure.xml` nao trouxe `history-item-80` nem `history-search-input`
+    - o dump final mostrou o shell principal do app, indicando perda de contexto da tela de historico antes da cobertura
+  - encerramento conservador:
+    - `operator_run_outcome=aborted`
+    - `operator_run_reason=operator_aborted`
+    - `pilot_outcome_after=insufficient_evidence`
+    - `candidate_ready_for_real_tenant_after=false`
+- Validacoes reais rodadas:
+  - `GET /health` -> `200 {"status":"ok","versao":"2.0-SaaS","ambiente":"dev"}`
+  - login admin no portal local
+  - login mobile do inspetor demo
+  - coleta de `summary`, `capabilities` e `operator-run status` antes/depois
+  - build/install do Android
+  - execucao do flow Maestro `android/maestro/mobile-v2-pilot-run.yaml`
+- Resultado operacional:
+  - o runner foi executado de verdade no projeto atual e coletou a trilha completa de ambiente, backend, sessao organica, `operator run`, build/install, logs, UI dump e screenshots
+  - a cobertura continuou parcial porque o fluxo falhou ao confirmar o item `history-item-80`
+  - classificacao honesta:
+    - `partial_execution`
+- Riscos remanescentes:
+  - a navegacao do historico ainda perde o alvo `80` antes da confirmacao visual necessaria para cobrir `feed` e `thread`
+  - `candidate_ready_for_real_tenant` continua bloqueado porque nao houve requests V2 cobertos nem `human_ack`
+- Proximo passo recomendado:
+  - Epic 09L - estabilizacao conservadora da navegacao do historico no runner e nova rodada assistida para confirmar `feed` e `thread` do laudo `80`
+
+## 2026-03-26 11:36:23 -0300 - Runner operacional do piloto mobile V2 no tenant demo
+
+- Objetivo:
+  - executar de verdade um runner operacional completo para o piloto Android V2 no tenant demo, automatizando descoberta de ambiente, bootstrap do backend, sessao organica, `operator run`, instalacao do app, navegacao assistida e coleta de artefatos.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - continua sendo o unico tenant seguro usado nesta trilha
+- Arquivos alterados:
+  - `android/src/config/mobileV2HumanValidation.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `android/src/features/common/OperationalModals.tsx`
+  - `android/src/config/mobileV2HumanValidation.test.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `android/maestro/mobile-v2-pilot-run.yaml`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `web/app/v2/mobile_organic_validation.py`
+  - `web/tests/test_v2_android_operator_run.py`
+  - `docs/restructuring-roadmap/59_mobile_pilot_runner_execution.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Ambiente encontrado:
+  - device fisico `RQCW20887GV / SM-S918B`
+  - `adb 37.0.0`
+  - `node v20.20.1`
+  - `npm 11.12.0`
+  - `python 3.12.3`
+  - `maestro 2.3.0`
+  - app `com.tarielia.inspetor` com activity `.MainActivity`
+- Entregas principais:
+  - novo runner `scripts/run_mobile_pilot_runner.py` para preparar ambiente, coletar `summary/capabilities`, iniciar sessao organica e `operator run`, instalar o app, rodar Maestro, coletar logcat/screenshots e escrever `final_report.md`
+  - flow Maestro `android/maestro/mobile-v2-pilot-run.yaml` para abrir o app, atravessar configuracoes, tentar passar pela central de atividade e navegar para o historico/laudo alvo
+  - enriquecimento da propagacao de metadados no app Android com `suggestedTargetIds` para a validacao humana guiada
+  - correcao operacional no backend para selecionar targets de validacao acessiveis ao inspetor demo, em vez de escolher um laudo de outro usuario do tenant
+- Execucao real desta fase:
+  - tentativa 1:
+    - artefatos em `artifacts/mobile_pilot_run/20260326_111352`
+    - app instalado e aberto
+    - flow falhou em `settings-system-activity-center-row`
+  - tentativa 2:
+    - artefatos em `artifacts/mobile_pilot_run/20260326_112134`
+    - flow abriu a central de atividade, mas sem itens visiveis
+    - a navegacao falhou ao procurar `history-item-1`
+    - essa tentativa expôs que o `operator run` estava escolhendo `laudo_id=1`, inacessivel ao inspetor demo
+  - correcao aplicada:
+    - `resolve_demo_mobile_organic_validation_targets(...)` passou a preferir laudos recentes de usuarios internos seguros do tenant demo
+    - `operator run` passou a selecionar `laudo_id=80` para `feed` e `thread`
+  - tentativa 3:
+    - artefatos em `artifacts/mobile_pilot_run/20260326_113319`
+    - `operator_run_id=oprv_92496d5e88cb`
+    - `session_id=orgv_e80f694c4ed9`
+    - target `80` resolvido com sucesso
+    - o relancamento do app caiu em estado de tela preta/travada e o Maestro falhou antes de reencontrar `open-settings-button`
+    - encerramento conservador:
+      - `operator_run_outcome=aborted`
+      - `operator_run_reason=operator_aborted`
+      - `pilot_outcome_after=insufficient_evidence`
+      - `candidate_ready_for_real_tenant_after=false`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_organic_validation.py scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `python3 -m pytest -q web/tests/test_v2_android_operator_run.py` -> `5 passed`
+  - `cd android && npm test -- --runInBand src/config/mobileV2HumanValidation.test.ts src/config/mesaApi.test.ts` -> `12 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `cd android && npm run lint` -> `ok`
+- Resultado operacional:
+  - o runner foi executado de verdade, com build/install do app, bootstrap do backend, sessao organica e `operator run`
+  - a automacao UI permaneceu parcial e nao confirmou cobertura de `feed` nem `thread`
+  - classificacao honesta:
+    - `partial_execution`
+- Riscos remanescentes:
+  - o device precisa permanecer desbloqueado e estavel para que a rodada UI automatizada chegue ao shell do app com previsibilidade
+  - a observabilidade e o estado do `operator run` continuam em memoria de processo
+  - `candidate_ready_for_real_tenant` permanece bloqueado ate cobertura humana real de `feed` e `thread`
+- Proxima fase recomendada:
+  - Epic 09L - execucao assistida da primeira rodada humana real no app Android do tenant demo e fechamento controlado do piloto local
+
+## 2026-03-26 09:41:56 -0300 - Epic 09K - operator validation run para sessao organica humana real no tenant demo
+
+- Objetivo:
+  - preparar uma rodada operacional real e controlada para o tenant demo ja promovido, com start/status/finish explicitos, instrucoes minimas para o operador, integracao discreta do app Android com `operator_run_id` e conclusao formal do run sem depender de interpretacao manual de logs.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - continua sendo o unico tenant seguro desta trilha
+- Arquivos alterados:
+  - `web/app/v2/mobile_operator_run.py`
+  - `web/app/v2/mobile_organic_validation.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/app/domains/admin/routes.py`
+  - `web/app/domains/chat/auth_contracts.py`
+  - `web/app/domains/chat/auth_mobile_routes.py`
+  - `web/tests/test_v2_android_operator_run.py`
+  - `web/tests/test_v2_android_operator_run_summary.py`
+  - `android/src/config/mobileV2Rollout.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mobileV2HumanValidation.ts`
+  - `android/src/config/mobileV2Rollout.test.ts`
+  - `android/src/config/mobileV2HumanValidation.test.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `docs/restructuring-roadmap/57_epic09k_operator_validation_run.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Entregas principais:
+  - novo modulo `mobile_operator_run` com `MobileOperatorValidationRun`, `MobileOperatorValidationTarget`, `MobileOperatorValidationProgress` e `MobileOperatorValidationStatus`
+  - endpoints admin/local-only para `start`, `status` e `finish` do operator run
+  - criterio minimo explicito por superficie/target para `feed` e `thread`, com outcomes `blocked_no_targets`, `in_progress`, `completed_successfully`, `completed_with_fallback`, `completed_inconclusive` e `aborted`
+  - summary admin enriquecido com campos de operator run, inclusive `operator_run_progress`, `required_surfaces`, `covered_surfaces`, `missing_targets`, `human_coverage_from_operator_run` e `validation_session_source`
+  - `capabilities` mobile agora expõe `operator_validation_run_active`, `operator_validation_run_id` e `operator_validation_required_surfaces`
+  - o app Android passou a propagar `operator_run_id` nos headers de leitura e no ack humano, sem mudar UX
+- Execucao local real desta fase:
+  - run iniciado com sucesso:
+    - `operator_run_id=oprv_eb0b740c2862`
+    - `session_id=orgv_6eebb7d61d7d`
+    - `required_surfaces=[feed, thread]`
+  - run encerrado formalmente com:
+    - `operator_run_outcome=completed_inconclusive`
+    - `operator_run_reason=minimum_human_coverage_not_met`
+  - interpretacao:
+    - o tenant demo possuia targets suficientes para a rodada
+    - a camada operacional do run esta pronta
+    - ainda falta a sessao humana real no app para fechar a evidencia
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_operator_run.py web/app/v2/mobile_organic_validation.py web/app/v2/mobile_rollout.py web/app/v2/mobile_rollout_metrics.py web/app/domains/admin/routes.py web/app/domains/chat/auth_contracts.py web/app/domains/chat/auth_mobile_routes.py web/tests/test_v2_android_operator_run.py web/tests/test_v2_android_operator_run_summary.py` -> `ok`
+  - `python3 -m pytest -q web/tests/test_v2_android_operator_run.py web/tests/test_v2_android_operator_run_summary.py` -> `5 passed`
+  - `cd android && npm test -- --runInBand src/config/mobileV2Rollout.test.ts src/config/mobileV2HumanValidation.test.ts src/config/mesaApi.test.ts` -> `23 passed`
+- Riscos remanescentes:
+  - o run operacional foi executado e concluido formalmente, mas ainda sem uso humano real observado no app Android
+  - a observabilidade e o estado do run continuam em memoria de processo
+  - `candidate_ready_for_real_tenant` continua bloqueado ate uma rodada humana real cobrir `feed` e `thread` com confirmacao valida
+- Proxima fase recomendada:
+  - Epic 09L - execucao assistida da primeira rodada humana real no app Android do tenant demo e fechamento controlado do piloto local
+
+## 2026-03-26 06:18:28 -0300 - Epic 09I - coleta organica guiada no tenant demo com sessao identificavel e cobertura por superficie
+
+- Objetivo:
+  - fechar o ciclo operacional da validacao organica do tenant demo promovido, expondo um `session_id` no gate remoto, fazendo o app Android propagar esse sinal de volta ao backend e medindo cobertura real de `feed` e `thread` separadamente do probe.
+- Tenant alvo:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - continua sendo o unico tenant seguro desta trilha
+- Arquivos alterados:
+  - `web/app/v2/mobile_organic_validation.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/app/domains/chat/mesa.py`
+  - `web/.env`
+  - `web/.env.example`
+  - `web/tests/test_v2_android_organic_validation.py`
+  - `web/tests/test_v2_android_organic_validation_summary.py`
+  - `web/tests/test_v2_android_organic_session_signal.py`
+  - `web/tests/test_v2_android_organic_coverage.py`
+  - `android/src/config/mobileV2Rollout.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mobileV2OrganicSessionSignal.test.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `docs/restructuring-roadmap/55_epic09i_guided_organic_collection.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Entregas principais:
+  - sessao organica agora nasce com `organic_validation_session_id` e esse sinal e exposto no `GET /app/api/mobile/v2/capabilities`
+  - o app Android passou a enviar `X-Tariel-Mobile-Usage-Mode: organic_validation` e `X-Tariel-Mobile-Validation-Session` em leituras V2 e no fallback legado subsequente da mesma rota
+  - o backend agora classifica trafego em `probe`, `organic_validation`, `organic_general`, `legacy_fallback_from_validation` e `legacy_general`
+  - o summary admin passou a medir cobertura por superficie e alvo real via `organic_validation_surface_summaries`, `organic_validation_distinct_targets` e `organic_validation_missing_targets`
+  - o modulo de validacao organica deixou de capturar `SessaoLocal` estaticamente no import e passou a seguir a session factory ativa do runtime, alinhando comportamento real e testes
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_android_organic_validation.py web/tests/test_v2_android_organic_validation_summary.py web/tests/test_v2_android_organic_session_signal.py web/tests/test_v2_android_organic_coverage.py` -> `13 passed`
+  - `cd android && npm test -- --runInBand src/config/mobileV2OrganicSessionSignal.test.ts src/config/mobileV2Rollout.test.ts src/config/mobileV2PilotRollout.test.ts src/config/mesaApi.test.ts` -> `25 passed`
+- Riscos remanescentes:
+  - a fase implementa o mecanismo de coleta organica guiada, mas nao fabrica uso humano real; sem navegacao real do app o tenant demo ainda pode continuar em `insufficient_evidence`
+  - a observabilidade continua em memoria de processo e nao preserva historico persistente de sessoes organicas
+  - nenhum tenant real foi promovido nem avaliado; `candidate_ready_for_real_tenant` continua bloqueado ate evidencia organica real suficiente no demo
+- Proxima fase recomendada:
+  - Epic 09J - sessao organica assistida com uso humano real do app no tenant demo e consolidacao do primeiro criterio minimo antes de qualquer candidato real
+
+## 2026-03-25 22:40:00 -0300 - Epic 09E - primeiro tenant promovido com runbook operacional e janela de rollback
+
+- Objetivo:
+  - executar a primeira promocao controlada real do mobile V2 em um tenant seguro do ambiente local, com superficies promovidas, janela formal de rollback, summary operacional do piloto e app Android respeitando promoted/hold/rollback sem tocar no legado.
+- Tenant promovido:
+  - `empresa_id=1`
+  - `Empresa Demo (DEV)`
+  - justificativa de seguranca:
+    - seed explicito de desenvolvimento em `web/app/shared/db/bootstrap.py`
+    - CNPJ placeholder `00000000000000`
+    - presente no banco local real `web/tariel_admin (1).db`
+    - possui usuarios `Inspetor` ativos para consumo mobile real
+- Arquivos alterados:
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/.env`
+  - `web/.env.example`
+  - `web/tests/test_v2_android_rollout.py`
+  - `web/tests/test_v2_android_rollout_pilot.py`
+  - `android/.env`
+  - `android/src/config/mobileV2Rollout.ts`
+  - `android/src/config/mobileV2PilotRollout.test.ts`
+  - `docs/restructuring-roadmap/51_epic09e_first_promoted_tenant.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_rollout.py web/app/v2/mobile_rollout_metrics.py web/tests/test_v2_android_rollout_pilot.py` -> `ok`
+  - `cd web && python3 -m pytest -q tests/test_v2_android_rollout_pilot.py tests/test_v2_android_rollout.py tests/test_v2_android_public_contract.py tests/test_smoke.py` -> `38 passed`
+  - `cd web && python3 -m pytest -q tests/test_v2_android_rollout_metrics.py tests/test_v2_android_rollout_state.py tests/test_v2_android_rollout_promotion.py` -> `9 passed`
+  - `cd android && npm test -- --runInBand src/config/mobileV2Rollout.test.ts src/config/mobileV2PilotRollout.test.ts src/config/mesaApi.test.ts` -> `21 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `cd android && npm run lint` -> `ok`
+- Riscos remanescentes:
+  - a observabilidade continua em memoria e ainda nao oferece trilha historica persistente da janela do piloto
+  - promoted continua sendo controlado por configuracao operacional; ainda nao existe workflow administrativo proprio nem auditoria dedicada dessa decisao
+  - o piloto real desta fase continua restrito ao tenant demo local; nenhum tenant real foi promovido
+- Proxima fase recomendada:
+  - Epic 09F - consolidacao do piloto promovido com acompanhamento pos-janela e criterio formal de saida para ampliar a promocao
+
+## 2026-03-25 21:52:22 -0300 - Epic 09D - promocao controlada do piloto mobile V2 por tenant/superficie
+
+- Objetivo:
+  - transformar o rollout mobile V2 atual em um piloto governavel por tenant e superficie, com estados explicitos, criterio operacional de promocao, hold/rollback por superficie, resumo admin mais util e app Android respeitando esses estados sem quebrar legado ou UX.
+- Arquivos alterados:
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/.env.example`
+  - `web/tests/test_v2_android_rollout_state.py`
+  - `web/tests/test_v2_android_rollout_promotion.py`
+  - `android/src/config/mobileV2Rollout.ts`
+  - `android/src/config/mobileV2Rollout.test.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `docs/restructuring-roadmap/50_epic09d_mobile_v2_promotion.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_rollout.py web/app/v2/mobile_rollout_metrics.py web/tests/test_v2_android_rollout.py web/tests/test_v2_android_rollout_metrics.py web/tests/test_v2_android_rollout_state.py web/tests/test_v2_android_rollout_promotion.py` -> `ok`
+  - `python3 -m pytest -q web/tests/test_v2_android_rollout.py` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_public_contract.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_rollout_metrics.py web/tests/test_v2_android_rollout_state.py web/tests/test_v2_android_rollout_promotion.py` -> `9 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `cd android && npm run lint` -> `ok`
+  - `cd android && npm test -- --runInBand src/config/mobileV2Rollout.test.ts src/config/mesaApi.test.ts` -> `18 passed`
+- Riscos remanescentes:
+  - a observabilidade continua em memoria e serve para piloto/operacao controlada, nao como historico persistente de longo prazo
+  - `promoted` segue dependente de override operacional explicito; ainda nao existe autopromocao assistida nem workflow administrativo proprio para isso
+  - a governanca atual cobre apenas leituras `feed` e `thread`; comandos mobile V2 continuam fora desta fase
+- Proxima fase recomendada:
+  - Epic 09E - primeiro tenant promovido com runbook operacional de saida do piloto e janela formal de rollback
+
+## 2026-03-25 18:51:51 -0300 - Epic 09A - adocao opt-in do contrato publico mobile V2 no app Android
+
+- Objetivo:
+  - fazer o app Android real consumir os contratos `MobileInspectorFeedV2` e `MobileInspectorThreadV2` de forma opt-in, com mapper para os modelos legados da UI atual e fallback automatico para o caminho legado.
+- Arquivos alterados:
+  - `android/.env.example`
+  - `android/src/config/mobileV2Config.ts`
+  - `android/src/config/mobileV2MesaAdapter.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/types/mobileV2.ts`
+  - `android/src/config/mobileV2MesaAdapter.test.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `docs/restructuring-roadmap/48_epic09a_android_opt_in_adoption.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Validacoes rodadas:
+  - `cd android && npm run typecheck` -> `ok`
+  - `cd android && npm run test -- --runInBand src/config/mesaApi.test.ts src/config/mobileV2MesaAdapter.test.ts` -> `9 passed`
+  - `cd android && npm run lint` -> `ok`
+  - `python3 -m pytest -q web/tests/test_v2_android_public_contract.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Riscos remanescentes:
+  - a flag do app continua local e desligada por padrao; ainda nao existe rollout remoto por tenant/coorte no cliente
+  - o app ainda usa o legado para escrita/comandos; a adocao V2 desta fase cobre apenas leituras de feed e thread da mesa
+  - fallback para o legado mascara problemas do V2 se a telemetria nao for acompanhada no piloto
+- Proxima fase recomendada:
+  - Epic 09B - rollout controlado por coorte/tenant do consumo mobile V2 e observabilidade de fallback
+
+## 2026-03-25 17:32:42 -0300 - Epic 08D - implementacao real do contrato publico mobile V2 para feed/thread
+
+- Objetivo:
+  - abrir uma superficie publica mobile V2, somente leitura e versionada, para o feed e a thread da mesa visiveis ao Inspetor, sem tocar nos endpoints legados do Android.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/47_epic08d_android_public_contract.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/contracts/mobile.py`
+  - `web/app/domains/chat/mesa_mobile_support.py`
+  - `web/app/domains/chat/mesa.py`
+  - `web/app/core/http_setup_support.py`
+  - `web/tests/test_v2_android_public_contract.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_reviewdesk_projection.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_provenance.py` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_v2_policy_engine.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_facade.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_shadow.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_adapter.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_feed_adapter.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_thread_adapter.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_public_contract.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m pytest -q tests/test_mesa_mobile_sync.py` executado a partir de `web/` -> `3 passed`
+  - `python3 -m py_compile web/app/v2/contracts/mobile.py web/app/domains/chat/mesa_mobile_support.py web/app/domains/chat/mesa.py web/app/core/http_setup_support.py web/tests/test_v2_android_public_contract.py` -> `ok`
+- Riscos remanescentes:
+  - o app Android real ainda consome apenas as rotas legadas, nao os contratos `MobileInspectorFeedV2` e `MobileInspectorThreadV2`
+  - a superficie publica V2 ainda e somente leitura; nao existe contrato V2 correspondente para comandos da mesa no mobile
+  - ainda falta estrategia de rollout por tenant/coorte no cliente real antes de adocao efetiva
+- Proxima fase recomendada:
+  - Epic 09A - adocao opt-in do contrato publico mobile V2 no app Android
+
+## 2026-03-25 16:55:31 -0300 - Epic 08C - implementacao real do adapter canonico da conversa detalhada mobile
+
+- Objetivo:
+  - fazer o endpoint detalhado `/app/api/laudo/{laudo_id}/mesa/mensagens` consumir internamente a leitura canônica do Inspetor e um adapter de thread, preservando o payload publico legado do Android.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/46_epic08c_android_thread_adapter.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/contracts/interactions.py`
+  - `web/app/v2/adapters/android_case_feed.py`
+  - `web/app/v2/adapters/android_case_thread.py`
+  - `web/app/v2/adapters/__init__.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/domains/chat/mesa.py`
+  - `web/tests/test_v2_android_case_thread_adapter.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_reviewdesk_projection.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_provenance.py` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_v2_policy_engine.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_facade.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_shadow.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_adapter.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_feed_adapter.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_thread_adapter.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m pytest -q tests/test_mesa_mobile_sync.py` executado a partir de `web/` -> `3 passed`
+  - `python3 -m py_compile web/app/v2/contracts/interactions.py web/app/v2/adapters/android_case_feed.py web/app/v2/adapters/android_case_thread.py web/app/v2/adapters/__init__.py web/app/v2/runtime.py web/app/domains/chat/mesa.py web/tests/test_v2_android_case_thread_adapter.py` -> `ok`
+- Riscos remanescentes:
+  - o Android ainda consome o payload legado da conversa detalhada, nao um contrato canônico publico versionado
+  - o endpoint detalhado continua compartilhado com o Inspetor web, embora a leitura interna agora seja protegida por adapter e fallback
+  - a visibilidade mobile de feedback ainda depende do recorte legado do Inspetor, sem policy explicita por tenant para rollout do app real
+- Proxima fase recomendada:
+  - Epic 08D - consolidacao do contrato publico mobile versionado para thread/feed da mesa
+
+## 2026-03-25 16:20:50 -0300 - Epic 08B - implementacao real do adapter canonico do feed mobile de interacoes
+
+- Objetivo:
+  - fazer o endpoint mobile `/app/api/mobile/mesa/feed` consumir internamente a leitura canônica do Inspetor e um adapter de feed, preservando o payload publico legado do Android.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/45_epic08b_android_feed_adapter.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/contracts/interactions.py`
+  - `web/app/v2/adapters/android_case_feed.py`
+  - `web/app/v2/adapters/__init__.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/domains/chat/mesa_mobile_support.py`
+  - `web/app/domains/chat/mesa.py`
+  - `web/tests/test_v2_android_case_feed_adapter.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_reviewdesk_projection.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_provenance.py` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_v2_policy_engine.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_facade.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_shadow.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_adapter.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_feed_adapter.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m pytest -q tests/test_mesa_mobile_sync.py` executado a partir de `web/` -> `3 passed`
+  - `python3 -m py_compile web/app/v2/contracts/interactions.py web/app/v2/adapters/android_case_feed.py web/app/v2/adapters/__init__.py web/app/v2/runtime.py web/app/domains/chat/mesa_mobile_support.py web/app/domains/chat/mesa.py web/tests/test_v2_android_case_feed_adapter.py` -> `ok`
+- Riscos remanescentes:
+  - o Android ainda consome o payload legado do feed, nao um contrato canônico publico versionado
+  - a rota detalhada `/app/api/laudo/{laudo_id}/mesa/mensagens` ainda nao passou pelo mesmo adapter canônico
+  - a visibilidade continua ancorada no recorte legado do Inspetor, sem policy explicita por tenant para sync de feedback mobile
+- Proxima fase recomendada:
+  - Epic 08C - adapter canônico da conversa detalhada mobile da mesa
+
+## 2026-03-25 17:05:00 -0300 - Epic 08A - implementacao real do primeiro adapter Android para leitura canonica do caso
+
+- Objetivo:
+  - fazer o endpoint mobile de leitura de laudos consumir internamente a `InspectorCaseViewProjectionV1`, preservando o payload publico legado do Android.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/44_epic08_android_case_adapter.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/adapters/android_case_view.py`
+  - `web/app/v2/adapters/__init__.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/domains/chat/auth_mobile_support.py`
+  - `web/app/domains/chat/auth_mobile_routes.py`
+  - `web/tests/test_v2_android_case_adapter.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_reviewdesk_projection.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_provenance.py` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_v2_policy_engine.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_facade.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_shadow.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_case_adapter.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/v2/adapters/android_case_view.py web/app/v2/adapters/__init__.py web/app/v2/runtime.py web/app/domains/chat/auth_mobile_support.py web/app/domains/chat/auth_mobile_routes.py web/tests/test_v2_android_case_adapter.py` -> `ok`
+- Riscos remanescentes:
+  - o Android ainda consome apenas payload legado de card, nao contrato canônico direto
+  - a integracao atual cobre `/api/mobile/laudos`, mas nao o feed mobile da mesa
+  - provenance/policy/document continuam internos e nao orientam UX do app nesta fase
+- Proxima fase recomendada:
+  - Epic 08B - adapter canônico do feed mobile de interacoes/mesa com visibilidade controlada
+
+## 2026-03-25 16:10:00 -0300 - Epic 07B - integracao shadow da facade documental com o pipeline legado
+
+- Objetivo:
+  - conectar a facade documental canonica ao caminho real de decisao do pipeline legado em shadow mode, sem alterar endpoint ou payload publico.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/43_epic07b_document_shadow.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/document/models.py`
+  - `web/app/v2/document/template_binding.py`
+  - `web/app/v2/document/legacy_adapter.py`
+  - `web/app/v2/document/__init__.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/tests/test_v2_document_shadow.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_reviewdesk_projection.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_provenance.py` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_v2_policy_engine.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_facade.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_v2_document_shadow.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/v2/document/models.py web/app/v2/document/template_binding.py web/app/v2/document/legacy_adapter.py web/app/v2/document/facade.py web/app/v2/document/__init__.py web/app/v2/runtime.py web/app/v2/contracts/projections.py web/app/domains/chat/laudo_service.py web/app/domains/revisor/mesa_api.py web/tests/test_v2_document_shadow.py` -> `ok`
+- Riscos remanescentes:
+  - o shadow adapter ainda compara selecao e prontidao, nao materializacao real
+  - `legacy_pdf_fallback` continua sendo apenas um controle de caminho observado, nao um contrato documental canônico
+  - o resultado shadow segue interno e ainda nao alimenta Android ou UI final
+- Proxima fase recomendada:
+  - Epic 08A - primeiro adapter Android para contratos canônicos de leitura do caso
+
+## 2026-03-25 15:34:00 -0300 - Epic 07A - implementacao real da facade documental minima para materializacao controlada
+
+- Objetivo:
+  - modelar binding de template, readiness documental e blockers canonicos a partir do caso canonico, sem alterar endpoint ou payload publico legado.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/42_epic07_document_facade.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/document/models.py`
+  - `web/app/v2/document/template_binding.py`
+  - `web/app/v2/document/facade.py`
+  - `web/app/v2/document/__init__.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/tests/test_v2_document_facade.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_document_facade.py` -> `5 passed`
+  - `python3 -m py_compile web/app/v2/document/models.py web/app/v2/document/template_binding.py web/app/v2/document/facade.py web/app/v2/document/__init__.py web/app/v2/runtime.py web/app/v2/contracts/projections.py web/app/domains/chat/laudo_service.py web/app/domains/revisor/mesa_api.py web/tests/test_v2_document_facade.py` -> `ok`
+- Riscos remanescentes:
+  - a facade ainda depende do template ativo legado para sair de `template_not_bound`
+  - nao ha materializacao real nem retorno do resultado documental ao caso canonico
+  - `editor_rico` ainda e apenas um source kind observado, nao um contrato documental novo
+- Proxima fase recomendada:
+  - Epic 07B - chamada shadow da facade documental ao pipeline legado sem trocar o contrato publico
+
+## 2026-03-25 15:05:00 -0300 - Epic 06A - implementacao real do policy engine minimo por tenant/template nas leituras canonicas
+
+- Objetivo:
+  - centralizar decisoes minimas de revisao, aprovacao do engenheiro, materializacao e emissao em um ponto canonico, sem alterar endpoint ou payload publico legado.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/41_epic06_policy_engine.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/policy/models.py`
+  - `web/app/v2/policy/tenant_rules.py`
+  - `web/app/v2/policy/engine.py`
+  - `web/app/v2/policy/__init__.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/tests/test_v2_policy_engine.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_policy_engine.py` -> `5 passed`
+  - `python3 -m py_compile web/app/v2/policy/models.py web/app/v2/policy/tenant_rules.py web/app/v2/policy/engine.py web/app/v2/policy/__init__.py web/app/v2/runtime.py web/app/v2/contracts/projections.py web/app/domains/chat/laudo_service.py web/app/domains/revisor/mesa_api.py web/tests/test_v2_policy_engine.py` -> `ok`
+- Riscos remanescentes:
+  - a politica atual ainda usa apenas fontes `default` e `system`
+  - ainda nao existe override real por tenant/template persistido no legado
+  - o engine ainda nao faz enforcement real em comandos ou gates de escrita
+- Proxima fase recomendada:
+  - Epic 07A - facade documental minima para materializacao controlada a partir do caso canonico
+
+## 2026-03-25 13:51:48 -0300 - Epic 05A - implementacao real de provenance minima IA/humana nas leituras canonicas
+
+- Objetivo:
+  - anexar provenance minima e segura as leituras canônicas do Inspetor e da Mesa, preservando endpoint e payload publico legado.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/40_epic05_provenance.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/v2/contracts/provenance.py`
+  - `web/app/v2/provenance.py`
+  - `web/app/v2/contracts/envelopes.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/acl/technical_case_core.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/tests/test_v2_provenance.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_reviewdesk_projection.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_v2_provenance.py` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/v2/contracts/provenance.py web/app/v2/provenance.py web/app/v2/contracts/envelopes.py web/app/v2/runtime.py web/app/v2/acl/technical_case_core.py web/app/v2/contracts/projections.py web/app/domains/chat/laudo_service.py web/app/domains/revisor/mesa_api.py web/tests/test_v2_provenance.py` -> `ok`
+- Riscos remanescentes:
+  - `ai_assisted` continua sem derivacao automatica porque o legado ainda nao oferece sinal confiavel para isso
+  - `dados_formulario` permanece em `legacy_unknown` ate existir autoria confiavel por campo
+  - a provenance atual e um resumo de leitura, nao lineage completo nem trilha formal de auditoria
+- Proxima fase recomendada:
+  - Epic 06A - policy engine minimo por tenant/template sobre revisao e materializacao
+
+## 2026-03-25 13:29:13 -0300 - Epic 04A - implementacao real da primeira projecao canonica da Mesa consumindo a ACL
+
+- Objetivo:
+  - transformar a leitura operacional da Mesa em um consumer real da projecao canonica do caso, preservando endpoint e payload publico legado do revisor.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/39_epic04_reviewdesk_projection.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/domains/revisor/mesa_api.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/v2/adapters/__init__.py`
+  - `web/app/v2/adapters/reviewdesk_package.py`
+  - `web/tests/test_v2_reviewdesk_projection.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_reviewdesk_projection.py` -> `3 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/v2/runtime.py web/app/v2/contracts/projections.py web/app/v2/adapters/__init__.py web/app/v2/adapters/reviewdesk_package.py web/app/domains/revisor/mesa_api.py web/tests/test_v2_reviewdesk_projection.py` -> `ok`
+- Riscos remanescentes:
+  - `ReviewDeskCaseViewProjectionV1` ainda precisa de um consumer final futuro fora do adapter de compatibilidade
+  - `case_id`, `thread_id` e `document_id` ainda sao derivados do `laudo_id` legado
+  - a projecao da Mesa ainda depende de fallback para o payload legado em caso de divergencia
+- Proxima fase recomendada:
+  - Epic 05A - provenance minima IA/humana nas leituras canonicas de Inspetor e Mesa
+
+## 2026-03-25 13:08:51 -0300 - Epic 03A - implementacao real da primeira projecao canonica do Inspetor consumindo a ACL
+
+- Objetivo:
+  - transformar a leitura de status do inspetor em um consumer real da projecao canonica do caso, preservando endpoint e payload publico legado.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/38_epic03_inspector_projection.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/v2/adapters/__init__.py`
+  - `web/app/v2/adapters/inspector_status.py`
+  - `web/tests/test_v2_inspector_projection.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_v2_inspector_projection.py` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/chat/laudo_service.py web/app/v2/runtime.py web/app/v2/acl/__init__.py web/app/v2/acl/technical_case_core.py web/app/v2/contracts/__init__.py web/app/v2/contracts/projections.py web/app/v2/adapters/__init__.py web/app/v2/adapters/inspector_status.py web/app/v2/shadow.py web/tests/test_v2_case_core_acl.py web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py web/tests/test_v2_inspector_projection.py` -> `ok`
+- Riscos remanescentes:
+  - `InspectorCaseViewProjectionV1` ainda precisa de um consumer final futuro fora do adapter de compatibilidade
+  - `case_id`, `thread_id` e `document_id` ainda sao derivados do `laudo_id` legado
+  - a projecao ainda depende de fallback para o payload legado em caso de divergencia
+- Proxima fase recomendada:
+  - Epic 04A - primeira projecao canonica da Mesa consumindo a ACL do Technical Case Core
+
+## 2026-03-25 12:51:34 -0300 - Epic 02A - implementacao real da ACL inicial do Technical Case Core sobre o laudo legado
+
+- Objetivo:
+  - encapsular identidade e estado canonicos do caso tecnico a partir do legado de laudo/status, sem alterar payload publico, endpoint, regra de negocio ou UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/37_epic02_case_core_acl.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/contracts/__init__.py`
+  - `web/app/v2/acl/__init__.py`
+  - `web/app/v2/acl/technical_case_core.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/v2/shadow.py`
+  - `web/tests/test_v2_case_core_acl.py`
+  - `web/tests/test_v2_envelopes.py`
+  - `web/tests/test_v2_projection_shadow.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_case_core_acl.py` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `8 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/chat/laudo_service.py web/app/v2/runtime.py web/app/v2/contracts/__init__.py web/app/v2/acl/__init__.py web/app/v2/acl/technical_case_core.py web/app/v2/contracts/projections.py web/app/v2/shadow.py web/tests/test_v2_case_core_acl.py web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `ok`
+- Riscos remanescentes:
+  - o `case_id` canonico ainda e namespaced sobre o `laudo_id` legado e nao uma entidade persistida propria
+  - a ACL ainda cobre apenas leitura de identidade/status, nao escrita nem orquestracao completa do caso
+  - `InspectorCaseStatusProjectionV1` continua em shadow mode e sem consumer final
+- Proxima fase recomendada:
+  - Epic 03A - primeira projecao canonica do Inspetor consumindo a ACL do Technical Case Core
+
+## 2026-03-25 12:16:31 -0300 - Epic 01A - implementacao real dos envelopes canonicos base + contrato piloto em shadow mode
+
+- Objetivo:
+  - introduzir uma biblioteca real de envelopes canonicos versionaveis, com contrato piloto em shadow mode, sem alterar payload publico, regra de negocio ou UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/36_epic01_envelopes_canonicos.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/domains/chat/laudo_service.py`
+  - `web/app/v2/__init__.py`
+  - `web/app/v2/runtime.py`
+  - `web/app/v2/contracts/__init__.py`
+  - `web/app/v2/contracts/envelopes.py`
+  - `web/app/v2/contracts/commands.py`
+  - `web/app/v2/contracts/events.py`
+  - `web/app/v2/contracts/projections.py`
+  - `web/app/v2/shadow.py`
+  - `web/tests/test_v2_envelopes.py`
+  - `web/tests/test_v2_projection_shadow.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `5 passed`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/chat/laudo_service.py web/app/v2/__init__.py web/app/v2/runtime.py web/app/v2/contracts/__init__.py web/app/v2/contracts/envelopes.py web/app/v2/contracts/commands.py web/app/v2/contracts/events.py web/app/v2/contracts/projections.py web/app/v2/shadow.py web/tests/test_v2_envelopes.py web/tests/test_v2_projection_shadow.py` -> `ok`
+- Riscos remanescentes:
+  - `case_id` do piloto ainda e derivado do `laudo_id` legado
+  - o consumer piloto ainda e interno e nao troca o contrato principal do produto
+  - a ACL do `Technical Case Core` ainda nao existe
+- Proxima fase recomendada:
+  - Epic 02A - primeira ACL do Technical Case Core sobre o status/identidade do laudo legado
+
+## 2026-03-24 21:11:53 -0300 - Fase 01.7 - Congelamento do Contrato Shared API Web/Mobile
+
+- Objetivo:
+  - consolidar no pacote `docs/restructuring-roadmap/` a matriz canonica da API compartilhada entre backend web e app mobile do inspetor.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/17_mobile_shared_api_contract_freeze.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Validacoes rodadas:
+  - `python3 -m pytest web/tests/test_portais_acesso_critico.py -q -k 'mobile'` -> `1 passed, 11 deselected`
+  - `python3 -m pytest tests/test_mesa_mobile_sync.py -q` em `web/` -> `3 passed`
+  - `python3 -m pytest web/tests/test_smoke.py -q -k 'openapi or mobile'` -> `6 passed, 20 deselected`
+- Riscos remanescentes:
+  - o mobile depende de rotas compartilhadas fora de `/app/api/mobile/*`
+  - `/app/api/chat` continua sendo a fronteira mais sensivel por responder JSON ou stream
+  - ainda falta inventario canonico de `compat layers` e assets ativos por portal
+- Proxima fase recomendada:
+  - Fase 01.8 - Inventario canonico de compat layers e assets ativos por portal
+
+## 2026-03-24 21:24:04 -0300 - Fase 01.8 - Inventario canonico de compat layers e assets ativos por portal
+
+- Objetivo:
+  - fechar o baseline da Fase 1 com o mapa real de templates, assets ativos, globals e compat layers por portal antes de qualquer modularizacao profunda.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/18_compat_layers_and_assets_by_portal.md`
+  - `docs/restructuring-roadmap/19_frontend_entrypoints_matrix.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Validacoes rodadas:
+  - `rg -n 'index.html|dashboard.html|cliente_portal.html|painel_revisor.html|admin/painel.js|cliente/portal.js|revisor/revisor_painel_core.js|shared/app_shell.js' web/templates web/app web/static/js` -> confirmou os entrypoints reais dos quatro portais
+  - `rg -n 'TarielScript|document\\._sidebarEl|TarielInspetorModules|revisor-front-contract|shared/trabalhador_servico.js' web/templates web/static/js web/app` -> confirmou compat layers ativas, globals e o service worker do inspetor
+- Riscos remanescentes:
+  - `/app` continua sendo o portal mais fragil por ordem de scripts, service worker e aliases globais
+  - `/revisao` continua dependente do namespace `window.TarielRevisorPainel` e do contrato oculto `#revisor-front-contract`
+  - `web/templates/base.html`, `web/static/js/admin/admin.js` e `web/static/js/painel.js` parecem legado fora do boot atual, mas ainda nao foram validados para remocao
+- Proxima fase recomendada:
+  - Fase 01.9 - baseline dedicada e reducao segura do boot de `/revisao/painel`
+
+## 2026-03-24 21:54:00 -0300 - Fase 01.9 - baseline dedicada e reducao segura do boot de `/revisao/painel`
+
+- Objetivo:
+  - medir a cadeia real de boot do painel do revisor e aplicar o menor hotfix seguro para reduzir SSR repetitivo, fan-out no primeiro laudo aberto e duplicacao de runtime em voo.
+- Arquivos alterados:
+  - `web/app/domains/revisor/panel.py`
+  - `web/static/js/revisor/revisor_painel_core.js`
+  - `web/static/js/revisor/painel_revisor_page.js`
+  - `web/tests/test_reviewer_panel_boot_hotfix.py`
+  - `docs/restructuring-roadmap/24_reviewer_panel_boot_baseline.md`
+  - `docs/restructuring-roadmap/25_reviewer_panel_boot_hotfix.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Validacoes rodadas:
+  - `node --check web/static/js/revisor/painel_revisor_page.js` -> `ok`
+  - `node --check web/static/js/revisor/revisor_painel_core.js` -> `ok`
+  - `python3 -m pytest tests/test_reviewer_panel_boot_hotfix.py -q` em `web/` -> `1 passed`
+  - `python3 -m pytest tests/test_regras_rotas_criticas.py -q -k 'revisor_painel_exibe_laudos_em_andamento_rascunho or revisor_painel_precarrega_whisper_em_laudo_rascunho or revisor_painel_abre_com_laudo_aguardando_sem_atualizado_em or revisor_api_mensagens_e_completo_aceitam_cursor_nullish or revisor_api_pacote_mesa_consolida_resumo_e_pendencias'` em `web/` -> `5 passed, 117 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+  - medicao local com `perf_support` -> `GET /revisao/painel` caiu de `sql_count=16` para `sql_count=14` no mesmo seed; primeiro laudo aberto caiu de `3 requests / 18 SQL` para `2 requests / 14 SQL`
+- Riscos remanescentes:
+  - o portal do revisor ainda entrega toda a stack JS no HTML inicial e continua dependente de `window.TarielRevisorPainel`
+  - `/revisao/api/laudo/{id}/pacote` segue como subrequest dominante do first load
+  - `#revisor-front-contract` continua sendo uma fronteira de compatibilidade fragil por ordem
+- Proxima fase recomendada:
+  - Fase 2.1 - extracao interna controlada de `web/static/js/cliente/portal.js`
+
+## 2026-03-24 22:16:13 -0300 - Fase 2.1 - extracao interna controlada de `web/static/js/cliente/portal.js`
+
+- Objetivo:
+  - iniciar a Fase 2 pelo portal cliente com um corte de baixo risco, reduzindo a responsabilidade monolitica de `portal.js` sem alterar contratos, UX, endpoints ou regras de negocio.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/26_cliente_portal_extraction_baseline.md`
+  - `docs/restructuring-roadmap/27_cliente_portal_modularization_step1.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/static/js/cliente/portal_runtime.js`
+  - `web/static/js/cliente/portal_priorities.js`
+  - `web/static/js/cliente/portal.js`
+  - `web/templates/cliente_portal.html`
+  - `web/tests/test_smoke.py`
+- Validacoes rodadas:
+  - `node --check web/static/js/cliente/portal_runtime.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_priorities.js` -> `ok`
+  - `node --check web/static/js/cliente/portal.js` -> `ok`
+  - `python3 -m pytest tests/test_cliente_portal_critico.py -q` em `web/` -> `9 passed`
+  - `python3 -m pytest tests/test_portais_acesso_critico.py -q -k 'cliente'` em `web/` -> `5 passed, 7 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+- Riscos remanescentes:
+  - `portal.js` ainda concentra render, loaders e binds das areas `admin`, `chat` e `mesa`
+  - a ordem `portal_runtime.js -> portal_priorities.js -> portal.js` agora e obrigatoria no template
+  - `window.TarielClientePortalRuntime` e `window.TarielClientePortalPriorities` sao bridges internas temporarias, nao contratos publicos
+- Proxima fase recomendada:
+  - Fase 2.2 - extracao controlada do slice `admin` de render do portal cliente
+
+## 2026-03-24 22:35:28 -0300 - Fase 2.2 - extracao controlada do slice `admin` de render do portal cliente
+
+- Objetivo:
+  - retirar do facade `web/static/js/cliente/portal.js` o bloco coeso de render e acoes administrativas, mantendo o portal cliente funcional e preservando contratos, payloads e UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/28_cliente_portal_admin_slice.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/static/js/cliente/portal_admin.js`
+  - `web/static/js/cliente/portal.js`
+  - `web/templates/cliente_portal.html`
+  - `web/tests/test_smoke.py`
+- Validacoes rodadas:
+  - `node --check web/static/js/cliente/portal_admin.js` -> `ok`
+  - `node --check web/static/js/cliente/portal.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_runtime.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_priorities.js` -> `ok`
+  - `python3 -m pytest tests/test_cliente_portal_critico.py -q` em `web/` -> `9 passed`
+  - `python3 -m pytest tests/test_portais_acesso_critico.py -q -k 'cliente'` em `web/` -> `5 passed, 7 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+- Riscos remanescentes:
+  - `portal.js` ainda concentra `chat`, `mesa`, `bootstrapPortal()`, `loadChat()`, `loadMesa()` e o roteador de acoes cross-slice
+  - a ordem `portal_runtime.js -> portal_priorities.js -> portal_admin.js -> portal.js` agora e obrigatoria
+  - `window.TarielClientePortalAdmin` e uma bridge interna temporaria, nao contrato publico
+- Proxima fase recomendada:
+  - Fase 2.3 - extracao controlada do slice `chat` do portal cliente
+
+## 2026-03-24 22:52:57 -0300 - Fase 2.3 - extracao controlada do slice `chat` do portal cliente
+
+- Objetivo:
+  - retirar do facade `web/static/js/cliente/portal.js` o bloco coeso de render, load e handlers do chat, mantendo o portal cliente funcional e preservando contratos, payloads e UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/29_cliente_portal_chat_slice.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/static/js/cliente/portal_chat.js`
+  - `web/static/js/cliente/portal.js`
+  - `web/templates/cliente_portal.html`
+  - `web/tests/test_smoke.py`
+- Validacoes rodadas:
+  - `node --check web/static/js/cliente/portal_chat.js` -> `ok`
+  - `node --check web/static/js/cliente/portal.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_runtime.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_priorities.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_admin.js` -> `ok`
+  - `python3 -m pytest tests/test_cliente_portal_critico.py -q` em `web/` -> `9 passed`
+  - `python3 -m pytest tests/test_portais_acesso_critico.py -q -k 'cliente'` em `web/` -> `5 passed, 7 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+- Riscos remanescentes:
+  - `portal.js` ainda concentra todo o slice `mesa`, `bootstrapPortal()` e o roteador de acoes cross-slice
+  - a ordem `portal_runtime.js -> portal_priorities.js -> portal_admin.js -> portal_chat.js -> portal.js` agora e obrigatoria
+  - `window.TarielClientePortalChat` e uma bridge interna temporaria, nao contrato publico
+- Proxima fase recomendada:
+  - Fase 2.4 - extracao controlada do slice `mesa` do portal cliente
+
+## 2026-03-25 06:52:38 -0300 - Fase 2.4 - extracao controlada do slice `mesa` do portal cliente
+
+- Objetivo:
+  - retirar do facade `web/static/js/cliente/portal.js` o bloco coeso de render, load, filtros e handlers da mesa, mantendo o portal cliente funcional e preservando contratos, payloads e UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/30_cliente_portal_mesa_slice.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/static/js/cliente/portal_mesa.js`
+  - `web/static/js/cliente/portal.js`
+  - `web/templates/cliente_portal.html`
+  - `web/tests/test_smoke.py`
+- Validacoes rodadas:
+  - `node --check web/static/js/cliente/portal_mesa.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_chat.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_admin.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_runtime.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_priorities.js` -> `ok`
+  - `node --check web/static/js/cliente/portal.js` -> `ok`
+  - `python3 -m pytest tests/test_cliente_portal_critico.py -q` em `web/` -> `9 passed`
+  - `python3 -m pytest tests/test_portais_acesso_critico.py -q -k 'cliente'` em `web/` -> `5 passed, 7 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+- Riscos remanescentes:
+  - `portal.js` agora concentra principalmente `bootstrapPortal()`, `renderEverything()`, `bindCommercialActions()` e os helpers compartilhados do shell
+  - a ordem `portal_runtime.js -> portal_priorities.js -> portal_admin.js -> portal_chat.js -> portal_mesa.js -> portal.js` agora e obrigatoria
+  - `renderAvisosOperacionais()` e `renderAnexos()` continuam compartilhados e presos ao facade
+  - `window.TarielClientePortalMesa` e uma bridge interna temporaria, nao contrato publico
+- Proxima fase recomendada:
+  - Fase 2.5 - consolidacao final do facade e dos helpers compartilhados do portal cliente
+
+## 2026-03-25 07:20:48 -0300 - Fase 2.5 - consolidacao final do facade e dos helpers compartilhados do portal cliente
+
+- Objetivo:
+  - consolidar `web/static/js/cliente/portal.js` como facade fino e intencional, movendo shell/bootstrap e helpers compartilhados para modulos internos sem alterar contratos, payloads ou UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/31_cliente_portal_facade_consolidation.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/static/js/cliente/portal_shared_helpers.js`
+  - `web/static/js/cliente/portal_shell.js`
+  - `web/static/js/cliente/portal.js`
+  - `web/templates/cliente_portal.html`
+  - `web/tests/test_smoke.py`
+- Validacoes rodadas:
+  - `node --check web/static/js/cliente/portal.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_runtime.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_priorities.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_admin.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_chat.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_mesa.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_shared_helpers.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_shell.js` -> `ok`
+  - `python3 -m pytest tests/test_cliente_portal_critico.py -q` em `web/` -> `9 passed`
+  - `python3 -m pytest tests/test_portais_acesso_critico.py -q -k 'cliente'` em `web/` -> `5 passed, 7 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+- Riscos remanescentes:
+  - `bindCommercialActions()` continua como principal roteador cross-slice do portal cliente
+  - a ordem `portal_runtime.js -> portal_priorities.js -> portal_admin.js -> portal_chat.js -> portal_mesa.js -> portal_shared_helpers.js -> portal_shell.js -> portal.js` continua obrigatoria
+  - as bridges `window.*` continuam temporarias e dependentes de ordem
+  - `bindTabs()` e `bindFiltros()` ainda vivem no facade por operarem sobre o `state` compartilhado
+- Proxima fase recomendada:
+  - Fase 2.6 - racionalizacao final do roteador cross-slice e inventario canonico das bridges do portal cliente
+
+## 2026-03-25 07:37:47 -0300 - Fase 2.6 - racionalizacao final do roteador cross-slice e inventario canonico das bridges do portal cliente
+
+- Objetivo:
+  - explicitar o roteador cross-slice e os bindings compartilhados do portal cliente, congelando o inventario de bridges `window.*` e reduzindo o acoplamento residual do facade sem alterar contratos, payloads ou UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/18_compat_layers_and_assets_by_portal.md`
+  - `docs/restructuring-roadmap/19_frontend_entrypoints_matrix.md`
+  - `docs/restructuring-roadmap/32_cliente_portal_cross_slice_router.md`
+  - `docs/restructuring-roadmap/33_cliente_portal_bridges_inventory.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/static/js/cliente/portal_bindings.js`
+  - `web/static/js/cliente/portal.js`
+  - `web/templates/cliente_portal.html`
+  - `web/tests/test_smoke.py`
+- Validacoes rodadas:
+  - `node --check web/static/js/cliente/portal.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_runtime.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_priorities.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_admin.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_chat.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_mesa.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_shared_helpers.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_shell.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_bindings.js` -> `ok`
+  - `python3 -m pytest tests/test_cliente_portal_critico.py -q` em `web/` -> `9 passed`
+  - `python3 -m pytest tests/test_portais_acesso_critico.py -q -k 'cliente'` em `web/` -> `5 passed, 7 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+- Riscos remanescentes:
+  - o contrato de ordem dos scripts continua manual e dependente do template
+  - as bridges `window.TarielClientePortal*` continuam temporarias, embora agora mapeadas de forma canonica
+  - `portal.js` ainda precisa conhecer todos os modulos internos para montar o boot final
+- Proxima fase recomendada:
+  - Fase 2.7 - hardening do contrato de entrypoint e preparacao para desglobalizacao futura do portal cliente
+
+## 2026-03-25 07:58:50 -0300 - Fase 2.7 - hardening do contrato de entrypoint e preparacao para desglobalizacao futura do portal cliente
+
+- Objetivo:
+  - endurecer o contrato de entrada do portal cliente, tornando boot, bridges, ordem de scripts e diagnostico de inicializacao mais explicitos sem alterar contratos, payloads ou UX.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/33_cliente_portal_bridges_inventory.md`
+  - `docs/restructuring-roadmap/34_cliente_portal_entry_contract.md`
+  - `docs/restructuring-roadmap/35_cliente_portal_deglobalization_prep.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/static/js/cliente/portal.js`
+  - `web/templates/cliente_portal.html`
+  - `web/tests/test_smoke.py`
+- Validacoes rodadas:
+  - `node --check web/static/js/cliente/portal.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_runtime.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_priorities.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_admin.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_chat.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_mesa.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_shared_helpers.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_shell.js` -> `ok`
+  - `node --check web/static/js/cliente/portal_bindings.js` -> `ok`
+  - `python3 -m pytest tests/test_cliente_portal_critico.py -q` em `web/` -> `9 passed`
+  - `python3 -m pytest tests/test_portais_acesso_critico.py -q -k 'cliente'` em `web/` -> `5 passed, 7 deselected`
+  - `python3 -m pytest tests/test_smoke.py -q` em `web/` -> `26 passed`
+- Riscos remanescentes:
+  - a ordem dos scripts continua manual, embora agora marcada e validada de forma mais forte
+  - as bridges `window.TarielClientePortal*` continuam temporarias e expostas em `window`
+  - a desglobalizacao total ainda depende de mudanca estrutural de pipeline de assets
+- Proxima fase recomendada:
+  - Fase 2.8 - baseline do entrypoint do portal revisor para modularizacao controlada
+
+## 2026-03-25 19:17:38 -0300 - Epic 09B - rollout controlado do consumo mobile V2 com observabilidade de fallback
+
+- Objetivo:
+  - transformar a adocao opt-in do contrato publico mobile V2 em rollout controlado por tenant/coorte, com gate remoto e observabilidade de fallback, sem alterar UX nem contratos legados.
+- Estrategia executada:
+  - criado endpoint aditivo `GET /app/api/mobile/v2/capabilities` em vez de alterar o bootstrap legado;
+  - backend agora resolve elegibilidade por `TARIEL_V2_ANDROID_ROLLOUT`, allowlist de tenant, coorte estavel por tenant e flags separadas de feed/thread;
+  - app Android combina `EXPO_PUBLIC_ANDROID_V2_READ_CONTRACTS_ENABLED` com o gate remoto antes de tentar o V2;
+  - fallback para o legado agora envia headers discretos para observabilidade do backend.
+- Arquivos alterados:
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mesaApi.test.ts`
+  - `android/src/config/mobileV2Rollout.ts`
+  - `android/src/config/mobileV2Rollout.test.ts`
+  - `docs/restructuring-roadmap/49_epic09b_android_rollout.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/domains/chat/auth_mobile_routes.py`
+  - `web/app/domains/chat/mesa.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/tests/test_v2_android_rollout.py`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_rollout.py web/app/domains/chat/auth_mobile_routes.py web/app/domains/chat/mesa.py web/tests/test_v2_android_rollout.py` em `web/` -> `ok`
+  - `python3 -m pytest -q tests/test_v2_android_rollout.py` em `web/` -> `4 passed`
+  - `npm run test -- --runInBand src/config/mobileV2Rollout.test.ts src/config/mesaApi.test.ts` em `android/` -> `11 passed`
+- Riscos remanescentes:
+  - o cache de capabilities no app e apenas em memoria e de curta duracao; rollback remoto nao e instantaneo no meio da janela de cache
+  - a observabilidade de fallback no backend e discreta por log/request metadata, ainda sem painel agregado ou metrica dedicada
+  - feed/thread V2 continuam somente em leitura; comandos mobile permanecem no legado
+- Proxima fase recomendada:
+  - Epic 09C - piloto real por tenant com coleta operacional de fallback e criterio explicito de promocao para default
+
+## 2026-03-25 20:24:17 -0300 - Epic 09C - piloto controlado por tenant do mobile V2 com agregacao operacional de fallback
+
+- Objetivo:
+  - operacionalizar o rollout mobile V2 como piloto real por tenant/coorte, com agregacao operacional segura de uso e fallback, sem alterar UX, payload legado ou regras de negocio.
+- Estrategia executada:
+  - rollout backend endurecido com allowlist por tenant, allowlist por coorte, razao explicita, bucket estavel e versao de capabilities;
+  - agregador em memoria limitado criado em `web/app/v2/mobile_rollout_metrics.py`;
+  - resumo operacional protegido exposto em `GET /admin/api/mobile-v2-rollout/summary`, guardado por sessao Admin-CEO e pela flag `TARIEL_V2_ANDROID_ROLLOUT_OBSERVABILITY`;
+  - app Android ganhou TTL explicito de 15s para o gate remoto, invalidacao previsivel por sessao/refresh e razoes estruturadas de fallback;
+  - requests V2 e fallbacks passaram a enviar metadata discreta de `capabilities_version` e `rollout_bucket`.
+- Arquivos alterados:
+  - `android/src/config/mesaApi.test.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mobileV2Rollout.test.ts`
+  - `android/src/config/mobileV2Rollout.ts`
+  - `android/src/features/common/buildRefreshAction.ts`
+  - `android/src/features/session/useInspectorSession.ts`
+  - `docs/restructuring-roadmap/50_epic09c_mobile_v2_pilot_rollout.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/domains/admin/routes.py`
+  - `web/app/domains/chat/mesa.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/tests/test_v2_android_rollout.py`
+  - `web/tests/test_v2_android_rollout_metrics.py`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_rollout.py web/app/v2/mobile_rollout_metrics.py web/app/domains/chat/mesa.py web/app/domains/admin/routes.py` em `web/` -> `ok`
+  - `python3 -m pytest -q tests/test_v2_android_rollout.py tests/test_v2_android_rollout_metrics.py` em `web/` -> `8 passed`
+  - `npm run test -- --runInBand src/config/mobileV2Rollout.test.ts src/config/mesaApi.test.ts` em `android/` -> `13 passed`
+- Riscos remanescentes:
+  - a agregacao operacional e em memoria de processo; um restart limpa historico e nao substitui observabilidade persistida
+  - o cache do gate remoto continua sem persistencia em disco, embora agora tenha TTL curto e invalidacao explicita
+  - a fase ainda cobre apenas leituras mobile; comandos de escrita seguem fora do piloto V2
+- Proxima fase recomendada:
+  - Epic 09D - promocao controlada do piloto mobile V2 com criterio operacional de saida por tenant/superficie
+
+## 2026-03-25 22:59:09 -0300 - Epic 09F - acompanhamento pos-janela do tenant demo promovido e criterio formal de saida do piloto
+
+- Objetivo:
+  - transformar o piloto local do tenant demo promovido em um piloto operacionalmente avaliavel apos a janela de rollback, sem promover tenant real e sem mudar UX, contratos legados ou regras de negocio.
+- Estrategia executada:
+  - criado motor canonico de avaliacao do piloto por superficie e por tenant, com outcomes `insufficient_evidence`, `observing`, `healthy`, `attention`, `hold_recommended`, `rollback_recommended` e `candidate_for_real_tenant`;
+  - thresholds configuraveis adicionados via env para requests minimos, fallback rate, parse/visibility, HTTP e exigencia da janela completa;
+  - summary admin enriquecido com `pilot_evaluation_thresholds`, `pilot_outcome`, `evidence_level`, `evaluation_reason`, `candidate_for_real_tenant`, `requires_hold`, `requires_rollback`, `window_elapsed` e breakdown seguro de fallback por tenant/superficie;
+  - app Android passou a distinguir `legacy_only`, `hold`, `rollback_forced` e `route_disabled` nos motivos de fallback remoto, evitando que o backend trate gate denial como falha tecnica do V2;
+  - a configuracao local do tenant demo `empresa_id=1` foi movida para uma janela ja encerrada, permitindo acompanhamento pos-janela real.
+- Estado local observado:
+  - tenant seguro avaliado: `1 - Empresa Demo (DEV)`
+  - superficies promovidas mantidas: `feed`, `thread`
+  - `window_elapsed=true`
+  - `pilot_outcome=insufficient_evidence`
+  - `evaluation_reason=no_v2_traffic_observed`
+  - nenhum tenant real foi promovido nesta fase
+- Arquivos alterados:
+  - `android/src/config/mesaApi.test.ts`
+  - `android/src/config/mobileV2PilotRollout.test.ts`
+  - `android/src/config/mobileV2Rollout.test.ts`
+  - `android/src/config/mobileV2Rollout.ts`
+  - `docs/restructuring-roadmap/52_epic09f_pilot_exit_criteria.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/.env`
+  - `web/.env.example`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/tests/test_v2_android_pilot_evaluation.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_android_pilot_evaluation.py` em `web/` -> `7 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_rollout.py web/tests/test_v2_android_public_contract.py web/tests/test_v2_android_rollout_pilot.py web/tests/test_v2_android_rollout_promotion.py web/tests/test_v2_android_rollout_state.py web/tests/test_v2_android_rollout_metrics.py` em `web/` -> `21 passed`
+  - `npm test -- --runInBand src/config/mobileV2Rollout.test.ts src/config/mobileV2PilotRollout.test.ts src/config/mesaApi.test.ts` em `android/` -> `22 passed`
+- Riscos remanescentes:
+  - o tenant demo continua sem trafego V2 observado, portanto o piloto nao pode sair de `insufficient_evidence`
+  - a observabilidade continua em memoria, sem historico persistente da janela encerrada
+  - a promocao de tenant real segue bloqueada ate que o demo alcance `candidate_for_real_tenant`
+- Proxima fase recomendada:
+  - Epic 09G - geracao controlada de evidencia operacional no tenant demo antes de qualquer decisao sobre tenant real
+
+## 2026-03-25 23:32:29 -0300 - Epic 09G - geracao controlada de evidencia operacional no tenant demo
+
+- Objetivo:
+  - gerar leitura controlada e reversivel no tenant demo promovido para sair de `insufficient_evidence`, sem tocar em tenant real, sem escrita de negocio e sem alterar UX.
+- Estrategia executada:
+  - criada descoberta segura de alvos do tenant demo em `resolve_demo_mobile_probe_targets()`, exigindo tenant seguro, inspetor ativo, laudos elegiveis para `feed` e laudos com mensagens para `thread`;
+  - criado probe controlado em `web/app/v2/mobile_probe.py`, com volume pequeno, timeout curto, marcacao explicita `pilot_probe` e execucao por rotina local ou por `POST /admin/api/mobile-v2-rollout/probe/run`;
+  - observabilidade do rollout foi separada entre trafego organico e trafego de probe, incluindo `probe_requests_v2`, `probe_requests_fallback`, `probe_reason_breakdown`, `organic_requests_v2`, `organic_requests_fallback` e `probe_resolved_insufficient_evidence`;
+  - a avaliacao do piloto foi endurecida para permitir que o probe tire o tenant demo de `insufficient_evidence`, mas sem conceder `candidate_for_real_tenant` apenas com evidencia sintetica;
+  - execucao local real do probe foi realizada no tenant `1 - Empresa Demo (DEV)`.
+- Estado local observado:
+  - `probe_requests_v2=10`
+  - `probe_requests_fallback=0`
+  - `probe_surfaces_exercised=[feed, thread]`
+  - `pilot_outcome=healthy`
+  - `evaluation_reason=pilot_healthy_via_probe`
+  - `probe_resolved_insufficient_evidence=true`
+  - `candidate_for_real_tenant=false`
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/53_epic09g_probe_evidence_generation.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/.env`
+  - `web/.env.example`
+  - `web/app/domains/admin/routes.py`
+  - `web/app/v2/mobile_probe.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/tests/test_v2_android_pilot_probe.py`
+  - `web/tests/test_v2_android_probe_targets.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_android_probe_targets.py` em `web/` -> `2 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_pilot_probe.py` em `web/` -> `4 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_rollout.py web/tests/test_v2_android_public_contract.py web/tests/test_v2_android_pilot_evaluation.py web/tests/test_v2_android_probe_targets.py web/tests/test_v2_android_pilot_probe.py web/tests/test_smoke.py` em `web/` -> `48 passed`
+  - `python3 -m py_compile web/app/v2/mobile_rollout.py web/app/v2/mobile_rollout_metrics.py web/app/v2/mobile_probe.py web/app/domains/admin/routes.py` em `web/` -> `ok`
+- Riscos remanescentes:
+  - a evidencia atual que removeu `insufficient_evidence` ainda e sintetica, nao organica
+  - a observabilidade continua em memoria de processo e nao sobrevive a restart
+  - o tenant demo ainda nao deve ser usado para inferir prontidao de tenant real sem uso organico complementar
+- Proxima fase recomendada:
+  - Epic 09H - validacao organica assistida no tenant demo apos o probe controlado, antes de qualquer candidato real
+
+## 2026-03-26 00:12:00 -0300 - Epic 09H - validacao organica assistida do tenant demo promovido
+
+- Objetivo:
+  - abrir uma janela operacional explicita para observar apenas uso organico do tenant demo promovido, separando esse uso do probe sintetico e mantendo bloqueada qualquer inferencia sobre tenant real.
+- Estrategia executada:
+  - criado modulo canonico `web/app/v2/mobile_organic_validation.py` com sessao admin/local-only, baseline de contadores no inicio, deltas por superficie e outcomes `insufficient_evidence`, `observing`, `healthy`, `candidate_ready_for_real_tenant`, `hold_recommended` e `rollback_recommended`;
+  - adicionadas rotas `POST /admin/api/mobile-v2-rollout/organic-validation/start` e `POST /admin/api/mobile-v2-rollout/organic-validation/stop`, protegidas por sessao admin e host local;
+  - o summary `GET /admin/api/mobile-v2-rollout/summary` foi enriquecido com estado da sessao organica no payload raiz, em `first_promoted_tenant`, em `tenant_rollout_states` e em `tenant_surface_states`;
+  - a comparacao `probe_vs_organic_evidence` passou a calcular deltas desde o baseline da sessao, garantindo que o probe continue visivel mas ignorado para `candidate_ready_for_real_tenant`;
+  - thresholds da sessao organica foram registrados em `web/.env` e `web/.env.example`.
+- Estado local observado:
+  - tenant validado: `1 - Empresa Demo (DEV)`
+  - sessao organica aberta localmente e probe reexecutado no mesmo processo
+  - `pilot_outcome=healthy`
+  - `organic_validation_outcome=insufficient_evidence`
+  - `probe_vs_organic_evidence.evidence_source=probe_only`
+  - `probe_requests_v2_since_start=10`
+  - `organic_requests_v2_since_start=0`
+  - `candidate_ready_for_real_tenant=false`
+  - nenhum tenant real foi promovido nesta fase
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/54_epic09h_organic_validation_session.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/.env`
+  - `web/.env.example`
+  - `web/app/domains/admin/routes.py`
+  - `web/app/v2/mobile_organic_validation.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/app/v2/mobile_rollout_metrics.py`
+  - `web/tests/test_v2_android_organic_validation.py`
+  - `web/tests/test_v2_android_organic_validation_summary.py`
+- Validacoes rodadas:
+  - `python3 -m pytest -q web/tests/test_v2_android_organic_validation.py` em `web/` -> `6 passed`
+  - `python3 -m pytest -q web/tests/test_v2_android_organic_validation_summary.py` em `web/` -> `2 passed`
+  - `python3 -m py_compile web/app/v2/mobile_organic_validation.py web/app/v2/mobile_rollout.py web/app/v2/mobile_rollout_metrics.py web/app/domains/admin/routes.py` em `web/` -> `ok`
+  - execucao local controlada de `start_mobile_v2_organic_validation_session()` seguida de `run_demo_mobile_v2_pilot_probe()` -> sessao permaneceu `insufficient_evidence` com `probe_only`
+- Riscos remanescentes:
+  - a sessao organica continua dependente de trafego real do app; sem isso o tenant demo nao sai de `insufficient_evidence`
+  - a observabilidade continua em memoria de processo e a sessao nao sobrevive a restart
+  - nenhum header adicional de classificacao foi adicionado ao app; a distincao organico/probe continua baseada na presenca explicita do probe
+- Proxima fase recomendada:
+  - Epic 09I - coleta organica guiada no tenant demo ate cobrir `feed` e `thread` com evidencia minima antes de qualquer tenant candidato real
+
+## 2026-03-26 01:18:00 -0300 - Epic 09J - sessao organica assistida com confirmacao humana do tenant demo
+
+- Objetivo:
+  - transformar uso humano real do app no tenant demo em evidencia organica confirmada, sem promover tenant real, sem mudar UX e sem deixar request tecnico puro contar como prova suficiente por inferencia.
+- Estrategia executada:
+  - criado endpoint autenticado `POST /app/api/mobile/v2/organic-validation/ack`, aceitando apenas sessao organica valida do tenant demo seguro, `surface` em `feed` ou `thread`, `target_id` elegivel e `checkpoint_kind` canonico;
+  - o backend ganhou estruturas canonicas `MobileOrganicHumanCheckpoint` e `MobileOrganicHumanSurfaceSummary`, com agregacao em memoria por `session_id` e deduplicacao de checkpoints;
+  - o summary organico passou a expor `human_confirmed_count`, `human_confirmed_targets`, `human_confirmed_last_seen_at`, `human_confirmed_required_coverage_met` e `human_confirmed_surface_summaries`, inclusive por superficie no summary admin do rollout;
+  - `candidate_ready_for_real_tenant` foi endurecido para depender de cobertura tecnica organica minima **e** confirmacao humana minima em `feed` e `thread`;
+  - no Android, leituras de `feed` e `thread` passaram a carregar metadados internos de origem (`v2` vs `legacy`) e o app agora envia o `ack` humano apenas depois do render real da thread da mesa ou da central de atividade, sem mudar UX e sem quebrar fallback.
+- Estado local observado:
+  - tenant alvo mantido: `1 - Empresa Demo (DEV)`
+  - nenhuma confirmacao humana sintetica foi registrada nesta fase
+  - o mecanismo backend -> app -> backend de `human ack` ficou operacional
+  - sem uso humano real do app, o tenant demo permanece conservador e nao sobe para `candidate_ready_for_real_tenant`
+  - nenhum tenant real foi promovido nesta fase
+- Arquivos alterados:
+  - `android/src/config/mesaApi.test.ts`
+  - `android/src/config/mesaApi.ts`
+  - `android/src/config/mobileV2HumanValidation.test.ts`
+  - `android/src/config/mobileV2HumanValidation.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `android/src/features/activity/monitorActivityFlow.test.ts`
+  - `android/src/features/activity/monitorActivityFlow.ts`
+  - `android/src/features/activity/useActivityCenterController.ts`
+  - `android/src/features/mesa/useMesaController.ts`
+  - `docs/restructuring-roadmap/56_epic09j_human_confirmed_validation.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `web/app/domains/chat/auth_contracts.py`
+  - `web/app/domains/chat/auth_mobile_routes.py`
+  - `web/app/v2/mobile_organic_validation.py`
+  - `web/app/v2/mobile_rollout.py`
+  - `web/tests/test_v2_android_human_ack.py`
+  - `web/tests/test_v2_android_human_coverage.py`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_organic_validation.py web/app/domains/chat/auth_contracts.py web/app/domains/chat/auth_mobile_routes.py web/app/v2/mobile_rollout.py web/tests/test_v2_android_human_ack.py web/tests/test_v2_android_human_coverage.py` em `web/` -> `ok`
+  - `python3 -m pytest -q web/tests/test_v2_android_human_ack.py web/tests/test_v2_android_human_coverage.py` em `web/` -> `6 passed`
+  - `npx tsc --noEmit --pretty false` em `android/` -> `ok`
+  - `npm test -- --runInBand src/config/mobileV2HumanValidation.test.ts src/config/mesaApi.test.ts src/features/activity/monitorActivityFlow.test.ts` em `android/` -> `13 passed`
+- Riscos remanescentes:
+  - o mecanismo de confirmacao humana existe, mas ainda depende de uso humano real do app no tenant demo para produzir evidencia valida
+  - a observabilidade da sessao organica e dos checkpoints continua em memoria de processo e nao sobrevive a restart
+  - `candidate_ready_for_real_tenant` continua bloqueado ate haver cobertura humana minima real em `feed` e `thread`
+- Proxima fase recomendada:
+  - Epic 09K - execucao controlada de sessao organica humana real no tenant demo com checklist operacional e leitura final do summary
+
+## 2026-03-26 16:15:00 -0300 - Epic 09M - fechamento da evidencia backend de feed/thread no tenant demo
+
+- Objetivo:
+  - fechar de ponta a ponta a evidencia backend do piloto Android V2 no tenant demo, garantindo que `feed` e `thread` contem como `v2_served` e `human_confirmed` quando a UI realmente renderiza.
+- Estrategia executada:
+  - no Android, o `ack` humano ganhou helpers canonicos (`shouldSendHumanAck` e `buildHumanAckPayload`) e deixou de depender de `mensagensMesa.length > 0` para a `thread` da Mesa;
+  - o monitoramento da central de atividade passou a rodar imediatamente ao abrir o modal, e o fluxo passou a expor quais `laudoIds` foram realmente consultados no `feed`;
+  - o app passou a publicar markers operacionais discretos (`activity-center-feed-v2-ready` e `activity-center-feed-v2-target-<id>`) para o runner/Maestro;
+  - o backend organico passou a expor `human_ack_recent_events`, registrando `accepted`, `duplicate` e `rejected` com `session_id`, `surface`, `target_id`, `operator_run_id` e `rejection_reason`;
+  - o runner passou a esperar a telemetria apos a UI e a salvar `backend_summary_post_ui_wait.json`, `operator_run_status_post_ui_wait.json` e `backend_evidence_post_ui_wait.json`.
+- Estado local observado:
+  - checks locais passaram:
+    - `python3 -m py_compile web/app/v2/mobile_organic_validation.py scripts/run_mobile_pilot_runner.py`
+    - `cd android && npm test -- --runInBand --runTestsByPath src/config/mobileV2HumanValidation.test.ts src/features/activity/monitorActivityFlow.test.ts src/features/activity/useActivityCenterController.test.ts src/features/chat/ThreadConversationPane.test.tsx`
+    - `cd android && npm run typecheck`
+    - `python3 -m pytest -q web/tests/test_v2_android_ack_accounting.py web/tests/test_v2_android_surface_served_accounting.py web/tests/test_smoke.py`
+  - a rodada operacional real foi executada em `artifacts/mobile_pilot_run/20260326_160710/`
+  - o app foi rebuildado, reinstalado e aberto no device `RQCW20887GV`
+  - o `operator_run` para `feed/thread -> laudo 80` foi iniciado no tenant `1 - Empresa Demo (DEV)`
+  - o historico filtrou o laudo `80`, mas o tap nao chegou a expor `mesa-tab-button`
+  - a `activity-center` abriu vazia e o marker `activity-center-feed-v2-ready` nao apareceu
+  - o `backend_summary_post_ui_wait.json` registrou apenas `capabilities_checks`; `v2_served=0` e `human_ack_recent_events=[]`
+  - o `operator_run` terminou em `aborted` com `operator_aborted`
+  - resultado honesto da rodada: `app_opened_but_target_not_reached`
+- Arquivos alterados:
+  - `android/src/config/mobileV2HumanValidation.ts`
+  - `android/src/config/mobileV2HumanValidation.test.ts`
+  - `android/src/features/activity/monitorActivityFlow.ts`
+  - `android/src/features/activity/monitorActivityFlow.test.ts`
+  - `android/src/features/activity/useActivityCenterController.ts`
+  - `android/src/features/activity/useActivityCenterController.test.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `android/maestro/mobile-v2-pilot-run.yaml`
+  - `docs/restructuring-roadmap/61_epic09m_backend_evidence_closure.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `web/app/v2/mobile_organic_validation.py`
+  - `web/tests/test_v2_android_ack_accounting.py`
+  - `web/tests/test_v2_android_surface_served_accounting.py`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/mobile_organic_validation.py scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `cd android && npm test -- --runInBand --runTestsByPath src/config/mobileV2HumanValidation.test.ts src/features/activity/monitorActivityFlow.test.ts src/features/activity/useActivityCenterController.test.ts src/features/chat/ThreadConversationPane.test.tsx` -> `4 suites passed, 8 tests passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `python3 -m pytest -q web/tests/test_v2_android_ack_accounting.py web/tests/test_v2_android_surface_served_accounting.py web/tests/test_smoke.py` -> `28 passed`
+  - `python3 scripts/run_mobile_pilot_runner.py` -> execucao real concluida com artefatos em `artifacts/mobile_pilot_run/20260326_160710/`
+- Riscos remanescentes:
+  - a contabilidade backend agora esta mais explicita, mas a rodada real desta fase nao chegou a gerar trafego V2 para `feed` ou `thread`
+  - o problema operacional voltou a ficar antes da evidencia: selecao efetiva do laudo `80` e/ou trigger real do monitoramento da central no device
+  - `candidate_ready_for_real_tenant` continua corretamente bloqueado
+- Proxima fase recomendada:
+  - Epic 09N - estabilizacao final da selecao do laudo 80 e diagnostico do monitoramento vazio da central de atividade antes de nova rodada de evidencia backend
+
+## 2026-03-26 17:10:00 -0300 - Epic 09N - estabilizacao final da selecao do laudo 80 e diagnostico da central de atividade
+
+- Objetivo:
+  - eliminar o falso positivo de navegacao que ainda tratava `mesa-tab-button` como prova de selecao do laudo `80`, tornar a central de atividade mais observavel e rerodar o runner real no tenant demo.
+- Causa operacional apurada:
+  - a screenshot `pilot-run-conversation.png` da fase 09M ja mostrava o shell generico do app, nao a conversa do laudo `80`
+  - o botao `mesa-tab-button` existe nesse shell generico, portanto nao e evidencia de laudo selecionado
+  - consulta real ao endpoint `/app/api/mobile/laudos` confirmou que o laudo `80` chega como `status_card="aberto"`
+  - como a central monitora o laudo ativo e, sem laudo ativo, apenas itens em `ajustes/aguardando`, a selecao falha impede qualquer leitura do `feed` para o alvo `80`
+- Entregas principais:
+  - o historico passou a usar `keyboardShouldPersistTaps=\"handled\"` e markers discretos por item (`history-target-visible-<id>` e `history-item-selected-<id>`)
+  - `runMonitorActivityFlow(...)` passou a devolver um resumo operacional canonicamente rastreavel para o controller da central
+  - `useActivityCenterController` ganhou um diagnostico discreto de fase (`idle/loading/settled/error`), `requestDispatched`, `requestedTargetIds`, `lastReadMetadata` e `lastError`
+  - foi criado um builder de markers operacionais para selecao real do laudo e estados terminais da central
+  - o Maestro trocou o checkpoint de progresso de `mesa-tab-button` para `selected-history-item-id-${TARGET_LAUDO_ID}`
+  - o runner passou a salvar `ui_marker_summary.json` e a classificar explicitamente `app_opened_but_target_not_reached`, `central_opened_but_empty`, `central_opened_with_legacy_only` e `central_opened_with_v2_but_no_ack`
+- Validacoes rodadas:
+  - `maestro check-syntax android/maestro/mobile-v2-pilot-run.yaml` -> `OK`
+  - `python3 -m py_compile scripts/run_mobile_pilot_runner.py` -> `ok`
+  - `cd android && npm test -- --runInBand --runTestsByPath src/features/common/mobilePilotAutomationDiagnostics.test.ts src/features/history/HistoryDrawerPanel.test.tsx src/features/activity/monitorActivityFlow.test.ts src/features/activity/useActivityCenterController.test.ts src/features/chat/ThreadConversationPane.test.tsx` -> `12 passed`
+  - `cd android && npm run typecheck` -> `ok`
+  - `python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Rodadas reais executadas:
+  - `artifacts/mobile_pilot_run/20260326_164854`
+    - primeira rodada com espera por `selected-history-item-id-80`
+    - o marker nunca apareceu e o flow abortou ainda no historico
+  - `artifacts/mobile_pilot_run/20260326_165914`
+    - tentativa intermediaria apos ajuste discreto nos markers globais
+    - mesmo resultado operacional: selecao nao confirmada
+  - `artifacts/mobile_pilot_run/20260326_170358`
+    - rodada final autoritativa
+    - `history-item-80` ficou visivel, foi tocado e mesmo assim `selected-history-item-id-80` nunca apareceu
+    - o dump final mostrou apenas o shell generico com `open-history-button`, `open-settings-button`, `chat-tab-button`, `mesa-tab-button` e `chat-composer-input`
+    - a central nao chegou a abrir nessa rodada final
+    - `v2_served=0`, `human_ack_recent_events=0`, `operator_run_outcome=aborted`
+    - classificacao honesta: `app_opened_but_target_not_reached`
+- Observacao importante:
+  - os markers globais de selecao/central foram adicionados, mas o `uiautomator` do device continuou nao materializando essas `View`s ocultas no dump final; por isso a rodada final continua apoiada principalmente na screenshot e no dump do shell generico
+- Arquivos alterados:
+  - `android/src/features/history/HistoryDrawerPanel.tsx`
+  - `android/src/features/history/HistoryDrawerPanel.test.tsx`
+  - `android/src/features/activity/monitorActivityFlow.ts`
+  - `android/src/features/activity/monitorActivityFlow.test.ts`
+  - `android/src/features/activity/useActivityCenterController.ts`
+  - `android/src/features/activity/useActivityCenterController.test.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.ts`
+  - `android/src/features/common/mobilePilotAutomationDiagnostics.test.ts`
+  - `android/src/features/InspectorMobileApp.tsx`
+  - `android/maestro/mobile-v2-pilot-run.yaml`
+  - `scripts/run_mobile_pilot_runner.py`
+  - `docs/restructuring-roadmap/62_epic09n_activity_center_diagnostics.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Riscos remanescentes:
+  - a selecao real do laudo `80` ainda nao fica deterministica o bastante para o runner prosseguir ate a central
+  - o `uiautomator` do device continua nao refletindo os markers globais ocultos, o que limita a observabilidade automatica do estado interno
+  - `candidate_ready_for_real_tenant` continua corretamente bloqueado
+- Proxima fase recomendada:
+  - Epic 09O - diagnostico do callback real de selecao do historico e prova automatizavel de `laudoSelecionadoId` no shell autenticado
+
+## 2026-03-27 21:15:00 -0300 - Epic 10G - isolamento estrutural e trilha duravel de evidencia para `report_finalize_stream`
+
+- Objetivo:
+  - cumprir as condicoes abertas no gate review do `report_finalize_stream`, fortalecendo o isolamento estrutural do branch `eh_comando_finalizar` e introduzindo uma trilha local duravel de evidencia, sem abrir `enforce`.
+- Estrategia executada:
+  - a logica documental do recorte saiu do corpo de `web/app/domains/chat/chat_stream_routes.py::rota_chat` e passou para `web/app/domains/chat/report_finalize_stream_shadow.py::processar_finalizacao_stream_documental`;
+  - o novo modulo dedicado concentrou o escopo local/controlado do shadow, a chamada ao hard gate documental, a persistencia local de evidence e o fechamento SSE do recorte;
+  - foi adicionada a trilha duravel local-only em `web/app/v2/document/hard_gate_evidence.py`, com `index.jsonl`, JSON por execucao e resumo persistido reconstruivel;
+  - o admin local ganhou `GET /admin/api/document-hard-gate/durable-summary` para leitura do journal duravel;
+  - foi criado o runner `scripts/run_document_hard_gate_10g_validation.py` para repetir campanhas do mesmo slice sem depender apenas do harness ad hoc anterior.
+- Estado local observado:
+  - o recorte continuou `shadow_only` do inicio ao fim;
+  - `did_block` continuou `false`;
+  - `enforce_enabled` continuou `false`;
+  - a rodada real do 10G foi executada em `artifacts/document_hard_gate_validation_10g/20260327_211111/`;
+  - o caso `shadow_stream_gap_padrao_10g` preservou `HTTP 200` e `text/event-stream`, terminou o laudo em `Aguardando`, registrou `would_block=true` com `template_not_bound` e `template_source_unknown`, e exportou evidence duravel individual sob `durable_evidence/executions/report_finalize_stream/`.
+- Arquivos alterados:
+  - `web/app/domains/chat/chat_stream_routes.py`
+  - `web/app/domains/chat/report_finalize_stream_shadow.py`
+  - `web/app/v2/document/hard_gate_evidence.py`
+  - `web/app/domains/admin/routes.py`
+  - `web/tests/test_v2_document_hard_gate_10g.py`
+  - `scripts/run_document_hard_gate_10g_validation.py`
+  - `docs/restructuring-roadmap/82_epic10g_stream_isolation_and_durable_evidence.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/v2/document/hard_gate_evidence.py web/app/domains/chat/report_finalize_stream_shadow.py web/app/domains/chat/chat_stream_routes.py web/app/domains/admin/routes.py web/tests/test_v2_document_hard_gate_10g.py scripts/run_document_hard_gate_10g_validation.py` -> `ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10g.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -c "import main; main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+  - `python3 scripts/run_document_hard_gate_10g_validation.py --case gap` -> artifacts em `artifacts/document_hard_gate_validation_10g/20260327_211111/`
+- Riscos remanescentes:
+  - a trilha duravel continua local-only e ainda nao substitui uma observabilidade central;
+  - `materialization_disallowed_by_policy` e `no_active_report` seguem sem observacao propria neste slice;
+  - a evidencia operacional do 10G ainda veio de uma unica rodada controlada.
+- Proxima fase recomendada:
+  - nova rodada controlada do `report_finalize_stream` com o runner 10G, ampliando a amostra sem sair de `shadow_only`
+
+## 2026-03-27 21:30:00 -0300 - Epic 10G+ - campanha operacional ampliada do `report_finalize_stream`
+
+- Objetivo:
+  - ampliar a amostra operacional do slice `report_finalize_stream` usando o runner e a trilha duravel do 10G, sem abrir `enforce` e sem tocar em tenant real.
+- Estrategia executada:
+  - foi feita uma nova campanha em `artifacts/document_hard_gate_shadow_campaign_10g/20260327_212348/`;
+  - o runner `scripts/run_document_hard_gate_10g_validation.py` foi reutilizado em quatro rodadas controladas, duas de `template_gap` e duas de `template_ok`;
+  - a campanha consolidou a evidence duravel individual de cada rodada em `durable_evidence/` no root da campanha e exportou `campaign_summary.json`, `campaign_cases.json`, `campaign_findings.md` e `responses/admin_summary_response.json`.
+- Estado local observado:
+  - execucoes uteis novas:
+    - `4`
+  - tipos de caso exercitados:
+    - `template_gap`
+    - `template_ok`
+  - `HTTP 200`:
+    - `4`
+  - `text/event-stream` preservado:
+    - `4`
+  - `would_block=true`:
+    - `2`
+  - `did_block=true`:
+    - `0`
+  - `shadow_only` permaneceu ativo em todas as quatro rodadas;
+  - `template_not_bound` e `template_source_unknown` repetiram duas vezes cada, exatamente nos rounds de gap;
+  - `materialization_disallowed_by_policy` e `no_active_report` continuaram `nao_observado`, e a auditoria de codigo confirmou que o slice atual exige laudo ativo e deriva `document_materialization_allowed=true` quando ha laudo ativo.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/83_epic10g_shadow_campaign.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_shadow_campaign_10g/20260327_212348/campaign_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10g/20260327_212348/campaign_cases.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10g/20260327_212348/campaign_findings.md`
+  - `artifacts/document_hard_gate_shadow_campaign_10g/20260327_212348/source_cases_index.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10g/20260327_212348/boot_import_check.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10g/20260327_212348/responses/admin_summary_response.json`
+- Validacoes rodadas:
+  - `python3 -m py_compile web/app/domains/chat/report_finalize_stream_shadow.py web/app/v2/document/hard_gate_evidence.py scripts/run_document_hard_gate_10g_validation.py` -> `ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10g.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -c "import main; main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+- Riscos remanescentes:
+  - os blockers `materialization_disallowed_by_policy` e `no_active_report` continuam sem observacao propria neste slice;
+  - a evidencia segue local/controlada, embora agora esteja mais forte e mais repetivel;
+  - a campanha melhora a base para novo gate review, mas nao autoriza qualquer `enforce`.
+- Proxima fase recomendada:
+  - gate review formal do `report_finalize_stream` apos a campanha ampliada 10G com trilha duravel
+
+## 2026-03-27 21:55:00 -0300 - Epic 10H - campanha operacional cruzada do `report_finalize_stream`
+
+- Objetivo:
+  - fortalecer a evidencia do slice `report_finalize_stream` com uma campanha cruzada em `shadow_only`, usando o runner principal do 10G e um segundo harness HTTP/TestClient.
+- Estrategia executada:
+  - foi criado e usado o runner complementar `scripts/run_document_hard_gate_10h_http_harness.py`;
+  - a campanha foi consolidada em `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/`;
+  - os dois harnesses exerceram `template_gap` e `template_ok`, cada execucao com trilha duravel propria e consolidacao posterior em `campaign_summary.json`, `campaign_cases.json`, `campaign_findings.md` e `harness_matrix.json`.
+- Estado local observado:
+  - execucoes uteis novas:
+    - `4`
+  - execucoes por harness:
+    - `main_runner_direto_rota_chat`:
+      - `2`
+    - `testclient_http_harness`:
+      - `2`
+  - `HTTP 200`:
+    - `4`
+  - `text/event-stream` preservado:
+    - `4`
+  - `would_block=true`:
+    - `2`
+  - `did_block=true`:
+    - `0`
+  - `shadow_without_bleed_count`:
+    - `4`
+  - `template_not_bound` e `template_source_unknown` apareceram `2` vezes cada, uma por harness no caso `template_gap`;
+  - `materialization_disallowed_by_policy` e `no_active_report` permaneceram `nao_observado`, e a auditoria do codigo confirmou que o slice atual exige laudo ativo antes do branch observado.
+- Arquivos alterados:
+  - `scripts/run_document_hard_gate_10h_http_harness.py`
+  - `docs/restructuring-roadmap/84_epic10h_cross_shadow_campaign.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/campaign_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/campaign_cases.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/campaign_findings.md`
+  - `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/harness_matrix.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/source_cases_index.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/boot_import_check.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10h/20260327_214808/responses/admin_summary_response.json`
+- Validacoes rodadas:
+  - `python3 -m py_compile scripts/run_document_hard_gate_10g_validation.py scripts/run_document_hard_gate_10h_http_harness.py web/app/domains/chat/report_finalize_stream_shadow.py web/app/v2/document/hard_gate_evidence.py` -> `ok`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10g.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -c "import main; main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+- Riscos remanescentes:
+  - `materialization_disallowed_by_policy` e `no_active_report` seguem sem observacao propria neste slice;
+  - a evidencia continua local/controlada, embora agora exista em dois harnesses diferentes;
+  - a fase melhora a base para novo gate review, mas continua sem base para qualquer `enforce`.
+- Proxima fase recomendada:
+  - gate review formal do `report_finalize_stream` apos a campanha cruzada 10H
+
+## 2026-03-27 22:12:21 -0300 - Gate review consolidado do `report_finalize_stream` com evidencia ate 10H
+
+- Objetivo:
+  - consolidar toda a evidencia acumulada do recorte `report_finalize_stream` para fechar uma posicao unica de roadmap sem abrir `enforce` e sem repetir campanha operacional.
+- Estrategia executada:
+  - foram revisitados os docs canonicos de arquitetura/produto, toda a trilha local 10F -> 10H e os artifacts obrigatorios de validacao, campanha e review;
+  - a evidencia operacional foi agregada numa matriz unica em `artifacts/document_hard_gate_review_10f_consolidated/20260327_221221/evidence_matrix.json`;
+  - a decisao consolidada foi registrada em `consolidated_review_summary.json`, `consolidated_findings.md` e `decision.txt`.
+- Estado consolidado observado:
+  - execucoes uteis totais:
+    - `15`
+  - `template_gap`:
+    - `8`
+  - `template_ok`:
+    - `7`
+  - `HTTP 200`:
+    - `15`
+  - `text/event-stream` preservado:
+    - `15`
+  - `would_block=true`:
+    - `8`
+  - `did_block=true`:
+    - `0`
+  - `shadow_without_bleed_count`:
+    - `15`
+  - harnesses consolidados:
+    - `pre10g_testclient_local`
+    - `main_runner_direto_rota_chat`
+    - `testclient_http_harness`
+  - blockers observados com estabilidade:
+    - `template_not_bound`
+    - `template_source_unknown`
+  - blockers ainda nao observados:
+    - `materialization_disallowed_by_policy`
+    - `no_active_report`
+- Decisao consolidada:
+  - `retire_from_active_focus_and_keep_as_observed_slice`
+- Racional consolidado:
+  - o slice ja demonstrou estabilidade suficiente em `shadow_only` para sair da zona de duvida;
+  - 10G e 10H resolveram as maiores restricoes anteriores de observabilidade e harness unico;
+  - mesmo assim, os blockers faltantes seguem estruturalmente nao observados neste recorte, o branch continua subordinado ao endpoint generico de chat/SSE e a observabilidade continua local-only;
+  - por isso, a melhor decisao de roadmap deixou de ser continuar investindo aqui e passou a ser manter o slice observado em shadow, fora do foco ativo imediato.
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/85_epic10f_consolidated_gate_review.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_review_10f_consolidated/20260327_221221/consolidated_review_summary.json`
+  - `artifacts/document_hard_gate_review_10f_consolidated/20260327_221221/consolidated_findings.md`
+  - `artifacts/document_hard_gate_review_10f_consolidated/20260327_221221/evidence_matrix.json`
+  - `artifacts/document_hard_gate_review_10f_consolidated/20260327_221221/decision.txt`
+  - `artifacts/document_hard_gate_review_10f_consolidated/20260327_221221/source_evidence_index.txt`
+- Validacoes rerodadas:
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10g.py` -> `2 passed`
+  - `PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Proxima fase recomendada:
+  - congelar `report_finalize_stream` em shadow como slice observado e selecionar outro ponto documental mais forte para a frente ativa seguinte
+
+## 2026-03-27 22:53:20 -0300 - Selecao formal do proximo ponto documental forte
+
+- Objetivo:
+  - escolher a proxima frente ativa documental depois de congelar `review_reject` e `report_finalize_stream` como slices observados.
+- Pre-checagem consolidada:
+  - `review_reject` confirmado fora da trilha de futuro `enforce`:
+    - `artifacts/document_review_reject_semantics/20260327_150443/decision.txt`
+  - `report_finalize_stream` confirmado fora do foco ativo imediato:
+    - `artifacts/document_hard_gate_review_10f_consolidated/20260327_221221/decision.txt`
+  - pontos ja cobertos:
+    - `report_finalize`
+    - `review_approve`
+- Candidatos fortes auditados:
+  - escolhido:
+    - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+    - `POST /revisao/api/templates-laudo/editor/{template_id}/publicar`
+    - `operation_kind` recomendado:
+      - `template_publish_activate`
+  - segundo lugar:
+    - `POST /app/api/laudo/{laudo_id}/reabrir`
+    - `POST /cliente/api/chat/laudos/{laudo_id}/reabrir`
+    - `operation_kind` proposto:
+      - `report_reopen`
+  - segurar:
+    - `PATCH /revisao/api/templates-laudo/{template_id}/status`
+    - `operation_kind` proposto:
+      - `template_status_transition`
+  - nao abrir agora:
+    - `POST /revisao/api/templates-laudo/lote/status`
+    - `POST /revisao/api/templates-laudo/lote/excluir`
+    - `operation_kind` proposto:
+      - `template_library_batch_mutation`
+- Achados principais:
+  - `template_publish_activate` virou o melhor candidato restante porque:
+    - pertence diretamente ao dominio `Laudo / Template / Documento`
+    - publica a versao ativa operacional do template
+    - ja possui trilha duravel em `RegistroAuditoriaEmpresa`
+    - expõe `GET /revisao/api/templates-laudo/auditoria`
+    - e menos acoplado do que o endpoint generico de chat usado por `report_finalize_stream`
+  - `report_reopen` ficou em segundo porque:
+    - e uma transicao corretiva e multiportal
+    - os blockers atuais continuam semanticamente fracos para qualquer `enforce` nesse ponto
+  - `template_status_transition` foi segurado porque:
+    - mistura transicoes demais num unico endpoint
+    - o recorte forte de `publicar` e mais claro para uma primeira abertura
+  - mutacoes em lote ficaram fora por blast radius e rollback piores
+- Decisao formal:
+  - `approved_for_shadow_first_only`
+- Candidato escolhido:
+  - `template_publish_activate`
+  - rota principal:
+    - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+  - semantica:
+    - `publicar`
+- Modo recomendado:
+  - `shadow_only`
+- Blockers recomendados:
+  - em `enforce`:
+    - nenhum
+  - em `shadow`:
+    - `template_source_unknown`
+    - `template_not_bound`
+- Arquivos alterados:
+  - `docs/restructuring-roadmap/86_next_strong_document_point_selection.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Artefatos gerados:
+  - `artifacts/document_next_strong_point_selection/20260327_225320/candidate_matrix.json`
+  - `artifacts/document_next_strong_point_selection/20260327_225320/candidate_ranking.md`
+  - `artifacts/document_next_strong_point_selection/20260327_225320/selection_decision.txt`
+  - `artifacts/document_next_strong_point_selection/20260327_225320/source_evidence_index.txt`
+- Validacoes rerodadas:
+  - `AMBIENTE=dev python3 -c "import sys; sys.path.insert(0, 'web'); import main; app = main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10d.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10g.py` -> `2 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Riscos remanescentes:
+  - os blockers atuais do hard gate ainda sao majoritariamente case-level e nao sustentam `enforce` imediato na governanca de templates;
+  - `template_publish_activate` tem blast radius tenant-wide se for aberto sem allowlists estritas;
+  - a proxima implementacao ainda precisara definir `operation_kind` e recorte de observacao especificos.
+- Proxima fase recomendada:
+  - Epic 10I - abertura controlada de `template_publish_activate` em `shadow_only`
+
+## 2026-03-27 23:28:30 -0300 - Epic 10I - abertura controlada de `template_publish_activate` em `shadow_only`
+
+- Objetivo:
+  - abrir o ponto mutável documental de publicação de template apenas em `shadow_only`, sem alterar contrato público e sem bloquear a publicação real.
+- Escopo implementado:
+  - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+  - `POST /revisao/api/templates-laudo/editor/{template_id}/publicar`
+  - `operation_kind`:
+    - `template_publish_activate`
+- Implementação realizada:
+  - novo helper isolado:
+    - `web/app/domains/revisor/template_publish_shadow.py`
+  - integração nas rotas reais de publicação:
+    - `web/app/domains/revisor/templates_laudo_management_routes.py`
+  - registro do `operation_kind`:
+    - `web/app/v2/document/gate_models.py`
+  - marcação explícita como `shadow_only` e ajuste de relevância do hard gate:
+    - `web/app/v2/document/hard_gate.py`
+  - allowlist opcional por código do template:
+    - `web/app/v2/runtime.py`
+- Regras preservadas:
+  - `did_block` permaneceu `false`
+  - `enforce_enabled` permaneceu `false` neste slice
+  - a resposta pública de publicação de template permaneceu:
+    - `{"ok": true, "template_id": <id>, "status": "publicado"}`
+  - a publicação real continuou funcionando
+- Blockers observados na abertura:
+  - `template_not_bound`
+  - `template_source_unknown`
+- Semântica observada:
+  - caso gap:
+    - sem template ativo anterior do mesmo código
+    - `would_block=true`
+    - `did_block=false`
+  - caso template ok:
+    - já havia template ativo anterior do mesmo código
+    - `would_block=false`
+    - `did_block=false`
+- Observabilidade adicionada:
+  - summary operacional local agora agrega `template_publish_activate`
+  - trilha durável local-only registra `tenant`, `template_id`, `codigo_template`, `route_name`, `route_path`, blockers, `would_block`, `did_block` e vínculo com auditoria de templates
+  - auditoria operacional de templates continuou disponível via `RegistroAuditoriaEmpresa` e `GET /revisao/api/templates-laudo/auditoria`
+- Arquivos alterados:
+  - `web/app/domains/revisor/template_publish_shadow.py`
+  - `web/app/domains/revisor/templates_laudo_management_routes.py`
+  - `web/app/v2/document/gate_models.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/v2/runtime.py`
+  - `web/tests/test_v2_document_hard_gate_10i.py`
+  - `scripts/run_document_hard_gate_10i_validation.py`
+  - `docs/restructuring-roadmap/87_epic10i_template_publish_shadow.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/boot_import_check.txt`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/durable_summary.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/final_report.md`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/responses/admin_summary_response.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/responses/admin_durable_summary_response.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/durable_evidence/executions/template_publish_activate/20260327_233050_647444__tenant_1__laudo_no_laudo__corr_22ef02611b454dfb9c60fa36005d5091.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/durable_evidence/executions/template_publish_activate/20260327_233051_542966__tenant_1__laudo_no_laudo__corr_f4ff80b70cbe448d9520c9ef7eb9ebe5.json`
+- Validacoes executadas:
+  - `AMBIENTE=dev python3 -c "import sys; sys.path.insert(0, 'web'); import main; main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+  - `python3 -m py_compile web/app/domains/revisor/template_publish_shadow.py web/app/domains/revisor/templates_laudo_management_routes.py web/app/v2/document/hard_gate.py web/app/v2/runtime.py web/app/v2/document/gate_models.py web/tests/test_v2_document_hard_gate_10i.py scripts/run_document_hard_gate_10i_validation.py` -> `ok`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_enforce.py` -> `4 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10d.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10f.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10g.py` -> `2 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10i.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 scripts/run_document_hard_gate_10i_validation.py` -> rodada controlada com `2` casos úteis
+- Resultado operacional:
+  - `template_publish_activate` abriu em `shadow_only` nas duas rotas escolhidas
+  - a publicação real do template continuou funcional
+  - o summary refletiu `2` avaliações, `1` `would_block`, `0` `did_block`
+  - a trilha durável registrou as duas execuções com auditoria operacional associada
+- Riscos remanescentes:
+  - os blockers atuais ainda são os dois sinais reaproveitados de template e ainda não formam uma família completa de governança de template
+  - a discussão de `enforce` continua prematura neste novo ponto até campanha própria ampliar a amostra
+- Proxima fase recomendada:
+  - gate review formal do `template_publish_activate` após a validação inicial em `shadow_only`
+
+## 2026-03-27 23:58 - Gate review formal do Epic 10I sobre `template_publish_activate` em `shadow_only`
+
+- Escopo revisado:
+  - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+  - `POST /revisao/api/templates-laudo/editor/{template_id}/publicar`
+  - `operation_kind`:
+    - `template_publish_activate`
+- Codigo auditado:
+  - `web/app/domains/revisor/template_publish_shadow.py`
+  - `web/app/domains/revisor/templates_laudo_management_routes.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/domains/admin/routes.py`
+- Artifacts revisados:
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/durable_summary.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/final_report.md`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/responses/admin_summary_response.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/responses/admin_durable_summary_response.json`
+- Pre-checagem:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora do recorte documental
+    - esta fase ficou restrita a docs e artifacts de review
+  - tenant/flags revisados:
+    - `tenant=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=template_publish_activate`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TEMPLATE_CODES=template_gap_10i_validation,template_ok_10i_validation`
+- Achados principais:
+  - o slice permaneceu realmente em `shadow_only`
+  - `did_block` permaneceu `false` em todas as `2` execucoes uteis observadas
+  - a publicacao real do template continuou funcional com `HTTP 200` e auditoria operacional gerada
+  - `template_publish_activate` e semanticamente mais forte e mais isolado do que `review_reject` e `report_finalize_stream`
+  - `template_not_bound` e `template_source_unknown` se mostraram fortes para observacao, mas ainda apenas parcialmente maduros para qualquer futura conversa de `enforce`
+  - a observabilidade atual e suficiente para `shadow` e melhor do que a do `report_finalize_stream`, mas a amostra ainda e pequena demais para endurecimento
+- Validacoes rerodadas:
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10i.py` -> `3 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/revisor/template_publish_shadow.py web/app/domains/revisor/templates_laudo_management_routes.py web/app/v2/document/hard_gate.py web/tests/test_v2_document_hard_gate_10i.py` -> `ok`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -c "from main import create_app; app = create_app(); print('boot_ok', type(app).__name__)"` -> `boot_ok FastAPI`
+- Decisao formal:
+  - `approved_for_shadow_continuation`
+- Condicoes para qualquer futura discussao de `enforce`:
+  - campanha operacional propria do `template_publish_activate` com amostra maior
+  - repeticao em pelo menos um segundo harness
+  - manutencao de rollout local/controlado com tenant allowlist e template code allowlist
+  - qualquer futuro escopo inicial, no maximo, limitado a `template_not_bound` e `template_source_unknown`
+  - observacao de blockers proprios de governanca de template antes de qualquer endurecimento real
+- Arquivos alterados nesta fase:
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/review_summary.json`
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/review_findings.md`
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/decision.txt`
+  - `docs/restructuring-roadmap/88_epic10i_gate_review.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - campanha operacional ampliada do `template_publish_activate` em `shadow_only`
+
+## 2026-03-28 06:21 - Campanha operacional ampliada do Epic 10J para `template_publish_activate` em `shadow_only`
+
+- Escopo executado:
+  - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+  - `POST /revisao/api/templates-laudo/editor/{template_id}/publicar`
+  - `operation_kind`:
+    - `template_publish_activate`
+- Objetivo da fase:
+  - ampliar a amostra operacional
+  - repetir o ponto em mais de um harness
+  - fortalecer a trilha durável de evidência
+  - preparar base para novo gate review do ponto ainda em `shadow_only`
+- Restrições mantidas:
+  - sem `enforce`
+  - sem tenant real
+  - sem mudança de payload público
+  - sem mudança de UX
+  - sem Android
+  - sem banco novo
+  - sem remoção do legado
+- Pré-checagem executada:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - registrado em `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/git_status_short.txt`
+    - worktree permanece ampla e suja fora do recorte desta fase
+  - boot/import:
+    - `AMBIENTE=dev PYTHONPATH=web python3 -c "import main; main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+  - flags/recorte confirmados:
+    - `shadow_only_operations=['report_finalize_stream', 'review_reject', 'template_publish_activate']`
+    - tenant local/controlado:
+      - `tenant=1 host=testclient`
+    - operação allowlisted:
+      - `template_publish_activate`
+  - runner do `10I`:
+    - existente e executado com sucesso
+- Casos reais e seguros exercitados:
+  - `legacy_gap`
+  - `legacy_ok`
+  - `editor_gap`
+  - `editor_ok`
+  - família adicional própria de blockers de governança de template:
+    - `nao_observado`
+- Harnesses usados:
+  - `direct_route_call`
+    - runner:
+      - `scripts/run_document_hard_gate_10i_validation.py`
+    - execuções úteis:
+      - `2`
+  - `testclient_http_harness`
+    - runner:
+      - `scripts/run_document_hard_gate_10j_http_harness.py`
+    - execuções úteis:
+      - `4`
+- Agregação da campanha:
+  - total de execuções úteis:
+    - `6`
+  - total por harness:
+    - `direct_route_call`: `2`
+    - `testclient_http_harness`: `4`
+  - templates distintos exercitados:
+    - `6`
+  - perfis de caso distintos:
+    - `4`
+  - publicação funcional preservada:
+    - `6`
+  - shadow sem bleed:
+    - `6`
+  - `HTTP 200`:
+    - `6`
+  - `audit_generated=true`:
+    - `6`
+  - `would_block=true`:
+    - `3`
+  - `did_block=true`:
+    - `0`
+- Blockers observados:
+  - `template_not_bound`: `3`
+  - `template_source_unknown`: `3`
+- Blockers ainda não observados:
+  - família própria adicional de blockers de governança de template:
+    - `nao_observado`
+- Arquivos alterados:
+  - `scripts/run_document_hard_gate_10j_http_harness.py`
+  - `scripts/run_document_hard_gate_10j_shadow_campaign.py`
+  - `web/tests/test_v2_document_hard_gate_10i.py`
+  - `docs/restructuring-roadmap/89_epic10j_template_publish_shadow_campaign.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Artefatos gerados:
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/campaign_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/campaign_cases.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/campaign_findings.md`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/source_cases_index.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/boot_import_check.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/harness_matrix.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/direct_route_call/runtime_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/direct_route_call/durable_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/testclient_http_harness/runtime_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/testclient_http_harness/durable_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/direct_route_call/admin_summary_response.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/direct_route_call/admin_durable_summary_response.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/testclient_http_harness/admin_summary_response.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/summaries/testclient_http_harness/admin_durable_summary_response.json`
+- Validações executadas:
+  - `python3 -m py_compile scripts/run_document_hard_gate_10j_http_harness.py scripts/run_document_hard_gate_10j_shadow_campaign.py web/tests/test_v2_document_hard_gate_10i.py` -> `ok`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10i.py` -> `5 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 scripts/run_document_hard_gate_10j_shadow_campaign.py` -> campanha concluída com `6` execuções úteis
+- Resultado operacional:
+  - a amostra foi ampliada de forma material
+  - o ponto foi repetido em dois harnesses independentes
+  - `did_block` permaneceu `false` em todas as execuções úteis
+  - a publicação real do template continuou funcional em todos os casos
+  - os blockers continuaram limitados a `template_not_bound` e `template_source_unknown`
+- Avaliação da fase:
+  - já faz sentido um novo gate review formal deste ponto para continuidade em `shadow_only`
+  - ainda nao faz sentido discutir `enforce`
+- Proximo passo recomendado:
+  - gate review formal do Epic 10J sobre `template_publish_activate` em `shadow_only`
+
+## 2026-03-28 06:57 - Gate review formal do Epic 10J sobre `template_publish_activate` após campanha ampliada
+
+- Escopo revisado:
+  - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+  - `POST /revisao/api/templates-laudo/editor/{template_id}/publicar`
+  - `operation_kind`:
+    - `template_publish_activate`
+- Código auditado:
+  - `web/app/domains/revisor/template_publish_shadow.py`
+  - `web/app/domains/revisor/templates_laudo_management_routes.py`
+  - `web/app/v2/document/hard_gate.py`
+  - `web/app/v2/document/hard_gate_evidence.py`
+  - `web/app/domains/admin/routes.py`
+- Artifacts revisados:
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/runtime_summary.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/durable_summary.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/validation_cases.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/final_report.md`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/responses/admin_summary_response.json`
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/responses/admin_durable_summary_response.json`
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/review_summary.json`
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/review_findings.md`
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/decision.txt`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/campaign_summary.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/campaign_cases.json`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/campaign_findings.md`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/harness_matrix.json`
+- Pré-checagem:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora do recorte documental
+    - esta fase ficou restrita a docs e artifacts de review
+  - artifacts mais recentes localizados:
+    - `artifacts/document_hard_gate_validation_10i/20260327_233048/`
+    - `artifacts/document_hard_gate_review_10i/20260327_235811/`
+    - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/`
+  - tenant/flags revisados:
+    - tenant:
+      - `1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=template_publish_activate`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_DURABLE_EVIDENCE=1`
+  - código alterado fora do recorte esperado:
+    - sim, a worktree global continua com muitas alterações não relacionadas
+- Amostra consolidada revisada:
+  - execuções úteis totais:
+    - `8`
+  - harnesses reais:
+    - `direct_route_call`
+    - `testclient_http_harness`
+  - perfis de caso distintos:
+    - `legacy_gap`
+    - `legacy_ok`
+    - `editor_gap`
+    - `editor_ok`
+  - templates distintos exercitados:
+    - `6`
+  - `HTTP 200`:
+    - `8`
+  - `audit_generated=true`:
+    - `8`
+  - `would_block=true`:
+    - `4`
+  - `did_block=true`:
+    - `0`
+- Achados principais:
+  - o slice permaneceu realmente em `shadow_only`
+  - `did_block` permaneceu `false` em todas as execuções úteis revisadas
+  - a publicação real do template continuou funcional em todas as execuções úteis
+  - `template_publish_activate` continua semanticamente mais forte e mais isolado do que `review_reject` e `report_finalize_stream`
+  - `template_not_bound` e `template_source_unknown` continuam fortes para observação e parcialmente maduros para um eventual escopo futuro estreito
+  - a família própria adicional de blockers de governança de template continua `nao_observado`
+  - a observabilidade atual já é suficiente para `shadow` e suficiente com restrições para uma conversa futura; ela deixou de ser o principal gargalo
+- Validações rerodadas:
+  - `AMBIENTE=dev PYTHONPATH=web python3 -c "import main; main.create_app(); print('boot_import_ok')"` -> `boot_import_ok`
+  - `python3 -m py_compile web/app/domains/revisor/template_publish_shadow.py web/app/domains/revisor/templates_laudo_management_routes.py web/app/v2/document/hard_gate.py web/app/v2/document/hard_gate_evidence.py web/tests/test_v2_document_hard_gate_10i.py scripts/run_document_hard_gate_10i_validation.py scripts/run_document_hard_gate_10j_http_harness.py scripts/run_document_hard_gate_10j_shadow_campaign.py` -> `ok`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10i.py` -> `5 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+- Decisão formal:
+  - `hold_before_any_enforce`
+- Rationale curto:
+  - a campanha ampliada resolveu a falta de amostra pequena e de harness único
+  - o ponto confirmou semântica forte e observabilidade durável suficiente
+  - porém a evidência de blockers ainda está restrita a `template_not_bound` e `template_source_unknown`
+  - a família própria adicional de governança de template segue `nao_observado`
+  - por isso não há base para aprovar avanço além de `shadow_only` agora
+- Condições para qualquer futura discussão de `enforce`:
+  - observar e validar ao menos uma família própria adicional de blockers de governança de template, ou justificar formalmente por evidência dedicada por que o escopo inicial continuaria restrito apenas a `template_not_bound` e `template_source_unknown`
+  - provar comportamento bloqueado e comportamento permitido em piloto estritamente local/controlado, com tenant allowlist, template code allowlist, rollback imediato e trilha durável em pelo menos dois harnesses
+  - manter qualquer futuro escopo inicial sem misturar blockers case-level de emissão/finalização de laudo com a semântica de publicação de template
+- Arquivos alterados nesta fase:
+  - `artifacts/document_hard_gate_review_10j/20260328_065704/review_summary.json`
+  - `artifacts/document_hard_gate_review_10j/20260328_065704/review_findings.md`
+  - `artifacts/document_hard_gate_review_10j/20260328_065704/source_artifacts_index.txt`
+  - `artifacts/document_hard_gate_review_10j/20260328_065704/decision.txt`
+  - `docs/restructuring-roadmap/90_epic10j_gate_review.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Próximo passo recomendado:
+  - descoberta controlada da família própria de blockers de governança de template para eventual `future_controlled_enforce`
+
+## 2026-03-28 07:20 - Epic 10K: descoberta controlada da familia propria de blockers de governanca de template
+
+- Escopo auditado:
+  - `POST /revisao/api/templates-laudo/{template_id}/publicar`
+  - `POST /revisao/api/templates-laudo/editor/{template_id}/publicar`
+  - `operation_kind`:
+    - `template_publish_activate`
+- Artefatos de entrada revisados:
+  - `artifacts/document_hard_gate_validation_10i/20260327_233048/`
+  - `artifacts/document_hard_gate_review_10i/20260327_235811/`
+  - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/`
+  - `artifacts/document_hard_gate_review_10j/20260328_065704/`
+- Pré-checagem:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora do recorte
+    - esta fase permaneceu restrita a docs, journal e artefatos de descoberta
+  - tenant/flags usados:
+    - tenant:
+      - `1`
+    - host:
+      - `testclient`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_ENFORCE=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_OPERATIONS=template_publish_activate`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_TENANTS=1`
+    - `TARIEL_V2_DOCUMENT_HARD_GATE_DURABLE_EVIDENCE=1`
+- Governanca de template identificada:
+  - versionamento por tenant, codigo e versao
+  - ciclo de vida por `status_template`
+  - promocao operacional da versao ativa via publish
+  - rebaixamento automatico dos ativos anteriores para `legado`
+  - auditoria de dominio por `template_publicado`
+  - snapshot PDF obrigatorio no publish de `editor_rico`
+- Observacoes reais executadas:
+  - `archived_transition_direct_publish`
+    - `direct_route_call`
+    - template `arquivado` foi republicado com sucesso
+    - `would_block=false`
+    - `did_block=false`
+    - nenhum blocker
+    - resultado:
+      - `publish_transition_invalid` nao foi observado como blocker
+  - `multiple_active_conflict_http_editor_publish`
+    - `testclient_http_harness`
+    - havia dois ativos do mesmo codigo antes do publish
+    - `HTTP 200`
+    - `would_block=false`
+    - `did_block=false`
+    - nenhum blocker
+    - resultado:
+      - o fluxo rebaixou os dois ativos anteriores para `legado`
+      - `active_version_conflict` nao foi observado como blocker
+- Classificacao consolidada:
+  - reaproveitados que continuam validos so para `shadow`:
+    - `template_not_bound`
+    - `template_source_unknown`
+  - candidatos proprios encontrados, mas ainda imaturos:
+    - `publish_transition_invalid`
+    - `active_version_conflict`
+    - `template_snapshot_generation_invalid`
+    - `publish_audit_context_missing`
+- Decisao formal:
+  - `familia_propria_insuficiente`
+- Leitura final:
+  - existe governanca real de template
+  - nao apareceu familia propria madura de blockers de publish
+  - o que existe hoje com maior evidencia continua sendo:
+    - blockers reaproveitados validos para observacao em `shadow`
+    - comportamentos permissivos ou de auto-cura no proprio dominio
+- Validacoes rerodadas:
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10i.py` -> `5 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/revisor/template_publish_shadow.py web/app/domains/revisor/templates_laudo_management_routes.py web/app/domains/revisor/templates_laudo_support.py web/app/domains/revisor/templates_laudo_editor_routes.py web/nucleo/template_editor_word.py web/tests/test_v2_document_hard_gate_10i.py` -> `ok`
+- Arquivos gerados/alterados nesta fase:
+  - `artifacts/template_governance_blockers_discovery/20260328_072049/blockers_hypotheses.json`
+  - `artifacts/template_governance_blockers_discovery/20260328_072049/blockers_classification.md`
+  - `artifacts/template_governance_blockers_discovery/20260328_072049/domain_governance_summary.md`
+  - `artifacts/template_governance_blockers_discovery/20260328_072049/source_evidence_index.txt`
+  - `artifacts/template_governance_blockers_discovery/20260328_072049/observations.json`
+  - `docs/restructuring-roadmap/91_epic10k_template_governance_blockers.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - decisao de roadmap para manter `template_publish_activate` em `shadow_only` com blockers reaproveitados ou definir uma nova descoberta focada em falhas operacionais do `editor_rico` sem confundir isso com politica madura de governanca
+
+## 2026-03-28 07:53 - Roadmap review formal pos-10K sobre o futuro de `template_publish_activate`
+
+- Escopo revisado:
+  - docs canonicos em `/home/gabriel/Área de trabalho/Tarie 2`
+  - docs locais `67` ate `91`
+  - artefatos:
+    - `artifacts/document_hard_gate_validation_10i/20260327_233048/`
+    - `artifacts/document_hard_gate_shadow_campaign_10i/20260328_062125/`
+    - `artifacts/document_hard_gate_review_10j/20260328_065704/`
+    - `artifacts/template_governance_blockers_discovery/20260328_072049/`
+- Pré-checagem:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora do recorte
+    - esta fase permaneceu restrita a docs, journal e artefatos de review
+  - estado do roadmap onde parou:
+    - `review_reject` ja estava fora da trilha de `enforce`
+    - `report_finalize_stream` ja estava congelado como slice observado
+    - `template_publish_activate` chegou ao `10K` com semantica forte, mas familia propria insuficiente de blockers
+- Estado consolidado:
+  - pontos ja cobertos e validados:
+    - `report_finalize`
+    - `review_approve`
+  - pontos congelados em `shadow`:
+    - `review_reject`
+    - `report_finalize_stream`
+  - ponto atual com familia insuficiente:
+    - `template_publish_activate`
+- Leitura decisiva:
+  - `template_publish_activate` continua forte para observacao em `shadow`
+  - o gargalo remanescente nao e mais observabilidade nem amostra
+  - o gargalo remanescente e semantico: a familia propria de blockers ainda nao amadureceu
+  - insistir em nova descoberta de template governance agora tem relacao custo/ganho ruim
+- Decisao formal:
+  - decisao geral:
+    - `shift_active_focus_to_next_documental_point`
+  - futuro de `template_publish_activate`:
+    - `keep_template_publish_as_observed_shadow_slice`
+  - novo foco ativo:
+    - `select_new_documental_candidate`
+- O que sai do foco:
+  - descoberta adicional de blockers proprios de `template_publish_activate` neste momento
+- O que entra no foco:
+  - nova selecao formal do proximo ponto documental do roadmap
+- Validacoes rerodadas:
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_v2_document_hard_gate_10i.py` -> `5 passed`
+  - `AMBIENTE=dev PYTHONPATH=web python3 -m pytest -q web/tests/test_smoke.py` -> `26 passed`
+  - `python3 -m py_compile web/app/domains/revisor/template_publish_shadow.py web/app/domains/revisor/templates_laudo_management_routes.py web/app/domains/revisor/templates_laudo_support.py web/app/domains/revisor/templates_laudo_editor_routes.py web/nucleo/template_editor_word.py web/tests/test_v2_document_hard_gate_10i.py` -> `ok`
+- Arquivos gerados/alterados nesta fase:
+  - `artifacts/document_roadmap_review_post_10k/20260328_075332/roadmap_state_matrix.json`
+  - `artifacts/document_roadmap_review_post_10k/20260328_075332/roadmap_review_findings.md`
+  - `artifacts/document_roadmap_review_post_10k/20260328_075332/decision.txt`
+  - `artifacts/document_roadmap_review_post_10k/20260328_075332/source_evidence_index.txt`
+  - `docs/restructuring-roadmap/92_post_10k_roadmap_review.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - selecao formal do proximo ponto documental forte pos-10K
+
+## 2026-03-28 09:15 - Auditoria funcional do servico web + primeiro slice da Mesa focado em templates
+
+- Escopo executado:
+  - auditoria real do servico web em `web/`
+  - mapeamento funcional de portais, entrypoints e rotas reais
+  - escolha e implementacao de um unico slice pequeno da Mesa ligado ao lifecycle de templates
+- Pre-checagem:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora do recorte
+    - mudancas preexistentes relevantes em `web/app/domains/revisor/panel.py` e `web/templates/painel_revisor.html`
+  - servico web auditado a partir de `web/main.py` e `create_app()`
+- Estado consolidado do web:
+  - quatro portais reais em uso:
+    - `admin`
+    - `cliente`
+    - `app`
+    - `revisao`
+  - total de rotas HTTP auditadas:
+    - `177`
+  - leitura estrutural:
+    - `revisao` concentra a operacao da Mesa
+    - `revisao` tambem concentra o lifecycle completo de templates
+    - o backoffice documental de templates ja pertence, na pratica, ao mesmo dominio operacional da Mesa
+- Mapa funcional fechado:
+  - Admin Geral:
+    - autenticacao, SaaS e observabilidade administrativa
+  - Admin Cliente:
+    - gestao company-scoped, wrappers de chat e wrappers de mesa
+  - Chat Inspetor:
+    - ciclo do laudo, gate, chat, pendencias e mesa bilateral
+  - Mesa Avaliadora:
+    - inbox tecnico, pacote, whispers, pendencias, avaliacao e aprendizados
+  - Templates da Mesa:
+    - biblioteca, editor Word, auditoria, diff, status, clone, base recomendada e publish
+- Conclusao da auditoria para o foco Mesa-template:
+  - o problema nao era falta de rota
+  - o problema era distancia operacional entre o inbox `/revisao/painel` e a biblioteca `/revisao/templates-laudo`
+  - melhor primeiro slice seguro:
+    - resumo operacional da biblioteca de templates dentro do painel da Mesa
+- Slice implementado:
+  - novo helper read-only `resumir_operacao_templates_mesa(...)` em `web/app/domains/revisor/templates_laudo_support.py`
+  - `web/app/domains/revisor/panel.py` passou a injetar `templates_operacao` no SSR
+  - `web/templates/painel_revisor.html` ganhou o bloco `Biblioteca no fluxo operacional`
+  - `web/static/css/revisor/painel_revisor.css` ganhou estilos locais do bloco
+  - `web/tests/test_regras_rotas_criticas.py` ganhou teste focado no novo resumo
+- O que o slice melhorou:
+  - a Mesa agora ve, no proprio inbox:
+    - total de versoes
+    - total de ativas
+    - total em teste
+    - codigos em operacao sem versao ativa
+  - a biblioteca deixou de ser apenas um link seco no topo
+- Validacoes rerodadas:
+  - `cd web && python3 -m pytest -q tests/test_regras_rotas_criticas.py -k "painel_exibe_resumo_operacional_templates or revisor_publicar_template_desativa_ativo_anterior or revisor_publicar_template_editor_rico_desativa_ativo_anterior"` -> `3 passed`
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+  - `cd web && python3 -m pytest -q tests/test_v2_document_hard_gate_10i.py` -> `5 passed`
+  - `cd web && python3 -m py_compile app/domains/revisor/panel.py app/domains/revisor/templates_laudo_support.py` -> `ok`
+- Artefatos desta fase:
+  - `artifacts/web_service_audit/20260328_090546/route_inventory.json`
+  - `artifacts/web_service_audit/20260328_090546/portal_matrix.md`
+  - `artifacts/web_service_audit/20260328_090546/mesa_template_focus.md`
+  - `artifacts/web_service_audit/20260328_090546/source_index.txt`
+  - `docs/restructuring-roadmap/93_web_service_functional_audit.md`
+  - `docs/restructuring-roadmap/94_mesa_template_first_slice.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - segundo slice pequeno no painel da Mesa para transformar o alerta de templates em atalho filtrado para a biblioteca, focado nos codigos em operacao sem versao ativa
+
+## 2026-03-28 15:24 - FE-V1 do frontend da Mesa com novo visual corporativo aplicado nas telas reais
+
+- Escopo executado:
+  - aplicacao do design system compartilhado nas telas reais:
+    - `/mesa/templates`
+    - `/mesa/fila`
+    - `/mesa/caso/[laudoId]`
+  - preservacao dos modos `real` e `mock`
+  - preservacao dos payloads publicos do backend
+- Pre-checagem registrada:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora do recorte
+    - slice isolado no frontend novo, sem mexer em Android nem trocar backend Python
+    - `ok`
+  - real e mock revisitados antes e depois da implementacao:
+    - `source=real` validado nos BFFs da Mesa
+    - `source=mock` validado nos BFFs da Mesa
+- Referencia visual usada:
+  - Stitch localizado em:
+    - `/home/gabriel/Downloads/stitch_editor_de_template/mesa_tactical_oversight/DESIGN.md`
+    - `/home/gabriel/Downloads/stitch_editor_de_template/biblioteca_de_templates/code.html`
+    - `/home/gabriel/Downloads/stitch_editor_de_template/fila_da_mesa/code.html`
+    - `/home/gabriel/Downloads/stitch_editor_de_template/caso_em_revis_o/code.html`
+  - adaptacao aplicada:
+    - mesma logica estrutural de shell, densidade e hierarquia
+    - paleta final mais clara, sobria e corporativa para respeitar o objetivo desta fase
+- Implementacao principal:
+  - novo design system local em:
+  - badges alinhados ao novo sistema em:
+  - telas refinadas:
+- O que mudou no shell:
+  - sidebar fixa, clara e mais técnica
+  - topbar com fonte dos dados, modo e timestamp
+  - superfícies neutras e bordas discretas
+  - linguagem unificada de filtros, métricas, painéis, badges e estados vazios
+- O que mudou nas telas:
+  - templates:
+    - biblioteca virou tabela técnica por código
+    - drill-down por versão ficou mais claro
+    - auditoria passou para um painel read-only mais estável
+  - fila:
+    - lista principal virou tabela operacional
+    - caso em foco passou a viver em coluna lateral consistente
+    - pacote técnico e sinais recentes ficaram mais legíveis
+  - caso:
+    - timeline virou a área principal
+    - resumo, template e documento foram reorganizados em trilhos laterais claros
+    - checks documentais e sinais operacionais ganharam semântica visual única
+- Validacoes rerodadas:
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+  - `GET http://127.0.0.1:3001/api/mesa/templates` -> `source=real`
+  - `GET http://127.0.0.1:3001/api/mesa/fila` -> `source=real`
+  - `GET http://127.0.0.1:3001/api/mesa/caso/6` -> `source=real`
+  - `HEAD http://127.0.0.1:3001/mesa/templates?code=padrao` -> `200`
+  - `HEAD http://127.0.0.1:3001/mesa/fila?code=padrao&queueFilter=missing_template&laudoId=6` -> `200`
+  - `HEAD http://127.0.0.1:3001/mesa/caso/6?code=padrao&queueFilter=missing_template` -> `200`
+  - `GET http://127.0.0.1:3002/api/mesa/templates` -> `source=mock`
+  - `GET http://127.0.0.1:3002/api/mesa/fila` -> `source=mock`
+  - `GET http://127.0.0.1:3002/api/mesa/caso/9101` -> `source=mock`
+  - `HEAD http://127.0.0.1:3002/mesa/templates?code=spda_aterramento&filter=missing_active_operational` -> `200`
+  - `HEAD http://127.0.0.1:3002/mesa/fila?code=spda_aterramento&queueFilter=code_without_active&laudoId=9101` -> `200`
+  - `HEAD http://127.0.0.1:3002/mesa/caso/9101?code=spda_aterramento&queueFilter=code_without_active` -> `200`
+- Artefatos desta fase:
+  - `docs/restructuring-roadmap/103_mesa_visual_system_v1.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - FE-V2 - refinamento de densidade, estados de carregamento/erro e polimento visual fino da Mesa sobre o shell ja consolidado
+
+## 2026-03-28 - FE-V2 - polimento visual fino, densidade e estados operacionais da Mesa
+
+- Escopo executado:
+  - consolidacao do FE-V1 sem abrir feature grande nova
+  - refino em:
+    - `/mesa/templates`
+    - `/mesa/fila`
+    - `/mesa/caso/[laudoId]`
+  - cobertura de loading, empty, error e recovery
+- Pre-checagem registrada:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora deste slice
+    - FE-V2 isolado no frontend novo da Mesa, sem mexer em Android nem trocar backend Python
+    - `ok`
+  - revisão de base:
+    - FE-V1 revisado em `docs/restructuring-roadmap/103_mesa_visual_system_v1.md`
+    - artifacts e screenshots do FE-V1 revisitados antes do polimento
+- Implementacao principal:
+  - design system refinado em:
+  - estados segmentados adicionados em:
+  - telas polidas:
+- O que mudou no shell e no sistema visual:
+  - sidebar mais estreita e densa para notebook
+  - paddings, tabelas, badges e painéis mais compactos
+  - `status strips` reutilizaveis para sincronizacao, foco e materializacao
+  - `alert` com acao de retry
+  - `empty state` com CTA e tom semantico
+  - skeletons reutilizaveis para loading inicial da area `/mesa`
+- O que mudou nas telas:
+  - templates:
+    - recorte atual ficou explicito acima da tabela
+    - vazio por filtro ganhou recovery claro
+    - foco do codigo e drill-down de versao ficaram mais coesos
+  - fila:
+    - leitura mais densa e mais madura para central tecnica
+    - caso em foco ficou mais legivel
+    - pacote tecnico distingue melhor leitura completa vs parcial
+  - caso:
+    - timeline ganhou strip de materializacao e leitura atual
+    - resumo do caso explicita quando o pacote veio parcial
+    - readiness documental e vinculo com template ficaram menos ruidosos
+- Validacoes rerodadas:
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+  - `GET http://127.0.0.1:3001/api/mesa/templates` -> `real|real|3`
+  - `GET http://127.0.0.1:3001/api/mesa/fila?laudoId=6` -> `real|real|74`
+  - `GET http://127.0.0.1:3001/api/mesa/caso/6` -> `real|real|6`
+  - `HEAD http://127.0.0.1:3001/mesa/templates?code=padrao` -> `200`
+  - `HEAD http://127.0.0.1:3001/mesa/fila?code=padrao&queueFilter=missing_template&laudoId=6` -> `200`
+  - `HEAD http://127.0.0.1:3001/mesa/caso/6?code=padrao&queueFilter=missing_template` -> `200`
+  - `GET http://127.0.0.1:3002/api/mesa/templates` -> `mock|mock|4`
+  - `GET http://127.0.0.1:3002/api/mesa/fila?laudoId=9101` -> `mock|mock|4`
+  - `GET http://127.0.0.1:3002/api/mesa/caso/9101` -> `mock|mock|4`
+  - `HEAD http://127.0.0.1:3002/mesa/templates?code=spda_aterramento&filter=missing_active_operational` -> `200`
+  - `HEAD http://127.0.0.1:3002/mesa/fila?code=spda_aterramento&queueFilter=code_without_active&laudoId=9101` -> `200`
+  - `HEAD http://127.0.0.1:3002/mesa/caso/9101?code=spda_aterramento&queueFilter=code_without_active` -> `200`
+- Captura visual:
+  - modo real e modo mock conseguiram gerar screenshot local nesta fase
+  - `next start` foi usado para capturas mais estaveis, evitando ruido de hot reload
+- Artefatos desta fase:
+  - `docs/restructuring-roadmap/104_mesa_visual_system_v2_polish.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - FE-V3 - ergonomia operacional fina, ordenacao tabular e microinteracoes da Mesa
+
+## 2026-03-28 - FE-V3 - ergonomia operacional fina, ordenacao tabular e microinteracoes da Mesa
+
+- Escopo executado:
+  - consolidacao operacional do FE-V2 sem abrir feature grande nova
+  - refinamento em:
+    - `/mesa/templates`
+    - `/mesa/fila`
+    - `/mesa/caso/[laudoId]`
+  - preservacao dos modos `real` e `mock`
+  - preservacao do backend Python como fonte de verdade
+- Pre-checagem registrada:
+  - `pwd`:
+    - `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short`:
+    - worktree ampla e suja fora deste slice
+    - FE-V3 isolado no frontend novo da Mesa, sem mexer em Android nem trocar backend Python
+    - `ok`
+  - revisao de base:
+    - FE-V1 revisado em `docs/restructuring-roadmap/103_mesa_visual_system_v1.md`
+    - FE-V2 revisado em `docs/restructuring-roadmap/104_mesa_visual_system_v2_polish.md`
+    - artifacts e screenshots do FE-V2 revisitados antes da implementacao
+- Implementacao principal:
+  - primitives e ergonomia visual:
+  - modelos de ordenacao e vizinhanca:
+  - telas refinadas:
+  - testes cobertos:
+- O que mudou operacionalmente:
+  - templates:
+    - ordenacao por coluna com `templateSort` e `templateDir`
+    - foco por codigo com anterior/proximo, limpar foco e copy rapido
+    - `templateId` copiavel no drill-down
+  - fila:
+    - ordenacao por coluna com `queueSort` e `queueDir`
+    - foco do caso com anterior/proximo, limpar foco e copy rapido
+    - recorte atual mais explicito por strip e chips de contexto
+  - caso:
+    - navegacao auxiliar pelo recorte atual da fila
+    - explicita quando o caso esta fora do recorte
+    - copy rapido de laudo, hash e codigo do template
+- Validacoes rerodadas:
+  - `curl -sS -o /tmp/mesa_ready.out -w '%{http_code}' http://127.0.0.1:8000/ready` -> `200`
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+  - `GET http://127.0.0.1:3001/api/mesa/templates` -> `real|real|3`
+  - `GET http://127.0.0.1:3001/api/mesa/fila?laudoId=6` -> `real|real|74`
+  - `GET http://127.0.0.1:3001/api/mesa/caso/6` -> `real|real|6`
+  - `HEAD http://127.0.0.1:3001/mesa/templates?code=padrao&templateSort=in_field&templateDir=desc` -> `200`
+  - `HEAD http://127.0.0.1:3001/mesa/fila?code=padrao&queueFilter=missing_template&laudoId=6&queueSort=pending&queueDir=desc` -> `200`
+  - `HEAD http://127.0.0.1:3001/mesa/caso/6?code=padrao&queueFilter=missing_template&queueSort=pending&queueDir=desc` -> `200`
+  - `GET http://127.0.0.1:3002/api/mesa/templates` -> `mock|mock|4`
+  - `GET http://127.0.0.1:3002/api/mesa/fila?laudoId=9101` -> `mock|mock|4`
+  - `GET http://127.0.0.1:3002/api/mesa/caso/9101` -> `mock|mock|4`
+  - `HEAD http://127.0.0.1:3002/mesa/templates?code=spda_aterramento&filter=missing_active_operational&templateSort=last_used&templateDir=desc` -> `200`
+  - `HEAD http://127.0.0.1:3002/mesa/fila?code=spda_aterramento&queueFilter=code_without_active&laudoId=9101&queueSort=priority&queueDir=desc` -> `200`
+  - `HEAD http://127.0.0.1:3002/mesa/caso/9101?code=spda_aterramento&queueFilter=code_without_active&queueSort=priority&queueDir=desc` -> `200`
+- Captura visual:
+  - modo real e modo mock conseguiram gerar screenshot local nesta fase
+  - `next start` foi usado para capturas estaveis com query params do FE-V3 preservados
+- Artefatos desta fase:
+  - `docs/restructuring-roadmap/105_mesa_visual_v3_operational_ergonomics.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - FE-V4 - produtividade contextual da Mesa com atalhos de decisao, agrupamentos operacionais e pinagem de recortes
+
+## 2026-03-28 - FE-V4 - produtividade contextual da Mesa com atalhos, agrupamentos e pinagem de recortes
+
+- Objetivo:
+  - evoluir o FE-V3 sem abrir area nova do produto, aumentando produtividade real da Mesa nas telas ja existentes
+  - reduzir o atrito entre templates, fila e caso com contexto persistido, agrupamentos e atalhos pequenos
+- Pre-check e baseline:
+  - `pwd` executado em `/home/gabriel/Área de trabalho/TARIEL/Tariel Control Consolidado`
+  - `git status --short` confirmou worktree ampla e suja fora do slice; o recorte do FE-V4 ficou isolado no frontend novo, docs e artifacts
+  - `cd web && python3 -m pytest -q tests/test_smoke.py` -> `26 passed`
+  - `GET http://127.0.0.1:8000/ready` -> `200`
+- Atritos mais claros observados no FE-V3:
+  - templates, fila e caso ja tinham deep links, mas ainda exigiam reconstituir o contexto mentalmente a cada volta
+  - nao havia retomada local do trabalho nem memoria curta de casos/recortes
+  - a fila seguia mais tabular do que agrupada por blocos de decisao util
+  - templates ainda mostravam estados utilitarios, mas sem um trilho mais explicito para o que exige acao primeiro
+- Implementacao principal:
+  - shell local novo com `Retomar`, `Pinados` e `Casos recentes` via `localStorage`
+  - `Copiar link`, `Pinar recorte` e `Pinar caso` nas telas do shell da Mesa
+  - agrupamentos operacionais em `/mesa/templates`:
+    - `Precisa acao`
+    - `Sem ativa em operacao`
+    - `Em validacao`
+    - `Cobertura estavel`
+  - agrupamentos operacionais em `/mesa/fila`:
+    - `Responder agora`
+    - `Prontos para decisao`
+    - `Lacunas documentais`
+    - `Cobrar campo`
+    - `Validar aprendizado`
+  - atalhos no detalhe do caso para:
+    - proximo caso
+    - fila mantendo recorte
+    - template relacionado
+    - casos do mesmo codigo
+  - testes novos para:
+    - workspace local
+    - agrupamentos de templates
+    - agrupamentos de fila
+- Arquivos centrais tocados:
+- Runtime validado:
+  - real:
+    - `GET http://127.0.0.1:3001/api/mesa/templates` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/fila?laudoId=6` -> `source=real`
+    - `GET http://127.0.0.1:3001/api/mesa/caso/6` -> `source=real`
+    - `HEAD http://127.0.0.1:3001/mesa/templates?code=padrao&templateSort=in_field&templateDir=desc` -> `200`
+    - `HEAD http://127.0.0.1:3001/mesa/fila?code=padrao&queueFilter=missing_template&laudoId=6&queueSort=pending&queueDir=desc` -> `200`
+    - `HEAD http://127.0.0.1:3001/mesa/caso/6?code=padrao&queueFilter=missing_template&queueSort=pending&queueDir=desc` -> `200`
+  - mock:
+    - `GET http://127.0.0.1:3002/api/mesa/templates` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/fila?laudoId=9101` -> `source=mock`
+    - `GET http://127.0.0.1:3002/api/mesa/caso/9101` -> `source=mock`
+    - `HEAD http://127.0.0.1:3002/mesa/templates?code=spda_aterramento&filter=missing_active_operational&templateSort=last_used&templateDir=desc` -> `200`
+    - `HEAD http://127.0.0.1:3002/mesa/fila?code=spda_aterramento&queueFilter=code_without_active&laudoId=9101&queueSort=priority&queueDir=desc` -> `200`
+    - `HEAD http://127.0.0.1:3002/mesa/caso/9101?code=spda_aterramento&queueFilter=code_without_active&queueSort=priority&queueDir=desc` -> `200`
+- Observacao operacional:
+  - as capturas do FE-V4 foram feitas em navegacao sequencial com o mesmo perfil headless para materializar `Retomar` e `Casos recentes`
+  - a camada de pinagem/localStorage foi validada por teste unitario do workspace local
+- Artefatos gerados:
+  - `docs/restructuring-roadmap/106_mesa_visual_v4_productivity.md`
+  - `docs/restructuring-roadmap/99_execution_journal.md`
+- Proximo passo recomendado:
+  - FE-V5 - acoes contextuais seguras da Mesa no mesmo shell
+## 2026-03-29 07:00:12 -0300
+
+- fase: DevKit de alto nível para Codex CLI no Linux
+- impacto: mantém o stack Next atual, preserva `npm`, não muda regra de negócio e destrava a operação coordenada backend + Mesa real + Mesa mock no Linux
+- validacao executada:
+  - `./scripts/dev/status.sh --json` -> ok
+  - `./scripts/dev/open_codex_workspace_tmux.sh --plan` -> ok
+  - `./scripts/dev/run_android_stack.sh --mode metro --dry-run` -> ok
+  - `./scripts/dev/check_backend.sh` -> ok
+  - `./scripts/dev/check_frontend.sh` -> ok
+  - `./scripts/dev/check_android.sh` -> fail em teste existente `src/config/mobileV2OrganicSessionSignal.test.ts`
+  - `./scripts/dev/check_all.sh` -> resumo consolidado com `backend=ok`, `frontend=ok`, `android=fail`
+  - `./scripts/dev/status.sh --strict` com stack online -> ok
+- limites observados na maquina:
+  - `tmux` nao esta instalado localmente, entao o layout foi validado via `--plan`
+  - `adb` esta disponivel, mas nao havia dispositivo conectado durante a fase
+
+## 2026-03-29 07:17:12 -0300
+
+- fase: DevKit-V2 - baseline Android estável e automação do kit operacional
+- auditoria Android concluida:
+  - comandos existentes auditados em `android/package.json`, `android/README.md`, `android/scripts/` e `android/maestro/`
+  - falha do DevKit anterior localizada em `android/src/config/mobileV2OrganicSessionSignal.test.ts`
+  - classificacao da falha: divergencia segura de contrato interno, nao flaky
+- correcao aplicada:
+  - `android/src/config/mobileV2Rollout.ts` agora so inclui `operatorRunId` quando houver valor valido
+  - efeito: `npm --prefix android run test:baseline -- mobileV2OrganicSessionSignal.test.ts` voltou a ficar verde
+- baseline Android oficial definida:
+  - obrigatoria e device-less:
+    - `typecheck`
+    - `lint`
+    - `test:baseline`
+  - opcional:
+    - `format:check`
+    - `maestro:smoke`
+    - lanes com device/emulador
+- alinhamentos operacionais:
+  - `android/package.json` ganhou `test:baseline`, `quality:baseline` e `quality:strict`
+  - `scripts/dev/check_android.sh` agora registra a ultima baseline Android em `.tmp_online/devkit/android_baseline_status.json`
+  - `scripts/dev/status.sh` passou a expor `android_baseline`
+  - `scripts/dev/check_ci_baseline.sh` foi criado como wrapper oficial do baseline do kit
+  - `scripts/dev/check_all.sh` passou a aceitar `--with-android-maestro-smoke`
+- decisao explicita de honestidade operacional:
+  - `format:check` permanece util, mas ficou fora da baseline oficial porque hoje ainda existe divida de estilo em diversos arquivos Android do worktree
+  - nao houve “verde fake”: a lane estrita continua disponivel e segue falhando ate uma limpeza dedicada de formatacao
+- automacao CI:
+  - `ci.yml` do Android foi alinhado para `npm run quality:baseline`
+  - workflow novo `devkit-operational-baseline.yml` roda `./scripts/dev/check_ci_baseline.sh` e publica `.tmp_online/devkit`
+- validacao executada:
+  - `bash -n scripts/dev/*.sh` -> ok
+  - `npm --prefix android run test:baseline -- mobileV2OrganicSessionSignal.test.ts` -> ok
+  - `./scripts/dev/check_backend.sh` -> ok
+  - `./scripts/dev/check_frontend.sh` -> ok
+  - `./scripts/dev/check_android.sh` -> ok
+  - `./scripts/dev/check_all.sh` -> ok
+  - `./scripts/dev/check_ci_baseline.sh` -> ok
+  - `./scripts/dev/status.sh` -> Android com `android_baseline ok`
+
+## 2026-03-29 08:55:26 -0300
+
+- fase: FE-V5 - acoes contextuais seguras da Mesa no mesmo shell
+- objetivo:
+  - evoluir o FE-V4 sem abrir area nova, trazendo microacoes mutaveis pequenas para o shell atual da Mesa
+  - manter a honestidade operacional entre `real`, `mock` e `mock_fallback`
+- recorte escolhido:
+  - `mark whispers read`
+  - `resolve pending`
+  - sem entrar ainda em aprovar/rejeitar ou compositor de resposta
+- implementacao principal:
+  - `actionLane` novo nos payloads de fila e caso para declarar disponibilidade mutavel de forma explicita
+  - BFF mutavel no `frontend paralelo da Mesa`:
+    - `POST /api/mesa/caso/[laudoId]/whispers/read`
+    - `PATCH /api/mesa/caso/[laudoId]/pendencias/[mensagemId]`
+  - o BFF passou a:
+    - reutilizar `MESA_BACKEND_COOKIE`
+    - extrair `csrf_token` do HTML de `/revisao/painel`
+    - falhar com bloqueio honesto em `mock`, `mock_fallback` ou sessao ausente
+  - painel compartilhado `Acoes contextuais seguras` integrado em:
+- arquivos centrais tocados:
+- validacao executada:
+  - `HEAD http://127.0.0.1:3001/mesa/templates` -> `200`
+  - `GET http://127.0.0.1:3001/api/mesa/fila?laudoId=6` -> `actionLane.enabled=true`
+  - `POST http://127.0.0.1:3001/api/mesa/caso/6/whispers/read` -> `success=true`, `markedCount=1`
+  - `PATCH http://127.0.0.1:3001/api/mesa/caso/6/pendencias/22` -> `success=true`, `resolved=true`, `pendingOpenCount=0`
+  - `GET http://127.0.0.1:3001/api/mesa/fila?laudoId=6` apos refetch -> `whispersUnread=0`, `openIssues=0`, `pendingOpen=0`
+- observacao operacional:
+  - a mutacao de resolver pendencia respondeu `success=true` antes de a projeção read-only consolidada da fila refletir `openIssues=0`
+  - alguns segundos depois do refetch, a leitura da fila convergiu para o novo estado
+- artefatos gerados:
+  - `docs/restructuring-roadmap/107_mesa_visual_v5_contextual_actions.md`
+- proximo passo recomendado:
+  - FE-V6 - decisao final e resposta contextual da Mesa no mesmo shell
+
+## 2026-03-29 09:20:30 -0300
+
+- fase: FE-V6 - workspace de decisao da Mesa no mesmo shell
+- objetivo:
+  - transformar o detalhe do caso em uma superficie real de decisao da Mesa sem abrir fluxo novo
+  - consolidar resposta contextual, decisao final controlada, validacao inline de aprendizado e trilha local de auditoria
+- direcao adotada:
+  - manter a mesma lane mutavel oficial do FE-V5
+  - ampliar a capability layer para:
+    - `replyMessage`
+    - `evaluateCase`
+    - `validateLearning`
+  - usar apenas endpoints reais ja existentes no backend do revisor:
+    - `POST /revisao/api/laudo/{laudo_id}/responder`
+    - `POST /revisao/api/laudo/{laudo_id}/avaliar`
+    - `POST /revisao/api/aprendizados/{aprendizado_id}/validar`
+- implementacao principal:
+  - BFF mutavel novo no `frontend paralelo da Mesa`:
+    - `POST /api/mesa/caso/[laudoId]/reply`
+    - `POST /api/mesa/caso/[laudoId]/decision`
+    - `POST /api/mesa/aprendizados/[aprendizadoId]/validate`
+  - painel novo `MesaDecisionWorkspacePanel` com:
+    - status de readiness
+    - guardrails
+    - composer de resposta
+    - decisao final controlada
+    - trilha local das acoes da sessao
+  - painel novo `MesaLearningReviewPanel` para validar aprendizado visual inline no mesmo shell
+  - `MesaContextualActionsPanel` integrado a trilha local para whispers e pendencias
+  - `MesaListItem` passou a renderizar `copy` em container flexivel, permitindo composicao rica sem HTML invalido
+- arquivos centrais tocados:
+- validacao executada:
+  - `./scripts/dev/check_backend.sh` -> ok
+  - `./scripts/dev/check_frontend.sh` -> ok
+  - `HEAD http://127.0.0.1:3001/mesa/caso/6` -> `200`
+  - `POST http://127.0.0.1:3001/api/mesa/caso/6/reply` -> `success=true`, `referenceMessageId=22`
+  - `GET http://127.0.0.1:3001/api/mesa/caso/6` apos refetch -> timeline com item novo da `Mesa` e texto da validacao FE-V6
+  - `POST http://127.0.0.1:3001/api/mesa/aprendizados/1/validate` -> `success=true`, `status=validado_mesa`, `laudoId=89`
+  - `GET http://127.0.0.1:3001/api/mesa/caso/89` apos refetch -> `pending_learning=0`
+  - `POST http://127.0.0.1:3001/api/mesa/caso/1/decision` -> `success=true`, `action=rejeitar`, `reviewStatus=Rejeitado`
+  - `GET http://127.0.0.1:3001/api/mesa/caso/1` apos refetch -> `packageSummary.statusReview=Rejeitado`, `completeSummary.statusReview=Rejeitado`
+- observacoes operacionais:
+  - o endpoint real de resposta da Mesa continua retornando apenas `success=true`; o frontend provou a escrita pelo refetch da timeline
+  - depois da decisao final, o caso pode sair da fila operacional ativa; o shell continua carregando o caso, mas expõe warning honesto de desencaixe da fila
+- artefatos gerados:
+  - `docs/restructuring-roadmap/108_mesa_visual_v6_decision_workspace.md`
+- proximo passo recomendado:
+  - FE-V7 - estabilizacao final do shell profissional da Mesa com e2e dedicado, polimento visual fino e decisao sobre anexos da resposta
+
+## 2026-03-29 09:44:03 -0300
+
+- fase: FE-V7 - estabilizacao final do shell profissional da Mesa
+- objetivo:
+  - endurecer o shell mutavel do caso depois do FE-V6
+  - fechar e2e dedicado para reply, aprendizado e decisao
+  - registrar de forma explicita a decisao operacional sobre anexos no composer
+- direcao adotada:
+  - manter a arquitetura do FE-V6 e atacar apenas estabilizacao
+  - provar mutacoes por Playwright stateful em `mock`, sem tocar backend real
+  - manter anexos fora do composer nesta fase, com comunicacao honesta na UI
+- implementacao principal:
+  - `MesaPanel` e `MesaListItem` expostos com `testId` e `className` para suportar automacao e variacoes visuais
+  - `MesaDecisionWorkspacePanel` e `MesaLearningReviewPanel` receberam:
+    - test ids estaveis
+    - variantes visuais de workspace
+    - nota explicita sobre anexos fora do composer
+  - `MesaCaseDetailScreen` ganhou rail lateral sticky para o workspace no desktop
+    - resposta contextual
+    - validacao inline de aprendizado
+    - decisao final controlada
+- arquivos centrais tocados:
+- validacao executada:
+  - `./scripts/dev/check_frontend.sh --with-e2e-mock` -> ok
+- observacoes operacionais:
+  - o e2e mutavel do workspace ficou deliberadamente restrito ao `mock`
+  - a baseline visual do mock permaneceu valida; nao foi necessario atualizar snapshots
+  - anexos continuam fora do composer da Mesa nesta fase por decisao explicita de risco e escopo
+- artefatos gerados:
+  - `docs/restructuring-roadmap/109_mesa_visual_v7_shell_stabilization.md`
+- proximo passo recomendado:
+  - FE-V8 - anexos operacionais do composer da Mesa + hardening final do caso
+
+## 2026-03-29 10:02:12 -0300
+
+- fase: FE-V8 - anexos operacionais no composer da Mesa
+- objetivo:
+  - integrar upload real de anexo no composer do caso
+  - manter o backend legado do revisor como fonte de verdade
+  - endurecer a UX final do caso sem reescrever a stack
+- auditoria executada:
+  - o legado do revisor expõe:
+    - `POST /revisao/api/laudo/{laudo_id}/responder`
+    - `POST /revisao/api/laudo/{laudo_id}/responder-anexo`
+  - o fluxo com anexo usa `multipart/form-data` com:
+    - `arquivo`
+    - `texto`
+    - `referencia_mensagem_id`
+  - as regras oficiais do backend da Mesa foram confirmadas em `web/app/domains/mesa/attachments.py`
+    - 1 anexo por envio
+    - `PNG`, `JPG`, `WebP`, `PDF`, `DOCX`
+    - maximo `12 MB`
+- direcao adotada:
+  - manter a mesma rota interna `POST /api/mesa/caso/[laudoId]/reply`
+  - estender o BFF para aceitar `application/json` e `multipart/form-data`
+  - quando houver anexo, repassar para `/revisao/api/laudo/{laudo_id}/responder-anexo`
+- implementacao principal:
+    - regras do anexo
+    - validacao
+    - descricao resumida do arquivo
+  - `MesaDecisionWorkspacePanel` passou a suportar:
+    - selecionar 1 anexo
+    - trocar/remover anexo
+    - enviar texto ou anexo
+    - preview de nome, tipo e tamanho
+  - a timeline do caso ficou mais clara para mensagens sem texto e com anexo
+- arquivos centrais tocados:
+- validacao executada:
+  - `./scripts/dev/check_frontend.sh --with-e2e-mock` -> ok
+- observacoes operacionais:
+  - o composer da Mesa agora suporta anexo, mas continua limitado a 1 arquivo por envio, conforme o backend atual
+  - a automacao mutavel permaneceu em `mock`; nao foi aberta suite Playwright mutavel em `real` nesta fase
+  - o baseline visual permaneceu valido sem regravar snapshots
+- artefatos gerados:
+  - `docs/restructuring-roadmap/110_mesa_visual_v8_reply_attachments.md`
+- proximo passo recomendado:
+  - FE-V9 - validacao assistida em real do shell mutavel + acabamento final do caso
+
+## 2026-03-29 10:06:23 -0300
+
+- fase: handoff consolidado da Mesa frontend
+- objetivo:
+  - deixar um ponto de retomada unico e explicito no repositorio antes de encerrar a sessao
+- entregue:
+  - checkpoint consolidado em `docs/restructuring-roadmap/111_mesa_frontend_handoff_checkpoint.md`
+- conteudo do handoff:
+  - estado atual da Mesa ate o `FE-V8`
+  - lista das fases/documentos principais
+  - contratos importantes ja decididos
+  - comandos seguros para retomada
+  - proximo passo recomendado `FE-V9`
+- proximo passo recomendado:
+  - FE-V9 - validacao assistida em real do shell mutavel + acabamento final do caso
+
+## 2026-03-29 11:40:00 -0300
+
+- fase: FE-V9 - validacao assistida em real do shell mutavel + acabamento final do caso
+- objetivo:
+  - fechar o gap entre shell mutavel pronto e aceite seguro em ambiente real
+  - evitar automacao mutavel cega sobre dados reais do revisor
+  - dar acabamento final ao shell do caso com orientacao operacional explicita
+- direcao adotada:
+  - manter Playwright mutavel oficial apenas em `mock stateful`
+  - adicionar um painel de validacao assistida diretamente em `/mesa/caso/[laudoId]`
+  - criar um runner read-only para gerar checklist e artifact de aceite em `real`
+- implementacao principal:
+    - readiness da validacao em `mock`, `fallback`, `sessao ausente` e `real`
+    - trilho separado para baseline, reply, aprendizado e decisao final
+    - badges de source/data mode/lane
+    - links certos para fila, template, pacote, completo e painel legado
+    - notas operacionais sobre o contrato do composer e a politica de validacao em `real`
+    - integrou o novo painel ao rail lateral do caso
+  - novos runners:
+    - o shell script sobe backend + frontend real
+    - o script Python gera:
+      - `frontend_validation_summary.json`
+      - `manual_checklist.md`
+      - `source_index.txt`
+- docs e retomada atualizados:
+    - `docs/restructuring-roadmap/111_mesa_frontend_handoff_checkpoint.md`
+    - `docs/restructuring-roadmap/112_mesa_real_validation_assist.md`
+- validacao executada:
+- resultado real observado:
+  - `source=real`
+  - `dataMode=real`
+  - `laneMode=enabled`
+  - `caseCount=73`
+  - candidato inicial para `reply`: laudo `7`
+  - candidato inicial para `decisao`: laudo `18`
+- artefatos gerados:
+- decisao operacional fechada:
+  - `real` continua como validacao manual assistida
+  - nao foi aberta suite Playwright mutavel em `real`
+- proximo passo recomendado:
+  - FE-V10 - criterio de rollout e aceite final da frontend paralelo da Mesa no fluxo do revisor
+
+## 2026-03-29 18:20:00 -0300
+
+- fase: F0-A - fundacao de observabilidade do frontend
+- objetivo:
+  - abrir a primeira fase do roadmap amplo de modernizacao do frontend
+  - reduzir a duplicacao de tratamento de erro no `frontend paralelo da Mesa`
+  - tornar as rotas `app/api/mesa/*` observaveis antes do rollout maior
+- roadmap aberto:
+  - `docs/restructuring-roadmap/113_frontend_modernization_roadmap.md`
+- implementacao principal:
+    - `trace id` por request do BFF
+    - cabecalhos `X-Mesa-Trace-Id`, `X-Mesa-Route`, `X-Mesa-Duration-Ms` e `Server-Timing`
+    - logs estruturados para erro e rota lenta
+    - `X-Mesa-Client-Trace-Id` em toda chamada do cliente
+    - erro tipado `MesaApiError`
+    - captura de rota, duracao e `trace id` da resposta
+    - passou a usar o helper central
+    - removeu repeticao de parse/erro em cada operacao
+    - passaram a usar o helper unico de telemetria/resposta
+    - cobre `trace id` do cliente
+    - cobre propagacao de erro/telemetria do BFF
+- docs atualizadas:
+  - `docs/restructuring-roadmap/113_frontend_modernization_roadmap.md`
+- impacto:
+  - o `frontend paralelo da Mesa` ganha uma fundacao melhor para profiling e rollout
+  - a operacao continua igual do ponto de vista funcional
+  - a diagnostica de lentidao/erro fica mais clara no shell novo
+- proximo passo recomendado:
+  - F0-B - cliente tipado do backend e convencao de query keys
+
+## 2026-03-29 18:35:00 -0300
+
+- fase: checkpoint consolidado da modernizacao do frontend
+- objetivo:
+  - deixar um ponto unico e explicito de retomada antes de encerrar a sessao
+  - evitar confusao entre o handoff antigo da Mesa e a linha nova de modernizacao ampla do frontend
+- entregue:
+  - checkpoint consolidado em `docs/restructuring-roadmap/114_frontend_modernization_checkpoint.md`
+  - ponte explicita no roadmap `docs/restructuring-roadmap/113_frontend_modernization_roadmap.md`
+- conteudo do checkpoint:
+  - estado atual da linha de modernizacao
+  - ultimo slice fechado `F0-A`
+  - arquivos principais tocados
+  - validacao executada
+  - proximo passo recomendado `F0-B`
+- proximo passo recomendado:
+  - F0-B - cliente tipado do backend e convencao de query keys
+
+## 2026-04-04 12:05:00 -0300 - Auditoria final completa de prontidão do projeto Tariel
+
+Objetivo:
+
+- executar uma auditoria real, extensa e ponta a ponta do projeto atual para medir estado real, blockers de finalização e plano final de fechamento
+
+Escopo executado:
+
+- leitura do briefing canônico e ajuste do entrypoint raiz `12_FOR_CHATGPT.md`
+- inventário real de rotas e superfícies
+- leitura de backend, web, mobile, CI, scripts e artifacts recentes
+- execução real dos gates principais do repositório
+
+Gates executados:
+
+- `make verify` -> verde após correção mínima de formatação local
+- `make mesa-smoke` -> verde
+- `make mesa-acceptance` -> verde
+- `make document-acceptance` -> verde
+- `make observability-acceptance` -> verde
+- `make contract-check` -> verde com warning de depreciação
+- `make hygiene-check` -> verde
+- `make smoke-mobile` -> falha inconclusiva por freeze de `System UI` no emulador headless
+
+Achados centrais:
+
+- o produto já é funcional de verdade no backend/web/Mesa/documento/observabilidade
+- a Mesa oficial SSR está consolidada e validada
+- o principal ponto ainda instável é a lane mobile real
+- o mobile continua em transição arquitetural V2 com rollout/fallback explícito
+- a operação de produção ainda carece de fechamento formal para uploads/anexos/sessão multi-instância
+- o web ainda precisa de convergência visual e redução de hotspots grandes
+- a CI ainda não representa sozinha o pronto real do produto
+
+Artifacts gerados:
+
+- `artifacts/final_project_audit/20260404_113129/project_state_matrix.json`
+- `artifacts/final_project_audit/20260404_113129/route_inventory.json`
+- `artifacts/final_project_audit/20260404_113129/flow_audit.md`
+- `artifacts/final_project_audit/20260404_113129/buttons_actions_inventory.md`
+- `artifacts/final_project_audit/20260404_113129/visual_product_review.md`
+- `artifacts/final_project_audit/20260404_113129/debt_hotspots.md`
+- `artifacts/final_project_audit/20260404_113129/final_closure_plan.md`
+- `artifacts/final_project_audit/20260404_113129/source_index.txt`
+
+Docs atualizados:
+
+- `docs/final-project-audit/00_final_project_state.md`
+- `docs/final-project-audit/01_routes_and_surfaces.md`
+- `docs/final-project-audit/02_flows_and_gaps.md`
+- `docs/final-project-audit/03_frontend_and_visual_review.md`
+- `docs/final-project-audit/04_final_closure_plan.md`
+
+Leitura final desta rodada:
+
+- o projeto não precisa de reescrita total
+- o fechamento real depende de estabilizar mobile, canonizar release gate, fechar operação de produção e concluir convergência visual/técnica do web
+
+## 2026-04-04 14:28:00 -0300 - Execucao 3 - estabilizacao do host Android do gate real e fechamento da lane mobile
+
+Objetivo:
+
+- estabilizar o host Android real por tras de `make smoke-mobile`
+- transformar a lane mobile do gate real em algo repetivel
+- validar o gate canonicamente real do produto
+
+Diagnostico confirmado:
+
+- o bloqueador dominante era ambiental do host Android
+- o emulador podia ser reutilizado a partir de snapshot velho (`default_boot`)
+- a leitura antiga de boot aceitava cedo demais
+- a degradacao do Package Manager aparecia no `adb install` antes do Maestro
+- sondas ADB do devkit podiam travar em emulador doente
+
+Mudancas aplicadas:
+
+- `scripts/run_mobile_pilot_runner.py`
+  - boot fresco por padrao para a lane oficial
+  - fases explicitas de host em `host_phase_events.json`
+  - retry controlado de instalacao para falha ambiental
+  - runtime state oficial em `.tmp_online/devkit/mobile_pilot_lane_status.json`
+- `scripts/dev/lib.sh`
+  - timeouts em probes ADB do devkit
+  - readiness de package alinhada com `cmd package resolve-activity`
+- `scripts/dev/android_wait_for_boot.sh`
+  - boot exige estabilidade em probes consecutivos
+- `scripts/dev/run_android_emulator.sh`
+  - reinicia emulador existente quando o runner pede cold boot ou wipe-data
+- `android/scripts/run-android-preview.cjs`
+  - install espera boot forte, nao so `sys.boot_completed`
+- `scripts/dev/status.sh`
+  - passa a mostrar a lane oficial `android_mobile_acceptance`
+  - marca o velho `android_maestro_smoke` como stale quando houver dado mais novo da lane oficial
+
+Validacao executada:
+
+- `cd android && npm run android:preview` -> verde
+- `make smoke-mobile` -> verde (`artifacts/mobile_pilot_run/20260404_140933`)
+- `make smoke-mobile` -> verde (`artifacts/mobile_pilot_run/20260404_141247`)
+- `make release-gate` -> verde, incluindo mobile real (`artifacts/mobile_pilot_run/20260404_141923`)
+- `python3 scripts/run_mobile_pilot_runner.py` -> verde (`artifacts/mobile_pilot_run/20260404_142431`)
+- `scripts/dev/check_android.sh --json` -> verde
+- `scripts/dev/status.sh --json` -> verde com lane oficial refletida
+
+Classificacao final da lane:
+
+- `estavel` no host atual, usando a politica oficial de cold boot
+
+Leitura honesta:
+
+- a lane nao foi mascarada nem removida do gate real
+- ela ficou mais lenta, mas repetivel
+- o gate real do produto voltou a ficar verde no host atual
+- a CI hospedada continua representando apenas `make release-gate-hosted`
+
+Artifacts desta fase:
+
+- `artifacts/mobile_host_stabilization/20260404_142743/mobile_host_diagnosis.md`
+- `artifacts/mobile_host_stabilization/20260404_142743/mobile_lane_matrix.json`
+- `artifacts/mobile_host_stabilization/20260404_142743/source_index.txt`
+
+---
+
+## 2026-04-04 15:15 - Execução 4: fechamento do rollout mobile V2 e da operação real de produção
+
+Objetivo:
+
+- canonizar a decisao arquitetural do mobile V2 sem falsificar fechamento do rollout
+- explicitar a politica de producao para uploads, anexos e sessao multi-instancia
+- validar o estado real contra o gate canonico ja existente
+
+Mudancas aplicadas:
+
+- `web/app/v2/mobile_rollout.py`
+  - adiciona decisao sintetica publica do rollout mobile V2:
+    - `mobile_v2_architecture_status`
+    - `mobile_v2_architecture_reason`
+    - `mobile_v2_legacy_fallback_policy`
+    - `mobile_v2_transition_active`
+  - publica esses sinais em `MobileInspectorCapabilitiesV2`, `mobile_v2_closure_summary` e `first_promoted_tenant`
+- `android/src/config/mobileV2Rollout.ts`
+  - passa a parsear os novos sinais canônicos do rollout
+- `web/app/core/settings.py`
+  - centraliza politica operacional de uploads/anexos/backup/restore e `session_fail_closed_on_db_error`
+- `web/app/shared/security_session_store.py`
+  - falha fechada em producao quando a revalidacao no banco falha
+  - publica `describe_session_operational_policy()`
+- `web/app/domains/admin/production_ops_summary.py`
+  - cria o resumo operacional canônico de producao
+- `web/app/domains/admin/routes.py`
+  - expõe `GET /admin/api/production-ops/summary`
+- `web/app/domains/admin/observability_summary.py`
+  - incorpora `production_ops` ao resumo operacional do admin
+- `web/app/core/http_setup_support.py`
+  - expõe sinais resumidos de producao em `/ready`
+- `scripts/run_production_ops_check.py`
+  - cria check executavel da politica operacional de producao
+- `render.yaml` e `web/.env.example`
+  - passam a declarar explicitamente os defaults canônicos desta politica
+
+Validacao executada:
+
+- `python3 -m py_compile ...` -> verde
+- `cd android && npm run test -- --runInBand src/config/mobileV2Rollout.test.ts` -> verde
+- `cd web && pytest -q tests/test_production_ops_summary.py tests/test_v2_android_rollout_state.py tests/test_v2_android_rollout_promotion.py tests/test_smoke.py` -> verde
+- `make verify` -> verde
+- `make smoke-mobile` -> verde
+- `make mesa-acceptance` -> falhou uma vez no login do inspetor; rerun verde
+- `make document-acceptance` -> verde
+- `make observability-acceptance` -> verde
+- `scripts/dev/status.sh --json` -> verde, lane mobile oficial refletida
+- `scripts/dev/check_android.sh --json` -> verde
+- `python3 scripts/run_production_ops_check.py --json --strict` com env de producao -> verde
+- `make release-gate` -> verde
+
+Decisao final desta fase:
+
+- o mobile V2 nao foi marcado artificialmente como encerrado; a decisao agora e canonicamente publicada e continua orientada por evidencia
+- a operacao de producao ficou explicitada e verificavel no runtime, com sessao multi-instancia endurecida e politica de storage declarada
+- a ressalva remanescente de producao e a ausencia de cleanup automatico de uploads, hoje assumida como `manual_review`
+
+---
+
+## 2026-04-04 16:02 - Execução 5: promoção evidenciada do mobile V2 e automação da limpeza operacional de uploads/anexos
+
+Objetivo:
+
+- fechar a decisão final do mobile V2 sem promoção artificial
+- substituir `manual_review` por cleanup automatizado e seguro de uploads/anexos
+- reduzir a distância entre `release-gate` verde e produto realmente fechável
+
+Mudanças aplicadas:
+
+- `web/app/v2/mobile_acceptance_evidence.py`
+  - cria leitura canônica da evidência durável da lane oficial do mobile
+- `web/app/v2/mobile_rollout.py`
+  - passa a aceitar a lane oficial durável como evidência de fechamento arquitetural
+  - publica `mobile_v2_durable_acceptance_evidence`
+- `web/app/core/settings.py`
+  - adiciona caminhos e políticas para `visual_learning_uploads`, retenção e scheduler de cleanup
+- `web/app/domains/admin/uploads_cleanup.py`
+  - cria cleanup guardado com lock, dry-run/apply, pruning de diretórios vazios e relatórios persistidos
+- `scripts/run_uploads_cleanup.py`
+  - cria check/execução operacional do cleanup
+- `web/app/domains/admin/production_ops_summary.py`
+  - incorpora runtime do cleanup no resumo operacional
+- `web/app/core/http_setup_support.py`
+  - expõe o estado resumido do cleanup em `/ready`
+- `web/main.py`
+  - inicia e encerra o scheduler de cleanup quando habilitado
+- `Makefile`
+  - adiciona `production-ops-check-strict`, `uploads-cleanup-check` e `uploads-cleanup-apply`
+  - inclui os checks operacionais no `release-gate-real`
+- `render.yaml` e `web/.env.example`
+  - habilitam a política automática canônica de cleanup e explicitam novos defaults
+
+Validação executada:
+
+- `python3 -m py_compile ...` -> verde
+- `cd web && pytest -q tests/test_v2_android_rollout_promotion.py tests/test_production_ops_summary.py tests/test_uploads_cleanup.py` -> verde
+- leitura viva de `get_mobile_v2_rollout_operational_summary()` -> `closed_with_guardrails`
+- `make verify` -> verde
+- `make mesa-acceptance` -> verde
+- `make document-acceptance` -> verde
+- `make observability-acceptance` -> verde
+- `make smoke-mobile` -> verde
+- `AMBIENTE=production ... python3 scripts/run_production_ops_check.py --json --strict` -> verde com warning honesto de primeiro run ainda não observado
+- `python3 scripts/run_uploads_cleanup.py --json --strict` -> verde
+- `make release-gate` -> verde
+
+Decisão final desta fase:
+
+- o mobile V2 deixa de depender do `observing` volátil para a decisão arquitetural e passa a fechar como `closed_with_guardrails` quando a lane oficial persistida sustenta isso
+- a limpeza operacional deixa de ser `manual_review` implícita e passa a existir como automação segura, com scheduler, relatórios e check executável
+- o produto fica materialmente mais próximo de `finalizado`; a ressalva remanescente é observacional, não mais estrutural: confirmar o primeiro relatório automático do cleanup em ambiente de produção real
+
+## 2026-04-04 16:44:30 -0300 - Execucao 6: observacao pos-deploy do cleanup automatico e carimbo final de produto
+
+- Objetivo:
+  - fechar a ultima lacuna observacional entre produto estruturalmente fechado e carimbo final honesto
+- Implementacao principal:
+  - `web/app/domains/admin/uploads_cleanup.py`
+    - preserva metadados uteis do scheduler (`started_at`, `stopped_at`, ultimo source/mode/status`)
+    - deixa de confundir `uploads_cleanup_runtime.json` com o ultimo report real
+  - `web/app/core/http_setup_support.py`
+    - expõe `uploads_cleanup_last_source` e `uploads_cleanup_last_mode` no `/ready`
+  - `scripts/run_post_deploy_cleanup_observation.py`
+    - cria ambiente production-like equivalente com storage persistente local
+    - semeia arquivos referenciados, recentes e órfãos antigos
+    - observa a primeira execução automática real do cleanup via `web_scheduler`
+    - gera artifact canônico com decisão final do produto
+  - `Makefile`
+    - novo target `post-deploy-cleanup-observation`
+    - novo target `final-product-stamp`
+  - nova documentação:
+    - `docs/final-project-audit/11_post_deploy_cleanup_observation.md`
+    - `docs/final-project-audit/12_final_product_stamp.md`
+- Validacoes executadas:
+  - `PYTHONPATH=. ./.venv-linux/bin/python -m pytest -q tests/test_uploads_cleanup.py tests/test_production_ops_summary.py` -> `3 passed`
+  - `python3 scripts/run_post_deploy_cleanup_observation.py --json --strict` -> `ok`
+  - `make final-product-stamp` -> `ok`
+- Evidencia principal:
+  - `artifacts/final_product_stamp/20260404_194522/`
+  - status final: `ready_except_post_deploy_observation`
+  - cleanup observado com:
+    - `source=web_scheduler`
+    - `mode=apply`
+    - `status=ok`
+    - órfãos antigos removidos
+    - arquivos referenciados e recentes preservados
+- Conclusao desta fase:
+  - o produto fecha estruturalmente com guardrails
+  - a observacao equivalente do cleanup automatico foi comprovada
+  - o unico passo remanescente, se exigido, é repetir a mesma observacao em deploy real do ambiente alvo
+
+## 2026-04-04 — Reauditoria final completa de prontidão
+
+Artifact principal: `artifacts/final_project_audit/20260404_171250`.
+
+Resumo desta reauditoria:
+
+- o código vivo está mais avançado do que as versões antigas dos docs 00-04 indicavam
+- `mesa-smoke`, `document-acceptance`, `observability-acceptance` e `smoke-mobile` passaram de novo
+- `contract-check` e `hygiene-check` passaram
+- `final-product-stamp` falhou nesta rodada por flake em `mesa-acceptance`
+- `mesa-acceptance` passou no rerun imediato, o que classifica o problema como flake de aceite, não quebra determinística confirmada do fluxo
+
+Leitura final desta auditoria:
+
+- produto estruturalmente fechado em quase todas as frentes
+- bloqueador real de finalização confiável agora é repetibilidade do gate visual da Mesa
+- passo observacional em deploy-alvo real continua sendo exigência extra de prova, não bloqueador estrutural do produto
+
+## 2026-04-04 22:02 -0300 - Execucao 7: desativacao controlada do legado nao-runtime e componentizacao final do historico do inspetor
+
+Objetivo:
+
+- fechar o ultimo slice pesado do `/app` que ainda dependia visualmente do `reboot.css`
+- reduzir mais uma vez `reboot.css`, `workspace.css` e o legado nao-runtime de `chat_base.css`
+- manter o runtime oficial do inspetor isolado em torno dos slices canonicos aprovados
+
+Mudancas aplicadas:
+
+- `web/static/css/inspetor/workspace_history.css`
+  - novo slice canonico do historico do inspetor
+  - assume header, toolbar, filtros, insights, timeline, grupos, cards, details, actions e empty state
+- `web/templates/inspetor/base.html`
+  - passa a carregar `workspace_history.css` no pipeline oficial do `/app`
+- `web/templates/inspetor/workspace/_inspection_history.html`
+  - explicita ownership e estado do historico por `data-*`
+- `web/static/js/chat/chat_index_page.js`
+  - passa a renderizar o historico por dataset (`data-history-role`, `data-history-type`, `data-history-state`, `data-history-focus`)
+  - reduz dependencia de classes visuais mortas no recorte do historico
+- `web/static/css/inspetor/reboot.css`
+  - perde ownership do historico oficial do inspetor
+- `web/static/css/inspetor/workspace.css`
+  - perde restos de compatibilidade de toolbar/empty state do historico
+- `web/static/css/chat/chat_base.css`
+  - remove o cluster ativo da familia `pagina-chat-luminous`, agora marcado como legado nao-runtime desativado
+- `web/static/js/shared/trabalhador_servico.js`
+  - precacheia explicitamente `official_visual_system.css` e os slices canonicos do inspetor
+- `web/tests/test_smoke.py`
+  - endurece a prova de ownership do runtime oficial do `/app`
+
+Delta objetivo desta fase:
+
+- `web/static/css/inspetor/reboot.css`: `2856 -> 2594` linhas
+- `web/static/css/inspetor/workspace.css`: `2504 -> 2479` linhas
+- `web/static/css/chat/chat_base.css`: `5375 -> 4536` linhas
+- novo slice `web/static/css/inspetor/workspace_history.css`: `459` linhas
+
+Validacoes executadas:
+
+- `cd web && ./.venv-linux/bin/python -m py_compile scripts/final_visual_audit.py` -> verde
+- `make verify` -> verde
+- `make mesa-smoke` -> verde
+- `make mesa-acceptance` -> verde
+- `cd web && ./.venv-linux/bin/python scripts/final_visual_audit.py --stage after --output-root ../artifacts/final_visual_history_closure/20260404_220125` -> verde
+
+Evidencia principal:
+
+- `artifacts/final_visual_history_closure/20260404_220125/visual_inventory_after.json`
+- `artifacts/final_visual_history_closure/20260404_220125/history_component_matrix.json`
+- `artifacts/final_visual_history_closure/20260404_220125/legacy_deactivation_report.md`
+
+Conclusao desta fase:
+
+- o historico do inspetor agora tem ownership visual canonico em slice proprio
+- o runtime oficial do `/app` continua sem depender de `chat_base.css` e `workspace.css`
+- o legado antigo nao foi apagado no escuro: o que saiu foi removido com prova de nao-runtime, e o que sobrou ficou explicitamente catalogado para aposentadoria final
+
+## 2026-04-05 02:05 -0300 - Execucao 8: aposentadoria controlada do entrypoint legado base.html e remocao final do cluster antigo fora do runtime oficial
+
+Objetivo:
+
+- encerrar a trilha de legado visual antigo que ja nao participa do runtime oficial
+- aposentar `web/templates/base.html` sem apagar o caminho no escuro
+- remover o ultimo cluster antigo remanescente de `web/static/css/shared/layout.css`
+
+Mudancas aplicadas:
+
+- `web/templates/base.html`
+  - deixa de carregar o pipeline legado
+  - vira shim depreciado que apenas estende `web/templates/inspetor/base.html`
+- `web/static/css/shared/layout.css`
+  - cluster antigo removido
+  - arquivo reduzido a placeholder nao-runtime
+- `web/static/css/chat/chat_base.css`
+  - arquivo reduzido a placeholder nao-runtime
+- `web/static/css/inspetor/workspace.css`
+  - arquivo reduzido a placeholder nao-runtime
+- `web/static/js/shared/trabalhador_servico.js`
+  - explicita `PIPELINE_RUNTIME_OFICIAL`
+  - separa `css` oficial de `cssRetired`
+- `web/tests/test_smoke.py`
+  - valida `base.html` como shim canonico
+  - valida que o legado aposentado nao entra no `ARQUIVOS_NUCLEO`
+- `web/tests/e2e/test_portais_playwright.py`
+  - passa a validar o pipeline real do `/app`
+
+Delta objetivo desta fase:
+
+- `web/templates/base.html`: `246 -> 5` linhas
+- `web/static/css/shared/layout.css`: `3199 -> 10` linhas
+- `web/static/css/chat/chat_base.css`: `4536 -> 10` linhas
+- `web/static/css/inspetor/workspace.css`: `2479 -> 5` linhas
+
+Decisao final desta fase:
+
+- `base.html`: aposentado como shim canonico, nao apagado fisicamente
+- cluster antigo nos hotspots tratados: removido do codigo ativo
+- placeholders curtos mantidos so para evitar 404 e permitir observacao curta antes de remocao fisica final
+
+## 2026-04-05 02:28 -0300 - Execucao 9: remocao fisica final dos placeholders legados e saneamento dos bundles orfaos
+
+Objetivo:
+
+- encerrar fisicamente a trilha do visual antigo fora do runtime oficial
+- remover placeholders temporarios e bundles orfaos sem dependencia viva
+- alinhar mapas, service worker e testes ao estado final do runtime
+
+Mudancas aplicadas:
+
+- remocao fisica de:
+  - `web/templates/base.html`
+  - `web/static/css/shared/layout.css`
+  - `web/static/css/chat/chat_base.css`
+  - `web/static/css/chat/chat_mobile.css`
+  - `web/static/css/chat/chat_index.css`
+  - `web/static/css/inspetor/shell.css`
+  - `web/static/css/inspetor/home.css`
+  - `web/static/css/inspetor/modals.css`
+  - `web/static/css/inspetor/profile.css`
+  - `web/static/css/inspetor/mesa.css`
+  - `web/static/css/inspetor/responsive.css`
+  - `web/static/css/inspetor/workspace.css`
+- `web/static/js/shared/trabalhador_servico.js`
+  - remove a lista `cssRetired`
+  - passa a declarar apenas `PIPELINE_RUNTIME_OFICIAL`
+  - atualiza versao para `3.0.7`
+- `web/tests/test_smoke.py`
+  - protege a inexistencia fisica dos arquivos aposentados
+  - garante que o worker nao menciona mais bundles removidos
+- `web/tests/e2e/test_portais_playwright.py`
+  - endurece a prova de que o `/app` nao carrega `layout.css`, `chat_base.css`, `chat_mobile.css` e `workspace.css`
+- mapas e docs atualizados:
+  - `web/PROJECT_MAP.md`
+  - `web/docs/frontend_mapa.md`
+  - `docs/full-system-audit/06_frontend_architecture.md`
+  - `docs/full-system-audit/11_file_index.md`
+  - `docs/full-system-audit/12_FOR_CHATGPT.md`
+  - `docs/full-system-audit/README.md`
+  - `web/docs/inspector-understanding-packet/05_template_js_css_map.md`
+  - `web/docs/inspector-understanding-packet/README.md`
+
+Delta objetivo desta fase:
+
+- `web/templates/base.html`: removido fisicamente
+- `web/static/css/shared/layout.css`: removido fisicamente
+- `web/static/css/chat/chat_base.css`: removido fisicamente
+- `web/static/css/chat/chat_mobile.css`: removido fisicamente
+- `web/static/css/chat/chat_index.css`: removido fisicamente
+- `web/static/css/inspetor/shell.css`: removido fisicamente
+- `web/static/css/inspetor/home.css`: removido fisicamente
+- `web/static/css/inspetor/modals.css`: removido fisicamente
+- `web/static/css/inspetor/profile.css`: removido fisicamente
+- `web/static/css/inspetor/mesa.css`: removido fisicamente
+- `web/static/css/inspetor/responsive.css`: removido fisicamente
+- `web/static/css/inspetor/workspace.css`: removido fisicamente
+
+Conclusao desta fase:
+
+- o runtime visual oficial do `/app` ficou definitivamente concentrado em `inspetor/base.html`, `official_visual_system.css`, `reboot.css` e nos slices canonicos do workspace
+- os placeholders temporarios sairam do repositório
+- os bundles orfaos tratados nao possuem mais caminho fisico nem presença no service worker oficial
+
+## 2026-04-05 07:57 -0300 - Execucao 10: janela curta de observacao pos-remocao fisica e limpeza documental historica nao-operacional
+
+Objetivo:
+
+- confirmar que a remocao fisica do legado visual nao quebrou o runtime oficial
+- provar nao-uso interno dos assets removidos
+- limpar docs auxiliares que ainda descreviam o pipeline antigo como ativo
+- encerrar a trilha visual antiga com observacao e rastreabilidade final
+
+Mudancas aplicadas:
+
+- observacao real das superficies oficiais:
+  - `/admin`
+  - `/cliente`
+  - `/app`
+  - `/revisao`
+- regeneracao do inventario visual `after` em:
+  - `artifacts/final_visual_post_removal/20260405_074453/visual_inventory_after.json`
+  - `artifacts/final_visual_post_removal/20260405_074453/source_inventory_after.json`
+  - `artifacts/final_visual_post_removal/20260405_074453/source_index.txt`
+  - `artifacts/final_visual_post_removal/20260405_074453/screenshots_after/`
+- checagens de observacao geradas:
+  - `artifacts/final_visual_post_removal/20260405_074453/runtime_observation_matrix.json`
+  - `artifacts/final_visual_post_removal/20260405_074453/runtime_reference_scan.txt`
+  - `artifacts/final_visual_post_removal/20260405_074453/removed_assets_404.json`
+  - `artifacts/final_visual_post_removal/20260405_074453/docs_cleanup_report.md`
+- limpeza documental aplicada em:
+  - `web/PROJECT_MAP.md`
+  - `web/docs/frontend_mapa.md`
+  - `web/docs/inspector-understanding-packet/README.md`
+  - `web/docs/inspector-understanding-packet/02_runtime_entrypoints.md`
+  - `web/docs/inspector-understanding-packet/05_template_js_css_map.md`
+  - `web/docs/inspector-understanding-packet/11_file_index.md`
+  - `docs/full-system-audit/06_frontend_architecture.md`
+  - `docs/full-system-audit/11_file_index.md`
+  - `docs/full-system-audit/12_FOR_CHATGPT.md`
+  - `docs/full-system-audit/README.md`
+  - `docs/full-system-audit/13_OPEN_QUESTIONS.md`
+  - `docs/tariel_visual_system.md`
+  - `AGENTS.md`
+- docs finais da fase adicionados:
+  - `docs/final-project-audit/26_post_removal_observation.md`
+  - `docs/final-project-audit/27_historical_docs_cleanup.md`
+
+Resultado objetivo:
+
+- o inventario `after` das superficies oficiais nao detectou nenhum dos bundles removidos
+- `runtime_reference_scan.txt` zerou matches em codigo/runtime para os paths aposentados
+- os arquivos removidos continuam ausentes fisicamente
+- o acesso direto sem sessao aos caminhos aposentados caiu em `302 -> /app/login`, comportamento de guard global que nao reabre o pipeline visual antigo
+
+Validacoes executadas:
+
+- `cd web && ./.venv-linux/bin/python -m py_compile scripts/final_visual_audit.py` -> verde
+- `cd web && ./.venv-linux/bin/python scripts/final_visual_audit.py --stage after --output-root ../artifacts/final_visual_post_removal/20260405_074453` -> verde
+- `make verify` -> verde
+- `make mesa-smoke` -> verde
+- `make mesa-acceptance` -> verde
+
+Conclusao desta fase:
+
+- nao houve regressao observada no runtime oficial das superficies web ativas
+- nao restou dependencia interna viva dos assets visuais removidos
+- a documentacao auxiliar mais enganosa foi limpa sem apagar a trilha historica
+- a trilha visual antiga pode ser considerada encerrada
+
+## 2026-04-05 08:25 -0300 - Execucao 11: encerramento formal da trilha visual antiga e rebaseline final do produto
+
+Objetivo:
+
+- transformar o encerramento funcional da trilha visual antiga em carimbo formal
+- rerodar os gates principais apos a convergencia visual
+- reavaliar o estado final do produto com o runtime visual canonico ja estabilizado
+
+Mudancas aplicadas:
+
+- docs finais adicionados:
+  - `docs/final-project-audit/28_visual_track_closure.md`
+  - `docs/final-project-audit/29_post_visual_product_rebaseline.md`
+- artefatos finais adicionados:
+  - `artifacts/final_visual_closeout/20260405_081246/visual_runtime_final.json`
+  - `artifacts/final_visual_closeout/20260405_081246/post_visual_product_state.md`
+  - `artifacts/final_visual_closeout/20260405_081246/source_index.txt`
+- `docs/restructuring-roadmap/99_execution_journal.md`
+  - registra o fechamento formal e o rebaseline final
+
+Resultado objetivo:
+
+- o runtime visual canonico final ficou formalmente descrito sem reabrir nenhuma superficie antiga
+- a trilha visual antiga passou de encerramento funcional para encerramento formal
+- o estado final do produto foi reavaliado apos os gates e permaneceu `ready_except_post_deploy_observation`
+- o remanescente real do produto ficou explicitamente fora do eixo visual: observacao pos-deploy real do cleanup automatico, caso esse nivel extra de prova seja exigido
+
+Validacoes executadas:
+
+- `make verify` -> verde
+- `make mesa-smoke` -> verde
+- `make mesa-acceptance` -> verde
+- `make document-acceptance` -> verde
+- `make observability-acceptance` -> verde
+- `make smoke-mobile` -> verde
+- `make final-product-stamp` -> verde
+
+Artefatos e evidencias desta fase:
+
+- `artifacts/final_visual_closeout/20260405_081246/visual_runtime_final.json`
+- `artifacts/final_visual_closeout/20260405_081246/post_visual_product_state.md`
+- `artifacts/final_visual_closeout/20260405_081246/source_index.txt`
+- `artifacts/document_phase_acceptance/20260405_082938`
+- `artifacts/observability_phase_acceptance/20260405_081503`
+- `artifacts/mobile_pilot_run/20260405_081530`
+- `artifacts/final_product_stamp/20260405_112442`
+
+Conclusao desta fase:
+
+- a trilha visual antiga esta formalmente encerrada
+- nao restou blocker visual real nas superficies oficiais
+- o mobile permaneceu `closed_with_guardrails`
+- a leitura canonica final do produto continuou `ready_except_post_deploy_observation`
+- qualquer passo futuro remanescente pertence ao eixo operacional pos-deploy, nao ao visual

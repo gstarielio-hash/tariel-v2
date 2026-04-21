@@ -1,0 +1,213 @@
+{
+  "schema_type": "tariel_filled_reference_bundle",
+  "schema_version": 1,
+  "family_key": "nr35_inspecao_linha_de_vida",
+  "template_code": "nr35_inspecao_linha_de_vida",
+  "reference_id": "nr35_inspecao_linha_de_vida.synthetic.v1",
+  "source_kind": "synthetic_repo_baseline",
+  "reference_summary": {
+    "title": "Baseline sintético - inspeção de linha de vida vertical",
+    "document_code": "REL-NR35-LV-T03-2026-014",
+    "status_final": "bloqueio",
+    "pdf_file": "pdf/nr35_inspecao_linha_de_vida_referencia_sintetica.pdf",
+    "asset_files": [
+      "assets/IMG_701_vista_geral.png",
+      "assets/IMG_702_ponto_superior_corrosao.png",
+      "assets/IMG_703_ponto_inferior_terminal.png",
+      "assets/IMG_704_fixacao_pontos.png",
+      "assets/IMG_705_detalhe_cabo_aco.png",
+      "assets/IMG_706_identificacao_sistema.png"
+    ],
+    "resumo": "Caso sintético de linha de vida vertical em escada metálica industrial com checklist técnico, não conformidade no cabo de aço e conclusão final em bloqueio."
+  },
+  "required_slots_snapshot": {
+    "tipo_sistema": "linha_de_vida_vertical",
+    "escada_acesso_industrial": true,
+    "identificacao_sistema": "LVV-T03-EA-17",
+    "unidade": "Unidade Grãos Centro-Oeste",
+    "local": "Torre de Transferência T-03 - escada metálica de acesso ao passadiço superior",
+    "laudo_fabricante": "LF-LV-T03-2022-081",
+    "laudo_inspecao": "LI-NR35-LV-T03-2026-014",
+    "art": "ART-GO2026/2241187",
+    "contratante": "Operadora Industrial Horizonte S.A.",
+    "contratada": "Atlas Soluções de Inspeção Vertical Ltda.",
+    "engenheiro_responsavel": "Eng. Camila Nogueira Bastos",
+    "inspetor_lider": "André Luiz Ferraz",
+    "data_vistoria": "28/03/2026",
+    "checklist_componentes": {
+      "fixacao_dos_pontos": "C",
+      "condicao_do_cabo_de_aco": "NC",
+      "condicao_do_esticador": "C",
+      "condicao_da_sapatilha": "C",
+      "condicao_do_olhal": "C",
+      "condicao_dos_grampos": "C"
+    },
+    "motivo_nc_cabo_aco": "corrosão inicial próxima ao ponto superior",
+    "status_final": "bloqueio"
+  },
+  "documental_sections_snapshot": [
+    "capa / folha de rosto",
+    "identificação geral",
+    "objeto da inspeção",
+    "componentes / acessórios inspecionados",
+    "registros fotográficos",
+    "não conformidades, restrições e providências",
+    "conclusão",
+    "governança da Mesa",
+    "assinaturas e responsabilidade técnica",
+    "anexos e referências"
+  ],
+  "notes": [
+    "Conteúdo integralmente sintético, produzido para baseline da família Tariel.",
+    "Checklist técnico consolidado com lógica auditável e item crítico do cabo de aço classificado como NC.",
+    "Bloqueio operacional amarrado às Figuras 2 e 5 e ao checklist."
+  ],
+  "laudo_output_snapshot": {
+    "tokens": {
+      "document_code": "REL-NR35-LV-T03-2026-014",
+      "laudo_fabricante": "LF-LV-T03-2022-081",
+      "laudo_inspecao": "LI-NR35-LV-T03-2026-014",
+      "art": "ART-GO2026/2241187",
+      "status_final": "bloqueio",
+      "identificacao_sistema": "LVV-T03-EA-17"
+    },
+    "case_context": {
+      "unidade": "Unidade Grãos Centro-Oeste",
+      "local": "Torre de Transferência T-03 - escada metálica de acesso ao passadiço superior",
+      "tipo": "Linha de vida vertical",
+      "contratante": "Operadora Industrial Horizonte S.A.",
+      "contratada": "Atlas Soluções de Inspeção Vertical Ltda.",
+      "data_vistoria": "28/03/2026",
+      "data_emissao": "03/04/2026"
+    },
+    "mesa_review": {
+      "mesa": "Mesa Tariel de Segurança em Altura",
+      "criterio_deliberacao": "materialidade do risco de queda e coerência entre checklist, registros fotográficos e restrição operacional",
+      "deliberacao": "baseline sintético aprovado com status bloqueio até correção e reinspeção"
+    },
+    "resumo_executivo": {
+      "sintese": "Sistema de linha de vida vertical em escada metálica com ponto crítico no cabo de aço próximo ao topo.",
+      "status": "bloqueio",
+      "fundamentos": [
+        "item condição do cabo de aço classificado como NC",
+        "corrosão inicial próxima ao ponto superior",
+        "necessidade de bloqueio operacional até correção e reinspeção"
+      ]
+    },
+    "identificacao": {
+      "contratante": "Operadora Industrial Horizonte S.A.",
+      "contratada": "Atlas Soluções de Inspeção Vertical Ltda.",
+      "unidade": "Unidade Grãos Centro-Oeste",
+      "local": "Torre de Transferência T-03 - escada metálica de acesso ao passadiço superior",
+      "engenheiro_responsavel": "Eng. Camila Nogueira Bastos",
+      "inspetor_lider": "André Luiz Ferraz"
+    },
+    "escopo_servico": {
+      "objeto": "inspeção visual sintética de linha de vida vertical",
+      "componentes_avaliados": [
+        "fixação dos pontos",
+        "cabo de aço",
+        "esticador",
+        "sapatilha",
+        "olhal",
+        "grampos"
+      ],
+      "restricoes": "sem desmontagem, sem ensaios destrutivos e sem medições laboratoriais"
+    },
+    "execucao_servico": {
+      "metodo": "vistoria visual objetiva com checklist técnico, fotografias e consolidação de parecer",
+      "data_vistoria": "28/03/2026",
+      "registros": [
+        "Figura 1",
+        "Figura 2",
+        "Figura 3",
+        "Figura 4",
+        "Figura 5",
+        "Figura 6"
+      ]
+    },
+    "evidencias_e_anexos": {
+      "figuras": [
+        "Figura 1 - Vista geral da linha de vida vertical instalada em escada metálica industrial.",
+        "Figura 2 - Ponto superior com corrosão inicial identificada no cabo de aço.",
+        "Figura 3 - Terminal inferior e conjunto de ancoragem da linha de vida.",
+        "Figura 4 - Pontos de fixação e ancoragem observados na estrutura metálica.",
+        "Figura 5 - Detalhe do cabo de aço inspecionado em campo.",
+        "Figura 6 - Identificação do sistema instalada próxima à escada."
+      ],
+      "laudo_fabricante": "LF-LV-T03-2022-081",
+      "laudo_inspecao": "LI-NR35-LV-T03-2026-014"
+    },
+    "documentacao_e_registros": {
+      "art": "ART-GO2026/2241187",
+      "laudo_fabricante": "LF-LV-T03-2022-081",
+      "laudo_inspecao": "LI-NR35-LV-T03-2026-014",
+      "proxima_inspecao": "03/04/2027, condicionada à correção, reinspeção corretiva e liberação formal do sistema."
+    },
+    "nao_conformidades_ou_lacunas": [
+      {
+        "item": "condição do cabo de aço",
+        "status": "NC",
+        "descricao": "corrosão inicial próxima ao ponto superior",
+        "evidencias": [
+          "Figura 2",
+          "Figura 5"
+        ]
+      }
+    ],
+    "recomendacoes": [
+      "manter bloqueio operacional até correção",
+      "substituir ou tratar o trecho comprometido conforme procedimento aplicável",
+      "registrar evidência corretiva",
+      "realizar reinspeção corretiva antes da liberação"
+    ],
+    "conclusao": {
+      "status_final": "bloqueio",
+      "parecer": "bloqueio operacional até correção e reinspeção",
+      "proxima_inspecao": "03/04/2027, condicionada à correção, reinspeção corretiva e liberação formal do sistema.",
+      "amarracao_evidencias": [
+        "Checklist: condição do cabo de aço = NC",
+        "Figura 2",
+        "Figura 5"
+      ]
+    },
+    "checklist_componentes": [
+      {
+        "item": "Fixação dos pontos",
+        "status": "C",
+        "observacao": "Parafusaria e ancoragem sem soltura visual.",
+        "evidencia": "Figura 4"
+      },
+      {
+        "item": "Condição do cabo de aço",
+        "status": "NC",
+        "observacao": "Corrosão inicial próxima ao ponto superior.",
+        "evidencia": "Figuras 2 e 5"
+      },
+      {
+        "item": "Condição do esticador",
+        "status": "C",
+        "observacao": "Sem empeno e com rosca útil aparente.",
+        "evidencia": "Figura 3"
+      },
+      {
+        "item": "Condição da sapatilha",
+        "status": "C",
+        "observacao": "Assentamento regular no terminal inferior.",
+        "evidencia": "Figura 3"
+      },
+      {
+        "item": "Condição do olhal",
+        "status": "C",
+        "observacao": "Sem abertura ou deformação visível.",
+        "evidencia": "Figura 3"
+      },
+      {
+        "item": "Condição dos grampos",
+        "status": "C",
+        "observacao": "Posicionamento visualmente adequado.",
+        "evidencia": "Figura 4"
+      }
+    ]
+  }
+}

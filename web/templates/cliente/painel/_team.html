@@ -1,0 +1,147 @@
+<section
+    id="admin-team"
+    class="admin-stage admin-tab-panel"
+    data-admin-stage="team"
+    data-admin-panel="team"
+    data-stage-state="idle"
+    role="tabpanel"
+    aria-labelledby="admin-section-tab-team"
+    {% if (cliente_admin_section_inicial | default('overview')) != 'team' %}hidden{% endif %}
+>
+    <div class="admin-stage-head">
+        <div class="admin-stage-copy">
+            <span class="admin-stage-kicker">Equipe operacional</span>
+            <h3>Criacao, ativacao e manutencao da equipe</h3>
+            <p class="box-subtitle">Distribua acessos da equipe de campo e da revisao, acompanhe primeiros logins e mantenha a operacao da empresa fluindo.</p>
+        </div>
+
+        <div class="admin-stage-meta">
+            <span class="hero-chip">Criacao guiada</span>
+            <span class="hero-chip">Ativacao visivel</span>
+            <span class="hero-chip">Bloqueios sob controle</span>
+        </div>
+    </div>
+
+    <div id="admin-team-brief" class="admin-stage-brief"></div>
+
+    <article id="admin-credencial-painel" class="box box--section admin-credential-panel" hidden aria-live="polite">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Acesso temporario pronto para compartilhar</h3>
+                <p id="admin-credencial-resumo" class="box-subtitle">Use este quadro para copiar o login temporario e orientar o primeiro acesso em canal seguro.</p>
+            </div>
+
+            <div class="toolbar-actions admin-credential-panel__actions">
+                <button id="btn-admin-credencial-copiar" class="btn" type="button">Copiar dados de acesso</button>
+                <button id="btn-admin-credencial-ocultar" class="btn ghost" type="button">Ocultar</button>
+            </div>
+        </div>
+
+        <div id="admin-credencial-body" class="admin-credential-panel__body"></div>
+    </article>
+
+    <div class="admin-stage-grid admin-stage-grid--split">
+        <article class="box" id="admin-equipe-criacao">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3>Novo usuario operacional</h3>
+                    <p class="box-subtitle">Crie pessoas da operacao e da revisao conforme as liberacoes da empresa. O acesso de administracao da empresa e liberado pela Tariel quando necessario.</p>
+                </div>
+            </div>
+
+            <form id="form-usuario" class="stack">
+                <label>
+                    Nome
+                    <input id="usuario-nome" required>
+                </label>
+                <label>
+                    E-mail
+                    <input id="usuario-email" type="email" required>
+                </label>
+                <label>
+                    Papel
+                    <select id="usuario-papel">
+                        <option value="inspetor">Equipe de campo</option>
+                        <option value="revisor">Revisao</option>
+                    </select>
+                </label>
+                <fieldset class="stack">
+                    <legend>Acessos liberados para esta pessoa</legend>
+                    <label>
+                        <input id="usuario-acesso-inspetor" type="checkbox" checked>
+                        Campo web + mobile
+                    </label>
+                    <label>
+                        <input id="usuario-acesso-revisor" type="checkbox">
+                        Revisao
+                    </label>
+                    <label>
+                        <input id="usuario-acesso-cliente" type="checkbox">
+                        Portal da empresa
+                    </label>
+                    <p class="box-subtitle" id="usuario-acesso-nota">Os acessos disponiveis seguem as liberacoes contratadas para esta empresa.</p>
+                </fieldset>
+                <label>
+                    Telefone
+                    <input id="usuario-telefone">
+                </label>
+                <label>
+                    CREA
+                    <input id="usuario-crea">
+                </label>
+                <div id="usuario-capacidade-nota"></div>
+                <button id="btn-usuario-criar" class="btn primary" type="submit">Criar usuario</button>
+            </form>
+        </article>
+
+        <article class="box" id="admin-equipe-onboarding">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3>Onboarding da equipe</h3>
+                    <p class="box-subtitle">Veja quem ainda nao ativou o acesso e entre direto na fila certa para destravar a operacao.</p>
+                </div>
+            </div>
+
+            <div id="admin-onboarding-resumo" class="summary-grid"></div>
+            <div id="admin-onboarding-lista" class="activity-list activity-list--section"></div>
+        </article>
+    </div>
+
+    <article class="box box--section" id="admin-equipe-lista">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Equipe operacional da empresa</h3>
+                <p class="box-subtitle">Filtre equipe de campo e revisao, ajuste cadastro e controle bloqueio ou senha temporaria.</p>
+            </div>
+
+            <div class="toolbar-actions">
+                <input id="usuarios-busca" type="search" placeholder="Buscar por nome, e-mail ou telefone">
+                <select id="usuarios-filtro-papel">
+                    <option value="todos">Todos os papeis</option>
+                    <option value="inspetor">Equipe de campo</option>
+                    <option value="revisor">Revisao</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="usuarios-resumo" class="toolbar-meta"></div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cadastro</th>
+                        <th>Operacao</th>
+                        <th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-usuarios"></tbody>
+            </table>
+        </div>
+
+        <div id="usuarios-vazio" class="empty-state" hidden>
+            <strong>Nenhum usuario encontrado</strong>
+            <p>Altere a busca ou o filtro para revisar a equipe certa.</p>
+        </div>
+    </article>
+</section>

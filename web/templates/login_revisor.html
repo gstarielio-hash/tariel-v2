@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f6f9">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>Mesa Avaliadora • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/shared/auth_shell.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app }}">
+</head>
+<body class="auth-shell auth-shell--mesa-login">
+    <main class="auth-layout auth-layout--split">
+        <section class="auth-hero" aria-hidden="true">
+            <div class="auth-hero-placeholder"></div>
+            <span class="auth-hero-label">Mesa Avaliadora</span>
+        </section>
+
+        <section class="auth-card">
+            <div class="auth-card-shell">
+                {% if erro %}
+                <div class="auth-error" role="alert" aria-live="assertive">{{ erro | e }}</div>
+                {% endif %}
+
+                <form method="POST" action="/revisao/login" class="auth-form auth-form--minimal" data-auth-form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                    <div class="auth-field">
+                        <input type="email" id="email" name="email" required autocomplete="username"
+                            autocapitalize="off" spellcheck="false" inputmode="email" placeholder="E-mail" aria-label="E-mail corporativo">
+                    </div>
+
+                    <div class="auth-field">
+                        <input type="password" id="senha" name="senha" required autocomplete="current-password" placeholder="Senha" aria-label="Senha">
+                    </div>
+
+                    <button type="submit" class="auth-button" id="btn-login" data-submit-label="Acessar">Acessar</button>
+                </form>
+
+                <p class="auth-access-note">Quer um acesso? Fale com o administrador.</p>
+            </div>
+        </section>
+    </main>
+
+    <script nonce="{{ csp_nonce }}">
+        (() => {
+            "use strict";
+
+            document.querySelectorAll("[data-auth-form]").forEach((form) => {
+                form.addEventListener("submit", () => {
+                    const botao = form.querySelector(".auth-button");
+                    if (!botao) return;
+                    botao.disabled = true;
+                    botao.innerHTML = "<span>Entrando...</span>";
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

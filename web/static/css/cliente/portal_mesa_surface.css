@@ -1,0 +1,49 @@
+.workspace-shell--mesa .workspace-radar-grid--mesa {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel--mesa .workspace-box--radar {
+    background:
+        linear-gradient(135deg, rgba(132, 216, 155, 0.12), transparent 40%),
+        linear-gradient(180deg, rgba(18, 28, 34, 0.98), rgba(11, 18, 22, 0.98));
+}
+
+.panel--mesa .workspace-box--thread {
+    background:
+        linear-gradient(180deg, rgba(17, 26, 31, 0.99), rgba(10, 16, 20, 0.99));
+}
+
+.panel--mesa .workspace-box--context,
+.panel--mesa .workspace-box--summary,
+.panel--mesa .workspace-box--list {
+    background:
+        linear-gradient(180deg, rgba(15, 24, 29, 0.98), rgba(10, 16, 20, 0.98));
+}
+
+.panel--mesa #mesa-alertas-operacionais,
+.panel--mesa #mesa-triagem,
+.panel--mesa #mesa-movimentos {
+    margin-top: 0;
+}
+
+.panel--mesa #mesa-alertas-operacionais {
+    grid-column: 1 / -1;
+}
+
+.panel--mesa #lista-mesa-laudos .item.active {
+    border-color: rgba(132, 216, 155, 0.34);
+    background:
+        linear-gradient(180deg, rgba(132, 216, 155, 0.14), rgba(255, 255, 255, 0.03)),
+        rgba(9, 14, 20, 0.58);
+}
+
+.panel--mesa #mesa-contexto .empty-state,
+.panel--mesa #mesa-mensagens .empty-state {
+    min-height: 180px;
+}
+
+@media (max-width: 1320px) {
+    .workspace-shell--mesa .workspace-radar-grid--mesa {
+        grid-template-columns: 1fr;
+    }
+}

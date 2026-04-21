@@ -1,0 +1,125 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr20_inspecao_instalacoes_inflamaveis",
+  "template_code": "nr20_inspecao_instalacoes_inflamaveis",
+  "tokens": {
+    "cliente_nome": "Empresa Demo (DEV)",
+    "unidade_nome": "Unidade Piloto Nacional",
+    "engenheiro_responsavel": "Engenheiro Revisor (Dev)",
+    "crea_art": "CREA 123456/D | ART 2026-0001",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "NR20_INSPECAO_INSTALACOES_INFLAMAVEIS-2026-001",
+    "empresa_nome": "Empresa Demo (DEV)",
+    "unidade_nome": "Unidade Piloto Nacional",
+    "data_execucao": "2026-04-08",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva",
+    "wave_portfolio": 1,
+    "modalidade_laudo": "inspecao_tecnica"
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Pendencias documentais secundarias foram registradas e tratadas pela Mesa.",
+    "observacoes_mesa": "Caso mantido em nr20_inspecao_instalacoes_inflamaveis com rastreabilidade de escopo e evidencias."
+  },
+  "resumo_executivo": "Foi executado o servico nr20 - inspecao instalacoes inflamaveis com registro estruturado do objeto principal, evidencias vinculadas, documentacao de apoio e conclusao tecnica consolidada para a Mesa.",
+  "identificacao": {
+    "objeto_principal": "Objeto principal do servico inspecao instalacoes inflamaveis",
+    "localizacao": "Setor tecnico associado a nr20",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_001",
+        "DOC_001"
+      ],
+      "referencias_texto": "IMG_001; DOC_001",
+      "descricao": "Referencia principal do objeto identificada com apoio de evidencia visual e documento associado.",
+      "observacao": "Rastreabilidade principal confirmada para o servico."
+    },
+    "codigo_interno": "NR20_INSPECAO_INSTALACOES_INFLAMAVEIS-001"
+  },
+  "escopo_servico": {
+    "tipo_entrega": "inspecao_tecnica",
+    "modo_execucao": "in_loco",
+    "ativo_tipo": "NR20",
+    "resumo_escopo": "Execucao do servico inspecao instalacoes inflamaveis no contexto da norma seguranca e saude no trabalho com inflamaveis e combustiveis, com consolidacao de evidencias, registros de campo ou base documental e conclusao tecnica auditavel."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Metodo padrao Tariel para inspecao instalacoes inflamaveis, com registro estruturado do escopo, dados de execucao, anexos principais e pontos de atencao.",
+    "condicoes_observadas": "Servico executado dentro do escopo previsto, com registros suficientes para revisao da Mesa e consolidacao do documento final.",
+    "parametros_relevantes": "Pacote tecnico de referencia para inspecao instalacoes inflamaveis.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_010",
+        "DOC_010"
+      ],
+      "referencias_texto": "IMG_010; DOC_010",
+      "descricao": "Evidencia da execucao principal do servico.",
+      "observacao": "Registros principais consolidados."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_020"
+      ],
+      "referencias_texto": "IMG_020",
+      "descricao": "Evidencia principal que suporta a conclusao tecnica.",
+      "observacao": "Material principal vinculado ao caso."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_021"
+      ],
+      "referencias_texto": "IMG_021",
+      "descricao": "Evidencia complementar para contextualizacao do servico.",
+      "observacao": "Registro complementar sem impacto critico."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_001"
+      ],
+      "referencias_texto": "Pacote tecnico de referencia para inspecao instalacoes inflamaveis.",
+      "descricao": "Documento base ou ancora principal do servico.",
+      "observacao": "Documento vinculado ao pacote final."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Pacote tecnico de referencia para inspecao instalacoes inflamaveis.",
+    "documentos_emitidos": "Pacote tecnico de nr20 - inspecao instalacoes inflamaveis consolidado para entrega.",
+    "observacoes_documentais": "Documento vinculado ao contexto de seguranca e saude no trabalho com inflamaveis e combustiveis."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": false,
+    "ha_pontos_de_atencao_texto": "Nao",
+    "descricao": "Nao foram identificados pontos de atencao relevantes no fechamento deste servico.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_030"
+      ],
+      "referencias_texto": "IMG_030",
+      "descricao": "Registro relacionado aos pontos de atencao ou a ausencia declarada deles.",
+      "observacao": "Evidencia vinculada ao fechamento da analise."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Manter rastreabilidade do servico inspecao instalacoes inflamaveis e registrar formalmente qualquer ajuste, complemento documental ou revalidacao futura."
+  },
+  "conclusao": {
+    "status": "conforme",
+    "conclusao_tecnica": "O servico nr20 - inspecao instalacoes inflamaveis foi consolidado com rastreabilidade suficiente, evidencias principais vinculadas e conclusao tecnica formalizada.",
+    "justificativa": "A conclusao considera o escopo registrado, o metodo aplicado, a documentacao disponivel, a evidencia principal e os pontos de atencao ou sua ausencia declarada."
+  }
+}

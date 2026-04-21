@@ -1,0 +1,256 @@
+{
+  "schema_type": "tariel_filled_reference_bundle",
+  "schema_version": "1",
+  "family_key": "nr10_inspecao_instalacoes_eletricas",
+  "template_code": "nr10_inspecao_instalacoes_eletricas",
+  "reference_id": "nr10_inspecao_instalacoes_eletricas.synthetic.v1",
+  "source_kind": "synthetic_repo_baseline",
+  "reference_summary": {
+    "title": "Laudo técnico sintético de inspeção de instalações elétricas - baixa tensão",
+    "client": "Planta Industrial Modelo do Centro Ltda.",
+    "unit": "Unidade Industrial Leste",
+    "document_code": "NR10-UIL-IEBT-2026-018",
+    "laudo_id": "LT-NR10-UIL-2026-0318",
+    "inspection_date": "18/03/2026",
+    "issue_date": "24/03/2026",
+    "status_final": "ajuste",
+    "main_nonconformity": "NC-01 - abertura sem vedação adequada na base do painel QGBT-01",
+    "support_documents": [
+      "DB-01 - Diagrama unifilar DG-UIL-BT-01 Rev.03",
+      "RA-01 - Relatório anterior RIE-UIL-2025-114 Rev.00"
+    ]
+  },
+  "required_slots_snapshot": {
+    "cliente": "Planta Industrial Modelo do Centro Ltda.",
+    "unidade": "Unidade Industrial Leste",
+    "objeto": "Inspeção técnica visual de instalação elétrica industrial de baixa tensão",
+    "localizacao": "Avenida do Polo Industrial, 1850 - Distrito Leste - Nova Esperanca/PR",
+    "responsavel_tecnico": {
+      "nome": "Eng. Rafael Menezes Prado",
+      "crea": "CREA-PR 148572/D",
+      "art": "ART 1720260009487"
+    },
+    "inspetor_lider": {
+      "nome": "Diego Lacerda Torres",
+      "registro": "Registro interno INSP-217"
+    },
+    "laudo_id": "LT-NR10-UIL-2026-0318",
+    "codigo_documental": "NR10-UIL-IEBT-2026-018",
+    "revisao": "00",
+    "status_final": "ajuste",
+    "painel_principal": "QGBT-01",
+    "painel_secundario": "QS-02",
+    "documentos_base": [
+      "DB-01",
+      "RA-01"
+    ]
+  },
+  "documental_sections_snapshot": [
+    {
+      "section_code": "01",
+      "title": "Capa / folha de rosto",
+      "present": true
+    },
+    {
+      "section_code": "02",
+      "title": "Controle documental / ficha da inspeção",
+      "present": true
+    },
+    {
+      "section_code": "03",
+      "title": "Objeto, escopo, base normativa e limitações",
+      "present": true
+    },
+    {
+      "section_code": "04",
+      "title": "Metodologia, execução e equipe",
+      "present": true
+    },
+    {
+      "section_code": "05",
+      "title": "Identificação da instalação / painéis inspecionados",
+      "present": true
+    },
+    {
+      "section_code": "06",
+      "title": "Verificações visuais e condição geral",
+      "present": true
+    },
+    {
+      "section_code": "07",
+      "title": "Documentação e registros avaliados",
+      "present": true
+    },
+    {
+      "section_code": "08",
+      "title": "Não conformidades, criticidade e recomendações",
+      "present": true
+    },
+    {
+      "section_code": "09",
+      "title": "Conclusão técnica",
+      "present": true
+    },
+    {
+      "section_code": "10",
+      "title": "Governança da Mesa",
+      "present": true
+    },
+    {
+      "section_code": "11",
+      "title": "Assinaturas e responsabilidade técnica",
+      "present": true
+    },
+    {
+      "section_code": "12",
+      "title": "Anexos e referências",
+      "present": true
+    }
+  ],
+  "notes": [
+    "Pacote totalmente sintético, com aparência de laudo técnico corporativo brasileiro.",
+    "A família principal representada é nr10_inspecao_instalacoes_eletricas; PIE, SPDA e LOTO não foram tratados como entrega principal.",
+    "A não conformidade modelada como principal é de severidade média e conduz ao status final ajuste.",
+    "As imagens PNG foram geradas sinteticamente para compor o PDF e a baseline de referência."
+  ],
+  "laudo_output_snapshot": {
+    "tokens": {
+      "family_key": "nr10_inspecao_instalacoes_eletricas",
+      "template_code": "nr10_inspecao_instalacoes_eletricas",
+      "reference_id": "nr10_inspecao_instalacoes_eletricas.synthetic.v1",
+      "document_code": "NR10-UIL-IEBT-2026-018",
+      "laudo_id": "LT-NR10-UIL-2026-0318",
+      "status_final": "ajuste"
+    },
+    "case_context": {
+      "tipo_instalacao": "Instalação elétrica industrial de baixa tensão",
+      "area_principal": "Sala Elétrica SE-01",
+      "painel_geral": "QGBT-01",
+      "quadro_secundario": "QS-02",
+      "cliente": "Planta Industrial Modelo do Centro Ltda.",
+      "unidade": "Unidade Industrial Leste",
+      "localizacao": "Avenida do Polo Industrial, 1850 - Distrito Leste - Nova Esperanca/PR"
+    },
+    "mesa_review": {
+      "coord_revisao": "Eng. Beatriz Couto Villar",
+      "data_revisao": "24/03/2026",
+      "decisao": "emissão autorizada com status ajuste",
+      "comentario": "Coerência entre evidências, recomendação e conclusão preservada."
+    },
+    "resumo_executivo": {
+      "status": "ajuste",
+      "sintese": "Instalação com condição geral organizada e rastreável no recorte inspecionado, com uma não conformidade principal localizada de severidade média no fechamento inferior do QGBT-01."
+    },
+    "identificacao": {
+      "codigo_documental": "NR10-UIL-IEBT-2026-018",
+      "laudo_id": "LT-NR10-UIL-2026-0318",
+      "cliente": "Planta Industrial Modelo do Centro Ltda.",
+      "unidade": "Unidade Industrial Leste",
+      "responsavel_tecnico": "Eng. Rafael Menezes Prado",
+      "inspetor_lider": "Diego Lacerda Torres",
+      "art": "ART 1720260009487",
+      "datas": {
+        "inspecao": "18/03/2026",
+        "emissao": "24/03/2026"
+      }
+    },
+    "escopo_servico": {
+      "objeto": "Inspeção técnica visual da instalação elétrica BT da SE-01",
+      "inclui": [
+        "QGBT-01",
+        "QS-02",
+        "barramento principal de aterramento",
+        "registro fotográfico",
+        "conferência com diagrama unifilar"
+      ],
+      "nao_inclui": [
+        "PIE como entrega principal",
+        "SPDA como entrega principal",
+        "LOTO como entrega principal",
+        "ensaios invasivos",
+        "termografia"
+      ]
+    },
+    "execucao_servico": {
+      "metodologia": [
+        "preparação documental",
+        "vistoria visual in loco",
+        "registro de evidências",
+        "consolidação de achados"
+      ],
+      "data_hora": "18/03/2026 - 08:45 às 11:20",
+      "equipe": [
+        "Eng. Rafael Menezes Prado",
+        "Diego Lacerda Torres"
+      ]
+    },
+    "evidencias_e_anexos": [
+      {
+        "figura": "Figura 1",
+        "arquivo": "assets/IMG_301_vista_geral_sala_eletrica.png",
+        "descricao": "Vista geral da sala elétrica"
+      },
+      {
+        "figura": "Figura 2",
+        "arquivo": "assets/IMG_302_painel_principal_frontal.png",
+        "descricao": "Frontal do QGBT-01"
+      },
+      {
+        "figura": "Figura 3",
+        "arquivo": "assets/IMG_303_painel_interno.png",
+        "descricao": "Painel aberto e organização interna"
+      },
+      {
+        "figura": "Figura 4",
+        "arquivo": "assets/IMG_304_nao_conformidade_identificacao_ou_abertura.png",
+        "descricao": "Não conformidade principal"
+      },
+      {
+        "figura": "Figura 5",
+        "arquivo": "assets/IMG_305_barramento_aterramento.png",
+        "descricao": "Barramento de aterramento"
+      },
+      {
+        "figura": "Figura 6",
+        "arquivo": "assets/IMG_306_documento_base_unifilar.png",
+        "descricao": "Documento base unifilar"
+      }
+    ],
+    "documentacao_e_registros": [
+      {
+        "ref": "DB-01",
+        "descricao": "Diagrama unifilar DG-UIL-BT-01 Rev.03",
+        "situacao": "disponível e utilizado"
+      },
+      {
+        "ref": "RA-01",
+        "descricao": "Relatório anterior RIE-UIL-2025-114 Rev.00",
+        "situacao": "disponível e consultado"
+      },
+      {
+        "ref": "CF-01",
+        "descricao": "Checklist de campo sintético Rev.02",
+        "situacao": "utilizado"
+      }
+    ],
+    "nao_conformidades_ou_lacunas": [
+      {
+        "id": "NC-01",
+        "classificacao": "abertura sem vedação adequada em invólucro de painel",
+        "localizacao": "base do QGBT-01",
+        "severidade": "media",
+        "evidencia_principal": "Figura 4 / IMG_304",
+        "efeito": "redução localizada da proteção do invólucro e necessidade de fechamento adequado"
+      }
+    ],
+    "recomendacoes": [
+      "Corrigir localmente o ponto de abertura sem vedação no QGBT-01.",
+      "Atualizar o registro documental correlato após a correção.",
+      "Realizar nova verificação visual para encerramento do item."
+    ],
+    "conclusao": {
+      "status": "ajuste",
+      "texto": "A instalação apresenta condição geral satisfatória no recorte inspecionado, porém permanece pendência localizada NC-01, de severidade média, que exige correção, atualização documental e nova verificação."
+    }
+  }
+}

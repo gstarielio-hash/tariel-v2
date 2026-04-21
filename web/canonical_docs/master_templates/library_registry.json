@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "master_template_id": "inspection_conformity",
+      "label": "Laudo de Inspecao de Conformidade",
+      "documental_type": "tipo_a",
+      "status": "ready",
+      "artifact_path": "docs/master_templates/inspection_conformity.template_master.json",
+      "usage": "Base premium governada para laudos de inspecao com capa controlada, checklist item a item, evidencias, conclusao, plano de acao e responsabilidade tecnica."
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+            <section class="secao admin-tab-panel" data-admin-tab-panel="acoes" hidden>
+                <div class="secao-header">
+                    <div class="secao-header__copy">
+                        <h3>
+                            <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                            Ações críticas
+                        </h3>
+                        <p>Bloqueio de empresa, troca de plano e resets operacionais com historico de auditoria.</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="info-card">
+                        <div class="label">Bloqueio de empresa</div>
+                        <div class="valor">{{ 'Empresa bloqueada' if _empresa_bloqueada else 'Empresa liberada' }}</div>
+                        <div class="valor-auxiliar">O bloqueio exige motivo, invalida sessoes vivas da empresa e registra tudo na auditoria.</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Reset seguro e plano</div>
+                        <div class="valor">Ações auditadas</div>
+                        <div class="valor-auxiliar">Troca de senha usa fluxo de force password change e alteração de plano mostra preview antes da confirmação.</div>
+                    </div>
+                </div>
+
+                <div class="secao-bloco">
+                    <div class="secao-header">
+                        <div class="secao-header__copy">
+                            <h3>
+                                <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+                                Configuracao de acesso da empresa
+                            </h3>
+                            <p>Defina por empresa se o painel principal fica so em acompanhamento ou se tambem participa da rotina operacional.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <div class="label">Modelo contratado</div>
+                            <div class="valor">{{ _admin_cliente_policy.get("operating_model_label", "Não definido") | e }}</div>
+                            <div class="valor-auxiliar">
+                                {% if _admin_cliente_policy.get("shared_mobile_operator_enabled") %}
+                                Este modelo concentra a rotina principal em {{ _admin_cliente_policy.get("contract_operational_user_limit", 1) | int }} pessoa,
+                                com continuidade no aplicativo e nas areas web liberadas.
+                                {% else %}
+                                A empresa segue com acessos distribuidos entre pessoas diferentes.
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">Visão vigente</div>
+                            <div class="valor">{{ _admin_cliente_policy.get("case_visibility_mode_label", "Não definida") | e }}</div>
+                            <div class="valor-auxiliar">
+                                {% if _policy.get("case_list_visible") %}
+                                A empresa pode acompanhar os casos em detalhe e usar a area de analise.
+                                {% else %}
+                                O portal da empresa fica so com visao resumida.
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">Atuação vigente</div>
+                            <div class="valor">{{ _admin_cliente_policy.get("case_action_mode_label", "Não definida") | e }}</div>
+                            <div class="valor-auxiliar">
+                                {% if _policy.get("case_actions_enabled") %}
+                                O painel principal da empresa pode responder, abrir, reabrir e avaliar casos.
+                                {% else %}
+                                O painel principal da empresa acompanha sem agir nos casos.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/politica-admin-cliente" class="form-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <div class="campo-form">
+                            <label for="admin-cliente-operating-model">
+                                <span class="label-with-help">
+                                    <span>Modelo operacional</span>
+                                    {{ help_icon("Define se a rotina principal fica concentrada em uma pessoa ou distribuida entre varias pessoas.", "Ajuda sobre modelo operacional") }}
+                                </span>
+                            </label>
+                            <select id="admin-cliente-operating-model" name="admin_cliente_operating_model">
+                                <option value="standard" {% if _admin_cliente_policy.get("operating_model") == "standard" %}selected{% endif %}>Operação padrão</option>
+                                <option value="mobile_single_operator" {% if _admin_cliente_policy.get("operating_model") == "mobile_single_operator" %}selected{% endif %}>Aplicativo principal com uma pessoa responsavel</option>
+                            </select>
+                        </div>
+                        <div class="campo-form">
+                            <label for="admin-cliente-mobile-web-inspetor">
+                                <span class="label-with-help">
+                                    <span>A mesma pessoa pode usar a area tecnica no navegador</span>
+                                    {{ help_icon("Ative quando a pessoa principal tambem puder continuar o trabalho tecnico pela area web.", "Ajuda sobre area tecnica no navegador") }}
+                                </span>
+                            </label>
+                            <select id="admin-cliente-mobile-web-inspetor" name="admin_cliente_mobile_web_inspector_enabled">
+                                <option value="true" {% if _admin_cliente_policy.get("shared_mobile_operator_web_inspector_enabled") %}selected{% endif %}>Sim</option>
+                                <option value="false" {% if not _admin_cliente_policy.get("shared_mobile_operator_web_inspector_enabled") %}selected{% endif %}>Não</option>
+                            </select>
+                        </div>
+                        <div class="campo-form">
+                            <label for="admin-cliente-mobile-web-mesa">
+                                <span class="label-with-help">
+                                    <span>A mesma pessoa pode usar a area de analise no navegador</span>
+                                    {{ help_icon("Ative quando a mesma pessoa puder revisar e concluir etapas tambem pela area web de analise.", "Ajuda sobre area de analise no navegador") }}
+                                </span>
+                            </label>
+                            <select id="admin-cliente-mobile-web-mesa" name="admin_cliente_mobile_web_review_enabled">
+                                <option value="true" {% if _admin_cliente_policy.get("shared_mobile_operator_web_review_enabled") %}selected{% endif %}>Sim</option>
+                                <option value="false" {% if not _admin_cliente_policy.get("shared_mobile_operator_web_review_enabled") %}selected{% endif %}>Não</option>
+                            </select>
+                        </div>
+                        <div class="campo-form">
+                            <label for="admin-cliente-cross-portal">
+                                <span class="label-with-help">
+                                    <span>A mesma pessoa pode acumular execucao e analise</span>
+                                    {{ help_icon("Use quando uma mesma pessoa puder executar e analisar etapas diferentes do processo.", "Ajuda sobre acumulacao de funcoes") }}
+                                </span>
+                            </label>
+                            <select id="admin-cliente-cross-portal" name="admin_cliente_operational_user_cross_portal_enabled">
+                                <option value="true" {% if _admin_cliente_policy.get("operational_user_cross_portal_enabled") %}selected{% endif %}>Sim</option>
+                                <option value="false" {% if not _admin_cliente_policy.get("operational_user_cross_portal_enabled") %}selected{% endif %}>Não</option>
+                            </select>
+                        </div>
+                        <div class="campo-form">
+                            <label for="admin-cliente-admin-portal">
+                                <span class="label-with-help">
+                                    <span>A pessoa operacional pode acessar o painel da empresa</span>
+                                    {{ help_icon("Ative quando alguem da operacao tambem puder entrar no painel principal da empresa.", "Ajuda sobre acesso ao painel da empresa") }}
+                                </span>
+                            </label>
+                            <select id="admin-cliente-admin-portal" name="admin_cliente_operational_user_admin_portal_enabled">
+                                <option value="true" {% if _admin_cliente_policy.get("operational_user_admin_portal_enabled") %}selected{% endif %}>Sim</option>
+                                <option value="false" {% if not _admin_cliente_policy.get("operational_user_admin_portal_enabled") %}selected{% endif %}>Não</option>
+                            </select>
+                        </div>
+                        <div class="campo-form">
+                            <label for="admin-cliente-visibility-mode">
+                                <span class="label-with-help">
+                                    <span>Visao operacional</span>
+                                    {{ help_icon("Escolha se o painel principal da empresa vai ver cada caso em detalhe ou apenas resumos.", "Ajuda sobre visao operacional") }}
+                                </span>
+                            </label>
+                            <select id="admin-cliente-visibility-mode" name="admin_cliente_case_visibility_mode">
+                                <option value="case_list" {% if _admin_cliente_policy.get("case_visibility_mode") == "case_list" %}selected{% endif %}>Lista caso a caso</option>
+                                <option value="summary_only" {% if _admin_cliente_policy.get("case_visibility_mode") == "summary_only" %}selected{% endif %}>Somente resumos agregados</option>
+                            </select>
+                        </div>
+                        <div class="campo-form">
+                            <label for="admin-cliente-action-mode">
+                                <span class="label-with-help">
+                                    <span>Atuacao operacional</span>
+                                    {{ help_icon("Define se o painel principal da empresa so acompanha os casos ou se tambem pode agir neles.", "Ajuda sobre atuacao operacional") }}
+                                </span>
+                            </label>
+                            <select id="admin-cliente-action-mode" name="admin_cliente_case_action_mode">
+                                <option value="case_actions" {% if _admin_cliente_policy.get("case_action_mode") == "case_actions" %}selected{% endif %}>Pode agir nos casos</option>
+                                <option value="read_only" {% if _admin_cliente_policy.get("case_action_mode") == "read_only" %}selected{% endif %}>Somente acompanhamento</option>
+                            </select>
+                        </div>
+                        <div class="campo-form campo-form--full">
+                            <div class="valor-auxiliar">
+                                {% if _admin_cliente_policy.get("shared_mobile_operator_enabled") %}
+                                Este modelo deixa a rotina principal concentrada em uma pessoa, com uso do aplicativo e das areas web liberadas.
+                                O sistema limita acessos paralelos quando esse formato estiver contratado.
+                                {% else %}
+                                Use estas configuracoes quando a empresa trabalhar com equipe distribuida, mas com combinacoes especificas de acesso para cada pessoa.
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-acao-tariel btn-plano">
+                            <span class="material-symbols-rounded" aria-hidden="true">save</span>
+                            Salvar política operacional
+                        </button>
+                    </form>
+                </div>
+
+                <div class="secao-bloco">
+                    <div class="secao-header">
+                        <div class="secao-header__copy">
+                            <h3>
+                                <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+                                Suporte excepcional
+                            </h3>
+                            <p>Janela formal de suporte do Admin-CEO para esta empresa, com nova confirmacao de acesso e trilha auditavel, sem abrir navegacao dentro do portal cliente.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <div class="label">Status atual</div>
+                            <div class="valor">{{ _suporte_excepcional.get("status_label", "Sem política") | e }}</div>
+                            <div class="valor-auxiliar">
+                                Escopo máximo: {{ _suporte_excepcional.get("scope_level_label", "Não definido") | e }} •
+                                expira em {{ _suporte_excepcional.get("expires_at_label", "Sem janela") | e }}
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">Política da plataforma</div>
+                            <div class="valor">{{ _suporte_excepcional.get("policy", {}).get("mode_label", "Sem política") | e }}</div>
+                            <div class="valor-auxiliar">
+                                Step-up {{ 'obrigatório' if _policy.get('exceptional_support_step_up_required') else 'não exigido' }} •
+                                aprovação {{ 'obrigatória' if _policy.get('exceptional_support_approval_required') else 'dispensada' }} •
+                                justificativa {{ 'obrigatória' if _policy.get('exceptional_support_justification_required') else 'dispensada' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if _suporte_excepcional.get("active") %}
+                    <div class="info-card">
+                        <div class="stack">
+                            <div class="linha-kv">
+                                <span class="texto-suave">Aberto por</span>
+                                <strong>{{ _suporte_excepcional.get("opened_by_label", "Sistema") | e }}</strong>
+                            </div>
+                            <div class="linha-kv">
+                                <span class="texto-suave">Aprovação</span>
+                                <strong>{{ _suporte_excepcional.get("approval_reference", "Não informada") | default("Não informada", true) | e }}</strong>
+                            </div>
+                            <div class="linha-kv">
+                                <span class="texto-suave">Justificativa</span>
+                                <strong>{{ _suporte_excepcional.get("justification", "Sem justificativa registrada") | default("Sem justificativa registrada", true) | e }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/suporte-excepcional/encerrar" class="form-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <div class="campo-form">
+                            <label for="motivo-encerramento-suporte">Motivo do encerramento</label>
+                            <input id="motivo-encerramento-suporte" type="text" name="motivo_encerramento" maxlength="300" placeholder="Opcional, mas recomendável para a trilha.">
+                        </div>
+                        <button type="submit" class="btn-acao-tariel btn-unblock">
+                            <span class="material-symbols-rounded" aria-hidden="true">event_busy</span>
+                            Encerrar suporte excepcional
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/suporte-excepcional/abrir" class="form-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <div class="campo-form">
+                            <label for="referencia-aprovacao-suporte">Referência de aprovação</label>
+                            <input id="referencia-aprovacao-suporte" type="text" name="referencia_aprovacao" maxlength="120" placeholder="Obrigatória quando a política exigir.">
+                        </div>
+                        <div class="campo-form">
+                            <label for="justificativa-suporte">Justificativa auditável</label>
+                            <input id="justificativa-suporte" type="text" name="justificativa" maxlength="500" placeholder="Explique por que a janela excepcional é necessária.">
+                        </div>
+                        <button type="submit" class="btn-acao-tariel btn-plano" {% if not _suporte_excepcional.get("policy", {}).get("can_open", true) %}disabled{% endif %}>
+                            <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+                            Abrir suporte excepcional
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </section>

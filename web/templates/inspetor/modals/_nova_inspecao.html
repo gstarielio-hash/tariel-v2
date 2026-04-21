@@ -1,0 +1,201 @@
+{% set chat_livre_disponivel_inicial = status_relatorio_atual == "sem_relatorio" and not laudo_selecionado_id %}
+
+<div
+    id="modal-nova-inspecao"
+    class="modal-overlay modal-overlay-inspecao"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-titulo"
+    aria-describedby="modal-descricao"
+    aria-hidden="true"
+    hidden
+>
+    <div class="modal-container modal-container-nova-inspecao" role="document">
+        <div class="modal-header">
+            <div>
+                <h2 id="modal-titulo">Nova Inspeção</h2>
+                <p id="modal-descricao">Escolha o modelo de inspecao e informe o contexto inicial do laudo.</p>
+            </div>
+
+            <button type="button" class="btn-fechar-modal" aria-label="Fechar modal">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="modal-campo">
+                <label id="label-template-inspecao" for="select-template-inspecao" class="modal-label">Modelo de Inspecao *</label>
+                <div id="select-template-custom" class="modal-select-custom" hidden>
+                    <button
+                        type="button"
+                        id="btn-select-template-custom"
+                        class="modal-select-trigger"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-labelledby="label-template-inspecao valor-select-template-custom"
+                        aria-controls="lista-select-template-custom"
+                    >
+                        <span id="valor-select-template-custom" class="modal-select-value">Selecione um modelo...</span>
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    <div id="painel-select-template-custom" class="modal-select-panel" hidden>
+                        <ul
+                            id="lista-select-template-custom"
+                            class="modal-select-list"
+                            role="listbox"
+                            tabindex="-1"
+                            aria-labelledby="label-template-inspecao"
+                        ></ul>
+                    </div>
+                </div>
+
+                <select id="select-template-inspecao" class="modal-select modal-select-native">
+                    <option value="">Selecione um modelo...</option>
+                    {% set _grupo_templates = namespace(valor='') %}
+                    {% for option in tipos_template_portal | default([], true) %}
+                    {% set _novo_grupo = option.group_label | default('Catálogo oficial', true) %}
+                    {% if _novo_grupo != _grupo_templates.valor %}
+                    {% if _grupo_templates.valor %}</optgroup>{% endif %}
+                    <optgroup label="{{ _novo_grupo | e }}">
+                    {% set _grupo_templates.valor = _novo_grupo %}
+                    {% endif %}
+                        <option
+                            value="{{ option.value | e }}"
+                            data-runtime-template="{{ option.runtime_template_code | e }}"
+                        >
+                            {{ option.label | e }}
+                        </option>
+                    {% endfor %}
+                    {% if _grupo_templates.valor %}</optgroup>{% endif %}
+                </select>
+            </div>
+
+            <div class="modal-campo">
+                <label for="input-local-inspecao" class="modal-label">Nome do Equipamento *</label>
+                <input
+                    id="input-local-inspecao"
+                    class="modal-input"
+                    type="text"
+                    maxlength="160"
+                    placeholder="Ex: Caldeira B-202"
+                >
+            </div>
+
+            <div class="modal-grid-2">
+                <div class="modal-campo">
+                    <label for="input-cliente-inspecao" class="modal-label">Cliente *</label>
+                    <input
+                        id="input-cliente-inspecao"
+                        class="modal-input"
+                        type="text"
+                        maxlength="120"
+                        placeholder="Ex: Petrobras"
+                        autocomplete="organization"
+                    >
+                </div>
+
+                <div class="modal-campo">
+                    <label for="input-unidade-inspecao" class="modal-label">Unidade *</label>
+                    <input
+                        id="input-unidade-inspecao"
+                        class="modal-input"
+                        type="text"
+                        maxlength="120"
+                        placeholder="Ex: REPLAN - Paulínia"
+                    >
+                </div>
+            </div>
+
+            <div class="modal-campo">
+                <label for="textarea-objetivo-inspecao" class="modal-label">Contexto Inicial</label>
+                <p class="modal-helper">Esta informação ajudará o assistente a personalizar as perguntas</p>
+                <textarea
+                    id="textarea-objetivo-inspecao"
+                    class="modal-textarea"
+                    rows="4"
+                    maxlength="600"
+                    placeholder="Descreva brevemente o objetivo da inspeção e observações iniciais..."
+                ></textarea>
+            </div>
+
+            <fieldset class="modal-campo modal-campo--entry-mode">
+                <legend class="modal-label">Como iniciar a inspeção</legend>
+                <p class="modal-helper">As regras do modelo ainda podem ajustar o melhor modo de iniciar este caso.</p>
+
+                <div class="modal-entry-mode-grid" role="radiogroup" aria-label="Modo de entrada da inspeção">
+                    <label class="modal-entry-mode-card" for="entry-mode-chat-first">
+                        <input
+                            id="entry-mode-chat-first"
+                            type="radio"
+                            name="entry-mode-preference"
+                            value="chat_first"
+                        >
+                        <span class="modal-entry-mode-card__title">Chat primeiro</span>
+                        <span class="modal-entry-mode-card__description">Começa pela conversa e pela narrativa técnica.</span>
+                    </label>
+
+                    <label class="modal-entry-mode-card" for="entry-mode-evidence-first">
+                        <input
+                            id="entry-mode-evidence-first"
+                            type="radio"
+                            name="entry-mode-preference"
+                            value="evidence_first"
+                        >
+                        <span class="modal-entry-mode-card__title">Evidências primeiro</span>
+                        <span class="modal-entry-mode-card__description">Prioriza foto, anexo e prova antes da conversa longa.</span>
+                    </label>
+
+                    <label class="modal-entry-mode-card" for="entry-mode-auto-recommended">
+                        <input
+                            id="entry-mode-auto-recommended"
+                            type="radio"
+                            name="entry-mode-preference"
+                            value="auto_recommended"
+                            checked
+                        >
+                        <span class="modal-entry-mode-card__title">Automático</span>
+                        <span class="modal-entry-mode-card__description">Deixa o sistema recomendar o melhor início para o caso.</span>
+                    </label>
+                </div>
+
+                <p id="modal-entry-mode-summary" class="modal-entry-mode-summary">O sistema escolherá o foco inicial mais adequado se houver regra mais forte.</p>
+            </fieldset>
+
+            <div class="modal-preview-shell">
+                <div class="modal-preview-header">
+                    <span class="modal-label">Nome da inspeção</span>
+                    <button type="button" id="btn-editar-nome-inspecao" class="modal-link-button">Editar nome</button>
+                </div>
+                <p id="preview-nome-inspecao" class="modal-preview-name">Modelo de inspecao — Cliente — Unidade</p>
+                <input
+                    id="input-nome-inspecao"
+                    class="modal-input modal-input-preview"
+                    type="text"
+                    maxlength="180"
+                    placeholder="Edite o nome da inspeção"
+                    hidden
+                >
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="modal-link-button modal-footer__secondary-action"
+                    data-action="open-assistant-chat"
+                    data-inspector-entry="modal-open-chat"
+                    aria-label="Abrir chat sem modelo"
+                    {% if not chat_livre_disponivel_inicial %}hidden aria-hidden="true"{% endif %}
+                >
+                    Abrir chat sem modelo
+                </button>
+                <button type="button" class="technical-record-btn technical-record-btn--ghost" id="btn-cancelar-modal-inspecao">
+                    Cancelar
+                </button>
+                <button type="button" class="technical-record-btn technical-record-btn--primary" id="btn-confirmar-inspecao" disabled>
+                    Criar Inspeção
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

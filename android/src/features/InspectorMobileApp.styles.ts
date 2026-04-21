@@ -1,0 +1,337 @@
+import { StyleSheet } from "react-native";
+
+import { colors, radii, shadows, spacing, typography } from "../theme/tokens";
+import { chatStyles } from "./styles/chatStyles";
+import { historyStyles } from "./styles/historyStyles";
+import { loginStyles } from "./styles/loginStyles";
+import { settingsSecurityStyles } from "./styles/settingsSecurityStyles";
+
+export const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
+  launchOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 40,
+  },
+  launchOverlayGradient: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  launchOverlayInner: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+  },
+  launchOverlayHalo: {
+    position: "absolute",
+    width: 168,
+    height: 168,
+    borderRadius: 84,
+    backgroundColor: "rgba(244,123,32,0.1)",
+  },
+  launchOverlayMark: {
+    width: 108,
+    height: 108,
+    borderRadius: 30,
+    ...shadows.panel,
+  },
+  launchOverlayBrand: {
+    color: colors.textPrimary,
+    fontSize: 18,
+    fontWeight: "800",
+    letterSpacing: 2.8,
+    textTransform: "uppercase",
+  },
+  launchOverlaySubtitle: {
+    color: colors.accent,
+    fontSize: 13,
+    fontWeight: "800",
+    letterSpacing: 1.4,
+    textTransform: "uppercase",
+  },
+  safeArea: {
+    flex: 1,
+  },
+  keyboard: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.xl,
+    gap: spacing.xl,
+  },
+  ...loginStyles,
+  heroCard: {
+    backgroundColor: "rgba(9,16,25,0.6)",
+    borderRadius: radii.xl,
+    padding: spacing.xl,
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    ...shadows.floating,
+  },
+  brandRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: spacing.md,
+  },
+  brandEyebrow: {
+    color: colors.accentSoft,
+    ...typography.eyebrow,
+  },
+  brandTitle: {
+    color: colors.white,
+    fontSize: 30,
+    fontWeight: "800",
+    marginTop: 4,
+  },
+  heroTitle: {
+    color: colors.white,
+    fontSize: 30,
+    fontWeight: "800",
+    lineHeight: 38,
+  },
+  heroDescription: {
+    color: "rgba(238,243,247,0.78)",
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  heroTags: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+  heroTag: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  heroTagLabel: {
+    color: colors.white,
+    fontWeight: "700",
+  },
+  serverCard: {
+    marginTop: spacing.sm,
+    backgroundColor: "rgba(9,16,25,0.42)",
+    borderRadius: radii.md,
+    padding: spacing.md,
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  serverLabel: {
+    color: colors.accentSoft,
+    fontSize: 12,
+    textTransform: "uppercase",
+    letterSpacing: 1.1,
+    fontWeight: "700",
+  },
+  serverValue: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  secondaryButton: {
+    alignSelf: "flex-start",
+    marginTop: spacing.sm,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  secondaryButtonText: {
+    color: colors.white,
+    fontWeight: "700",
+  },
+  formCard: {
+    backgroundColor: colors.surfacePanel,
+    borderRadius: radii.xl,
+    padding: spacing.xl,
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.surfaceStrokeStrong,
+    ...shadows.panel,
+  },
+  loadingState: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.md,
+    paddingVertical: spacing.xxl,
+  },
+  loadingText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+  },
+  dashboardState: {
+    gap: spacing.md,
+  },
+  formEyebrow: {
+    color: colors.accent,
+    ...typography.eyebrow,
+  },
+  formTitle: {
+    color: colors.textPrimary,
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: "800",
+  },
+  formDescription: {
+    color: colors.textSecondary,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  inputGroup: {
+    gap: spacing.xs,
+  },
+  label: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  input: {
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.surfaceStrokeStrong,
+    backgroundColor: colors.surfaceCanvas,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 15,
+    color: colors.textPrimary,
+    fontSize: 15,
+  },
+  passwordWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.surfaceStrokeStrong,
+    backgroundColor: colors.surfaceCanvas,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 14,
+    color: colors.textPrimary,
+    fontSize: 15,
+  },
+  passwordToggle: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+  },
+  switchRow: {
+    marginTop: spacing.xs,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.md,
+  },
+  switchLabel: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  switchHint: {
+    color: colors.textMuted,
+    fontSize: 12,
+    marginTop: 4,
+    maxWidth: 240,
+  },
+  errorText: {
+    color: colors.danger,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  primaryButton: {
+    marginTop: spacing.sm,
+    borderRadius: radii.md,
+    backgroundColor: colors.accent,
+    minHeight: 54,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.accent,
+  },
+  primaryButtonDisabled: {
+    opacity: 0.65,
+  },
+  primaryButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  footerHint: {
+    color: colors.textMuted,
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  ...chatStyles,
+  ...settingsSecurityStyles,
+  ...historyStyles,
+  metricsRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  metricCard: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+    gap: 6,
+  },
+  metricValue: {
+    color: colors.textPrimary,
+    fontSize: 24,
+    fontWeight: "800",
+  },
+  metricLabel: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  actionList: {
+    gap: spacing.sm,
+  },
+  actionItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+    backgroundColor: colors.white,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+  },
+  actionItemDisabled: {
+    opacity: 0.6,
+    backgroundColor: colors.surfaceSoft,
+  },
+  actionItemCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  actionText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "700",
+  },
+  actionTextDisabled: {
+    color: colors.textSecondary,
+  },
+  actionItemDetail: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 17,
+  },
+});

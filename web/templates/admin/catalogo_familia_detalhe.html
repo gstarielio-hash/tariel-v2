@@ -1,0 +1,172 @@
+{% import "admin/_catalogo_laudos_macros.html" as catalogo %}
+{% set active_tab = active_tab | default('visao-geral', true) %}
+{% set family_detail_base = '/admin/catalogo-laudos/familias/' ~ family.family_key %}
+{% set offer_bundle = offer.commercial_bundle if offer and offer.commercial_bundle else none %}
+{% set offer_entitlements = offer.contract_entitlements if offer and offer.contract_entitlements else none %}
+{% set offer_model_label = offer.template_display_name if offer and offer.template_display_name else 'Modelo principal em definição' %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{{ family.display_name | e }} • Catálogo de Laudos</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_catalogo_laudos.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+            <nav class="menu-admin" aria-label="Navegação administrativa">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+                <a href="/admin/clientes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+                <a href="/admin/catalogo-laudos" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+                <a href="/admin/novo-cliente" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <section class="catalog-panel catalog-family-hero">
+                <div class="catalog-family-hero__header">
+                    <div>
+                        <a href="/admin/catalogo-laudos" class="catalog-back-link">← Voltar para o catálogo</a>
+                        <h1>{{ family.display_name | e }}</h1>
+                        <div class="catalog-family-hero__meta">
+                            <span>Norma: {{ ((family.nr_key | upper) if family.nr_key else family.macro_category) | e }}</span>
+                            <span>Categoria: {{ family.macro_category | e }}</span>
+                            <span>Uso: {{ family.classification_label | e }}</span>
+                        </div>
+                    </div>
+                    <div class="catalog-family-hero__status">
+                        {{ catalogo.status_badge(family.readiness) }}
+                        {{ catalogo.status_badge(family.technical_status) }}
+                        {{ catalogo.status_badge(family.commercial_status) }}
+                        {{ catalogo.status_badge(family.calibration_status) }}
+                    </div>
+                </div>
+
+                <div class="catalog-family-hero__actions">
+                    <a href="{{ family_detail_base }}?tab=schema-tecnico#schema-tecnico" class="catalog-btn catalog-btn--secondary">Base da família</a>
+                    <a href="{{ family_detail_base }}?tab=ofertas#ofertas" class="catalog-btn catalog-btn--secondary">Pacote comercial</a>
+                    <a href="{{ family_detail_base }}?tab=calibracao#calibracao" class="catalog-btn catalog-btn--secondary">Validação</a>
+                    <a href="{{ family_detail_base }}?tab=liberacao#liberacao" class="catalog-btn catalog-btn--primary">Liberação para empresas</a>
+                </div>
+
+                <section class="catalog-family-summary catalog-family-summary--compact">
+                    <article class="catalog-mini-kpi">
+                        <span class="catalog-mini-kpi__label">Formas de uso</span>
+                        <strong>{{ technical_modes | length }}</strong>
+                        <span>{{ 'formas registradas' if technical_modes else 'nenhuma forma registrada' }}</span>
+                    </article>
+                    <article class="catalog-mini-kpi">
+                        <span class="catalog-mini-kpi__label">Opções comerciais</span>
+                        <strong>{{ offer.variants | length if offer else 0 }}</strong>
+                        <span>{{ offer_model_label | e }}</span>
+                    </article>
+                    <article class="catalog-mini-kpi">
+                        <span class="catalog-mini-kpi__label">Empresas com acesso</span>
+                        <strong>{{ family.active_release_count | int }}</strong>
+                        <span>{{ tenant_releases | length }} liberações registradas</span>
+                    </article>
+                    <article class="catalog-mini-kpi">
+                        <span class="catalog-mini-kpi__label">Etapas prontas</span>
+                        <strong>{{ (1 if artifact_snapshot.has_family_schema else 0) + (1 if artifact_snapshot.has_template_seed else 0) + (1 if artifact_snapshot.has_laudo_output_seed else 0) }}</strong>
+                        <span>base, modelo e documento</span>
+                    </article>
+                </section>
+            </section>
+
+            <section class="catalog-help-strip" aria-label="Orientação rápida da família">
+                <strong>Use as abas para aprofundar.</strong>
+                <p>A visão geral mostra o estado da família. Base, pacote comercial, validação e acesso das empresas ficam separados para a leitura ficar mais clara.</p>
+            </section>
+
+            {% for msg in mensagens_flash %}
+            {% set _tipo_alerta = 'success' if msg.tipo == 'success' else 'error' %}
+            <div class="alert alert-{{ _tipo_alerta }}" role="alert" aria-live="assertive">
+                <span class="material-symbols-rounded" aria-hidden="true">{{ 'check_circle' if _tipo_alerta == 'success' else 'error' }}</span>
+                {{ msg.texto | e }}
+                <button type="button" class="alert-fechar" aria-label="Fechar alerta">×</button>
+            </div>
+            {% endfor %}
+
+            <section class="catalog-family-tabs" aria-label="Detalhe da família" data-catalog-family-tabs="true" data-catalog-active-tab="{{ active_tab | e }}">
+                <div class="catalog-tablist" role="tablist" aria-label="Seções da família">
+                    {{ catalogo.tab_button('visao-geral', 'Visão geral', family_detail_base ~ '?tab=visao-geral#visao-geral', active_tab == 'visao-geral', 'executivo') }}
+                    {{ catalogo.tab_button('schema-tecnico', 'Base', family_detail_base ~ '?tab=schema-tecnico#schema-tecnico', active_tab == 'schema-tecnico', 'regras e base') }}
+                    {{ catalogo.tab_button('modos', 'Modos', family_detail_base ~ '?tab=modos#modos', active_tab == 'modos', technical_modes | length ~ ' itens') }}
+                    {{ catalogo.tab_button('templates', 'Modelos', family_detail_base ~ '?tab=templates#templates', active_tab == 'templates', 'do modelo ao PDF') }}
+                    {{ catalogo.tab_button('ofertas', 'Pacote comercial', family_detail_base ~ '?tab=ofertas#ofertas', active_tab == 'ofertas', offer.offer_name if offer else 'sem pacote') }}
+                    {{ catalogo.tab_button('calibracao', 'Validação', family_detail_base ~ '?tab=calibracao#calibracao', active_tab == 'calibracao', calibration.status.label) }}
+                    {{ catalogo.tab_button('liberacao', 'Acesso das empresas', family_detail_base ~ '?tab=liberacao#liberacao', active_tab == 'liberacao', tenant_releases | length ~ ' empresas') }}
+                    {{ catalogo.tab_button('historico', 'Histórico', family_detail_base ~ '?tab=historico#historico', active_tab == 'historico', history | length ~ ' eventos') }}
+                </div>
+
+                {% if active_tab == 'visao-geral' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_visao_geral.html" %}
+                {% elif active_tab == 'schema-tecnico' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_schema_tecnico.html" %}
+                {% elif active_tab == 'modos' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_modos.html" %}
+                {% elif active_tab == 'templates' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_templates.html" %}
+                {% elif active_tab == 'ofertas' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_ofertas.html" %}
+                {% elif active_tab == 'calibracao' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_calibracao.html" %}
+                {% elif active_tab == 'liberacao' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_liberacao.html" %}
+                {% elif active_tab == 'historico' %}
+                {% include "admin/catalogo_familia_detalhe/_tab_historico.html" %}
+                {% else %}
+                {% include "admin/catalogo_familia_detalhe/_tab_default.html" %}
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/admin/admin_catalogo_laudos_page.js"></script>
+</body>
+
+</html>

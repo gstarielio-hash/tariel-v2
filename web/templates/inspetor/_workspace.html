@@ -1,0 +1,217 @@
+{% set home_forcado_inicial = home_forcado_inicial | default(false) %}
+{% set workspace_assistant_inicial = (not home_forcado_inicial) and status_relatorio_atual == "sem_relatorio" %}
+{% set workspace_record_inicial = not workspace_assistant_inicial %}
+{% set workspace_view_inicial = "assistant_landing" if workspace_assistant_inicial else "inspection_history" %}
+
+<section
+    class="chat-dashboard-grid"
+    aria-label="Registro técnico do laudo"
+    data-inspector-region="workspace-shell"
+    data-screen-root="workspace"
+    data-active="{{ 'false' if home_forcado_inicial else 'true' }}"
+    data-workspace-view="{{ workspace_view_inicial }}"
+    data-workspace-layout="{{ 'thread-only' if workspace_assistant_inicial else 'thread-with-rail' }}"
+    data-workspace-rail-visible="{{ 'false' if workspace_assistant_inicial else 'true' }}"
+    data-conversation-variant="technical"
+    aria-hidden="{{ 'true' if home_forcado_inicial else 'false' }}"
+    {% if home_forcado_inicial %}hidden inert{% endif %}
+>
+    <section class="chat-dashboard-thread">
+        <div class="chat-thread-surface">
+            {% include "inspetor/workspace/_workspace_header.html" %}
+            {% include "inspetor/workspace/_workspace_toolbar.html" %}
+
+            <div class="workspace-view-stack" data-workspace-view-stack>
+                <section
+                    class="workspace-view-root workspace-view-root--assistant"
+                    data-workspace-view-root="assistant_landing"
+                    data-active="{{ 'true' if workspace_assistant_inicial else 'false' }}"
+                    aria-hidden="{{ 'false' if workspace_assistant_inicial else 'true' }}"
+                    {% if not workspace_assistant_inicial %}hidden inert{% endif %}
+                >
+                    {% include "inspetor/workspace/_assistant_landing.html" %}
+                </section>
+
+                <section
+                    class="workspace-view-root workspace-view-root--history"
+                    data-workspace-view-root="inspection_history"
+                    data-active="{{ 'true' if workspace_record_inicial else 'false' }}"
+                    aria-hidden="{{ 'false' if workspace_record_inicial else 'true' }}"
+                    {% if not workspace_record_inicial %}hidden inert{% endif %}
+                >
+                    {% include "inspetor/workspace/_inspection_history.html" %}
+                </section>
+
+                <section
+                    class="workspace-view-root workspace-view-root--record"
+                    data-workspace-view-root="inspection_record"
+                    data-active="false"
+                    aria-hidden="true"
+                    hidden
+                    inert
+                >
+                    {% include "inspetor/workspace/_inspection_record.html" %}
+                </section>
+
+                <section
+                    class="workspace-view-root workspace-view-root--conversation"
+                    data-workspace-view-root="inspection_conversation"
+                    data-conversation-variant="technical"
+                    data-active="false"
+                    aria-hidden="true"
+                    hidden
+                    inert
+                >
+                    {% include "inspetor/workspace/_inspection_conversation.html" %}
+                </section>
+
+                <section
+                    class="workspace-view-root workspace-view-root--mesa"
+                    data-workspace-view-root="inspection_mesa"
+                    data-active="false"
+                    aria-hidden="true"
+                    hidden
+                    inert
+                >
+                    {% include "inspetor/workspace/_inspection_mesa.html" %}
+                </section>
+            </div>
+
+            <footer class="rodape-entrada" data-conversation-variant="technical" hidden>
+                <div class="rodape-entrada__contexto">
+                    <div class="rodape-entrada__contexto-copy">
+                        <span class="rodape-entrada__eyebrow">Primeiro passo</span>
+                        <strong id="rodape-contexto-titulo">Envie a primeira mensagem</strong>
+                    </div>
+                    <span id="rodape-contexto-status" class="rodape-entrada__contexto-status">
+                        O assistente organiza o laudo enquanto voce descreve o cenario.
+                    </span>
+                </div>
+
+                <div class="rodape-entrada__acoes">
+                    <button
+                        type="button"
+                        id="btn-assistant-landing-open-inspecao-modal"
+                        class="technical-inline-action technical-inline-action--prominent"
+                        data-open-inspecao-modal
+                        data-inspector-entry="assistant-landing-new-inspection"
+                        aria-haspopup="dialog"
+                        aria-controls="modal-nova-inspecao"
+                        aria-expanded="false"
+                    >
+                        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                        <span>Nova inspeção</span>
+                    </button>
+
+                    <button type="button" id="btn-anexo" class="technical-inline-action">
+                        <span class="material-symbols-rounded" aria-hidden="true">attach_file</span>
+                        <span>Anexar</span>
+                    </button>
+
+                    <button type="button" id="btn-foto-rapida" class="technical-inline-action" data-photo-trigger="true">
+                        <span class="material-symbols-rounded" aria-hidden="true">photo_camera</span>
+                        <span>Foto</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        id="btn-toggle-humano"
+                        class="technical-inline-action"
+                        data-inspector-entry="composer-mesa"
+                        aria-label="Abrir canal da mesa avaliadora"
+                    >
+                        <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+                        <span>Mesa</span>
+                    </button>
+
+                    <button type="button" id="btn-microfone" class="technical-inline-action">
+                        <span class="material-symbols-rounded" aria-hidden="true">mic</span>
+                        <span>Áudio</span>
+                    </button>
+                </div>
+
+                <div class="rodape-entrada__composer">
+                    <div class="pilula-entrada">
+                        <input
+                            type="file"
+                            id="input-anexo"
+                            accept="image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            hidden
+                            aria-hidden="true"
+                            tabindex="-1"
+                        >
+
+                        <div class="technical-composer-main">
+                            <div class="container-textarea">
+                                <textarea
+                                    id="campo-mensagem"
+                                    rows="1"
+                                    maxlength="8000"
+                                    spellcheck="false"
+                                    autocorrect="off"
+                                    autocapitalize="off"
+                                    autocomplete="off"
+                                    aria-label="Campo de mensagem"
+                                    aria-multiline="true"
+                                    placeholder="Descreva o equipamento, cenário ou dúvida técnica"
+                                ></textarea>
+                            </div>
+
+                            <div class="technical-composer-attachment-clip" aria-label="Ações de anexo do composer">
+                                <button type="button" class="technical-composer-clip-btn" data-composer-attachment-trigger="file">
+                                    <span class="material-symbols-rounded" aria-hidden="true">attach_file</span>
+                                    <span>Anexar</span>
+                                </button>
+                                <button type="button" class="technical-composer-clip-btn" data-composer-attachment-trigger="photo">
+                                    <span class="material-symbols-rounded" aria-hidden="true">photo_camera</span>
+                                    <span>Foto</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="technical-composer-actions">
+                            <span id="contador-chars" class="contador-chars" aria-live="polite" aria-atomic="true"></span>
+
+                            <button
+                                type="button"
+                                id="btn-enviar"
+                                class="technical-send-btn"
+                                disabled
+                                title="Enviar"
+                                aria-label="Enviar mensagem"
+                            >
+                                <span class="material-symbols-rounded" aria-hidden="true">send</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        id="preview-anexo"
+                        class="preview-anexo"
+                        role="status"
+                        aria-label="Pré-visualização do arquivo"
+                        aria-live="polite"
+                    ></div>
+
+                    <div id="slash-command-palette" class="slash-command-palette" hidden></div>
+
+                    <div id="composer-suggestions" class="composer-suggestions" aria-label="Sugestões rápidas do assistente"></div>
+
+                    <p class="dica-composer">Enter envia • Shift+Enter quebra linha • / abre comandos</p>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    {% include "inspetor/workspace/_workspace_context_rail.html" %}
+</section>
+
+<section id="aviso-laudo-bloqueado" class="aviso-laudo-bloqueado" hidden aria-live="polite">
+    <div class="aviso-laudo-bloqueado__texto">
+        <strong id="aviso-laudo-bloqueado-titulo">Laudo em modo leitura</strong>
+        <p id="aviso-laudo-bloqueado-descricao">Este laudo está temporariamente bloqueado para novas mensagens.</p>
+    </div>
+    <button type="button" id="btn-reabrir-laudo" class="technical-record-btn technical-record-btn--outline" hidden>
+        Reabrir inspeção
+    </button>
+</section>

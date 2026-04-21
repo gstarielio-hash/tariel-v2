@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f7fb">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>Portal Admin-CEO • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_auth_shell.css?v={{ v_app if v_app is defined else '' }}">
+    <link rel="stylesheet" href="/static/css/admin/admin_login.css?v={{ v_app if v_app is defined else '' }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+<body class="auth-shell auth-shell--admin" data-login-ok="{{ '1' if login_sucesso else '0' }}">
+    <main class="auth-layout auth-layout--split">
+        <section class="auth-hero" aria-hidden="true">
+            <div class="auth-hero-placeholder"></div>
+            <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+            <span class="auth-hero-label">Admin-CEO</span>
+        </section>
+
+        <section class="auth-card">
+            <div class="auth-card-shell">
+                <div class="auth-inline-banner" id="aviso-rate" role="alert" aria-live="assertive"></div>
+
+                {% if erro %}
+                <div class="auth-error" id="auth-error-admin" role="alert" aria-live="assertive">{{ erro | e }}</div>
+                {% endif %}
+
+                <p class="auth-access-note">Admin-CEO da Tariel.ia</p>
+
+                <form action="/admin/login" method="POST" id="form-login" class="auth-form auth-form--minimal" novalidate autocomplete="off" data-auth-form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="lembrar" value="false">
+
+                    <div class="auth-field">
+                        <input type="email" id="email" name="email" required placeholder="E-mail"
+                            autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="none"
+                            aria-label="E-mail corporativo" aria-describedby="msg-email">
+                    </div>
+                    <span class="auth-inline-message" id="msg-email" aria-live="polite"></span>
+
+                    <div class="auth-field">
+                        <input type="password" id="senha" name="senha" required placeholder="Senha"
+                            autocomplete="current-password" minlength="8" aria-label="Senha" aria-describedby="msg-senha">
+                    </div>
+                    <span class="auth-inline-message" id="msg-senha" aria-live="polite"></span>
+
+                    <button type="submit" class="auth-button" id="btn-login">Acessar</button>
+                </form>
+
+                <p class="auth-access-note">Quer um acesso? Fale com a Tariel.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/admin/admin_login_page.js" defer nonce="{{ csp_nonce }}"></script>
+</body>
+</html>

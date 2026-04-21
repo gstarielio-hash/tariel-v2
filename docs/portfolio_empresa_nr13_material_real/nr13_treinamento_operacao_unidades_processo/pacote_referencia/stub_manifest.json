@@ -1,0 +1,10 @@
+{
+  "family_key": "nr13_treinamento_operacao_unidades_processo",
+  "status": "stub_sintetico",
+  "description": "Stub local para orientar a futura consolidacao do pacote de filled_reference.",
+  "required_files": [
+    "manifest.json",
+    "tariel_filled_reference_bundle.json"
+  ],
+  "source_of_truth": "material real consolidado em coleta_entrada/"
+}

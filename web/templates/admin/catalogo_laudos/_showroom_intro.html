@@ -1,0 +1,158 @@
+<section class="catalog-showroom-hero" aria-label="Visao comercial do catálogo">
+    <div class="catalog-showroom-hero__copy">
+        <p class="catalog-section__eyebrow">Distribuicao governada</p>
+        <h1>Catálogo de modelos</h1>
+        <p>Organize modelos e laudos por plano, pacote e prontidão comercial, com visão do documento antes de liberar para as empresas.</p>
+    </div>
+    <div class="catalog-showroom-hero__actions">
+        <button type="button" class="catalog-btn catalog-btn--secondary" data-catalog-open-drawer="catalog-bootstrap">Atualizar base oficial</button>
+        <button type="button" class="catalog-btn catalog-btn--primary" data-catalog-open-drawer="family-create">Nova família</button>
+    </div>
+    <div class="catalog-showroom-hero__metrics" aria-label="Indicadores principais do catálogo">
+        <article class="catalog-showroom-hero__metric">
+            <span>Famílias no catálogo</span>
+            <strong>{{ total_publicadas | int }}</strong>
+            <small>{{ total_familias | int }} registradas</small>
+        </article>
+        <article class="catalog-showroom-hero__metric">
+            <span>Prontas para venda</span>
+            <strong>{{ total_variantes_comerciais | int }}</strong>
+            <small>{{ total_ofertas_ativas | int }} ofertas ativas</small>
+        </article>
+        <article class="catalog-showroom-hero__metric">
+            <span>Pontos de atenção</span>
+            <strong>{{ pendencias_prioritarias }}</strong>
+            <small>{{ 'Nenhum ponto aberto' if pendencias_prioritarias == 0 else 'Fila de validacao e alertas ativos' }}</small>
+        </article>
+        <article class="catalog-showroom-hero__metric">
+            <span>Base oficial</span>
+            <strong>{{ biblioteca.ready_template_count | default(0) | int }}</strong>
+            <small>{{ total_familias_canonicas | int }} familias oficiais mapeadas</small>
+        </article>
+    </div>
+</section>
+
+<section class="catalog-discovery-panel" aria-label="Descoberta do catálogo">
+    <form method="GET" action="/admin/catalogo-laudos" class="catalog-discovery-form" aria-label="Filtros do catálogo">
+        <input type="hidden" name="macro_categoria" value="{{ filtros.get('macro_categoria', '') | e }}">
+        <div class="catalog-discovery-form__top">
+            <label class="catalog-search-field">
+                <span>Buscar modelo</span>
+                <input type="search" name="busca" value="{{ filtros.get('busca', '') | e }}" placeholder="Procure por NR, família, bundle ou tipo de laudo">
+            </label>
+            <label class="catalog-select-field">
+                <span>Prontidão</span>
+                <select name="prontidao">
+                    <option value="">Todas</option>
+                    <option value="technical_only" {% if filtros.get('prontidao') == 'technical_only' %}selected{% endif %}>Base pronta</option>
+                    <option value="partial" {% if filtros.get('prontidao') == 'partial' %}selected{% endif %}>Parcial</option>
+                    <option value="sellable" {% if filtros.get('prontidao') == 'sellable' %}selected{% endif %}>Pronta para venda</option>
+                    <option value="calibrated" {% if filtros.get('prontidao') == 'calibrated' %}selected{% endif %}>Validada</option>
+                </select>
+            </label>
+            <label class="catalog-select-field">
+                <span>Comercial</span>
+                <select name="status_comercial">
+                    <option value="">Todos</option>
+                    <option value="none" {% if filtros.get('status_comercial') == 'none' %}selected{% endif %}>Sem oferta</option>
+                    <option value="draft" {% if filtros.get('status_comercial') == 'draft' %}selected{% endif %}>Em preparo</option>
+                    <option value="testing" {% if filtros.get('status_comercial') == 'testing' %}selected{% endif %}>Em validacao</option>
+                    <option value="active" {% if filtros.get('status_comercial') == 'active' %}selected{% endif %}>Ativa</option>
+                    <option value="paused" {% if filtros.get('status_comercial') == 'paused' %}selected{% endif %}>Pausada</option>
+                </select>
+            </label>
+            <label class="catalog-select-field">
+                <span>Clientes</span>
+                <select name="liberacao">
+                    <option value="">Todos</option>
+                    <option value="active" {% if filtros.get('liberacao') == 'active' %}selected{% endif %}>Com cliente liberado</option>
+                    <option value="none" {% if filtros.get('liberacao') == 'none' %}selected{% endif %}>Sem liberacao</option>
+                </select>
+            </label>
+            <div class="catalog-discovery-form__actions">
+                <button type="submit" class="catalog-btn catalog-btn--primary">Aplicar filtros</button>
+                <a href="/admin/catalogo-laudos" class="catalog-btn catalog-btn--secondary">Limpar</a>
+            </div>
+        </div>
+
+        <div class="catalog-category-strip" aria-label="Navegação por NR e categorias">
+            <span class="catalog-category-strip__label">Categorias</span>
+            <div class="catalog-category-strip__rail">
+                <a href="{{ request.url.include_query_params(macro_categoria='') }}" class="catalog-category-pill{% if not filtros.get('macro_categoria') %} is-active{% endif %}">Todas</a>
+                {% for item in macro_categorias %}
+                <a href="{{ request.url.include_query_params(macro_categoria=item) }}" class="catalog-category-pill{% if filtros.get('macro_categoria') == item %} is-active{% endif %}">{{ item | e }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <details class="catalog-filter-disclosure" {% if secondary_filters_open %}open{% endif %}>
+            <summary>Mais filtros de governança e preparo</summary>
+            <div class="catalog-filter-secondary">
+                <label class="catalog-select-field">
+                    <span>Etapa técnica</span>
+                    <select name="status_tecnico">
+                        <option value="">Todos</option>
+                        <option value="draft" {% if filtros.get('status_tecnico') == 'draft' %}selected{% endif %}>Em preparo</option>
+                        <option value="review" {% if filtros.get('status_tecnico') == 'review' %}selected{% endif %}>Em ajuste</option>
+                        <option value="ready" {% if filtros.get('status_tecnico') == 'ready' %}selected{% endif %}>Pronta</option>
+                        <option value="deprecated" {% if filtros.get('status_tecnico') == 'deprecated' %}selected{% endif %}>Arquivada</option>
+                    </select>
+                </label>
+                <label class="catalog-select-field">
+                    <span>Validação</span>
+                    <select name="calibracao">
+                        <option value="">Todas</option>
+                        <option value="none" {% if filtros.get('calibracao') == 'none' %}selected{% endif %}>Sem validacao</option>
+                        <option value="synthetic_only" {% if filtros.get('calibracao') == 'synthetic_only' %}selected{% endif %}>Base inicial</option>
+                        <option value="partial_real" {% if filtros.get('calibracao') == 'partial_real' %}selected{% endif %}>Em validacao</option>
+                        <option value="real_calibrated" {% if filtros.get('calibracao') == 'real_calibrated' %}selected{% endif %}>Validado com material real</option>
+                    </select>
+                </label>
+                <label class="catalog-select-field">
+                    <span>Modelo principal</span>
+                    <select name="template_default">
+                        <option value="">Todos</option>
+                        <option value="configured" {% if filtros.get('template_default') == 'configured' %}selected{% endif %}>Configurado</option>
+                        <option value="unconfigured" {% if filtros.get('template_default') == 'unconfigured' %}selected{% endif %}>Sem modelo</option>
+                        {% for item in template_default_options %}
+                        <option value="{{ item | e }}" {% if filtros.get('template_default') == item %}selected{% endif %}>{{ item | e }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label class="catalog-select-field">
+                    <span>Modo de execução</span>
+                    <select name="mode">
+                        <option value="">Todos</option>
+                        <option value="available" {% if filtros.get('mode') == 'available' %}selected{% endif %}>Com modo configurado</option>
+                    </select>
+                </label>
+            </div>
+        </details>
+    </form>
+
+    {% if total_metodos_catalogados %}
+    <div class="catalog-inline-note catalog-inline-note--subtle" role="note">
+        <div>
+            <strong>Metodos em trilha separada</strong>
+            <p>Ultrassom, liquido penetrante, particula magnetica e similares continuam fora da vitrine principal de famílias.</p>
+        </div>
+        <div class="catalog-chip-row">
+            {% for item in metodos_catalogo[:6] %}
+            <span class="catalog-chip">{{ item.nome_exibicao | e }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<section class="catalog-showroom-head" aria-label="Cabeçalho da vitrine">
+    <div>
+        <p class="catalog-section__eyebrow">Vitrine distribuível</p>
+        <h2>Modelos governados</h2>
+        <p>Veja o documento, o pacote, a disponibilidade por plano e as ações administrativas antes de liberar.</p>
+    </div>
+    <div class="catalog-showroom-head__meta">
+        <span>{{ catalog_rows | length }} exibidos</span>
+        <small>de {{ catalog_rows_total | int }} famílias no catálogo</small>
+    </div>
+</section>

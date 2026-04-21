@@ -1,0 +1,162 @@
+{% set workspace_assistant_inicial = workspace_assistant_inicial | default(false) %}
+
+<header class="chat-thread-toolbar technical-record-header" data-workspace-header data-component-slice="workspace-chrome">
+    <div class="technical-record-header__focused-bar" data-focused-conversation-topbar>
+        <a
+            href="/app/?home=1"
+            class="btn-secundario technical-record-back technical-record-back--focused"
+            data-action="go-home"
+            data-home-destino="/app/?home=1"
+            aria-label="Voltar para o Portal do Inspetor"
+        >
+            <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+            <span>Portal</span>
+        </a>
+
+        <span class="technical-record-status-pill technical-record-status-pill--focused">CONVERSA</span>
+    </div>
+
+    <div class="technical-record-header__row">
+        <div class="technical-record-header__main">
+            <div class="technical-record-header__backline">
+                <a
+                    href="/app/?home=1"
+                    class="btn-secundario btn-home-cabecalho technical-record-back"
+                    data-action="go-home"
+                    data-home-destino="/app/?home=1"
+                    aria-label="Voltar para o Portal do Inspetor"
+                >
+                    <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                    <span>Portal</span>
+                </a>
+
+                <div class="technical-record-ident">
+                    <h2 id="workspace-titulo-laudo">Assistente Tariel IA</h2>
+                    <p id="workspace-subtitulo-laudo">Conversa inicial • nenhum laudo ativo</p>
+                </div>
+            </div>
+
+            <div class="technical-record-copy">
+                <span id="workspace-eyebrow" class="technical-record-copy__eyebrow">Assistente operacional</span>
+                <h1 id="workspace-headline">Converse com o assistente</h1>
+                <p id="workspace-description">
+                    Descreva o equipamento, cenario ou duvida tecnica. A primeira mensagem organiza a sessao e abre o laudo.
+                </p>
+                <p id="workspace-entry-mode-note" class="technical-record-copy__note" hidden></p>
+            </div>
+
+            <div class="workspace-hero-strip" aria-label="Resumo operacional do laudo">
+                <article class="workspace-hero-stat workspace-hero-stat--state">
+                    <span>Estado atual</span>
+                    <strong id="workspace-summary-state">CHAT LIVRE</strong>
+                </article>
+                <article class="workspace-hero-stat">
+                    <span>Evidências</span>
+                    <strong id="workspace-summary-evidencias">0</strong>
+                </article>
+                <article class="workspace-hero-stat">
+                    <span>Pendências</span>
+                    <strong id="workspace-summary-pendencias">0</strong>
+                </article>
+                <article class="workspace-hero-stat">
+                    <span>Mesa técnica</span>
+                    <strong id="workspace-summary-mesa">Canal disponível</strong>
+                </article>
+            </div>
+
+            <section
+                id="workspace-public-verification"
+                class="workspace-public-verification"
+                aria-label="Verificação pública do laudo"
+                hidden
+            >
+                <div class="workspace-public-verification__copy">
+                    <span class="workspace-public-verification__eyebrow">Verificação pública</span>
+                    <strong id="workspace-public-verification-title">Entrega verificável pronta</strong>
+                    <p id="workspace-public-verification-meta">Hash e link prontos para conferência documental.</p>
+                </div>
+                <div class="workspace-public-verification__actions">
+                    <a
+                        id="workspace-public-verification-link"
+                        class="technical-record-btn technical-record-btn--ghost"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Abrir verificação
+                    </a>
+                    <button
+                        type="button"
+                        id="btn-workspace-copy-verification"
+                        class="technical-record-btn technical-record-btn--ghost"
+                    >
+                        Copiar link
+                    </button>
+                </div>
+            </section>
+
+            <section
+                id="workspace-official-issue"
+                class="workspace-official-issue"
+                aria-label="Emissão oficial do laudo"
+                hidden
+            >
+                <div class="workspace-official-issue__copy">
+                    <span class="workspace-official-issue__eyebrow">Emissão oficial</span>
+                    <strong id="workspace-official-issue-title">Aguardando governança documental</strong>
+                    <p id="workspace-official-issue-meta">A etapa oficial de emissão ainda não começou.</p>
+                </div>
+                <span
+                    id="workspace-official-issue-chip"
+                    class="technical-record-status-pill technical-record-status-pill--neutral"
+                >
+                    PENDENTE
+                </span>
+            </section>
+        </div>
+
+        <div class="technical-record-header__actions" data-workspace-header-actions>
+            <span id="workspace-status-badge" class="technical-record-status-pill">CHAT LIVRE</span>
+            <button
+                type="button"
+                id="btn-workspace-open-inspecao-modal"
+                class="technical-record-btn technical-record-btn--ghost"
+                data-open-inspecao-modal
+                data-inspector-entry="workspace-header-new-inspection"
+                {% if not workspace_assistant_inicial %}hidden{% endif %}
+            >
+                Nova Inspeção
+            </button>
+            <button
+                type="button"
+                id="btn-workspace-toggle-rail"
+                class="technical-record-btn technical-record-btn--ghost"
+                aria-expanded="false"
+                aria-controls="workspace-context-rail"
+                {% if workspace_assistant_inicial %}hidden{% endif %}
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">right_panel_open</span>
+                <span>Painel</span>
+            </button>
+            <button
+                type="button"
+                id="btn-workspace-preview"
+                class="technical-record-btn technical-record-btn--ghost"
+                {% if workspace_assistant_inicial %}hidden{% endif %}
+            >
+                Pré-visualizar
+            </button>
+            <button
+                type="button"
+                id="btn-finalizar-inspecao"
+                class="technical-record-btn technical-record-btn--primary"
+                data-finalizar-inspecao
+                data-inspector-entry="workspace-header-send-mesa"
+                {% if workspace_assistant_inicial %}hidden{% endif %}
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">send</span>
+                <span>Enviar para Mesa</span>
+            </button>
+        </div>
+    </div>
+</header>

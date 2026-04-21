@@ -1,0 +1,3083 @@
+{
+  "master_template_id": "inspection_conformity",
+  "template_code": "master_inspection_conformity",
+  "nome_template": "Master Template - Inspection Conformity",
+  "documental_type": "tipo_a",
+  "modo_editor": "editor_rico",
+  "observacoes": "Template mestre universal para laudos profissionais de inspecao de conformidade, cobrindo capa, controle documental, objeto, metodologia, identificacao tecnica, checklist, evidencias, criticidade, conclusao, plano de acao, assinaturas e anexos.",
+  "section_contract": {
+    "required_sections": [
+      "capa_folha_rosto",
+      "controle_documental_sumario",
+      "objeto_escopo_base_normativa",
+      "metodologia_instrumentos_equipe",
+      "identificacao_tecnica_do_objeto",
+      "checklist_tecnico",
+      "evidencias_registros_fotograficos",
+      "nao_conformidades_criticidade",
+      "conclusao",
+      "recomendacoes_plano_acao",
+      "assinaturas_responsabilidade_tecnica",
+      "anexos"
+    ],
+    "required_tokens": [
+      "cliente_nome",
+      "cliente_razao_social",
+      "cliente_cnpj",
+      "unidade_nome",
+      "documento_codigo",
+      "documento_revisao",
+      "documento_titulo",
+      "revisao_template",
+      "engenheiro_responsavel",
+      "crea_art",
+      "status_assinatura",
+      "confidencialidade_documento"
+    ],
+    "blocking_rules": [
+      "campo_critico_ausente",
+      "checklist_obrigatorio_incompleto",
+      "evidencia_minima_obrigatoria_ausente",
+      "conflito_grave_entre_evidencia_e_conclusao",
+      "familia_indefinida",
+      "pendencia_critica_em_aberto"
+    ]
+  },
+  "estilo_json": {
+    "pagina": {
+      "size": "A4",
+      "orientation": "portrait",
+      "margens_mm": {
+        "top": 18,
+        "right": 14,
+        "bottom": 18,
+        "left": 14
+      }
+    },
+    "tipografia": {
+      "font_family": "Georgia, 'Times New Roman', serif",
+      "font_size_px": 11,
+      "line_height": 1.5
+    },
+    "tema": {
+      "primaria": "#17324d",
+      "secundaria": "#55697a",
+      "acento": "#b6813a",
+      "suave": "#eef3f7",
+      "borda": "#c5d2dc"
+    },
+    "cabecalho_texto": "{{token:documento_titulo}} | {{token:cliente_nome}} | {{token:documento_codigo}} | {{json_path:case_context.data_emissao}}",
+    "rodape_texto": "{{token:cliente_razao_social}} | {{token:status_assinatura}} | {{token:confidencialidade_documento}} | {{token:documento_revisao}}",
+    "marca_dagua": {
+      "texto": "",
+      "opacity": 0.08,
+      "font_size_px": 72,
+      "rotate_deg": -32
+    }
+  },
+  "documento_editor_json": {
+    "version": 1,
+    "doc": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Tariel | Biblioteca Mestre Governada"
+            }
+          ],
+          "attrs": {
+            "className": "doc-kicker"
+          }
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "token",
+                "key": "documento_titulo",
+                "raw": "token:documento_titulo"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Template mestre universal para laudos profissionais de inspecao de conformidade. A emissao final deve fechar ao mesmo tempo suficiencia normativa, rastreabilidade tecnica, evidencia objetiva e apresentacao documental profissional."
+            }
+          ],
+          "attrs": {
+            "className": "doc-lead"
+          }
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Familia tecnica: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "family_key",
+                "raw": "json_path:family_key"
+              }
+            },
+            {
+              "type": "text",
+              "text": " | Tipo mestre: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "token",
+                "key": "documento_tipo_mestre",
+                "raw": "token:documento_tipo_mestre"
+              }
+            },
+            {
+              "type": "text",
+              "text": " | Emissao: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "case_context.data_emissao",
+                "raw": "json_path:case_context.data_emissao"
+              }
+            }
+          ],
+          "attrs": {
+            "className": "doc-meta"
+          }
+        },
+        {
+          "type": "horizontalRule",
+          "attrs": {
+            "className": "doc-divider"
+          }
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "1. Capa / Folha de Rosto"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-cover doc-compact"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Campo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Valor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Titulo do documento"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "documento_titulo",
+                            "raw": "token:documento_titulo"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Familia tecnica / modo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "family_key",
+                            "raw": "json_path:family_key"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "escopo_servico.modo_execucao",
+                            "raw": "json_path:escopo_servico.modo_execucao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Empresa contratante"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "cliente_razao_social",
+                            "raw": "token:cliente_razao_social"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Unidade / local"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "unidade_nome",
+                            "raw": "token:unidade_nome"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Ativo / sistema avaliado"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "identificacao.objeto_principal",
+                            "raw": "json_path:identificacao.objeto_principal"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Codigo / revisao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "documento_codigo",
+                            "raw": "token:documento_codigo"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "documento_revisao",
+                            "raw": "token:documento_revisao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Data de emissao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "case_context.data_emissao",
+                            "raw": "json_path:case_context.data_emissao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Responsavel tecnico / registro"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "engenheiro_responsavel",
+                            "raw": "token:engenheiro_responsavel"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "crea_art",
+                            "raw": "token:crea_art"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "A capa deve identificar de imediato cliente, objeto, codigo, revisao, emissao e responsabilidade tecnica. Branding entra como camada controlada, sem alterar a estrutura tecnica."
+            }
+          ],
+          "attrs": {
+            "className": "doc-note"
+          }
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "2. Controle Documental / Sumario / Ficha do Documento"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-compact"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Campo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Valor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Documento / codigo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "documento_titulo",
+                            "raw": "token:documento_titulo"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "documento_codigo",
+                            "raw": "token:documento_codigo"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Revisao / status de assinatura"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "documento_revisao",
+                            "raw": "token:documento_revisao"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "status_assinatura",
+                            "raw": "token:status_assinatura"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Confidencialidade"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "confidencialidade_documento",
+                            "raw": "token:confidencialidade_documento"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Cliente / CNPJ"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "cliente_nome",
+                            "raw": "token:cliente_nome"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "cliente_cnpj",
+                            "raw": "token:cliente_cnpj"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Controle do caso"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "case_context.laudo_id",
+                            "raw": "json_path:case_context.laudo_id"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "mesa_review.status",
+                            "raw": "json_path:mesa_review.status"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Template mestre"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "documento_tipo_mestre",
+                            "raw": "token:documento_tipo_mestre"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "text": " | revisao "
+                        },
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "revisao_template",
+                            "raw": "token:revisao_template"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Secoes-base: capa, controle documental, objeto e escopo, metodologia, identificacao tecnica, checklist, evidencias, nao conformidades, conclusao, plano de acao, assinaturas e anexos."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Historico de revisoes, aprovadores e lista de anexos podem ser ampliados pelo overlay da familia ou pela camada documental do tenant."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Toda pagina emitida deve permanecer identificada por codigo, revisao, cliente, data e status documental."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "3. Objeto, Escopo, Base Normativa e Limitacoes"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-compact"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Campo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Valor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Objeto principal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "identificacao.objeto_principal",
+                            "raw": "json_path:identificacao.objeto_principal"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Localizacao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "identificacao.localizacao",
+                            "raw": "json_path:identificacao.localizacao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Tipo de entrega"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "escopo_servico.tipo_entrega",
+                            "raw": "json_path:escopo_servico.tipo_entrega"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Modo de execucao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "escopo_servico.modo_execucao",
+                            "raw": "json_path:escopo_servico.modo_execucao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Resumo de escopo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "escopo_servico.resumo_escopo",
+                            "raw": "json_path:escopo_servico.resumo_escopo"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "NR / normas complementares / criterios"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "O overlay da familia deve materializar norma aplicavel, base complementar, criterio de aceitacao e limitacoes contratuais do caso."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Nenhuma conclusao deve sair solta: o documento precisa declarar o que foi inspecionado, o que ficou fora do escopo, quais premissas valem e quais limites impactam a leitura tecnica."
+            }
+          ],
+          "attrs": {
+            "className": "doc-note"
+          }
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "4. Metodologia, Instrumentos e Equipe"
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Metodo de inspecao: "
+                    },
+                    {
+                      "type": "placeholder",
+                      "attrs": {
+                        "mode": "json_path",
+                        "key": "execucao_servico.metodo_aplicado",
+                        "raw": "json_path:execucao_servico.metodo_aplicado"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Condicoes observadas: "
+                    },
+                    {
+                      "type": "placeholder",
+                      "attrs": {
+                        "mode": "json_path",
+                        "key": "execucao_servico.condicoes_observadas",
+                        "raw": "json_path:execucao_servico.condicoes_observadas"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Parametros relevantes: "
+                    },
+                    {
+                      "type": "placeholder",
+                      "attrs": {
+                        "mode": "json_path",
+                        "key": "execucao_servico.parametros_relevantes",
+                        "raw": "json_path:execucao_servico.parametros_relevantes"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Evidencia de execucao: "
+                    },
+                    {
+                      "type": "placeholder",
+                      "attrs": {
+                        "mode": "json_path",
+                        "key": "execucao_servico.evidencia_execucao.referencias_texto",
+                        "raw": "json_path:execucao_servico.evidencia_execucao.referencias_texto"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Instrumentos, calibracao, equipe, data/hora e condicoes ambientais devem ser detalhados pela familia quando influenciarem na confiabilidade do resultado."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "5. Identificacao Tecnica do Objeto"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-compact"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Campo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Valor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Identificacao do ativo / sistema"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "identificacao.objeto_principal",
+                            "raw": "json_path:identificacao.objeto_principal"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "TAG / codigo interno"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "identificacao.codigo_interno",
+                            "raw": "json_path:identificacao.codigo_interno"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Referencia principal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "identificacao.referencia_principal.referencias_texto",
+                            "raw": "json_path:identificacao.referencia_principal.referencias_texto"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Unidade / localizacao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "identificacao.localizacao",
+                            "raw": "json_path:identificacao.localizacao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Data de execucao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "case_context.data_execucao",
+                            "raw": "json_path:case_context.data_execucao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Dados de placa, fabricante, modelo, serie, fluido, tensao, pressao ou temperatura"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Este bloco deve ser especializado pelo overlay conforme a familia tecnica."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "6. Checklist Tecnico Item a Item"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Cada item do checklist deve carregar codigo estavel, requisito aplicavel, situacao observada, veredito, criticidade quando houver, justificativa curta, referencia da evidencia e acao corretiva vinculada."
+            }
+          ],
+          "attrs": {
+            "className": "doc-note"
+          }
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-matrix"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Item"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Criterio aplicavel"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Situacao observada"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Veredito"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Evidencia / acao"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "CHK-01"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Requisito normativo ou tecnico"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Sintese objetiva do que foi observado em campo ou em documento"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "C / NC / NA"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "ID da evidencia, foto, documento ou acao corretiva"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "CHK-02"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Critico especifico da familia"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Condicao encontrada, sem texto generico"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "C / NC / NA"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Referencia cruzada com pendencia, recomendacao ou bloqueio"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "7. Evidencias / Registros Fotograficos"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-evidence-matrix"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "ID"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Consolidacao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "O que comprova"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Vinculo esperado"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "EV-01"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "evidencias_e_anexos.evidencia_principal.referencias_texto",
+                            "raw": "json_path:evidencias_e_anexos.evidencia_principal.referencias_texto"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Comprovar o estado observado ou o ponto critico principal do caso."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Checklist, nao conformidade ou conclusao."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "EV-02"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "evidencias_e_anexos.evidencia_complementar.referencias_texto",
+                            "raw": "json_path:evidencias_e_anexos.evidencia_complementar.referencias_texto"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Contextualizar o achado, o ambiente ou a evolucao do item avaliado."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Checklist, observacoes ou restricoes de uso."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "DOC-BASE"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "evidencias_e_anexos.documento_base.referencias_texto",
+                            "raw": "json_path:evidencias_e_anexos.documento_base.referencias_texto"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Ancora documental da inspecao, do ensaio ou do prontuario vinculado."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Escopo, metodologia ou anexos obrigatorios."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "8. Nao Conformidades e Criticidade"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-compact"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Campo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Valor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Ha pontos de atencao / nao conformidades"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "nao_conformidades_ou_lacunas.ha_pontos_de_atencao_texto",
+                            "raw": "json_path:nao_conformidades_ou_lacunas.ha_pontos_de_atencao_texto"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Descricao consolidada"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "nao_conformidades_ou_lacunas.descricao",
+                            "raw": "json_path:nao_conformidades_ou_lacunas.descricao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Evidencias relacionadas"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "nao_conformidades_ou_lacunas.evidencias.referencias_texto",
+                            "raw": "json_path:nao_conformidades_ou_lacunas.evidencias.referencias_texto"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Risco / criticidade / restricao operacional"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "A familia deve derivar criticidade, risco associado, responsavel e prazo sempre que houver impacto relevante na decisao final."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "9. Conclusao"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-conclusion doc-compact"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Campo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Valor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Condicao final"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "conclusao.status",
+                            "raw": "json_path:conclusao.status"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Conclusao tecnica"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "conclusao.conclusao_tecnica",
+                            "raw": "json_path:conclusao.conclusao_tecnica"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Fundamento da conclusao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "conclusao.justificativa",
+                            "raw": "json_path:conclusao.justificativa"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Bloqueios / pendencias criticas"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "mesa_review.bloqueios_texto",
+                            "raw": "json_path:mesa_review.bloqueios_texto"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Proxima inspecao / proxima acao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "A familia deve materializar periodicidade, condicao de retorno e proxima acao obrigatoria quando aplicavel."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "10. Recomendacoes / Plano de Acao"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "recomendacoes.texto",
+                "raw": "json_path:recomendacoes.texto"
+              }
+            }
+          ],
+          "attrs": {
+            "className": "doc-note"
+          }
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-action-plan"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "NC / item"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Acao recomendada"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Fundamento tecnico"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Prioridade"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Condicao para encerramento"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "NC-01 / CHK-01"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Acao corretiva objetiva e verificavel"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Amarracao com norma, criterio ou achado tecnico"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Alta / Media / Baixa"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Evidencia, reinspecao ou documento que fecha a tratativa"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "11. Assinaturas e Responsabilidade Tecnica"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": {
+            "className": "doc-compact"
+          },
+          "content": [
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Campo"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableHeader",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Valor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Responsavel tecnico"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "engenheiro_responsavel",
+                            "raw": "token:engenheiro_responsavel"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Registro profissional / ART"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "crea_art",
+                            "raw": "token:crea_art"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Data de emissao"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "json_path",
+                            "key": "case_context.data_emissao",
+                            "raw": "json_path:case_context.data_emissao"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Status de assinatura"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "placeholder",
+                          "attrs": {
+                            "mode": "token",
+                            "key": "status_assinatura",
+                            "raw": "token:status_assinatura"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "content": [
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Ciencia operacional"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Assinatura de cliente ou operacao entra apenas quando exigida contratualmente, nunca como substituto de documento incompleto."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "12. Anexos"
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "ART / RRT, certificados, folhas de medicao, croquis, diagramas, calculos e relatorios complementares."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "PET, AR, PT, certificados de valvula, prontuarios e documentos-base exigidos pela familia."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Fotos numeradas, graficos, fluxogramas, memoriais e pacotes documentais que sustentam a conclusao."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Documento emitido a partir de template mestre governado pela Tariel. O PDF e a materializacao auditavel do laudo_output revisado pela Mesa, e nao a fonte primaria de verdade."
+            }
+          ],
+          "attrs": {
+            "className": "doc-small"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Acesso inicial • {{ empresa_nome | e }} • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_new_client.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Menu principal">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+                <a href="/admin/clientes" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+                <a href="/admin/catalogo-laudos" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+                <a href="/admin/novo-cliente" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="topbar">
+                <div class="titulo-pagina">
+                    <h1>Acesso inicial da empresa</h1>
+                    <p>{{ empresa_nome | e }} foi preparada. Use esta tela para informar o e-mail inicial, a senha temporaria e o caminho de entrada de cada area.</p>
+                </div>
+
+                <a href="/admin/clientes" class="btn-admin secundario">Empresas</a>
+            </header>
+
+            {% for msg in mensagens_flash %}
+            {% set _tipo_alerta = 'success' if msg.tipo == 'success' else 'error' %}
+            <div class="alert alert-{{ _tipo_alerta }}" role="alert" aria-live="assertive">
+                <span class="material-symbols-rounded" aria-hidden="true">{{ 'check_circle' if _tipo_alerta == 'success' else 'error' }}</span>
+                {{ msg.texto | e }}
+            </div>
+            {% endfor %}
+
+            <section class="setup-shell" aria-label="Credenciais iniciais da empresa">
+                <article class="setup-card">
+                    <div class="setup-summary">
+                        <strong>Instrucoes de primeiro acesso</strong>
+                        <p>{{ total_credenciais_onboarding | int }} credencial(is) foram preparadas para {{ empresa_nome | e }}. As senhas temporárias aparecem só nesta confirmação e exigem troca no primeiro acesso.</p>
+                    </div>
+
+                    {% for credencial in credenciais_onboarding %}
+                    {% set credencial_index = loop.index %}
+                    <div class="setup-grid"{% if not loop.first %} style="margin-top: 1.5rem;"{% endif %}>
+                        <div class="campo-form campo-form--full">
+                            <label for="credencial-referencia-{{ credencial_index }}">Perfil provisionado</label>
+                            <input
+                                id="credencial-referencia-{{ credencial_index }}"
+                                type="text"
+                                value="{{ credencial.referencia | e }}{% if credencial.papel and credencial.papel != credencial.referencia %} · {{ credencial.papel | e }}{% endif %}"
+                                readonly
+                                onclick="this.select();">
+                        </div>
+
+                        <div class="campo-form">
+                            <label for="credencial-usuario-{{ credencial_index }}">Pessoa responsavel</label>
+                            <input
+                                id="credencial-usuario-{{ credencial_index }}"
+                                type="text"
+                                value="{{ credencial.usuario_nome | e }}"
+                                readonly
+                                onclick="this.select();">
+                        </div>
+
+                        <div class="campo-form">
+                            <label for="credencial-login-{{ credencial_index }}">E-mail de entrada</label>
+                            <input
+                                id="credencial-login-{{ credencial_index }}"
+                                type="text"
+                                value="{{ credencial.login | e }}"
+                                readonly
+                                onclick="this.select();">
+                        </div>
+
+                        <div class="campo-form">
+                            <label for="credencial-senha-{{ credencial_index }}">Senha temporária</label>
+                            <input
+                                id="credencial-senha-{{ credencial_index }}"
+                                type="text"
+                                value="{{ credencial.senha | e }}"
+                                readonly
+                                onclick="this.select();">
+                        </div>
+
+                        {% for portal in credencial.portais %}
+                        <div class="campo-form">
+                            <label for="credencial-portal-{{ credencial_index }}-{{ loop.index }}">Pagina de entrada de {{ portal.label | e }}</label>
+                            <input
+                                id="credencial-portal-{{ credencial_index }}-{{ loop.index }}"
+                                type="text"
+                                value="{{ portal.login_url | e }}"
+                                readonly
+                                onclick="this.select();">
+                        </div>
+                        {% endfor %}
+
+                        <div class="campo-form campo-form--full">
+                            <label for="credencial-orientacao-{{ credencial_index }}">Como orientar</label>
+                            <textarea
+                                id="credencial-orientacao-{{ credencial_index }}"
+                                rows="4"
+                                readonly>{{ credencial.orientacao | e }}</textarea>
+                        </div>
+
+                        <div class="campo-form campo-form--full">
+                            <p class="campo-ajuda">O suporte informa o caminho e a senha temporaria, mas a entrada deve ser feita pela propria empresa ou equipe no portal correspondente.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="setup-actions">
+                        {% if tem_detalhe_empresa %}
+                        <a href="/admin/clientes/{{ empresa_id | int }}" class="btn-admin secundario">Ver detalhe da empresa</a>
+                        {% endif %}
+                        <a href="/admin/clientes" class="btn-admin secundario">Voltar para empresas</a>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

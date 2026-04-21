@@ -1,0 +1,31 @@
+<section
+    id="mesa-queue"
+    class="surface-stage"
+    data-mesa-panel="queue"
+    role="tabpanel"
+    aria-labelledby="mesa-section-tab-queue"
+    {% if (cliente_mesa_section_inicial | default('overview')) != 'queue' %}hidden{% endif %}
+>
+    <div class="surface-stage-head">
+        <div>
+            <span class="surface-stage-kicker">Fila de revisao</span>
+            <h3>Laudos aguardando leitura</h3>
+            <p class="box-subtitle">Entre pelo laudo certo e filtre a fila.</p>
+        </div>
+    </div>
+
+    <article class="box workspace-box workspace-box--list">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Fila da mesa</h3>
+                <p class="box-subtitle">Priorize o que tem chamado ou pendencia aberta.</p>
+            </div>
+            <div class="toolbar-actions">
+                <input id="mesa-busca-laudos" type="search" placeholder="Buscar laudos, status ou resumo">
+            </div>
+        </div>
+
+        <div id="mesa-lista-resumo" class="toolbar-meta"></div>
+        <div id="lista-mesa-laudos" class="list"></div>
+    </article>
+</section>

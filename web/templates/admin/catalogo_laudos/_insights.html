@@ -1,0 +1,422 @@
+<section class="catalog-secondary-intro" aria-label="Leituras complementares do catálogo">
+    <div>
+        <p class="catalog-section__eyebrow">Leituras complementares</p>
+        <h2>Base oficial, clientes e prioridades</h2>
+        <p>Esses blocos ajudam a entender quem ja usa cada familia, o que falta preparar e onde vale agir primeiro.</p>
+    </div>
+</section>
+
+<section class="catalog-governance-overview" aria-label="Liberação e padrão das famílias">
+    <article class="catalog-panel">
+        <div class="catalog-panel__header">
+            <div>
+                <p class="catalog-section__eyebrow">Clientes</p>
+                <h2>Clientes com acesso liberado</h2>
+                <p class="catalog-panel__description">Veja onde a familia ja esta ativa e qual regra de uso esta valendo.</p>
+            </div>
+            <div class="catalog-home-spotlight">
+                <span class="catalog-home-spotlight__value">{{ governanca.active_release_count | default(0) | int }}</span>
+                <span class="catalog-home-spotlight__label">liberações ativas</span>
+                <span class="catalog-home-spotlight__meta">{{ governanca.tenant_count | default(0) | int }} clientes com regra aplicada</span>
+            </div>
+        </div>
+
+        {% set release_modes = namespace(has_items=false) %}
+        <div class="catalog-card-grid catalog-card-grid--compact">
+            {% for item in governanca.effective_release_modes | default([]) %}
+            {% if item.count %}
+            {% set release_modes.has_items = true %}
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-status catalog-status--{{ item.mode.tone | e }}">{{ item.mode.label | e }}</span>
+                <strong>{{ item.count | int }}</strong>
+                <span>{{ item.tenant_count | int }} clientes • {{ item.family_count | int }} famílias</span>
+            </article>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% if not release_modes.has_items %}
+        <p class="catalog-panel__hint">Sem regras ativas neste recorte.</p>
+        {% endif %}
+
+        {% if governanca.tenant_highlights %}
+        <div class="catalog-governance-list">
+            {% for item in governanca.tenant_highlights %}
+            <article class="catalog-governance-list__item">
+                <div class="catalog-card__header">
+                    <div>
+                        <strong>{{ item.tenant_label | e }}</strong>
+                        <span class="catalog-card__meta">{{ item.plan_label | e }} • {{ item.active_release_count | int }} famílias ativas</span>
+                    </div>
+                    <a href="/admin/clientes/{{ item.tenant_id | int }}" class="catalog-btn catalog-btn--secondary">Abrir cliente</a>
+                </div>
+                <div class="catalog-governance-pill-row">
+                    <span class="catalog-status catalog-status--{{ item.strictest_mode.tone | e }}">{{ item.strictest_mode.label | e }}</span>
+                    {% if item.blocked %}
+                    <span class="catalog-chip catalog-chip--muted">Cliente bloqueado</span>
+                    {% endif %}
+                </div>
+                <span class="catalog-card__meta">{{ item.mode_breakdown_label | e }}</span>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="catalog-governance-note">Sem liberacao ativa neste recorte.</p>
+        {% endif %}
+    </article>
+
+    <article class="catalog-panel">
+        <div class="catalog-panel__header">
+            <div>
+                <p class="catalog-section__eyebrow">Regras da base</p>
+                <h2>Modo padrao das familias</h2>
+                <p class="catalog-panel__description">Mostra como a base esta configurada hoje e onde ja existe mais atencao.</p>
+            </div>
+            <div class="catalog-home-spotlight">
+                <span class="catalog-home-spotlight__value">{{ governanca.scope_family_count | default(0) | int }}</span>
+                <span class="catalog-home-spotlight__label">famílias no recorte</span>
+                <span class="catalog-home-spotlight__meta">{{ governanca.families_with_red_flags_count | default(0) | int }} com alertas</span>
+            </div>
+        </div>
+
+        {% set family_modes = namespace(has_items=false) %}
+        <div class="catalog-card-grid catalog-card-grid--compact">
+            {% for item in governanca.family_default_modes | default([]) %}
+            {% if item.count %}
+            {% set family_modes.has_items = true %}
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-status catalog-status--{{ item.mode.tone | e }}">{{ item.mode.label | e }}</span>
+                <strong>{{ item.count | int }}</strong>
+                <span>{{ item.share | int }}% da base no recorte</span>
+            </article>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% if not family_modes.has_items %}
+        <p class="catalog-panel__hint">Sem distribuicao relevante para destacar aqui.</p>
+        {% endif %}
+
+        {% if governanca.family_highlights %}
+        <div class="catalog-governance-list">
+            {% for item in governanca.family_highlights %}
+            <article class="catalog-governance-list__item">
+                <div class="catalog-card__header">
+                    <div>
+                        <strong>{{ item.family_label | e }}</strong>
+                        <span class="catalog-card__meta">{{ item.tenant_count | int }} clientes • {{ item.active_release_count | int }} liberações</span>
+                    </div>
+                    <a href="/admin/catalogo-laudos/familias/{{ item.family_key | e }}" class="catalog-btn catalog-btn--secondary">Abrir família</a>
+                </div>
+                <div class="catalog-governance-pill-row">
+                    <span class="catalog-status catalog-status--{{ item.default_review_mode.tone | e }}">{{ item.default_review_mode.label | e }}</span>
+                    <span class="catalog-status catalog-status--{{ item.dominant_mode.tone | e }}">{{ item.dominant_mode.label | e }}</span>
+                    {% if item.red_flags_count %}
+                    <span class="catalog-chip catalog-chip--muted">{{ item.red_flags_count | int }} alertas</span>
+                    {% endif %}
+                </div>
+                <span class="catalog-card__meta">{{ item.mode_breakdown_label | e }}</span>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="catalog-governance-note">Ainda nao ha liberacao suficiente para destacar familias.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="catalog-home-layout catalog-home-layout--dual" aria-label="Escala comercial do catálogo">
+    <article class="catalog-panel">
+        <div class="catalog-panel__header">
+            <div>
+                <p class="catalog-section__eyebrow">Comercial</p>
+                <h2>Pacotes e etapas de liberacao</h2>
+                <p class="catalog-panel__description">Resumo de como cada laudo esta empacotado e em que etapa de liberacao ele esta.</p>
+            </div>
+            <div class="catalog-home-spotlight">
+                <span class="catalog-home-spotlight__value">{{ escala_comercial.bundle_count | default(0) | int }}</span>
+                <span class="catalog-home-spotlight__label">pacotes detectados</span>
+            </div>
+        </div>
+        <div class="catalog-card-grid catalog-card-grid--compact">
+            {% for item in escala_comercial.release_channels | default([]) %}
+            {% if item.count %}
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-status catalog-status--{{ item.channel.tone | e }}">{{ item.channel.label | e }}</span>
+                <strong>{{ item.count | int }}</strong>
+                <span>{{ item.share | round(1) }}% dos pacotes neste recorte</span>
+            </article>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <div class="catalog-governance-list catalog-governance-list--dense">
+            {% for item in escala_comercial.bundle_highlights | default([]) %}
+            <article class="catalog-governance-list__item">
+                <div class="catalog-card__header">
+                    <div>
+                        <strong>{{ item.bundle_label | e }}</strong>
+                        <span class="catalog-card__meta">{{ item.family_count | int }} famílias</span>
+                    </div>
+                </div>
+                {% if item.summary %}
+                <p class="catalog-card__meta">{{ item.summary | e }}</p>
+                {% endif %}
+                <div class="catalog-chip-row">
+                    {% for highlight in item.highlights %}
+                    <span class="catalog-chip">{{ highlight | e }}</span>
+                    {% endfor %}
+                </div>
+            </article>
+            {% else %}
+            <article class="catalog-empty-card">
+                <strong>Sem pacotes comerciais no recorte.</strong>
+                <p>Os laudos ainda nao carregam pacotes suficientes para uma leitura consolidada.</p>
+            </article>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="catalog-panel">
+        <div class="catalog-panel__header">
+            <div>
+                <p class="catalog-section__eyebrow">Plano</p>
+                <h2>Recursos e limites mais usados</h2>
+                <p class="catalog-panel__description">Mostra o que mais aparece nas ofertas antes de fechar a matriz oficial de planos.</p>
+            </div>
+        </div>
+        <div class="catalog-governance-list catalog-governance-list--dense">
+            {% for item in escala_comercial.feature_highlights | default([]) %}
+            <article class="catalog-governance-list__item">
+                <div class="catalog-card__header">
+                    <div>
+                        <strong>{{ item.feature.label | e }}</strong>
+                        <span class="catalog-card__meta">{{ item.feature.key | e }}</span>
+                    </div>
+                    <span class="catalog-chip">{{ item.count | int }}</span>
+                </div>
+                <p class="catalog-card__meta">{{ item.share | round(1) }}% dos recursos incluidos neste recorte.</p>
+            </article>
+            {% else %}
+            <article class="catalog-empty-card">
+                <strong>Sem recursos destacados.</strong>
+                <p>Quando as ofertas ficarem mais estruturadas, o catálogo passa a mostrar a frequência aqui.</p>
+            </article>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+<section class="catalog-home-layout catalog-home-layout--dual" aria-label="Biblioteca oficial e material real">
+    <article class="catalog-panel catalog-panel--focus">
+        <div class="catalog-panel__header">
+            <div>
+                <p class="catalog-section__eyebrow">Base oficial</p>
+                <h2>Biblioteca oficial</h2>
+                <p class="catalog-panel__description">Modelos base, documentos principais e famílias que já podem ser mostradas como documento demonstrativo. A etapa com material real fica ao lado.</p>
+            </div>
+            <div class="catalog-home-spotlight">
+                <span class="catalog-home-spotlight__value">{{ biblioteca.template_count | default(0) | int }}</span>
+                <span class="catalog-home-spotlight__label">modelos oficiais</span>
+                <span class="catalog-home-spotlight__meta">{{ biblioteca.ready_template_count | default(0) | int }} prontos no registro</span>
+            </div>
+        </div>
+
+        <div class="catalog-card-grid catalog-card-grid--compact">
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-mini-kpi__label">Registro principal</span>
+                <strong>{{ biblioteca.registry_version | default(0) | int }}</strong>
+                <span>{{ 'registro sincronizado' if biblioteca.registry_path else 'sem registro' }}</span>
+            </article>
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-mini-kpi__label">Modelos demonstrativos</span>
+                <strong>{{ biblioteca.demonstration_ready_count | default(biblioteca.families_with_full_artifacts, true) | int }}</strong>
+                <span>já abrem como documento demonstrativo na vitrine</span>
+            </article>
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-mini-kpi__label">Modelo principal</span>
+                <strong>{{ biblioteca.families_with_template_default | default(0) | int }}</strong>
+                <span>famílias com modelo comercial definido</span>
+            </article>
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-mini-kpi__label">Prontas para venda</span>
+                <strong>{{ biblioteca.sellable_family_count | default(0) | int }}</strong>
+                <span>prontas para operar alem da base inicial</span>
+            </article>
+        </div>
+
+        {% if biblioteca.templates %}
+        <div class="catalog-governance-list catalog-governance-list--dense">
+            {% for item in biblioteca.templates %}
+            <article class="catalog-governance-list__item">
+                <div class="catalog-card__header">
+                    <div>
+                        <strong>{{ item.label | e }}</strong>
+                        <span class="catalog-card__meta">{% if item.documental_type %}{{ item.documental_type | e }}{% else %}Modelo oficial{% endif %}</span>
+                    </div>
+                    <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                </div>
+                {% if item.usage %}
+                <p class="catalog-card__meta">{{ item.usage | e }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="catalog-governance-note">Sem modelos oficiais em destaque neste recorte.</p>
+        {% endif %}
+    </article>
+
+    <article class="catalog-panel">
+        <div class="catalog-panel__header">
+            <div>
+                <p class="catalog-section__eyebrow">Validacao real</p>
+                <h2>Material real</h2>
+                <p class="catalog-panel__description">Briefings, coleta e pacotes de referencia por familia.</p>
+            </div>
+            <div class="catalog-home-spotlight">
+                <span class="catalog-home-spotlight__value">{{ material_real.workspace_count | default(0) | int }}</span>
+                <span class="catalog-home-spotlight__label">pastas detectadas</span>
+                <span class="catalog-home-spotlight__meta">{{ material_real.validated_workspace_count | default(0) | int }} bases validadas</span>
+            </div>
+        </div>
+
+        <div class="catalog-card-grid catalog-card-grid--compact">
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-mini-kpi__label">Pacotes prontos</span>
+                <strong>{{ material_real.reference_package_ready_count | default(0) | int }}</strong>
+                <span>manifesto + pacote de referencia</span>
+            </article>
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-mini-kpi__label">Briefings</span>
+                <strong>{{ material_real.with_briefing_count | default(0) | int }}</strong>
+                <span>familias com briefing real rastreavel</span>
+            </article>
+            {% for item in material_real_prioridade.priority_modes | default([]) %}
+            {% if item.count %}
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                <strong>{{ item.count | int }}</strong>
+                <span>famílias nesta faixa de prioridade</span>
+            </article>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if material_real.highlights %}
+        <div class="catalog-governance-list catalog-governance-list--dense">
+            {% for item in material_real.highlights %}
+            <article class="catalog-governance-list__item">
+                <div class="catalog-card__header">
+                    <div>
+                        <strong>{{ item.display_name | e }}</strong>
+                        <span class="catalog-card__meta">Material real em andamento</span>
+                    </div>
+                    <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if material_real_prioridade.highlights %}
+        <div class="catalog-governance-list catalog-governance-list--dense">
+            {% for item in material_real_prioridade.highlights %}
+            <article class="catalog-governance-list__item">
+                <div class="catalog-card__header">
+                    <div>
+                        <strong>{{ item.display_name | e }}</strong>
+                        <span class="catalog-card__meta">Próximo passo em aberto</span>
+                    </div>
+                    <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                </div>
+                {% if item.next_action %}
+                <p class="catalog-card__meta">{{ item.next_action | e }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% elif not material_real.highlights %}
+        <p class="catalog-governance-note">Nenhuma pasta de material real detectada neste recorte.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="catalog-home-layout catalog-home-layout--single">
+    <article class="catalog-panel">
+        <div class="catalog-panel__header">
+            <div>
+                <p class="catalog-section__eyebrow">Prioridades</p>
+                <h2>Fila de validacao por familia</h2>
+                <p class="catalog-panel__description">Mostra o que precisa de material real, ajuste de modelo ou revisao.</p>
+            </div>
+            <div class="catalog-home-spotlight">
+                <span class="catalog-home-spotlight__value">{{ fila_calibracao.queue_count | default(0) | int }}</span>
+                <span class="catalog-home-spotlight__label">famílias na fila</span>
+                <span class="catalog-home-spotlight__meta">{{ (fila_calibracao.template_targets | default([])) | length }} modelos com prioridade</span>
+            </div>
+        </div>
+
+        <div class="catalog-card-grid catalog-card-grid--compact">
+            {% for item in fila_calibracao.priority_modes | default([]) %}
+            {% if item.count %}
+            <article class="catalog-mini-kpi catalog-mini-kpi--governance">
+                <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                <strong>{{ item.count | int }}</strong>
+                <span>famílias acionáveis neste grupo</span>
+            </article>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="catalog-two-column">
+            <article class="catalog-card">
+                <h3>Familias na fila</h3>
+                <div class="catalog-governance-list catalog-governance-list--dense">
+                    {% for item in fila_calibracao.highlights | default([]) %}
+                    <article class="catalog-governance-list__item">
+                        <div class="catalog-card__header">
+                            <div>
+                                <strong>{{ item.display_name | e }}</strong>
+                                <span class="catalog-card__meta">{% if item.execution_track.track_label %}{{ item.execution_track.track_label | e }}{% else %}Família em acompanhamento{% endif %}</span>
+                            </div>
+                            <span class="catalog-status catalog-status--{{ item.priority.status.tone | e }}">{{ item.priority.status.label | e }}</span>
+                        </div>
+                        <p class="catalog-card__meta">{{ item.queue_reason | e }}</p>
+                        <p class="catalog-card__meta">{{ item.template_refinement_target.label | e }} • {{ item.active_release_count | int }} clientes • {{ item.variant_count | int }} variantes</p>
+                        <p class="catalog-card__meta">
+                            {{ item.worklist_pending_count | int }} pendencia(s)
+                            {% if item.next_checkpoint %}• checkpoint {{ item.next_checkpoint | e }}{% endif %}
+                            {% if item.next_action %}• {{ item.next_action | e }}{% endif %}
+                        </p>
+                    </article>
+                    {% else %}
+                    <article class="catalog-empty-card">
+                        <strong>Sem fila aberta agora.</strong>
+                        <p>As famílias já resolvidas saem da fila e viram base de melhoria contínua.</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </article>
+            <article class="catalog-card">
+                <h3>Modelos oficiais que pedem ajuste</h3>
+                <div class="catalog-governance-list catalog-governance-list--dense">
+                    {% for item in fila_calibracao.template_targets | default([]) %}
+                    <article class="catalog-governance-list__item">
+                        <div class="catalog-card__header">
+                            <div>
+                                <strong>{{ item.label | e }}</strong>
+                                <span class="catalog-card__meta">Modelo oficial priorizado</span>
+                            </div>
+                            <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                        </div>
+                        <p class="catalog-card__meta">{{ item.family_count | int }} famílias • {{ item.active_release_count | int }} clientes • {{ item.variant_count | int }} variantes</p>
+                    </article>
+                    {% else %}
+                    <article class="catalog-empty-card">
+                        <strong>Sem ajuste urgente por modelo.</strong>
+                        <p>Quando houver família acionável, o catálogo aponta qual modelo oficial recebe a próxima melhoria.</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+    </article>
+</section>

@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "Tariel Inspetor",
+    "slug": "tariel-inspetor",
+    "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "scheme": "tarielinspetor",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "androidStatusBar": {
+      "hidden": true,
+      "barStyle": "light-content"
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#091019"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.tarielia.inspetor",
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.tarielia.inspetor",
+      "versionCode": 1,
+      "usesCleartextTraffic": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#00000000",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permita que o Tariel Inspetor acesse suas imagens para anexar evidências ao laudo.",
+          "cameraPermission": "Permita que o Tariel Inspetor use a câmera para registrar evidências de inspeção."
+        }
+      ],
+      "expo-document-picker",
+      "expo-sharing",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#091019",
+          "defaultChannel": "tariel-chat"
+        }
+      ]
+    ],
+    "extra": {
+      "apiBaseUrl": "http://127.0.0.1:8000"
+    }
+  }
+}

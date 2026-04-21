@@ -1,0 +1,117 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr35_projeto_protecao_queda",
+  "template_code": "nr35_projeto_protecao_queda",
+  "tokens": {
+    "cliente_nome": "Planta Piloto NR35",
+    "unidade_nome": "Expedicao Norte",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 2026-00113",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "PROJ-2026-005",
+    "empresa_nome": "Planta Piloto NR35",
+    "unidade_nome": "Expedicao Norte",
+    "data_execucao": "2026-04-14",
+    "data_emissao": "2026-04-14",
+    "status_mesa": "rascunho",
+    "wave_portfolio": 1,
+    "modalidade_laudo": "projeto_protecao_queda"
+  },
+  "mesa_review": {
+    "status": "rascunho",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": null,
+    "observacoes_mesa": "Familia de projeto mantida com memoria de calculo e layout vinculados."
+  },
+  "resumo_executivo": "Projeto de linha de vida horizontal para a cobertura da expedicao norte consolidado com layout, memoria de calculo e ART, restando apenas ajuste na indicacao de acesso seguro.",
+  "identificacao": {
+    "objeto_principal": "Projeto de linha de vida horizontal da cobertura da expedicao norte",
+    "localizacao": "Cobertura da expedicao norte",
+    "codigo_interno": "LVH-EXP-N",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": ["DOC_710"],
+      "referencias_texto": "DOC_710 - prancha_implantacao_rev02.pdf",
+      "descricao": "Prancha principal de implantacao do sistema de protecao contra queda.",
+      "observacao": "Documento base do layout proposto."
+    }
+  },
+  "escopo_servico": {
+    "tipo_entrega": "projeto",
+    "modo_execucao": "analise_e_modelagem",
+    "ativo_tipo": "linha_de_vida_horizontal",
+    "resumo_escopo": "Dimensionamento e consolidacao documental de solucao de protecao contra queda para manutencao em cobertura."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Levantamento de premissas, compatibilizacao estrutural e memoria de calculo da solucao proposta.",
+    "condicoes_observadas": "Estrutura metalica com trechos aptos a fixacao, exigindo detalhamento de acesso seguro ao ponto inicial.",
+    "parametros_relevantes": "Cobertura metalica; linha horizontal de 24 m; uso para duas pessoas; cargas conforme memorial de calculo.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": ["DOC_711"],
+      "referencias_texto": "DOC_711 - memorial_calculo_rev02.pdf",
+      "descricao": "Memorial de calculo usado no dimensionamento do sistema.",
+      "observacao": "Documento tecnico central da solucao."
+    }
+  },
+  "parametros_de_projeto": {
+    "premissas_de_uso": "Uso eventual para manutencao de telhado por ate duas pessoas com talabarte duplo.",
+    "layout_ou_arranjo": "Linha horizontal posicionada no eixo da cobertura com dois pontos extremos e desvios intermediarios.",
+    "memoria_de_calculo": "Memorial de calculo REV02 contemplando cargas de servico, fatores de seguranca e checagem da estrutura suporte.",
+    "art_e_documentos": "ART 2026-00113, prancha REV02 e memorial de calculo vinculados ao caso."
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": ["DOC_710"],
+      "referencias_texto": "DOC_710 - prancha_implantacao_rev02.pdf",
+      "descricao": "Layout principal da solucao projetada.",
+      "observacao": "Documento de referencia da implantacao."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": ["IMG_930"],
+      "referencias_texto": "IMG_930 - cobertura_expedicao_norte.jpg",
+      "descricao": "Foto complementar da frente que recebera a solucao.",
+      "observacao": "Apoia a compatibilizacao do layout."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": ["DOC_711", "DOC_712"],
+      "referencias_texto": "DOC_711 - memorial_calculo_rev02.pdf; DOC_712 - ART_2026_00113.pdf",
+      "descricao": "Memorial de calculo e ART vinculados ao projeto.",
+      "observacao": "Documentos obrigatorios da familia."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Prancha de implantacao, memorial de calculo, ART e croqui de acesso a cobertura.",
+    "documentos_emitidos": "Projeto executivo da solucao de protecao contra queda para a expedicao norte.",
+    "observacoes_documentais": "Detalhar no proximo ciclo o procedimento de acesso inicial ao sistema."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "O acesso seguro ao ponto inicial da linha precisa de detalhamento adicional em prancha complementar.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": ["IMG_930"],
+      "referencias_texto": "IMG_930 - cobertura_expedicao_norte.jpg",
+      "descricao": "Area de acesso inicial que demanda detalhamento complementar.",
+      "observacao": "Lacuna pontual sem invalidar a solucao projetada."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Emitir prancha complementar do acesso seguro, manter a ART vinculada e liberar a solucao somente apos aprovacao final do conjunto documental."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "O projeto de protecao contra queda foi consolidado com base tecnica suficiente para revisao final e emissao controlada.",
+    "justificativa": "A solucao atende ao escopo definido, restando apenas ajuste documental complementar do acesso inicial."
+  }
+}

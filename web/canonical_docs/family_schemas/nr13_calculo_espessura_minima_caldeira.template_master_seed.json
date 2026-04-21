@@ -1,0 +1,683 @@
+{
+  "family_key": "nr13_calculo_espessura_minima_caldeira",
+  "template_code": "nr13_calculo_espessura_minima_caldeira",
+  "modo_editor": "editor_rico",
+  "observacoes": "Seed inicial de template_master para nr13 - calculo de espessura minima de caldeira usando o contrato canonico generico da carteira NR13 desta empresa.",
+  "estilo_json": {
+    "pagina": {
+      "size": "A4",
+      "orientation": "portrait",
+      "margens_mm": {
+        "top": 18,
+        "right": 14,
+        "bottom": 18,
+        "left": 14
+      }
+    },
+    "tipografia": {
+      "font_family": "Inter, 'Segoe UI', Arial, sans-serif",
+      "font_size_px": 12,
+      "line_height": 1.45
+    },
+    "cabecalho_texto": "Tariel.ia Portfolio NR13 | {{token:cliente_nome}} | {{token:unidade_nome}}",
+    "rodape_texto": "Familia {{json_path:family_key}} | Revisao {{token:revisao_template}} | Emissao {{json_path:case_context.data_emissao}}",
+    "marca_dagua": {
+      "texto": "",
+      "opacity": 0.08,
+      "font_size_px": 72,
+      "rotate_deg": -32
+    }
+  },
+  "documento_editor_json": {
+    "version": 1,
+    "doc": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "NR13 - Calculo de Espessura Minima de Caldeira"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Cliente: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "token",
+                "key": "cliente_nome",
+                "raw": "token:cliente_nome"
+              }
+            },
+            {
+              "type": "text",
+              "text": " | Unidade: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "token",
+                "key": "unidade_nome",
+                "raw": "token:unidade_nome"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "ID do laudo: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "case_context.laudo_id",
+                "raw": "json_path:case_context.laudo_id"
+              }
+            },
+            {
+              "type": "text",
+              "text": " | Data da execucao: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "case_context.data_execucao",
+                "raw": "json_path:case_context.data_execucao"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "1. Resumo Executivo"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "resumo_executivo",
+                "raw": "json_path:resumo_executivo"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "2. Identificacao do Calculo"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Objeto principal: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "identificacao.objeto_principal",
+                "raw": "json_path:identificacao.objeto_principal"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Localizacao: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "identificacao.localizacao",
+                "raw": "json_path:identificacao.localizacao"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Referencia principal: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "identificacao.referencia_principal.referencias_texto",
+                "raw": "json_path:identificacao.referencia_principal.referencias_texto"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "3. Escopo do Calculo"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Tipo de entrega: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "escopo_servico.tipo_entrega",
+                "raw": "json_path:escopo_servico.tipo_entrega"
+              }
+            },
+            {
+              "type": "text",
+              "text": " | Modo de execucao: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "escopo_servico.modo_execucao",
+                "raw": "json_path:escopo_servico.modo_execucao"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "escopo_servico.resumo_escopo",
+                "raw": "json_path:escopo_servico.resumo_escopo"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "4. Dados e Premissas"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Metodo aplicado: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "execucao_servico.metodo_aplicado",
+                "raw": "json_path:execucao_servico.metodo_aplicado"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Condicoes observadas: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "execucao_servico.condicoes_observadas",
+                "raw": "json_path:execucao_servico.condicoes_observadas"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Parametros relevantes: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "execucao_servico.parametros_relevantes",
+                "raw": "json_path:execucao_servico.parametros_relevantes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Evidencia de execucao: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "execucao_servico.evidencia_execucao.referencias_texto",
+                "raw": "json_path:execucao_servico.evidencia_execucao.referencias_texto"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "5. Memoria e Referencias"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Evidencia principal: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "evidencias_e_anexos.evidencia_principal.referencias_texto",
+                "raw": "json_path:evidencias_e_anexos.evidencia_principal.referencias_texto"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Documento base: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "evidencias_e_anexos.documento_base.referencias_texto",
+                "raw": "json_path:evidencias_e_anexos.documento_base.referencias_texto"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "6. Documentacao e Registros"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Documentos disponiveis: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "documentacao_e_registros.documentos_disponiveis",
+                "raw": "json_path:documentacao_e_registros.documentos_disponiveis"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Documentos emitidos: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "documentacao_e_registros.documentos_emitidos",
+                "raw": "json_path:documentacao_e_registros.documentos_emitidos"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Observacoes documentais: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "documentacao_e_registros.observacoes_documentais",
+                "raw": "json_path:documentacao_e_registros.observacoes_documentais"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "7. Lacunas Tecnicas"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Descricao: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "nao_conformidades_ou_lacunas.descricao",
+                "raw": "json_path:nao_conformidades_ou_lacunas.descricao"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "8. Recomendacoes"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "recomendacoes.texto",
+                "raw": "json_path:recomendacoes.texto"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "9. Conclusao"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Status: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "conclusao.status",
+                "raw": "json_path:conclusao.status"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Conclusao tecnica: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "conclusao.conclusao_tecnica",
+                "raw": "json_path:conclusao.conclusao_tecnica"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Justificativa: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "conclusao.justificativa",
+                "raw": "json_path:conclusao.justificativa"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Status Mesa: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "mesa_review.status",
+                "raw": "json_path:mesa_review.status"
+              }
+            },
+            {
+              "type": "text",
+              "text": " | Family lock: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "mesa_review.family_lock",
+                "raw": "json_path:mesa_review.family_lock"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Bloqueios: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "mesa_review.bloqueios_texto",
+                "raw": "json_path:mesa_review.bloqueios_texto"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Pendencias tratadas: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "mesa_review.pendencias_resolvidas_texto",
+                "raw": "json_path:mesa_review.pendencias_resolvidas_texto"
+              }
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "10. Assinatura Tecnica"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Engenheiro responsavel: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "token",
+                "key": "engenheiro_responsavel",
+                "raw": "token:engenheiro_responsavel"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "CREA / ART: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "token",
+                "key": "crea_art",
+                "raw": "token:crea_art"
+              }
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Data de emissao: "
+            },
+            {
+              "type": "placeholder",
+              "attrs": {
+                "mode": "json_path",
+                "key": "case_context.data_emissao",
+                "raw": "json_path:case_context.data_emissao"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

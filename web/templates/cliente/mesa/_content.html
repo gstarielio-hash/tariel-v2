@@ -1,0 +1,120 @@
+<section id="panel-mesa" class="panel panel--mesa{% if (cliente_tab_inicial | default('admin')) == 'mesa' %} active{% endif %}">
+    {% set mesa_secao_inicial = cliente_mesa_section_inicial | default('overview') %}
+    <div class="section-intro section-intro--surface">
+        <div>
+            <h2>Mesa Avaliadora</h2>
+            <p>Separe fila, pendencias e resposta tecnica para manter a analise clara.</p>
+        </div>
+    </div>
+
+    <div
+        class="surface-nav surface-nav--mesa"
+        data-surface-nav="mesa"
+        data-surface-active-section="{{ cliente_mesa_section_inicial | default('overview') | e }}"
+    >
+        <div class="surface-nav__intro">
+            <span class="surface-nav__eyebrow">Mesa avaliadora</span>
+            <strong>Fila tecnica com leitura clara</strong>
+            <p>Fila, pendencias e resposta em etapas distintas.</p>
+        </div>
+        <div id="mesa-section-summary" class="surface-nav__status" aria-live="polite">
+            <span class="surface-nav__status-label">Seção ativa</span>
+            <strong id="mesa-section-summary-title">
+                {% if mesa_secao_inicial == 'queue' %}
+                    Fila de revisao
+                {% elif mesa_secao_inicial == 'pending' %}
+                    Pendencias
+                {% elif mesa_secao_inicial == 'reply' %}
+                    Responder
+                {% else %}
+                    Visao geral
+                {% endif %}
+            </strong>
+            <span id="mesa-section-summary-meta">
+                {% if mesa_secao_inicial == 'queue' %}
+                    Selecao do laudo.
+                {% elif mesa_secao_inicial == 'pending' %}
+                    Chamados e movimentos.
+                {% elif mesa_secao_inicial == 'reply' %}
+                    Contexto e resposta tecnica.
+                {% else %}
+                    Panorama da analise.
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="surface-tabs" role="tablist" aria-label="Seções da mesa avaliadora">
+            <a
+                href="{{ cliente_surface_routes.mesa | default('/cliente/mesa') | e }}?sec=overview"
+                class="surface-tab{% if (cliente_mesa_section_inicial | default('overview')) == 'overview' %} is-active{% endif %}"
+                id="mesa-section-tab-overview"
+                data-mesa-section-tab="overview"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_mesa_section_inicial | default('overview')) == 'overview' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_mesa_section_inicial | default('overview')) == 'overview' else 'false' }}"
+                tabindex="{{ '0' if (cliente_mesa_section_inicial | default('overview')) == 'overview' else '-1' }}"
+            >
+                <span class="surface-tab__label">Visao geral</span>
+                <span class="surface-tab__meta">Panorama da analise</span>
+                <span class="surface-tab__footer">
+                    <span id="mesa-section-count-overview" class="surface-tab__count">panorama inicial</span>
+                </span>
+            </a>
+            <a
+                href="{{ cliente_surface_routes.mesa | default('/cliente/mesa') | e }}?sec=queue"
+                class="surface-tab{% if (cliente_mesa_section_inicial | default('overview')) == 'queue' %} is-active{% endif %}"
+                id="mesa-section-tab-queue"
+                data-mesa-section-tab="queue"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_mesa_section_inicial | default('overview')) == 'queue' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_mesa_section_inicial | default('overview')) == 'queue' else 'false' }}"
+                tabindex="{{ '0' if (cliente_mesa_section_inicial | default('overview')) == 'queue' else '-1' }}"
+            >
+                <span class="surface-tab__label">Fila de revisao</span>
+                <span class="surface-tab__meta">Selecao do laudo</span>
+                <span class="surface-tab__footer">
+                    <span id="mesa-section-count-queue" class="surface-tab__count">fila principal de revisao</span>
+                </span>
+            </a>
+            <a
+                href="{{ cliente_surface_routes.mesa | default('/cliente/mesa') | e }}?sec=pending"
+                class="surface-tab{% if (cliente_mesa_section_inicial | default('overview')) == 'pending' %} is-active{% endif %}"
+                id="mesa-section-tab-pending"
+                data-mesa-section-tab="pending"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_mesa_section_inicial | default('overview')) == 'pending' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_mesa_section_inicial | default('overview')) == 'pending' else 'false' }}"
+                tabindex="{{ '0' if (cliente_mesa_section_inicial | default('overview')) == 'pending' else '-1' }}"
+            >
+                <span class="surface-tab__label">Pendencias</span>
+                <span class="surface-tab__meta">Chamados e movimentos</span>
+                <span class="surface-tab__footer">
+                    <span id="mesa-section-count-pending" class="surface-tab__count">pendencias e chamados</span>
+                </span>
+            </a>
+            <a
+                href="{{ cliente_surface_routes.mesa | default('/cliente/mesa') | e }}?sec=reply"
+                class="surface-tab{% if (cliente_mesa_section_inicial | default('overview')) == 'reply' %} is-active{% endif %}"
+                id="mesa-section-tab-reply"
+                data-mesa-section-tab="reply"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_mesa_section_inicial | default('overview')) == 'reply' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_mesa_section_inicial | default('overview')) == 'reply' else 'false' }}"
+                tabindex="{{ '0' if (cliente_mesa_section_inicial | default('overview')) == 'reply' else '-1' }}"
+            >
+                <span class="surface-tab__label">Responder</span>
+                <span class="surface-tab__meta">Contexto e resposta tecnica</span>
+                <span class="surface-tab__footer">
+                    <span id="mesa-section-count-reply" class="surface-tab__count">resposta tecnica em foco</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <div class="surface-stage-panels">
+        {% include "cliente/mesa/_overview.html" %}
+        {% include "cliente/mesa/_queue.html" %}
+        {% include "cliente/mesa/_pending.html" %}
+        {% include "cliente/mesa/_reply.html" %}
+    </div>
+</section>

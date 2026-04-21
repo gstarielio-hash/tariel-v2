@@ -1,0 +1,78 @@
+            <section class="secao admin-tab-panel" data-admin-tab-panel="auditoria" hidden>
+                <div class="secao-header">
+                        <div class="secao-header__copy">
+                            <h3>
+                                <span class="material-symbols-rounded" aria-hidden="true">rule</span>
+                                Auditoria e diagnóstico
+                            </h3>
+                        <p>Eventos críticos do Admin-CEO, atividade do portal da empresa e diagnóstico exportável.</p>
+                    </div>
+                    <a href="/admin/clientes/{{ empresa.id | int }}/diagnostico" class="btn-admin secundario">Exportar diagnostico</a>
+                </div>
+
+                <div class="grid-2">
+                    <div class="info-card">
+                        <div class="label">Falhas recentes</div>
+                        <div class="stack">
+                            {% for item in falhas_recentes %}
+                            <div>
+                                <strong>{{ item.resumo | e }}</strong>
+                                <div class="texto-suave">{{ item.acao | e }} • {{ item.criado_em.strftime("%d/%m/%Y %H:%M") if item.criado_em else "Agora" }}</div>
+                            </div>
+                            {% else %}
+                            <div class="texto-suave">Nenhuma falha recente registrada na auditoria administrativa desta empresa.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="label">Diagnostico administrativo</div>
+                        <div class="valor">Exportação segura</div>
+                        <div class="valor-auxiliar">Inclui status, metricas, usuarios, sessoes, limites e falhas recentes sem conteudo tecnico bruto.</div>
+                    </div>
+                </div>
+
+                <div class="auditoria-grid">
+                    <div class="stack-cards">
+                        <h3 class="subsecao-titulo">
+                            <span class="material-symbols-rounded" aria-hidden="true">fact_check</span>
+                            Auditoria do admin-geral
+                        </h3>
+                        {% for item in auditoria_admin %}
+                        <article class="info-card">
+                            <div class="label">{{ item.criado_em_label | e }} • {{ item.acao | e }}</div>
+                            <div class="valor">{{ item.resumo | e }}</div>
+                            <div class="valor-auxiliar">
+                                Ator: {{ item.ator_nome | e }}{% if item.alvo_nome %} • Alvo: {{ item.alvo_nome | e }}{% endif %}
+                            </div>
+                            {% if item.detalhe %}
+                            <p class="texto-suave">{{ item.detalhe | e }}</p>
+                            {% endif %}
+                        </article>
+                        {% else %}
+                        <div class="estado-vazio-tabela">Nenhuma ação administrativa registrada para esta empresa ainda.</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="stack-cards">
+                        <h3 class="subsecao-titulo">
+                            <span class="material-symbols-rounded" aria-hidden="true">history</span>
+                            Auditoria do portal da empresa
+                        </h3>
+                        {% for item in auditoria_cliente %}
+                        <article class="info-card">
+                            <div class="label">{{ item.criado_em_label | e }} • {{ item.acao | e }}</div>
+                            <div class="valor">{{ item.resumo | e }}</div>
+                            <div class="valor-auxiliar">
+                                {{ item.categoria_label | default('Geral', true) | e }} • {{ item.scope_label | default('Painel', true) | e }} • Ator: {{ item.ator_nome | e }}{% if item.alvo_nome %} • Alvo: {{ item.alvo_nome | e }}{% endif %}
+                            </div>
+                            {% if item.detalhe %}
+                            <p class="texto-suave">{{ item.detalhe | e }}</p>
+                            {% endif %}
+                        </article>
+                        {% else %}
+                        <div class="estado-vazio-tabela">Nenhuma ação do portal cliente registrada para esta empresa ainda.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>

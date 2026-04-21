@@ -1,0 +1,112 @@
+{% macro render_sidebar_recent(item) %}
+    {% set item_pinado = item.pinado | default(false, true) %}
+    {% set official_issue_summary = item.official_issue_summary if item.official_issue_summary is defined else none %}
+    <div
+        class="inspetor-sidebar-report item-historico{% if item_pinado %} pinado{% endif %}"
+        role="button"
+        tabindex="0"
+        {% if item.id %}data-laudo-id="{{ item.id | int }}"{% endif %}
+        {% if item.id %}data-home-laudo-id="{{ item.id | int }}"{% endif %}
+        data-home-template="{{ item.tipo | default('padrao', true) | e }}"
+        data-home-title="{{ item.workspace_title | default(item.titulo, true) | e }}"
+        data-home-subtitle="{{ item.workspace_subtitle | default(item.subtitulo, true) | e }}"
+        data-home-status="{{ item.workspace_status | default(item.badge, true) | e }}"
+        data-data="{{ item.data_iso | default('', true) | e }}"
+        data-pinado="{{ 'true' if item_pinado else 'false' }}"
+        data-permite-exclusao="{{ 'true' if item.permite_exclusao | default(false, true) else 'false' }}"
+        data-card-status="{{ item.card_status | default('aberto', true) | e }}"
+        data-entry-mode-preference="{{ item.entry_mode_preference | default('', true) | e }}"
+        data-entry-mode-effective="{{ item.entry_mode_effective | default('', true) | e }}"
+        data-entry-mode-reason="{{ item.entry_mode_reason | default('', true) | e }}"
+        data-official-issue-diverged="{{ 'true' if official_issue_summary else 'false' }}"
+        data-official-issue-label="{{ official_issue_summary.label | default('', true) | e }}"
+        data-official-issue-detail="{{ official_issue_summary.detail | default('', true) | e }}"
+        data-official-issue-number="{{ official_issue_summary.issue_number | default('', true) | e }}"
+        data-open-thread-tab="{{ 'mesa' if official_issue_summary else 'conversa' }}"
+        aria-label="Abrir laudo {{ item.titulo }}"
+        title="Abrir laudo {{ item.titulo }}"
+    >
+        <span class="material-symbols-rounded inspetor-sidebar-report__icon" aria-hidden="true">
+            {{ item.sidebar_icon | default('history', true) | e }}
+        </span>
+        <span class="inspetor-sidebar-report__copy texto-laudo-historico">
+            <span>{{ item.titulo }}</span>
+            <span class="preview-mensagem">
+                {{ item.subtitulo }}{% if item.subtitulo and item.tempo %} • {% endif %}{{ item.tempo }}
+            </span>
+            {% if official_issue_summary %}
+            <small class="inspetor-sidebar-report__governance" aria-label="Reemissão recomendada">
+                <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                <span>{{ official_issue_summary.label }}</span>
+                <span class="inspetor-sidebar-report__governance-action">Abrir pela Mesa</span>
+            </small>
+            {% endif %}
+        </span>
+        <span class="inspetor-sidebar-report__side">
+            <span class="pill-status-laudo pill-status-{{ item.card_status | default('aberto', true) | e }}">
+                {{ item.card_status_label | default(item.badge, true) | e }}
+            </span>
+            {% if item.id %}
+                <span class="inspetor-sidebar-report__actions">
+                    <button
+                        type="button"
+                        class="btn-acao-laudo btn-pin-laudo"
+                        data-acao-laudo="pin"
+                        aria-label="{% if item_pinado %}Desafixar laudo{% else %}Fixar laudo{% endif %}"
+                        aria-pressed="{{ 'true' if item_pinado else 'false' }}"
+                        title="{% if item_pinado %}Desafixar laudo{% else %}Fixar laudo{% endif %}"
+                    >
+                        <span class="material-symbols-rounded" aria-hidden="true">{% if item_pinado %}keep{% else %}push_pin{% endif %}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-acao-laudo btn-deletar-laudo"
+                        data-acao-laudo="delete"
+                        aria-label="Excluir laudo"
+                        title="Excluir laudo"
+                    >
+                        <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+                    </button>
+                </span>
+            {% endif %}
+        </span>
+    </div>
+{% endmacro %}
+
+{% macro render_portal_recent(item, classe_extra="") %}
+    {% set official_issue_summary = item.official_issue_summary if item.official_issue_summary is defined else none %}
+    <button
+        type="button"
+        class="portal-report-card{{ classe_extra }}"
+        {% if item.id %}data-home-laudo-id="{{ item.id | int }}"{% endif %}
+        data-home-template="{{ item.tipo | default('padrao', true) | e }}"
+        data-home-title="{{ item.workspace_title | default(item.titulo, true) | e }}"
+        data-home-subtitle="{{ item.workspace_subtitle | default(item.subtitulo, true) | e }}"
+        data-home-status="{{ item.workspace_status | default(item.badge, true) | e }}"
+        data-entry-mode-preference="{{ item.entry_mode_preference | default('', true) | e }}"
+        data-entry-mode-effective="{{ item.entry_mode_effective | default('', true) | e }}"
+        data-entry-mode-reason="{{ item.entry_mode_reason | default('', true) | e }}"
+        data-official-issue-diverged="{{ 'true' if official_issue_summary else 'false' }}"
+        data-official-issue-label="{{ official_issue_summary.label | default('', true) | e }}"
+        data-official-issue-detail="{{ official_issue_summary.detail | default('', true) | e }}"
+        data-official-issue-number="{{ official_issue_summary.issue_number | default('', true) | e }}"
+        aria-label="Abrir laudo {{ item.titulo }}"
+    >
+        <div class="portal-report-card__header">
+            <strong>{{ item.titulo }}</strong>
+            <span class="inspetor-badge inspetor-badge--{{ item.status }}">{{ item.badge }}</span>
+        </div>
+        <p>{{ item.subtitulo }}</p>
+        <div class="portal-report-card__meta">
+            <span>{{ item.tempo }}</span>
+            <span>{{ item.evidencias }}</span>
+        </div>
+        {% if official_issue_summary %}
+        <div class="portal-report-card__alert" aria-label="Alerta de governança documental">
+            <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+            <span>{{ official_issue_summary.label }}</span>
+            <span>{{ official_issue_summary.detail }}</span>
+        </div>
+        {% endif %}
+    </button>
+{% endmacro %}

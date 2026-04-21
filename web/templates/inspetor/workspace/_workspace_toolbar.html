@@ -1,0 +1,63 @@
+{% set workspace_tab_inicial = "conversa" if (workspace_assistant_inicial | default(false)) else "historico" %}
+{% set workspace_nav_caption_inicial = "Canal do assistente" if workspace_tab_inicial == "conversa" else "Workspace tecnico do laudo" %}
+{% set workspace_nav_status_inicial = "Canal ativo" if workspace_tab_inicial == "conversa" else "Leitura e ação separadas" %}
+
+<div class="thread-nav" data-workspace-toolbar-nav data-component-slice="workspace-chrome" aria-label="Canais e seções do laudo">
+    <div class="thread-nav-shell">
+        <div class="thread-nav-copy">
+            <span class="thread-nav-copy__eyebrow">Workspace focado</span>
+            <div class="thread-nav-copy__row">
+                <strong id="workspace-nav-caption">{{ workspace_nav_caption_inicial }}</strong>
+                <span id="workspace-nav-status" class="thread-nav-status">{{ workspace_nav_status_inicial }}</span>
+            </div>
+        </div>
+
+        <div class="thread-nav-inner">
+            <div class="thread-tabs" role="tablist" aria-label="Seções do laudo">
+                <button
+                    type="button"
+                    class="thread-tab{% if workspace_tab_inicial == 'conversa' %} ativo{% endif %}"
+                    role="tab"
+                    aria-selected="{{ 'true' if workspace_tab_inicial == 'conversa' else 'false' }}"
+                    data-tab="conversa"
+                >
+                    <span class="thread-tab__icon material-symbols-rounded" aria-hidden="true">forum</span>
+                    <span class="thread-tab__label">Assistente</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="thread-tab{% if workspace_tab_inicial == 'historico' %} ativo{% endif %}"
+                    role="tab"
+                    aria-selected="{{ 'true' if workspace_tab_inicial == 'historico' else 'false' }}"
+                    data-tab="historico"
+                >
+                    <span class="thread-tab__icon material-symbols-rounded" aria-hidden="true">history</span>
+                    <span class="thread-tab__label">Histórico</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="thread-tab"
+                    role="tab"
+                    aria-selected="false"
+                    data-tab="anexos"
+                >
+                    <span class="thread-tab__icon material-symbols-rounded" aria-hidden="true">attach_file</span>
+                    <span class="thread-tab__label">Anexos</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="thread-tab"
+                    role="tab"
+                    aria-selected="false"
+                    data-tab="mesa"
+                >
+                    <span class="thread-tab__icon material-symbols-rounded" aria-hidden="true">support_agent</span>
+                    <span class="thread-tab__label">Mesa</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

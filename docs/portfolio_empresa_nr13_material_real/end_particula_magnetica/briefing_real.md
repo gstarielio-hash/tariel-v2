@@ -1,0 +1,85 @@
+# END - Particula Magnetica
+
+- family_key: `end_particula_magnetica`
+- macro_categoria: `END`
+- kind: `ndt`
+- wave: `5`
+- template_codes: `end_particula_magnetica`
+
+## Objetivo do refino
+
+Usar material real da empresa para ajustar linguagem, estrutura efetiva, anexos recorrentes, bindings e criterios operacionais dessa familia antes de mexer no template final ou no documento emitido.
+
+## O que coletar agora
+
+- `modelo_atual_vazio`: Modelo atual vazio usado pela empresa
+  min_items=1 | required=true | pasta=`coleta_entrada/modelo_atual_vazio`
+  finalidade: Comparar a estrutura atual com o template_master canonico.
+- `documentos_finais_reais`: Documentos finais reais ja emitidos
+  min_items=3 | required=true | pasta=`coleta_entrada/documentos_finais_reais`
+  finalidade: Extrair linguagem, estrutura efetiva e variacoes recorrentes do documento real.
+- `padrao_linguagem_tecnica`: Padrao de linguagem tecnica e conclusao
+  min_items=1 | required=true | pasta=`coleta_entrada/padrao_linguagem_tecnica`
+  finalidade: Fixar tom, parecer, ressalvas, clausulas e assinatura que a empresa realmente usa.
+- `regras_comerciais_e_operacionais`: Regras comerciais e operacionais do servico
+  min_items=1 | required=true | pasta=`coleta_entrada/regras_comerciais_e_operacionais`
+  finalidade: Capturar o que varia por cliente, ativo, escopo e contratacao.
+- `evidencias_reais_associadas`: Evidencias reais associadas aos documentos finais
+  min_items=1 | required=true | pasta=`coleta_entrada/evidencias_reais_associadas`
+  finalidade: Validar slots de imagem, anexos e criterios reais de evidencia.
+
+## Slots obrigatorios para confronto com o material real
+
+- `slot_referencia_principal`: Referencia principal
+  binding_path=`identificacao.referencia_principal` | accepted=foto, documento
+  finalidade: Vincular a referencia principal do objeto do servico end_particula_magnetica.
+- `slot_evidencia_execucao`: Evidencia de execucao
+  binding_path=`execucao_servico.evidencia_execucao` | accepted=foto, documento, texto
+  finalidade: Registrar a execucao principal do servico com evidencia rastreavel.
+- `slot_evidencia_principal`: Evidencia principal
+  binding_path=`evidencias_e_anexos.evidencia_principal` | accepted=foto, documento, texto
+  finalidade: Consolidar a evidencia principal que sustenta a conclusao do servico.
+- `slot_conclusao_servico`: Conclusao do servico
+  binding_path=`conclusao.conclusao_tecnica` | accepted=texto
+  finalidade: Registrar a conclusao tecnica estruturada para revisao.
+
+## Secoes esperadas no documento final
+
+- Identificacao do Ensaio
+- Escopo da Tecnica Aplicada
+- Execucao do Ensaio
+- Evidencias e Registros
+- Documentacao e Registros
+- Indicacoes ou Pontos de Atencao
+- Recomendacoes
+- Conclusao
+
+## Perguntas que o material real precisa responder
+
+- Qual documento atual a empresa considera referencia principal para esta familia?
+- Quais anexos ou evidencias sao obrigatorios na pratica, mesmo quando nao estao escritos no modelo vazio?
+- Quais campos sempre aparecem no documento final, mesmo quando o inspetor nao preencheu explicitamente em campo?
+- Quais trechos de linguagem precisam seguir o padrao exato do engenheiro responsavel?
+- Quais evidencias fotograficas entram no PDF final e quais ficam apenas em anexo ou acervo?
+- Quais nao conformidades ou ressalvas sao mais recorrentes nessa familia?
+
+## Bloqueios estruturais da familia
+
+- `escopo_principal_divergente_da_familia`
+- `troca_silenciosa_da_familia_principal`
+- `ausencia_de_objeto_principal`
+- `ausencia_de_localizacao`
+- `ausencia_de_slot_obrigatorio`
+- `ausencia_de_conclusao_tecnica`
+
+## Layout local da coleta
+
+- `coleta_entrada/`: recepcao do material bruto da empresa
+- `pacote_referencia/`: futuro pacote consolidado para importacao de filled_reference
+- `status_refino.json`: checkpoint curto do estado da familia
+
+## Regra
+
+Nao adaptar o template final direto a partir de um PDF isolado. Primeiro fechar este pacote de coleta real, depois consolidar o blueprint/fill_reference e so entao revisar template e linguagem final.
+
+Descricao canonica da familia: Execucao e registro tecnico de ensaio por particula magnetica com consolidacao das indicacoes e rastreabilidade do componente ensaiado.

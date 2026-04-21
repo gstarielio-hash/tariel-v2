@@ -1,0 +1,73 @@
+:root {
+  --adm-ink-950: #091019;
+  --adm-ink-900: #12233C;
+  --adm-ink-800: #16293D;
+  --adm-ink-700: #1F3B5A;
+  --adm-ink-600: #33506F;
+
+  --adm-canvas: #f5f8fc;
+  --adm-surface: #ffffff;
+  --adm-surface-soft: #f3f7fc;
+  --adm-surface-muted: #edf3fa;
+  --adm-surface-strong: #e8eef6;
+
+  --adm-stroke: #d6e0ed;
+  --adm-stroke-strong: #c0cedf;
+  --adm-stroke-focus: #245c93;
+
+  --adm-brand: #245c93;
+  --adm-brand-hover: #1e4d7a;
+  --adm-brand-soft: #eaf3fc;
+  --adm-brand-secondary: #7C8996;
+
+  --adm-success: #1F8F5F;
+  --adm-success-soft: #EAF7F1;
+  --adm-warning: #3F6F99;
+  --adm-warning-soft: #EAF3FC;
+  --adm-danger: #C44949;
+  --adm-danger-soft: #FDEDED;
+  --adm-info: #245C93;
+  --adm-info-soft: #EAF3FC;
+
+  --adm-text-strong: #16212D;
+  --adm-text: #24384C;
+  --adm-text-soft: #5E6C7B;
+  --adm-text-disabled: #8A9AA9;
+  --adm-text-on-dark: #F8F4EE;
+
+  --font-base: "IBM Plex Sans", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "Space Grotesk", "IBM Plex Sans", sans-serif;
+
+  --adm-radius-sm: 8px;
+  --adm-radius-md: 12px;
+  --adm-radius-lg: 16px;
+  --adm-radius-xl: 20px;
+
+  --adm-space-1: 8px;
+  --adm-space-2: 12px;
+  --adm-space-3: 16px;
+  --adm-space-4: 20px;
+  --adm-space-5: 24px;
+  --adm-space-6: 32px;
+
+  --adm-shadow-sm: 0 1px 2px rgba(18, 35, 60, 0.05);
+  --adm-shadow-md: 0 10px 26px rgba(18, 35, 60, 0.1);
+}
+
+:root[data-theme="dark"],
+body[data-theme="dark"] {
+  --adm-canvas: #091019;
+  --adm-surface: #12233c;
+  --adm-surface-soft: #16293d;
+  --adm-surface-muted: #1f3b5a;
+  --adm-surface-strong: #33506f;
+  --adm-stroke: rgba(255, 255, 255, 0.16);
+  --adm-stroke-strong: rgba(255, 255, 255, 0.24);
+  --adm-brand-soft: rgba(36, 92, 147, 0.24);
+  --adm-text-strong: #f5f8fc;
+  --adm-text: #d8e1ee;
+  --adm-text-soft: #9db0c6;
+  --adm-text-disabled: #7f90a5;
+  --adm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --adm-shadow-md: 0 12px 30px rgba(0, 0, 0, 0.32);
+}

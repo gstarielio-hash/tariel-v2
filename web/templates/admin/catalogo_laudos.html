@@ -1,0 +1,96 @@
+{% import "admin/_catalogo_laudos_macros.html" as catalogo %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Catálogo de Modelos • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_catalogo_laudos.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+
+<body class="admin-body admin-body--catalog-showroom">
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Navegação administrativa">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+                <a href="/admin/clientes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+                <a href="/admin/catalogo-laudos" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+                <a href="/admin/novo-cliente" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            {% for msg in mensagens_flash %}
+            {% set _tipo_alerta = 'success' if msg.tipo == 'success' else 'error' %}
+            <div class="alert alert-{{ _tipo_alerta }}" role="alert" aria-live="assertive">
+                <span class="material-symbols-rounded" aria-hidden="true">{{ 'check_circle' if _tipo_alerta == 'success' else 'error' }}</span>
+                {{ msg.texto | e }}
+                <button type="button" class="alert-fechar" aria-label="Fechar alerta">×</button>
+            </div>
+            {% endfor %}
+
+            {% set governanca = governance_rollup | default({}) %}
+            {% set fila_calibracao = calibration_queue_rollup | default({}) %}
+            {% set escala_comercial = commercial_scale_rollup | default({}) %}
+            {% set biblioteca = template_library_rollup | default({}) %}
+            {% set material_real = material_real_rollup | default({}) %}
+            {% set material_real_prioridade = material_real_priority_rollup | default({}) %}
+            {% set pendencias_prioritarias = (governanca.families_with_red_flags_count | default(0) | int) + (fila_calibracao.queue_count | default(0) | int) %}
+            {% set secondary_filters_open = filtros.get('status_tecnico') or filtros.get('calibracao') or filtros.get('template_default') or filtros.get('mode') or filtros.get('oferta_ativa') %}
+
+            {% include "admin/catalogo_laudos/_showroom_intro.html" %}
+            {% include "admin/catalogo_laudos/_showroom_grid.html" %}
+            {% include "admin/catalogo_laudos/_insights.html" %}
+        </main>
+    </div>
+
+    {% include "admin/catalogo_laudos/_overlays.html" %}
+
+    <script src="/static/js/admin/admin_catalogo_laudos_page.js"></script>
+</body>
+
+</html>

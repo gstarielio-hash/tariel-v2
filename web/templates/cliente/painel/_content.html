@@ -1,0 +1,173 @@
+<section id="panel-admin" class="panel panel--admin{% if (cliente_tab_inicial | default('admin')) == 'admin' %} active{% endif %}">
+    {% set admin_secao_inicial = cliente_admin_section_inicial | default('overview') %}
+    <div class="admin-surface-layout">
+        <aside
+            class="surface-nav surface-nav--admin admin-sidebar"
+            data-surface-nav="admin"
+            data-surface-active-section="{{ cliente_admin_section_inicial | default('overview') | e }}"
+        >
+            <div class="surface-nav__intro admin-sidebar__intro">
+                <span class="surface-nav__eyebrow">Admin da empresa</span>
+                <strong>Escolha um bloco administrativo</strong>
+                <p>Resumo, plano, equipe e suporte ficam separados para a leitura nao se misturar.</p>
+            </div>
+
+            <div class="surface-nav__aside admin-sidebar__status-stack">
+                <div id="admin-section-summary" class="surface-nav__status" aria-live="polite">
+                    <span class="surface-nav__status-label">Secao ativa</span>
+                    <strong id="admin-section-summary-title">
+                        {% if admin_secao_inicial == 'capacity' %}
+                            Plano e capacidade
+                        {% elif admin_secao_inicial == 'team' %}
+                            Equipe
+                        {% elif admin_secao_inicial == 'support' %}
+                            Suporte
+                        {% else %}
+                            Resumo
+                        {% endif %}
+                    </strong>
+                    <span id="admin-section-summary-meta">
+                        {% if admin_secao_inicial == 'capacity' %}
+                            Limites e folga da empresa.
+                        {% elif admin_secao_inicial == 'team' %}
+                            Cadastro e manutencao dos perfis.
+                        {% elif admin_secao_inicial == 'support' %}
+                            Diagnostico e trilha recente.
+                        {% else %}
+                            Panorama e saude da empresa.
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div id="admin-stage-spotlight" class="surface-nav__spotlight" aria-live="polite">
+                    <span class="surface-nav__status-label">Leitura executiva</span>
+                    <strong id="admin-stage-spotlight-title">
+                        {% if admin_secao_inicial == 'capacity' %}
+                            Capacidade com leitura rapida
+                        {% elif admin_secao_inicial == 'team' %}
+                            Equipe no mesmo mapa
+                        {% elif admin_secao_inicial == 'support' %}
+                            Suporte com historico claro
+                        {% else %}
+                            Folga, equipe e auditoria alinhadas
+                        {% endif %}
+                    </strong>
+                    <span id="admin-stage-spotlight-meta">
+                        {% if admin_secao_inicial == 'capacity' %}
+                            Limites, folga e historico no mesmo contexto.
+                        {% elif admin_secao_inicial == 'team' %}
+                            Criacao, primeiros acessos e bloqueios com leitura direta.
+                        {% elif admin_secao_inicial == 'support' %}
+                            Diagnostico, politica e auditoria no mesmo fluxo.
+                        {% else %}
+                            Abra a secao ativa para aprofundar o proximo ponto.
+                        {% endif %}
+                    </span>
+                    <div id="admin-stage-spotlight-kpis" class="surface-nav__chips"></div>
+                </div>
+            </div>
+
+            <div class="admin-tabs cliente-admin-tabs admin-sidebar__nav" role="tablist" aria-label="Blocos administrativos da empresa">
+                <a
+                    href="{{ cliente_surface_routes.admin | default('/cliente/painel') | e }}?sec=overview"
+                    class="admin-tab cliente-admin-tab{% if (cliente_admin_section_inicial | default('overview')) == 'overview' %} is-active{% endif %}"
+                    id="admin-section-tab-overview"
+                    data-admin-section-tab="overview"
+                    role="tab"
+                    aria-selected="{{ 'true' if (cliente_admin_section_inicial | default('overview')) == 'overview' else 'false' }}"
+                    aria-current="{{ 'page' if (cliente_admin_section_inicial | default('overview')) == 'overview' else 'false' }}"
+                    tabindex="{{ '0' if (cliente_admin_section_inicial | default('overview')) == 'overview' else '-1' }}"
+                >
+                    <span class="cliente-admin-tab__head">
+                        <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                        <span class="cliente-admin-tab__label">Resumo</span>
+                    </span>
+                    <span class="cliente-admin-tab__meta">Panorama e saude da empresa</span>
+                    <span class="cliente-admin-tab__footer">
+                        <span id="admin-section-count-overview" class="cliente-admin-tab__count">Painel inicial</span>
+                    </span>
+                </a>
+                <a
+                    href="{{ cliente_surface_routes.admin | default('/cliente/painel') | e }}?sec=capacity"
+                    class="admin-tab cliente-admin-tab{% if (cliente_admin_section_inicial | default('overview')) == 'capacity' %} is-active{% endif %}"
+                    id="admin-section-tab-capacity"
+                    data-admin-section-tab="capacity"
+                    role="tab"
+                    aria-selected="{{ 'true' if (cliente_admin_section_inicial | default('overview')) == 'capacity' else 'false' }}"
+                    aria-current="{{ 'page' if (cliente_admin_section_inicial | default('overview')) == 'capacity' else 'false' }}"
+                    tabindex="{{ '0' if (cliente_admin_section_inicial | default('overview')) == 'capacity' else '-1' }}"
+                >
+                    <span class="cliente-admin-tab__head">
+                        <span class="material-symbols-rounded" aria-hidden="true">monitoring</span>
+                        <span class="cliente-admin-tab__label">Plano e capacidade</span>
+                    </span>
+                    <span class="cliente-admin-tab__meta">Limites, folga e historico</span>
+                    <span class="cliente-admin-tab__footer">
+                        <span id="admin-section-count-capacity" class="cliente-admin-tab__count">Folga monitorada</span>
+                    </span>
+                </a>
+                <a
+                    href="{{ cliente_surface_routes.admin | default('/cliente/painel') | e }}?sec=team"
+                    class="admin-tab cliente-admin-tab{% if (cliente_admin_section_inicial | default('overview')) == 'team' %} is-active{% endif %}"
+                    id="admin-section-tab-team"
+                    data-admin-section-tab="team"
+                    role="tab"
+                    aria-selected="{{ 'true' if (cliente_admin_section_inicial | default('overview')) == 'team' else 'false' }}"
+                    aria-current="{{ 'page' if (cliente_admin_section_inicial | default('overview')) == 'team' else 'false' }}"
+                    tabindex="{{ '0' if (cliente_admin_section_inicial | default('overview')) == 'team' else '-1' }}"
+                >
+                    <span class="cliente-admin-tab__head">
+                        <span class="material-symbols-rounded" aria-hidden="true">groups</span>
+                        <span class="cliente-admin-tab__label">Equipe</span>
+                    </span>
+                    <span class="cliente-admin-tab__meta">Criacao e manutencao</span>
+                    <span class="cliente-admin-tab__footer">
+                        <span id="admin-section-count-team" class="cliente-admin-tab__count">Perfis operacionais</span>
+                    </span>
+                </a>
+                <a
+                    href="{{ cliente_surface_routes.admin | default('/cliente/painel') | e }}?sec=support"
+                    class="admin-tab cliente-admin-tab{% if (cliente_admin_section_inicial | default('overview')) == 'support' %} is-active{% endif %}"
+                    id="admin-section-tab-support"
+                    data-admin-section-tab="support"
+                    role="tab"
+                    aria-selected="{{ 'true' if (cliente_admin_section_inicial | default('overview')) == 'support' else 'false' }}"
+                    aria-current="{{ 'page' if (cliente_admin_section_inicial | default('overview')) == 'support' else 'false' }}"
+                    tabindex="{{ '0' if (cliente_admin_section_inicial | default('overview')) == 'support' else '-1' }}"
+                >
+                    <span class="cliente-admin-tab__head">
+                        <span class="material-symbols-rounded" aria-hidden="true">shield</span>
+                        <span class="cliente-admin-tab__label">Suporte</span>
+                    </span>
+                    <span class="cliente-admin-tab__meta">Diagnostico e trilha recente</span>
+                    <span class="cliente-admin-tab__footer">
+                        <span id="admin-section-count-support" class="cliente-admin-tab__count">Eventos recentes</span>
+                    </span>
+                </a>
+            </div>
+        </aside>
+
+        <div class="admin-content">
+            <section class="admin-content-header">
+                <div class="admin-content-header__copy">
+                    <span class="surface-nav__eyebrow">Admin da empresa</span>
+                    <h2>{{ empresa.nome_fantasia | e }}</h2>
+                    <p>Gerencie a empresa, a equipe e o suporte em blocos separados, sem misturar essa rotina com os outros fluxos do portal.</p>
+                </div>
+
+                <div class="admin-content-header__meta">
+                    <span class="hero-chip">Plano {{ empresa.plano_ativo | e }}</span>
+                    <span class="hero-chip">Responsavel {{ empresa.nome_responsavel | default('nao informado', true) | e }}</span>
+                    <span class="hero-chip">CNPJ {{ empresa.cnpj | default('nao informado', true) | e }}</span>
+                </div>
+            </section>
+
+            <div class="tab-panels admin-tab-panels cliente-admin-panels">
+                {% include "cliente/painel/_overview.html" %}
+                {% include "cliente/painel/_capacity.html" %}
+                {% include "cliente/painel/_team.html" %}
+                {% include "cliente/painel/_support.html" %}
+            </div>
+        </div>
+    </div>
+</section>

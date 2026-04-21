@@ -1,0 +1,117 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr35_projeto_protecao_queda",
+  "template_code": "nr35_projeto_protecao_queda",
+  "tokens": {
+    "cliente_nome": null,
+    "unidade_nome": null,
+    "engenheiro_responsavel": null,
+    "crea_art": null,
+    "revisao_template": null
+  },
+  "case_context": {
+    "laudo_id": null,
+    "empresa_nome": null,
+    "unidade_nome": null,
+    "data_execucao": null,
+    "data_emissao": null,
+    "status_mesa": null,
+    "wave_portfolio": 1,
+    "modalidade_laudo": "projeto_protecao_queda"
+  },
+  "mesa_review": {
+    "status": null,
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": null,
+    "pendencias_resolvidas_texto": null,
+    "observacoes_mesa": null
+  },
+  "resumo_executivo": null,
+  "identificacao": {
+    "objeto_principal": null,
+    "localizacao": null,
+    "codigo_interno": null,
+    "referencia_principal": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "escopo_servico": {
+    "tipo_entrega": null,
+    "modo_execucao": null,
+    "ativo_tipo": null,
+    "resumo_escopo": null
+  },
+  "execucao_servico": {
+    "metodo_aplicado": null,
+    "condicoes_observadas": null,
+    "parametros_relevantes": null,
+    "evidencia_execucao": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "parametros_de_projeto": {
+    "premissas_de_uso": null,
+    "layout_ou_arranjo": null,
+    "memoria_de_calculo": null,
+    "art_e_documentos": null
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    },
+    "evidencia_complementar": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    },
+    "documento_base": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": null,
+    "documentos_emitidos": null,
+    "observacoes_documentais": null
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": null,
+    "ha_pontos_de_atencao_texto": null,
+    "descricao": null,
+    "evidencias": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "recomendacoes": {
+    "texto": null
+  },
+  "conclusao": {
+    "status": null,
+    "conclusao_tecnica": null,
+    "justificativa": null
+  }
+}

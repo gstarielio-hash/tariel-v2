@@ -1,0 +1,196 @@
+appId: com.tarielia.inspetor
+tags:
+  - pilot
+  - mobile-v2
+  - mesa
+env:
+  LOGIN_EMAIL: ${MAESTRO_LOGIN_EMAIL}
+  LOGIN_PASSWORD: ${MAESTRO_LOGIN_PASSWORD}
+  TARGET_LAUDO_ID: ${MAESTRO_TARGET_LAUDO_ID}
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: login-email-input
+    timeout: 45000
+
+- tapOn:
+    id: login-email-input
+
+- inputText: ${LOGIN_EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-password-input
+
+- inputText: ${LOGIN_PASSWORD}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-submit-button
+
+- extendedWaitUntil:
+    visible:
+      id: open-settings-button
+    timeout: 30000
+
+- takeScreenshot: pilot-run-shell
+
+- extendedWaitUntil:
+    visible:
+      id: open-history-button
+    timeout: 15000
+
+- tapOn:
+    id: open-history-button
+
+- extendedWaitUntil:
+    visible:
+      id: history-first-item-button
+    timeout: 15000
+
+- takeScreenshot: pilot-run-history-open
+
+- tapOn:
+    id: history-search-input
+
+- inputText: ${TARGET_LAUDO_ID}
+
+- extendedWaitUntil:
+    visible:
+      id: history-item-${TARGET_LAUDO_ID}
+    timeout: 15000
+
+- takeScreenshot: pilot-run-history-search-applied
+
+- scrollUntilVisible:
+    element:
+      id: history-item-${TARGET_LAUDO_ID}
+    direction: DOWN
+    timeout: 15000
+
+- extendedWaitUntil:
+    visible:
+      id: history-item-${TARGET_LAUDO_ID}
+    timeout: 15000
+
+- takeScreenshot: pilot-run-history
+
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: history-item-${TARGET_LAUDO_ID}
+          retryTapIfNoChange: true
+          waitToSettleTimeoutMs: 1800
+      - extendedWaitUntil:
+          visible:
+            id: history-selection-callback-fired-${TARGET_LAUDO_ID}
+          timeout: 4000
+      - extendedWaitUntil:
+          visible:
+            id: authenticated-shell-selection-ready-${TARGET_LAUDO_ID}
+          timeout: 7000
+
+- takeScreenshot: pilot-run-conversation
+
+- takeScreenshot: pilot-run-history-selected
+
+- tapOn:
+    id: open-settings-button
+
+- extendedWaitUntil:
+    visible:
+      id: settings-drawer
+    timeout: 15000
+
+- scrollUntilVisible:
+    element:
+      id: settings-print-aplicativos-row
+    direction: DOWN
+    timeout: 15000
+
+- extendedWaitUntil:
+    visible:
+      id: settings-print-aplicativos-row
+    timeout: 15000
+
+- tapOn:
+    id: settings-print-aplicativos-row
+
+- extendedWaitUntil:
+    visible:
+      id: settings-section-link-sistema
+    timeout: 15000
+
+- tapOn:
+    id: settings-section-link-sistema
+
+- extendedWaitUntil:
+    visible:
+      id: settings-system-activity-center-row
+    timeout: 15000
+
+- tapOn:
+    id: settings-system-activity-center-row
+
+- extendedWaitUntil:
+    visible:
+      id: activity-center-modal
+    timeout: 15000
+
+- extendedWaitUntil:
+    visible:
+      id: activity-center-terminal-state
+    timeout: 20000
+
+- takeScreenshot: pilot-run-activity-center
+
+- runFlow:
+    when:
+      visible:
+        id: activity-center-feed-v2-served
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: activity-center-feed-v2-target-${TARGET_LAUDO_ID}
+          timeout: 4000
+      - tapOn:
+          id: activity-center-close-button
+      - runFlow:
+          when:
+            visible:
+              id: settings-drawer-back-button
+          commands:
+            - tapOn:
+                id: settings-drawer-back-button
+      - runFlow:
+          when:
+            visible:
+              id: settings-drawer-back-button
+          commands:
+            - tapOn:
+                id: settings-drawer-back-button
+      - runFlow:
+          when:
+            visible:
+              id: close-settings-drawer-button
+          commands:
+            - tapOn:
+                id: close-settings-drawer-button
+      - runFlow:
+          when:
+            visible:
+              id: mesa-tab-button
+          commands:
+            - tapOn:
+                id: mesa-tab-button
+            - extendedWaitUntil:
+                visible:
+                  id: mesa-thread-surface
+                timeout: 15000
+            - takeScreenshot: pilot-run-mesa-thread

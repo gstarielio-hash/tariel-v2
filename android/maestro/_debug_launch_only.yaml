@@ -1,0 +1,8 @@
+appId: com.tarielia.inspetor
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: open-settings-button
+    timeout: 30000

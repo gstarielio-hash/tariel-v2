@@ -1,0 +1,108 @@
+        /* Coluna direita */
+        .coluna-view {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            background: var(--cor-fundo);
+            position: relative;
+        }
+
+        .estado-vazio {
+            flex: 1;
+            display: grid;
+            place-items: center;
+            padding: 32px;
+            color: var(--texto-mutado);
+            text-align: center;
+        }
+
+        .estado-vazio-box {
+            max-width: 420px;
+            opacity: .82;
+        }
+
+        #view-content[hidden] {
+            display: none !important;
+        }
+
+        #view-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
+        }
+
+        .view-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--borda);
+            background: rgba(33, 38, 47, 0.58);
+            backdrop-filter: blur(6px);
+        }
+
+        .view-titulo {
+            min-width: 0;
+        }
+
+        .view-titulo h2 {
+            margin: 0 0 4px;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .view-titulo span {
+            color: var(--texto-mutado);
+            font-size: 13px;
+        }
+
+        .view-acoes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn:hover:not(:disabled),
+        .btn-enviar-chat:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled,
+        .btn-enviar-chat:disabled {
+            opacity: 0.58;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ver {
+            background: rgba(191, 198, 209, 0.14);
+            border: 1px solid rgba(191, 198, 209, 0.34);
+            color: #e8edf5;
+        }
+
+        .btn-aprovar {
+            background: var(--cor-aprovado);
+            color: #fff;
+        }
+
+        .btn-rejeitar {
+            background: transparent;
+            color: var(--cor-rejeitado-soft);
+            border: 1px solid var(--cor-rejeitado);
+        }

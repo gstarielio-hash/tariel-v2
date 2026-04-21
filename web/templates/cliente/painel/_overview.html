@@ -1,0 +1,42 @@
+<section
+    id="admin-overview"
+    class="admin-stage admin-tab-panel"
+    data-admin-stage="overview"
+    data-admin-panel="overview"
+    data-stage-state="idle"
+    role="tabpanel"
+    aria-labelledby="admin-section-tab-overview"
+    {% if (cliente_admin_section_inicial | default('overview')) != 'overview' %}hidden{% endif %}
+>
+    {% include "cliente/_shell_header.html" %}
+
+    <div class="admin-stage-head">
+        <div class="admin-stage-copy">
+            <span class="admin-stage-kicker">Empresa</span>
+            <h3>Capacidade, saude e contexto da empresa</h3>
+            <p class="box-subtitle">Veja se a empresa segue com folga operacional, que parte do contrato esta sendo pressionada e qual e o proximo foco administrativo.</p>
+        </div>
+
+        <div class="admin-stage-meta">
+            <span class="hero-chip">Status executivo</span>
+            <span class="hero-chip">Saude operacional</span>
+            <span class="hero-chip">Proximo foco</span>
+        </div>
+    </div>
+
+    <div id="admin-executive-brief" class="admin-stage-brief"></div>
+    <div id="admin-resumo-geral" class="summary-grid"></div>
+    <div id="empresa-cards" class="cards-grid"></div>
+
+    <article class="box box--section">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Saude da operacao</h3>
+                <p class="box-subtitle">Acompanhe tendencia de uso, aderencia da equipe e historico recente sem sair do console administrativo.</p>
+            </div>
+        </div>
+
+        <div id="admin-saude-resumo" class="summary-grid"></div>
+        <div id="admin-saude-historico" class="health-grid"></div>
+    </article>
+</section>

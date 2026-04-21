@@ -1,0 +1,295 @@
+{% from "admin/_help_macros.html" import help_icon %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Nova empresa • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_new_client.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Menu principal">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+                <a href="/admin/clientes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+                <a href="/admin/catalogo-laudos" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+                <a href="/admin/novo-cliente" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+
+            {% if usuario %}
+            <div class="usuario-painel" aria-label="Usuário conectado">
+                <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+                <div>
+                    <strong class="usuario-painel__nome">{{ usuario.nome_completo | e }}</strong>
+                    <span class="usuario-painel__cargo">Admin-CEO</span>
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="topbar">
+                <div class="titulo-pagina">
+                    <h1>Nova empresa</h1>
+                    <p>Cadastro da empresa e preparo do primeiro acesso administrativo.</p>
+                </div>
+
+                <a href="/admin/clientes" class="btn-admin secundario">Voltar</a>
+            </header>
+
+            <section class="setup-shell">
+                <article class="setup-card">
+                    <div class="setup-summary">
+                        <strong>Provisionar empresa assinante</strong>
+                        <p>Preencha os dados principais. O primeiro responsavel da empresa recebe uma senha temporaria e cria a senha definitiva no primeiro login.</p>
+                    </div>
+
+                    <form method="post" action="/admin/novo-cliente">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                        <div class="setup-grid">
+                            <div class="campo-form">
+                                <label for="nome">
+                                    <span class="label-with-help">
+                                        <span>Nome da empresa</span>
+                                        {{ help_icon("Nome que sera usado no cadastro, nos relatorios e na identificacao do portal da empresa.", "Ajuda sobre nome da empresa") }}
+                                    </span>
+                                </label>
+                                <input id="nome" name="nome" required>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="cnpj">
+                                    <span class="label-with-help">
+                                        <span>CNPJ</span>
+                                        {{ help_icon("Documento usado para identificar a empresa e evitar cadastros duplicados.", "Ajuda sobre CNPJ") }}
+                                    </span>
+                                </label>
+                                <input id="cnpj" name="cnpj" required>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="plano">
+                                    <span class="label-with-help">
+                                        <span>Plano</span>
+                                        {{ help_icon("Define a capacidade inicial contratada, como volume de uso e quantidade de acessos.", "Ajuda sobre plano") }}
+                                    </span>
+                                </label>
+                                <select id="plano" name="plano">
+                                    <option value="Inicial" {% if plano_padrao_onboarding == 'Inicial' %}selected{% endif %}>Inicial</option>
+                                    <option value="Intermediario" {% if plano_padrao_onboarding == 'Intermediario' %}selected{% endif %}>Intermediário</option>
+                                    <option value="Ilimitado" {% if plano_padrao_onboarding == 'Ilimitado' %}selected{% endif %}>Ilimitado</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="email">
+                                    <span class="label-with-help">
+                                        <span>E-mail do primeiro acesso da empresa</span>
+                                        {{ help_icon("Esse e-mail vira o login inicial do responsavel da empresa no portal dela.", "Ajuda sobre o primeiro acesso da empresa") }}
+                                    </span>
+                                </label>
+                                <input id="email" name="email" type="email" required>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="nome_responsavel">
+                                    <span class="label-with-help">
+                                        <span>Responsável</span>
+                                        {{ help_icon("Pessoa de referencia para contato inicial, aprovacoes e alinhamento comercial.", "Ajuda sobre responsavel") }}
+                                    </span>
+                                </label>
+                                <input id="nome_responsavel" name="nome_responsavel">
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="segmento">
+                                    <span class="label-with-help">
+                                        <span>Segmento</span>
+                                        {{ help_icon("Ajuda a identificar o tipo de operacao da empresa e organizar o cadastro.", "Ajuda sobre segmento") }}
+                                    </span>
+                                </label>
+                                <input id="segmento" name="segmento">
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="cidade_estado">
+                                    <span class="label-with-help">
+                                        <span>Cidade / Estado</span>
+                                        {{ help_icon("Referencia geografica basica da empresa para cadastro e suporte.", "Ajuda sobre cidade e estado") }}
+                                    </span>
+                                </label>
+                                <input id="cidade_estado" name="cidade_estado">
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="admin_cliente_operating_model">
+                                    <span class="label-with-help">
+                                        <span>Modelo operacional contratado</span>
+                                        {{ help_icon("Define se o trabalho principal fica concentrado em uma pessoa ou distribuido entre pessoas diferentes.", "Ajuda sobre modelo operacional") }}
+                                    </span>
+                                </label>
+                                <select id="admin_cliente_operating_model" name="admin_cliente_operating_model">
+                                    <option value="standard" selected>Operação padrão</option>
+                                    <option value="mobile_single_operator">Aplicativo principal com uma pessoa responsavel</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="admin_cliente_mobile_web_inspector_enabled">
+                                    <span class="label-with-help">
+                                        <span>A mesma pessoa pode usar a area tecnica no navegador</span>
+                                        {{ help_icon("Ative quando a pessoa principal tambem puder continuar o trabalho tecnico pelo navegador.", "Ajuda sobre area tecnica no navegador") }}
+                                    </span>
+                                </label>
+                                <select id="admin_cliente_mobile_web_inspector_enabled" name="admin_cliente_mobile_web_inspector_enabled">
+                                    <option value="true" selected>Sim</option>
+                                    <option value="false">Não</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="admin_cliente_mobile_web_review_enabled">
+                                    <span class="label-with-help">
+                                        <span>A mesma pessoa pode usar a area de analise no navegador</span>
+                                        {{ help_icon("Ative quando a mesma pessoa puder revisar e concluir o trabalho tambem na area web de analise.", "Ajuda sobre area de analise no navegador") }}
+                                    </span>
+                                </label>
+                                <select id="admin_cliente_mobile_web_review_enabled" name="admin_cliente_mobile_web_review_enabled">
+                                    <option value="true" selected>Sim</option>
+                                    <option value="false">Não</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="admin_cliente_operational_user_cross_portal_enabled">
+                                    <span class="label-with-help">
+                                        <span>A mesma pessoa pode acumular execucao e analise</span>
+                                        {{ help_icon("Use quando a equipe for enxuta e uma pessoa puder executar e analisar etapas diferentes do processo.", "Ajuda sobre acumulacao de funcoes") }}
+                                    </span>
+                                </label>
+                                <select id="admin_cliente_operational_user_cross_portal_enabled" name="admin_cliente_operational_user_cross_portal_enabled">
+                                    <option value="false" selected>Não</option>
+                                    <option value="true">Sim</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="admin_cliente_operational_user_admin_portal_enabled">
+                                    <span class="label-with-help">
+                                        <span>A pessoa operacional pode acessar o painel da empresa</span>
+                                        {{ help_icon("Ative quando uma pessoa da operacao tambem puder entrar no painel principal da empresa para acompanhar ou agir.", "Ajuda sobre acesso ao painel da empresa") }}
+                                    </span>
+                                </label>
+                                <select id="admin_cliente_operational_user_admin_portal_enabled" name="admin_cliente_operational_user_admin_portal_enabled">
+                                    <option value="false" selected>Não</option>
+                                    <option value="true">Sim</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="admin_cliente_case_visibility_mode">
+                                    <span class="label-with-help">
+                                        <span>Painel da empresa: visao operacional</span>
+                                        {{ help_icon("Escolha se a empresa vai ver os casos em detalhe ou apenas um resumo consolidado.", "Ajuda sobre visao operacional") }}
+                                    </span>
+                                </label>
+                                <select id="admin_cliente_case_visibility_mode" name="admin_cliente_case_visibility_mode">
+                                    <option value="case_list" selected>Lista caso a caso</option>
+                                    <option value="summary_only">Somente resumos agregados</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form">
+                                <label for="admin_cliente_case_action_mode">
+                                    <span class="label-with-help">
+                                        <span>Painel da empresa: atuacao operacional</span>
+                                        {{ help_icon("Define se a empresa so acompanha os casos ou se tambem pode agir neles.", "Ajuda sobre atuacao operacional") }}
+                                    </span>
+                                </label>
+                                <select id="admin_cliente_case_action_mode" name="admin_cliente_case_action_mode">
+                                    <option value="case_actions" selected>Pode agir nos casos</option>
+                                    <option value="read_only">Somente acompanhamento</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-form campo-form--full">
+                                <label>
+                                    <span class="label-with-help">
+                                        <span>Como esse modelo funciona</span>
+                                        {{ help_icon("Resumo rapido do efeito pratico das escolhas acima na organizacao dos acessos da empresa.", "Ajuda sobre o modelo de uso") }}
+                                    </span>
+                                </label>
+                                <p class="campo-ajuda">
+                                    No modelo com <strong>uma pessoa principal</strong>, a mesma pessoa pode concentrar o trabalho no aplicativo e,
+                                    se liberado, tambem usar as areas web da empresa.
+                                    Fora desse modelo, os acessos ficam distribuidos entre pessoas diferentes e voce define quais funcoes podem ser acumuladas.
+                                </p>
+                            </div>
+
+                            <div class="campo-form campo-form--full">
+                                <label for="observacoes">
+                                    <span class="label-with-help">
+                                        <span>Observações</span>
+                                        {{ help_icon("Anote particularidades do contrato, combinacoes de acesso ou orientacoes internas para o cadastro.", "Ajuda sobre observacoes") }}
+                                    </span>
+                                </label>
+                                <textarea id="observacoes" name="observacoes" rows="5"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="setup-actions">
+                            <a href="/admin/clientes" class="btn-admin secundario">Cancelar</a>
+                            <button class="btn-admin primario" type="submit">Criar empresa</button>
+                        </div>
+                    </form>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

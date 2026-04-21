@@ -1,0 +1,148 @@
+<section class="catalog-drawer" data-catalog-drawer="catalog-bootstrap" hidden>
+    <button type="button" class="catalog-drawer__backdrop" data-catalog-close-drawer aria-label="Fechar painel de bootstrap"></button>
+    <div class="catalog-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="catalog-bootstrap-title">
+        <div class="catalog-drawer__header">
+            <div>
+                <p class="catalog-section__eyebrow">Base oficial</p>
+                <h2 id="catalog-bootstrap-title">Importar acervo oficial</h2>
+                <p>{{ total_familias_canonicas | int }} familias oficiais disponiveis para preencher o catalogo.</p>
+            </div>
+            <button type="button" class="catalog-drawer__close" data-catalog-close-drawer aria-label="Fechar painel">×</button>
+        </div>
+
+        <div class="catalog-drawer__body">
+            <article class="catalog-card">
+                <h3>Importação em lote</h3>
+                <p>Carrega toda a base oficial como ponto de partida do catalogo.</p>
+                <form class="catalog-form catalog-form--stack" method="POST" action="/admin/catalogo-laudos/familias/importar-canonico-lote">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="status_catalogo" value="publicado">
+                    <button type="submit" class="catalog-btn catalog-btn--primary">Importar base completa</button>
+                </form>
+            </article>
+
+            <article class="catalog-card">
+                <h3>Importação unitária</h3>
+                <p>Use quando so uma familia precisa entrar agora, sem abrir a base completa.</p>
+                <form class="catalog-form catalog-form--stack" method="POST" action="/admin/catalogo-laudos/familias/importar-canonico">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <label>
+                        <span>Chave da familia</span>
+                        <input type="text" name="family_key" maxlength="120" placeholder="nr13_inspecao_vaso_pressao" required>
+                    </label>
+                    <label>
+                        <span>Status inicial</span>
+                        <select name="status_catalogo">
+                            <option value="publicado">Publicado</option>
+                            <option value="rascunho">Rascunho</option>
+                            <option value="arquivado">Arquivado</option>
+                        </select>
+                    </label>
+                    <button type="submit" class="catalog-btn catalog-btn--secondary">Importar família</button>
+                </form>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="catalog-drawer" data-catalog-drawer="family-create" hidden>
+    <button type="button" class="catalog-drawer__backdrop" data-catalog-close-drawer aria-label="Fechar painel de criação"></button>
+    <div class="catalog-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="catalog-family-create-title">
+        <div class="catalog-drawer__header">
+            <div>
+                <p class="catalog-section__eyebrow">Nova família</p>
+                <h2 id="catalog-family-create-title">Registrar nova familia</h2>
+                <p>Cadastro rapido para incluir uma nova familia sem perder o foco da lista principal.</p>
+            </div>
+            <button type="button" class="catalog-drawer__close" data-catalog-close-drawer aria-label="Fechar painel">×</button>
+        </div>
+
+        <form class="catalog-form catalog-form--stack catalog-drawer__body" method="POST" action="/admin/catalogo-laudos/familias">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="return_to" value="/admin/catalogo-laudos">
+            <label>
+                <span>Chave da familia</span>
+                <input type="text" name="family_key" maxlength="120" placeholder="nr35_inspecao_linha_de_vida" required autofocus>
+            </label>
+            <label>
+                <span>Nome da familia</span>
+                <input type="text" name="nome_exibicao" maxlength="180" placeholder="NR35 · Linha de Vida" required>
+            </label>
+            <label>
+                <span>Categoria / NR</span>
+                <input type="text" name="macro_categoria" maxlength="80" placeholder="NR35">
+            </label>
+            <label>
+                <span>Chave da norma</span>
+                <input type="text" name="nr_key" maxlength="40" placeholder="nr35">
+            </label>
+            <label>
+                <span>Etapa</span>
+                <select name="technical_status">
+                    <option value="draft">Em preparo</option>
+                    <option value="review">Em ajuste</option>
+                    <option value="ready">Pronta</option>
+                    <option value="deprecated">Arquivado</option>
+                </select>
+            </label>
+            <label>
+                <span>Status antigo</span>
+                <select name="status_catalogo">
+                    <option value="rascunho">Rascunho</option>
+                    <option value="publicado">Publicado</option>
+                    <option value="arquivado">Arquivado</option>
+                </select>
+            </label>
+            <label>
+                <span>Descricao</span>
+                <textarea name="descricao" rows="5" placeholder="Explique de forma simples o que esta familia cobre."></textarea>
+            </label>
+            <button type="submit" class="catalog-btn catalog-btn--primary">Salvar família</button>
+        </form>
+    </div>
+</section>
+
+<div class="catalog-preview-modal" id="catalog-preview-modal" hidden>
+    <div class="catalog-preview-modal__backdrop" data-catalog-close-preview="true"></div>
+    <section class="catalog-preview-modal__dialog" id="catalog-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="catalog-preview-title">
+        <div class="catalog-preview-modal__side">
+            <div class="catalog-preview-modal__side-top">
+                <span class="catalog-preview-modal__code" id="catalog-preview-code">LAUDO</span>
+                <button type="button" class="catalog-preview-modal__close" data-catalog-close-preview="true" aria-label="Fechar prévia">×</button>
+            </div>
+            <div class="catalog-preview-modal__headline">
+                <div class="catalog-preview-modal__status-row">
+                    <span class="catalog-preview-modal__eyebrow">Visão do documento</span>
+                    <span class="catalog-status catalog-status--idle" id="catalog-preview-status">Em montagem</span>
+                </div>
+                <h2 id="catalog-preview-title">Documento base da família</h2>
+                <p id="catalog-preview-subtitle">Abra o modelo como documento para ver a leitura final antes do preenchimento.</p>
+            </div>
+            <div class="catalog-preview-modal__meta" id="catalog-preview-meta"></div>
+            <div class="catalog-preview-modal__field-list catalog-preview-modal__field-list--objective">
+                <strong id="catalog-preview-objective-title">Objetivo do documento</strong>
+                <span id="catalog-preview-objective-text">Mostrar como este laudo se apresenta antes do preenchimento final.</span>
+            </div>
+            <div class="catalog-preview-modal__section-list" id="catalog-preview-sections"></div>
+            <div class="catalog-preview-modal__field-list">
+                <strong>Campos previstos para preenchimento</strong>
+                <div id="catalog-preview-fields"></div>
+            </div>
+            <div class="catalog-preview-modal__feature-list" id="catalog-preview-features"></div>
+            <p class="catalog-preview-modal__note" id="catalog-preview-note">Documento pronto para apresentação comercial e liberação governada.</p>
+        </div>
+        <div class="catalog-preview-modal__viewer">
+            <div class="catalog-preview-modal__viewer-top">
+                <strong>Documento oficial</strong>
+                <div class="catalog-preview-modal__viewer-actions">
+                    <a href="/admin/catalogo-laudos" class="catalog-btn catalog-btn--secondary" id="catalog-preview-open-family">Abrir família</a>
+                    <a href="/admin/catalogo-laudos" class="catalog-btn catalog-btn--primary" id="catalog-preview-open-tab" target="_blank" rel="noopener noreferrer">Abrir em aba</a>
+                </div>
+            </div>
+            <div class="catalog-preview-modal__frame-shell">
+                <div class="catalog-preview-modal__loading" id="catalog-preview-loading">Abrindo a visualização do documento...</div>
+                <iframe id="catalog-preview-frame" title="Visualização do laudo oficial" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+</div>

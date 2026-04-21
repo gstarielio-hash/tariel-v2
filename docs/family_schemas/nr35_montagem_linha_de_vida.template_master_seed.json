@@ -1,0 +1,28 @@
+{
+  "family_key": "nr35_montagem_linha_de_vida",
+  "template_code": "nr35_montagem_linha_de_vida",
+  "nome_template": "NR35 - Montagem e fabricacao de linha de vida - Template Governado",
+  "versao": 1,
+  "modo_editor": "editor_rico",
+  "observacoes": "Template governado para montagem de linha de vida com execucao, fixacoes e condicao de liberacao.",
+  "documento_editor_json": {
+    "version": 1,
+    "doc": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "NR35 - Montagem e fabricacao de linha de vida"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

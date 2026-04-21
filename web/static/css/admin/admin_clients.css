@@ -1,0 +1,546 @@
+        :root {
+            --tariel-bg: #f4f7fb;
+            --tariel-surface: #ffffff;
+            --tariel-surface-soft: #f0f4f7;
+            --tariel-text: #102033;
+            --tariel-text-soft: #647487;
+            --tariel-border: #d8e1e8;
+            --tariel-accent: #234a73;
+            --tariel-accent-dark: #183553;
+            --tariel-success: #2fb979;
+            --tariel-success-bg: rgba(47, 185, 121, .12);
+            --tariel-danger: #e75a5a;
+            --tariel-danger-bg: rgba(231, 90, 90, .12);
+            --tariel-warning: #6d5430;
+            --tariel-warning-bg: rgba(109, 84, 48, .10);
+            --tariel-info: #36506b;
+            --tariel-info-bg: rgba(54, 80, 107, .10);
+            --tariel-radius-sm: 8px;
+            --tariel-radius-md: 12px;
+            --tariel-radius-lg: 14px;
+            --tariel-shadow: 0 10px 28px rgba(16, 32, 51, .08);
+            color-scheme: light;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-mini {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 15px 18px;
+            border: 1px solid var(--tariel-border);
+            border-radius: var(--tariel-radius-md);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 250, 252, .98));
+            box-shadow: 0 10px 24px rgba(16, 32, 51, .05);
+        }
+
+        .stat-mini .icone {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 10px;
+        }
+
+        .stat-mini .num {
+            color: var(--tariel-text);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .stat-mini .label {
+            color: var(--tariel-text-soft);
+            font-size: 12px;
+        }
+
+        .icone--clientes {
+            background: var(--tariel-info-bg);
+            color: var(--tariel-info);
+        }
+
+        .icone--ativos {
+            background: var(--tariel-success-bg);
+            color: var(--tariel-success);
+        }
+
+        .icone--bloqueados {
+            background: var(--tariel-danger-bg);
+            color: var(--tariel-danger);
+        }
+
+        .filtros {
+            display: grid;
+            gap: 14px;
+            margin-bottom: 18px;
+            padding: 18px;
+            border: 1px solid var(--tariel-border);
+            border-radius: var(--tariel-radius-md);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .99), rgba(248, 250, 252, .99));
+            box-shadow: 0 10px 24px rgba(16, 32, 51, .05);
+        }
+
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+        }
+
+        .filtros input,
+        .filtros select {
+            width: 100%;
+            min-height: 42px;
+            padding: 10px 14px;
+            border: 1px solid var(--tariel-border);
+            border-radius: var(--tariel-radius-sm);
+            background: var(--tariel-surface-soft);
+            color: var(--tariel-text);
+            font: inherit;
+            font-size: 14px;
+        }
+
+        .filtros input:focus,
+        .filtros select:focus {
+            outline: none;
+            border-color: var(--tariel-accent);
+            box-shadow: 0 0 0 3px rgba(35, 74, 115, .12);
+        }
+
+        .filtros-acoes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-filtrar,
+        .btn-limpar,
+        .btn-novo-cliente,
+        .btn-ver,
+        .btn-block,
+        .btn-unblock,
+        .btn-acao-secundaria {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: var(--tariel-radius-sm);
+            font: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform .15s ease, filter .15s ease, background-color .15s ease, border-color .15s ease;
+        }
+
+        .btn-filtrar:hover,
+        .btn-limpar:hover,
+        .btn-novo-cliente:hover,
+        .btn-ver:hover,
+        .btn-block:hover,
+        .btn-unblock:hover,
+        .btn-acao-secundaria:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.02);
+        }
+
+        .btn-filtrar {
+            min-height: 42px;
+            padding: 10px 18px;
+            border: none;
+            background: var(--tariel-accent);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .btn-limpar,
+        .btn-acao-secundaria {
+            min-height: 42px;
+            padding: 10px 14px;
+            border: 1px solid var(--tariel-border);
+            background: rgba(191, 198, 209, .12);
+            color: var(--tariel-text-soft);
+            font-size: 13px;
+        }
+
+        .btn-novo-cliente {
+            padding: 10px 18px;
+            background: var(--tariel-accent);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .resumo-listagem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border: 1px solid rgba(216, 225, 232, .84);
+            border-radius: var(--tariel-radius-md);
+            background: rgba(255, 255, 255, .84);
+            color: var(--tariel-text-soft);
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge.conforme {
+            background: var(--tariel-success-bg);
+            color: var(--tariel-success);
+        }
+
+        .badge.critico {
+            background: var(--tariel-danger-bg);
+            color: var(--tariel-danger);
+        }
+
+        .badge.atencao {
+            background: var(--tariel-warning-bg);
+            color: var(--tariel-warning);
+        }
+
+        .badge.info {
+            background: var(--tariel-info-bg);
+            color: var(--tariel-info);
+        }
+
+        .empresa-cell strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .meta-stack {
+            display: grid;
+            gap: 2px;
+            color: var(--tariel-text-soft);
+            font-size: 11.5px;
+            line-height: 1.5;
+        }
+
+        .uso-stack {
+            display: grid;
+            gap: 3px;
+        }
+
+        .acoes-tabela {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            min-width: 138px;
+        }
+
+        .form-acao-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 0;
+        }
+
+        .form-acao-inline select {
+            min-height: 34px;
+            padding: 6px 10px;
+            border: 1px solid var(--tariel-border);
+            border-radius: 6px;
+            background: var(--tariel-surface-soft);
+            color: var(--tariel-text);
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .btn-ver {
+            padding: 8px 12px;
+            border: 1px solid rgba(35, 74, 115, .16);
+            background: rgba(255, 255, 255, .92);
+            color: var(--tariel-accent);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .clientes-tabela {
+            min-width: 920px;
+            white-space: normal;
+        }
+
+        .clientes-tabela th,
+        .clientes-tabela td {
+            white-space: normal;
+        }
+
+        .clientes-tabela td {
+            vertical-align: top;
+        }
+
+        .clientes-tabela .col-acoes {
+            width: 152px;
+        }
+
+        .clientes-tabela .col-ultimo-acesso {
+            min-width: 118px;
+        }
+
+        .clientes-tabela .empresa-codigo {
+            color: var(--tariel-text);
+            font-weight: 600;
+        }
+
+        .acoes-menu__trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .btn-block,
+        .btn-unblock {
+            min-height: 34px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .btn-block {
+            border: 1px solid #ef9a9a;
+            background: var(--tariel-danger-bg);
+            color: var(--tariel-danger);
+        }
+
+        .btn-unblock {
+            border: 1px solid #a5d6a7;
+            background: var(--tariel-success-bg);
+            color: var(--tariel-success);
+        }
+
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            border-radius: var(--tariel-radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            transition: opacity .25s ease, transform .25s ease;
+        }
+
+        .alert.saindo {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+
+        .alert-success {
+            background: var(--tariel-success-bg);
+            color: var(--tariel-success);
+            border-left: 4px solid #4CAF50;
+        }
+
+        .alert-error {
+            background: var(--tariel-danger-bg);
+            color: var(--tariel-danger);
+            border-left: 4px solid #EF5350;
+        }
+
+        .alert-fechar {
+            margin-left: auto;
+            padding: 0 4px;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: .6;
+        }
+
+        .alert-fechar:hover {
+            opacity: 1;
+        }
+
+        .estado-vazio-tabela {
+            padding: 30px;
+            color: var(--tariel-text-soft);
+            text-align: center;
+        }
+
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .pagination-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pagination-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            min-height: 38px;
+            padding: 0 12px;
+            border: 1px solid var(--tariel-border);
+            border-radius: var(--tariel-radius-sm);
+            background: var(--tariel-surface);
+            color: var(--tariel-text-soft);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .pagination-link.ativo {
+            border-color: var(--tariel-accent);
+            background: var(--tariel-accent);
+            color: #fff;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(9, 16, 25, .34);
+            z-index: 1200;
+        }
+
+        .modal-overlay.ativo {
+            display: flex;
+        }
+
+        .modal-bloqueio {
+            width: min(520px, 100%);
+            padding: 24px;
+            border: 1px solid var(--tariel-border);
+            border-radius: var(--tariel-radius-lg);
+            background: var(--tariel-surface);
+            box-shadow: var(--tariel-shadow);
+        }
+
+        .modal-bloqueio h3 {
+            margin: 0 0 8px;
+            color: var(--tariel-text);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-bloqueio p {
+            margin: 0 0 16px;
+            color: var(--tariel-text-soft);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .modal-bloqueio label {
+            display: grid;
+            gap: 8px;
+            color: var(--tariel-text);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .modal-bloqueio textarea {
+            width: 100%;
+            min-height: 132px;
+            padding: 12px 14px;
+            border: 1px solid var(--tariel-border);
+            border-radius: var(--tariel-radius-sm);
+            background: var(--tariel-surface-soft);
+            color: var(--tariel-text);
+            font: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .modal-bloqueio textarea:focus {
+            outline: none;
+            border-color: var(--tariel-accent);
+            box-shadow: 0 0 0 3px rgba(35, 74, 115, .12);
+        }
+
+        .modal-bloqueio-erro {
+            min-height: 20px;
+            margin-top: 10px;
+            color: var(--tariel-danger);
+            font-size: 13px;
+        }
+
+        .modal-bloqueio-acoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .item-menu.logout-btn:focus-visible,
+        .btn-filtrar:focus-visible,
+        .btn-limpar:focus-visible,
+        .btn-novo-cliente:focus-visible,
+        .btn-ver:focus-visible,
+        .btn-block:focus-visible,
+        .btn-unblock:focus-visible,
+        .btn-acao-secundaria:focus-visible,
+        .alert-fechar:focus-visible {
+            outline: 2px solid var(--tariel-accent);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 960px) {
+            .resumo-listagem,
+            .pagination {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .acoes-tabela {
+                min-width: 0;
+            }
+
+            .filtros-acoes,
+            .form-acao-inline {
+                width: 100%;
+            }
+
+            .btn-filtrar,
+            .btn-limpar,
+            .btn-acao-secundaria {
+                width: 100%;
+            }
+        }

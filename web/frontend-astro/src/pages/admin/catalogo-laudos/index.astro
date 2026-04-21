@@ -1,0 +1,365 @@
+---
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Boxes,
+  Clock3,
+  FileStack,
+  ShieldCheck,
+} from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import KpiCard from "@/components/app/admin/kpi-card.astro";
+import StatusPill from "@/components/app/admin/status-pill.astro";
+import { getAdminCatalogList } from "@/lib/server/admin-catalog";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+import AdminShellLayout from "@/layouts/admin-shell-layout.astro";
+
+export const prerender = false;
+
+const notice = consumeAdminNotice(Astro.cookies);
+const data = await getAdminCatalogList({
+  busca: Astro.url.searchParams.get("busca"),
+  macroCategoria: Astro.url.searchParams.get("macroCategoria"),
+  statusTecnico: Astro.url.searchParams.get("statusTecnico"),
+  materialLevel: Astro.url.searchParams.get("materialLevel"),
+  pagina: Astro.url.searchParams.get("pagina"),
+  porPagina: Astro.url.searchParams.get("porPagina"),
+});
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("pt-BR").format(value);
+}
+
+function buildUrl(overrides: Record<string, string | number | null | undefined>) {
+  const params = new URLSearchParams();
+  const merged = {
+    busca: data.filters.busca,
+    macroCategoria: data.filters.macroCategoria,
+    statusTecnico: data.filters.statusTecnico,
+    materialLevel: data.filters.materialLevel,
+    porPagina: String(data.filters.porPagina),
+    pagina: String(data.filters.pagina),
+    ...overrides,
+  };
+
+  for (const [key, value] of Object.entries(merged)) {
+    if (value == null || value === "" || (key === "pagina" && String(value) === "1")) {
+      continue;
+    }
+
+    params.set(key, String(value));
+  }
+
+  const query = params.toString();
+  return query ? `/admin/catalogo-laudos?${query}` : "/admin/catalogo-laudos";
+}
+
+const cards = [
+  {
+    icon: Boxes,
+    label: "Familias no recorte",
+    value: formatNumber(data.totals.totalFamilies),
+    detail: `${formatNumber(data.totals.totalVariants)} variantes somadas no recorte atual.`,
+    tone: "orange" as const,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Prontas para uso",
+    value: formatNumber(data.totals.readyFamilies),
+    detail: `${formatNumber(data.totals.realCalibratedFamilies)} calibradas com material real.`,
+    tone: "emerald" as const,
+  },
+  {
+    icon: FileStack,
+    label: "Ofertas ativas",
+    value: formatNumber(data.totals.activeOffers),
+    detail: "Pacotes comerciais ligados ao catalogo oficial.",
+    tone: "sky" as const,
+  },
+  {
+    icon: Clock3,
+    label: "Liberacoes ativas",
+    value: formatNumber(data.totals.activeReleases),
+    detail: "Tenants ja expostos ao catalogo governado.",
+    tone: "slate" as const,
+  },
+];
+---
+
+<AdminShellLayout title="Catalogo de Laudos | Tariel Astro" activeItem="catalog" userName="Admin-CEO">
+  <Fragment slot="header">
+    <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+      <div class="max-w-4xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Nova fatia migrada</p>
+        <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950 sm:text-5xl">
+          Catalogo oficial de familias em Astro SSR.
+        </h1>
+        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+          A nova stack agora tambem cobre a vitrine operacional do catalogo de laudos, com leitura de familias,
+          pacotes comerciais, calibracao e liberacoes por tenant direto do PostgreSQL atual.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="/admin/painel"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/20 hover:bg-slate-50"
+        >
+          Voltar ao dashboard
+          <ArrowUpRight className="size-4" />
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+      <StatusPill label={`${formatNumber(data.pagination.totalItems)} familias encontradas`} tone="info" />
+      <span>Pagina {data.pagination.page} de {data.pagination.totalPages}</span>
+      <span>Filtros ativos sobre o catalogo governado</span>
+    </div>
+  </Fragment>
+
+  <AdminNotice notice={notice} />
+
+  <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+    {cards.map((card) => (
+      <KpiCard label={card.label} value={card.value} detail={card.detail} icon={card.icon} tone={card.tone} />
+    ))}
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Filtros</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Home do catalogo</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          Busca por familia, macro categoria, status tecnico e nivel de calibracao ja roda na nova camada server-side.
+        </p>
+      </div>
+    </div>
+
+    <form method="GET" action="/admin/catalogo-laudos" class="mt-6 grid gap-4 lg:grid-cols-4">
+      <label class="block space-y-2 lg:col-span-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Busca</span>
+        <input
+          type="text"
+          name="busca"
+          value={data.filters.busca}
+          placeholder="Nome da familia, family key ou macro categoria"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        />
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Macro categoria</span>
+        <select
+          name="macroCategoria"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        >
+          <option value="">Todas</option>
+          {data.options.macroCategories.map((macroCategory) => (
+            <option value={macroCategory} selected={data.filters.macroCategoria === macroCategory}>
+              {macroCategory}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Status tecnico</span>
+        <select
+          name="statusTecnico"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        >
+          <option value="">Todos</option>
+          <option value="ready" selected={data.filters.statusTecnico === "ready"}>Pronta</option>
+          <option value="draft" selected={data.filters.statusTecnico === "draft"}>Rascunho</option>
+          <option value="deprecated" selected={data.filters.statusTecnico === "deprecated"}>Arquivada</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Material</span>
+        <select
+          name="materialLevel"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        >
+          <option value="">Todos</option>
+          <option value="real_calibrated" selected={data.filters.materialLevel === "real_calibrated"}>Material real</option>
+          <option value="synthetic" selected={data.filters.materialLevel === "synthetic"}>Sintetica</option>
+          <option value="none" selected={data.filters.materialLevel === "none"}>Sem calibracao</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Por pagina</span>
+        <select
+          name="porPagina"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        >
+          {[12, 24, 48].map((size) => (
+            <option value={size} selected={data.filters.porPagina === size}>{size} por pagina</option>
+          ))}
+        </select>
+      </label>
+
+      <div class="flex items-end gap-3 lg:col-span-4">
+        <button
+          type="submit"
+          class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          Aplicar filtros
+        </button>
+        <a
+          href="/admin/catalogo-laudos"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-50"
+        >
+          Limpar
+        </a>
+      </div>
+    </form>
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Familias</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Governanca catalogada</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          Este recorte substitui a home legada do catalogo antes da migracao dos formulários de manutencao.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <StatusPill label={`${formatNumber(data.totals.totalVariants)} variantes`} tone="neutral" />
+        <StatusPill label={`${formatNumber(data.totals.activeReleases)} liberacoes`} tone="info" />
+      </div>
+    </div>
+
+    <div class="mt-6 overflow-x-auto">
+      <table class="min-w-full border-separate border-spacing-y-3">
+        <thead>
+          <tr class="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <th class="pb-1 pr-4">Familia</th>
+            <th class="pb-1 pr-4">Status</th>
+            <th class="pb-1 pr-4">Pacote</th>
+            <th class="pb-1 pr-4">Uso real</th>
+            <th class="pb-1 pr-4">Ultima atividade</th>
+            <th class="pb-1 text-right">Acao</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.items.length > 0 ? data.items.map((item) => (
+            <tr class="bg-slate-50 text-sm text-slate-700">
+              <td class="rounded-l-[20px] px-4 py-4">
+                <div>
+                  <p class="font-semibold text-slate-950">{item.displayName}</p>
+                  <div class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                    <span>{item.familyKey}</span>
+                    <span>{item.macroCategory}</span>
+                    <span>Schema v{item.schemaVersion}</span>
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-4 py-4">
+                <div class="flex flex-wrap gap-2">
+                  <StatusPill label={item.technicalStatus.label} tone={item.technicalStatus.tone} />
+                  <StatusPill label={item.offerLifecycle.label} tone={item.offerLifecycle.tone} />
+                  <StatusPill label={item.materialLevel.label} tone={item.materialLevel.tone} />
+                </div>
+              </td>
+
+              <td class="px-4 py-4">
+                <p class="font-medium text-slate-950">{item.offerName ?? "Sem pacote publicado"}</p>
+                <p class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                  {item.packageName ?? "Pacote indefinido"} • {item.templateDefaultCode ?? "template em definicao"}
+                </p>
+              </td>
+
+              <td class="px-4 py-4">
+                <p class="font-medium text-slate-950">
+                  {formatNumber(item.reportCount)} laudos • {formatNumber(item.activeReleaseCount)} liberacoes
+                </p>
+                <p class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                  {item.variantCount} variantes • {item.modeCount} modos ativos
+                </p>
+              </td>
+
+              <td class="px-4 py-4">
+                <p class="font-medium text-slate-950">{item.updatedLabel}</p>
+                <p class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">{item.lastReportLabel}</p>
+              </td>
+
+              <td class="rounded-r-[20px] px-4 py-4 text-right">
+                <a
+                  href={`/admin/catalogo-laudos/familias/${item.familyKey}`}
+                  class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-100"
+                >
+                  Abrir detalhe
+                  <ArrowUpRight className="size-4" />
+                </a>
+              </td>
+            </tr>
+          )) : (
+            <tr>
+              <td colspan="6" class="rounded-[24px] bg-slate-50 px-4 py-6 text-sm text-slate-500">
+                Nenhuma familia foi encontrada com os filtros atuais.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-slate-500">
+        Pagina {data.pagination.page} de {data.pagination.totalPages} • {formatNumber(data.pagination.totalItems)} resultados
+      </p>
+
+      <nav class="flex flex-wrap items-center gap-2" aria-label="Paginacao">
+        <a
+          href={data.pagination.hasPrev ? buildUrl({ pagina: data.pagination.page - 1 }) : "#"}
+          class:list={[
+            "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
+            data.pagination.hasPrev
+              ? "border-slate-950/10 bg-white text-slate-700 hover:border-slate-950/18 hover:bg-slate-50"
+              : "pointer-events-none border-slate-200 bg-slate-100 text-slate-400",
+          ]}
+        >
+          <ArrowLeft className="size-4" />
+          Anterior
+        </a>
+
+        {data.pagination.pages.map((page) => (
+          <a
+            href={buildUrl({ pagina: page })}
+            class:list={[
+              "inline-flex size-10 items-center justify-center rounded-full text-sm font-medium transition",
+              page === data.pagination.page
+                ? "bg-slate-950 text-white"
+                : "border border-slate-950/10 bg-white text-slate-700 hover:border-slate-950/18 hover:bg-slate-50",
+            ]}
+            aria-current={page === data.pagination.page ? "page" : undefined}
+          >
+            {page}
+          </a>
+        ))}
+
+        <a
+          href={data.pagination.hasNext ? buildUrl({ pagina: data.pagination.page + 1 }) : "#"}
+          class:list={[
+            "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
+            data.pagination.hasNext
+              ? "border-slate-950/10 bg-white text-slate-700 hover:border-slate-950/18 hover:bg-slate-50"
+              : "pointer-events-none border-slate-200 bg-slate-100 text-slate-400",
+          ]}
+        >
+          Proxima
+          <ArrowRight className="size-4" />
+        </a>
+      </nav>
+    </div>
+  </section>
+</AdminShellLayout>

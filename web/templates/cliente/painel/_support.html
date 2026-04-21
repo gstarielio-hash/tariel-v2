@@ -1,0 +1,80 @@
+<section
+    id="admin-support"
+    class="admin-stage admin-tab-panel"
+    data-admin-stage="support"
+    data-admin-panel="support"
+    data-stage-state="idle"
+    role="tabpanel"
+    aria-labelledby="admin-section-tab-support"
+    {% if (cliente_admin_section_inicial | default('overview')) != 'support' %}hidden{% endif %}
+>
+    <div class="admin-stage-head">
+        <div class="admin-stage-copy">
+            <span class="admin-stage-kicker">Suporte e auditoria</span>
+            <h3>Escalonamento, diagnostico e historico do portal</h3>
+            <p class="box-subtitle">Quando a empresa precisar de ajuda, o console deixa visivel o estado administrativo da conta e o historico recente das acoes executadas aqui.</p>
+        </div>
+
+        <div class="admin-stage-meta">
+            <span class="hero-chip">Diagnostico pronto para exportar</span>
+            <span class="hero-chip">Protocolo rastreavel</span>
+            <span class="hero-chip">Historico filtravel</span>
+        </div>
+    </div>
+
+    <div id="admin-support-brief" class="admin-stage-brief"></div>
+
+    <div class="admin-stage-grid admin-stage-grid--split admin-stage-grid--support">
+        <article class="box" id="admin-suporte">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3>Suporte e diagnostico</h3>
+                    <p class="box-subtitle">Exporte o estado administrativo visivel da empresa, sem evidencia bruta por padrao, e registre um protocolo de suporte sem sair do portal.</p>
+                </div>
+            </div>
+
+            <div id="admin-support-policy" class="support-policy-grid"></div>
+            <div id="admin-support-protocol" class="support-protocol"></div>
+            <div id="admin-diagnostico-resumo" class="toolbar-meta support-diagnostic-chips"></div>
+
+            <div class="toolbar-actions toolbar-actions--section">
+                <button id="btn-exportar-diagnostico" class="btn" type="button">Exportar diagnostico</button>
+                <button id="btn-whatsapp-suporte" class="btn ghost" type="button">Abrir suporte</button>
+            </div>
+
+            <form id="form-suporte-cliente" class="stack form-stack">
+                <label>
+                    Titulo
+                    <input id="suporte-titulo" maxlength="120" placeholder="Resumo rapido do caso">
+                </label>
+                <label>
+                    E-mail de retorno
+                    <input id="suporte-email" type="email" maxlength="254" placeholder="contato@empresa.com">
+                </label>
+                <label>
+                    Mensagem
+                    <textarea id="suporte-mensagem" rows="4" maxlength="4000" placeholder="Descreva o problema, contexto ou decisao que precisa de suporte." required></textarea>
+                </label>
+                <button id="btn-reportar-suporte" class="btn primary" type="submit">Registrar suporte</button>
+            </form>
+        </article>
+
+        <article class="box" id="admin-auditoria">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3>Atividade recente</h3>
+                    <p class="box-subtitle">Auditoria operacional do portal da empresa para plano, equipe e acessos.</p>
+                </div>
+
+                <div class="toolbar-actions toolbar-actions--audit">
+                    <input id="admin-auditoria-busca" type="search" placeholder="Buscar por protocolo, ator, detalhe ou acao">
+                    <button id="btn-admin-auditoria-limpar" class="btn ghost" type="button">Limpar</button>
+                </div>
+            </div>
+
+            <div id="admin-audit-overview" class="summary-grid"></div>
+            <div id="admin-auditoria-filtros" class="filter-chip-list" role="toolbar" aria-label="Filtros do historico operacional"></div>
+            <div id="admin-auditoria-lista" class="activity-list activity-list--timeline"></div>
+        </article>
+    </div>
+</section>

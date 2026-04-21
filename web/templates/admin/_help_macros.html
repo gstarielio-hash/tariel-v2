@@ -1,0 +1,8 @@
+{% macro help_icon(text, label='Mais informações') -%}
+<span class="help-inline">
+    <button type="button" class="help-inline__trigger" aria-label="{{ label | e }}">
+        i
+    </button>
+    <span class="help-inline__bubble" role="tooltip">{{ text | e }}</span>
+</span>
+{%- endmacro %}

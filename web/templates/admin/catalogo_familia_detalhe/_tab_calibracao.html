@@ -1,0 +1,179 @@
+                <section class="catalog-tab-panel" id="catalog-panel-calibracao">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Validacao</p>
+                                <h2>Validacao com material real</h2>
+                                <p class="catalog-panel__description">Mostra o status de hoje, o ultimo ajuste e o que mudou antes de abrir a edicao.</p>
+                            </div>
+                            <button type="button" class="catalog-btn catalog-btn--primary" data-catalog-open-disclosure="calibration-form">Atualizar validacao</button>
+                        </div>
+
+                        <div class="catalog-state-grid">
+                            <article class="catalog-card">
+                                <h3>Status hoje</h3>
+                                <p>{{ calibration.status.label | e }}</p>
+                                <p class="catalog-card__meta">Responsavel: {{ calibration.actor_label | e }}</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Ultima validacao</h3>
+                                <p>{{ calibration.last_calibrated_at_label | e }}</p>
+                                <p>{{ calibration.reference_source_label | e }}</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Mudanças registradas</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in calibration.changed_fields %}
+                                    <span class="catalog-chip">{{ item | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem campos destacados</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Prioridade da validacao</h3>
+                                <div class="catalog-governance-pill-row">
+                                    <span class="catalog-status catalog-status--{{ material_real_priority.status.tone | e }}">{{ material_real_priority.status.label | e }}</span>
+                                    <span class="catalog-status catalog-status--{{ material_real_priority.workspace_status.tone | e }}">{{ material_real_priority.workspace_status.label | e }}</span>
+                                </div>
+                                <ul class="catalog-inline-list">
+                                    {% for item in material_real_priority.signals %}
+                                    <li>{{ item | e }}</li>
+                                    {% else %}
+                                    <li>Sem sinais adicionais de prioridade.</li>
+                                    {% endfor %}
+                                </ul>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Proximos passos</h3>
+                                <ul class="catalog-inline-list">
+                                    {% for item in material_real_priority.recommended_actions %}
+                                    <li>{{ item | e }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </article>
+                        </div>
+
+                        {% if material_real_workspace and material_real_workspace.execution_track %}
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Plano de trabalho</h3>
+                                <p><strong>{{ material_real_workspace.execution_track.track_label | e }}</strong></p>
+                                <div class="catalog-governance-pill-row">
+                                    <span class="catalog-status catalog-status--{{ material_real_workspace.execution_track.phase.tone | e }}">{{ material_real_workspace.execution_track.phase.label | e }}</span>
+                                    <span class="catalog-status catalog-status--{{ material_real_workspace.status.tone | e }}">{{ material_real_workspace.status.label | e }}</span>
+                                </div>
+                                <p class="catalog-card__meta">{{ material_real_workspace.execution_track.focus_label | e }}</p>
+                                <ul class="catalog-inline-list">
+                                    <li><strong>Responsavel:</strong> {{ material_real_workspace.execution_track.recommended_owner | e }}</li>
+                                    <li><strong>Checkpoint:</strong> {{ material_real_workspace.execution_track.next_checkpoint | e }}</li>
+                                    <li><strong>Modelo que precisa de melhoria:</strong> {{ material_real_workspace.execution_track.template_pressure | e }}</li>
+                                    <li><strong>Pendencias:</strong> {{ material_real_workspace.worklist.pending_count | int }} de {{ material_real_workspace.worklist.task_count | int }}</li>
+                                </ul>
+                                </article>
+                                <article class="catalog-card">
+                                    <h3>Checklist</h3>
+                                    <div class="catalog-governance-list catalog-governance-list--dense">
+                                        {% for item in material_real_workspace.worklist['items'] %}
+                                        <article class="catalog-governance-list__item">
+                                            <div class="catalog-card__header">
+                                                <div>
+                                                    <strong>{{ item.title | e }}</strong>
+                                                    <span class="catalog-card__meta">{{ item.owner | e }}</span>
+                                            </div>
+                                            <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                                        </div>
+                                        <p class="catalog-card__meta">{{ item.deliverable | e }}</p>
+                                    </article>
+                                    {% else %}
+                                    <article class="catalog-empty-card">
+                                        <strong>Sem tarefas estruturadas.</strong>
+                                        <p>A pasta ainda nao gerou um checklist de validacao.</p>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                        </div>
+                        {% endif %}
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Resumo dos ajustes</h3>
+                                <p>{{ calibration.summary | default('Sem resumo operacional registrado.', true) | e }}</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Notas de linguagem</h3>
+                                <p>{{ calibration.changed_language_notes | default('Sem notas adicionais de linguagem.', true) | e }}</p>
+                            </article>
+                        </div>
+
+                        <div class="catalog-card-grid catalog-card-grid--compact">
+                            <article class="catalog-card">
+                                <h3>Materiais validados</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in (material_real_workspace.artefatos_externos_validados if material_real_workspace else []) %}
+                                    <span class="catalog-chip">{{ item.kind | default(item.source, true) | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem artefatos validados</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Anexos da validacao</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in calibration.attachments %}
+                                    <span class="catalog-chip">{{ item.label | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem anexos estruturados</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                        </div>
+
+                        <details class="catalog-disclosure" id="calibration-form">
+                            <summary>Atualizar validacao</summary>
+                            <form class="catalog-form" method="POST" action="/admin/catalogo-laudos/familias/{{ family.family_key | e }}/calibracao">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="return_to" value="{{ family_detail_base }}?tab=calibracao#calibracao">
+                                <div class="catalog-form__grid">
+                                    <label>
+                                        <span>Status da validacao</span>
+                                        <select name="calibration_status">
+                                            <option value="none" {% if calibration.status.key == 'none' %}selected{% endif %}>Sem validacao</option>
+                                            <option value="synthetic_only" {% if calibration.status.key == 'synthetic_only' %}selected{% endif %}>Base inicial</option>
+                                            <option value="partial_real" {% if calibration.status.key == 'partial_real' %}selected{% endif %}>Em validacao</option>
+                                            <option value="real_calibrated" {% if calibration.status.key == 'real_calibrated' %}selected{% endif %}>Validada com material real</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Origem da referencia</span>
+                                        <input type="text" name="reference_source" maxlength="255" value="{{ calibration.reference_source | default('', true) | e }}" placeholder="empresa parceira material real">
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Resumo dos ajustes</span>
+                                        <textarea name="summary_of_adjustments" rows="4">{{ calibration.summary | default('', true) | e }}</textarea>
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Campos alterados</span>
+                                        {{ catalogo.string_list_editor('changed_fields_json', calibration.changed_fields if calibration else [], 'Campo alterado', 'Adicionar campo') }}
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Notas de linguagem</span>
+                                        <textarea name="changed_language_notes" rows="5">{{ calibration.changed_language_notes | default('', true) | e }}</textarea>
+                                    </label>
+                                </div>
+                                <details class="catalog-advanced">
+                                    <summary>Ver anexos avançados</summary>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Anexos adicionais</span>
+                                        <textarea name="attachments_json" rows="6"></textarea>
+                                    </label>
+                                </details>
+                                <button type="submit" class="catalog-btn catalog-btn--primary">Salvar validacao</button>
+                            </form>
+                        </details>
+                    </div>
+                </section>

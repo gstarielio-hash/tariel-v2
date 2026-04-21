@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo_pagina | default("Troca de Senha") | e }}</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_auth_shell.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/admin/admin_login.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app }}">
+</head>
+<body class="auth-shell auth-shell--admin">
+    <main class="auth-layout auth-layout--single">
+        <section class="auth-card auth-card--single auth-card--narrow">
+            <div class="auth-card-header">
+                <div class="auth-brand auth-brand--compact" aria-hidden="true">
+                    <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                </div>
+                <span class="auth-eyebrow">Admin-CEO</span>
+                <h1 class="auth-card-title">{{ titulo_pagina | default("Troca de Senha") | e }}</h1>
+                <p class="auth-card-subtitle">{{ subtitulo_pagina | default("Atualize sua senha para continuar.") | e }}</p>
+            </div>
+
+            <div class="auth-inline-banner is-visible">Atualize a senha para liberar o acesso.</div>
+
+            <div class="auth-chip-row">
+                <span class="auth-chip">Senha temporária</span>
+                <span class="auth-chip">Acesso liberado após confirmação</span>
+            </div>
+
+            {% if erro %}
+            <div class="auth-error" role="alert" aria-live="assertive">{{ erro | e }}</div>
+            {% endif %}
+
+            <form class="auth-form" method="post" action="{{ acao_form | e }}" data-auth-form>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token | e }}">
+
+                <label for="senha_atual">
+                    Senha temporária
+                    <div class="auth-field auth-field--password">
+                        <input id="senha_atual" name="senha_atual" type="password" autocomplete="current-password" required>
+                        <button class="auth-toggle" type="button" data-password-toggle data-password-target="senha_atual" aria-label="Mostrar senha temporaria" aria-pressed="false">
+                            <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                        </button>
+                    </div>
+                </label>
+
+                <label for="nova_senha">
+                    Nova senha
+                    <div class="auth-field auth-field--password">
+                        <input id="nova_senha" name="nova_senha" type="password" autocomplete="new-password" required>
+                        <button class="auth-toggle" type="button" data-password-toggle data-password-target="nova_senha" aria-label="Mostrar nova senha" aria-pressed="false">
+                            <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                        </button>
+                    </div>
+                </label>
+
+                <label for="confirmar_senha">
+                    Confirmar nova senha
+                    <div class="auth-field auth-field--password">
+                        <input id="confirmar_senha" name="confirmar_senha" type="password" autocomplete="new-password" required>
+                        <button class="auth-toggle" type="button" data-password-toggle data-password-target="confirmar_senha" aria-label="Mostrar confirmacao da senha" aria-pressed="false">
+                            <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                        </button>
+                    </div>
+                </label>
+
+                <div class="auth-actions">
+                    <button class="auth-button" type="submit" data-submit-label="Atualizar senha">Atualizar senha</button>
+                    <a href="{{ rota_login | e }}">Voltar para login</a>
+                </div>
+            </form>
+
+            <small class="auth-note">Defina uma senha definitiva para continuar no portal.</small>
+        </section>
+    </main>
+
+    <script src="/static/js/admin/admin_password_page.js" defer nonce="{{ csp_nonce }}"></script>
+</body>
+</html>

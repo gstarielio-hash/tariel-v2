@@ -1,0 +1,138 @@
+                <section class="catalog-tab-panel" id="catalog-panel-visao-geral">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Resumo executivo</p>
+                                <h2>Visão geral da família</h2>
+                                <p class="catalog-panel__description">Leitura rápida do estado atual, do pacote comercial e das regras antes de editar qualquer parte.</p>
+                            </div>
+                        </div>
+
+                        <div class="catalog-state-grid">
+                            <article class="catalog-card">
+                                <h3>Como esta hoje</h3>
+                                <p>{{ family.display_name | e }} esta em {{ family.readiness.label | lower | e }}, com etapa {{ family.technical_status.label | lower | e }}, pacote {{ family.commercial_status.label | lower | e }} e validacao {{ family.calibration_status.label | lower | e }}.</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Regras de uso</h3>
+                                <p>Estrutura, modos, pacote comercial, validacao e liberacao ficam separados. O cliente usa apenas o que foi liberado pela Tariel.</p>
+                                <div class="catalog-chip-row">
+                                    <span class="catalog-chip">{{ family.classification_label | e }}</span>
+                                    {% if family.nr_key %}<span class="catalog-chip">{{ family.nr_key | upper }}</span>{% endif %}
+                                    <span class="catalog-chip">{{ family.macro_category | e }}</span>
+                                </div>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Pacote atual</h3>
+                                {% if offer %}
+                                <p><strong>{{ offer.offer_name | e }}</strong></p>
+                                <p>{{ offer.description | default('Sem resumo comercial registrado.', true) | e }}</p>
+                                <div class="catalog-chip-row">
+                                    <span class="catalog-chip">{{ offer.lifecycle_status.label | e }}</span>
+                                    <span class="catalog-chip">{{ offer.material_level.label | e }}</span>
+                                    <span class="catalog-chip">{{ offer_model_label | e }}</span>
+                                </div>
+                                {% else %}
+                                <p>Esta familia ainda nao recebeu um pacote comercial.</p>
+                                {% endif %}
+                            </article>
+                        </div>
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Fluxo do documento</h3>
+                                <p>Base da família, modelo visual, documento e PDF final aparecem como etapas separadas para manter o controle.</p>
+                                <ul class="catalog-inline-list">
+                                    <li>{{ 'Base da família pronta' if artifact_snapshot.has_family_schema else 'Base da família ausente' }}</li>
+                                    <li>{{ 'Modelo base pronto' if artifact_snapshot.has_template_seed else 'Modelo base ausente' }}</li>
+                                    <li>{{ 'Documento base pronto' if artifact_snapshot.has_laudo_output_seed else 'Documento base ausente' }}</li>
+                                    <li>{{ 'Exemplo de documento pronto' if artifact_snapshot.has_laudo_output_exemplo else 'Exemplo de documento ausente' }}</li>
+                                </ul>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Metodos detectados</h3>
+                                {% if family_methods %}
+                                <div class="catalog-chip-row">
+                                    {% for item in family_methods %}
+                                    <span class="catalog-chip">{{ item.display_name | e }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <p>Sem metodo separado sugerido para esta familia.</p>
+                                {% endif %}
+                            </article>
+                        </div>
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Base oficial de modelos</h3>
+                                <p>Esta família já conversa com a base oficial de modelos e documentos base.</p>
+                                <div class="catalog-chip-row">
+                                    <span class="catalog-chip {{ 'catalog-chip--success' if template_library.has_full_canonical_artifact_chain else 'catalog-chip--warning' }}">
+                                        {{ 'Base completa' if template_library.has_full_canonical_artifact_chain else 'Base parcial' }}
+                                    </span>
+                                    {% if template_library.template_default_label %}
+                                    <span class="catalog-chip">{{ template_library.template_default_label | e }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if template_library.missing_artifacts %}
+                                <ul class="catalog-inline-list">
+                                    {% for item in template_library.missing_artifacts %}
+                                    <li>{{ item | e }} pendente</li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p class="catalog-card__meta">Estrutura, modelo, saida e exemplo ja estao prontos para esta familia.</p>
+                                {% endif %}
+                                {% if template_library.registry_templates %}
+                                <div class="catalog-governance-list catalog-governance-list--dense">
+                                    {% for item in template_library.registry_templates %}
+                                    <article class="catalog-governance-list__item">
+                                        <div class="catalog-card__header">
+                                            <div>
+                                                <strong>{{ item.label | e }}</strong>
+                                            </div>
+                                            <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                                        </div>
+                                        {% if item.usage %}
+                                        <p class="catalog-card__meta">{{ item.usage | e }}</p>
+                                        {% endif %}
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </article>
+
+                            <article class="catalog-card">
+                                <h3>Validação com material real</h3>
+                                {% if material_real_workspace %}
+                                <p>O material real desta família já está rastreado com briefing, coleta e pacote de referência.</p>
+                                <div class="catalog-governance-pill-row">
+                                    <span class="catalog-status catalog-status--{{ material_real_workspace.status.tone | e }}">{{ material_real_workspace.status.label | e }}</span>
+                                    {% if material_real_workspace.has_reference_manifest and material_real_workspace.has_reference_bundle %}
+                                    <span class="catalog-chip catalog-chip--success">Pacote de referencia pronto</span>
+                                    {% endif %}
+                                </div>
+                                <ul class="catalog-inline-list">
+                                    <li>{{ material_real_workspace.material_recebido_count | int }} item(ns) recebidos</li>
+                                    <li>{{ material_real_workspace.lacunas_count | int }} lacuna(s) aberta(s)</li>
+                                    <li>{{ material_real_workspace.validations_count | int }} validação(ões) registradas</li>
+                                    <li>{{ 'Briefing real presente' if material_real_workspace.has_briefing else 'Briefing real ausente' }}</li>
+                                </ul>
+                                {% if material_real_workspace.proximo_passo %}
+                                <p class="catalog-card__meta"><strong>Proximo passo:</strong> {{ material_real_workspace.proximo_passo | e }}</p>
+                                {% endif %}
+                                {% if material_real_workspace.lacunas_abertas %}
+                                <ul class="catalog-inline-list">
+                                    {% for item in material_real_workspace.lacunas_abertas %}
+                                    <li>{{ item | e }}</li>
+                                {% endfor %}
+                                </ul>
+                                {% endif %}
+                                {% else %}
+                                <p>Esta família ainda não tem trilha de material real detectada. O próximo ganho vem de abrir briefing, coleta e pacote de referência.</p>
+                            {% endif %}
+                            </article>
+                        </div>
+                    </div>
+                </section>

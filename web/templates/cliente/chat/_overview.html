@@ -1,0 +1,33 @@
+<section
+    id="chat-overview"
+    class="surface-stage"
+    data-chat-panel="overview"
+    role="tabpanel"
+    aria-labelledby="chat-section-tab-overview"
+    {% if (cliente_chat_section_inicial | default('overview')) != 'overview' %}hidden{% endif %}
+>
+    <div class="surface-stage-head">
+        <div>
+            <span class="surface-stage-kicker">Visao geral</span>
+            <h3>Radar operacional do chat</h3>
+            <p class="box-subtitle">Volume, triagem e movimentos recentes do chat.</p>
+        </div>
+    </div>
+
+    <div id="chat-resumo-geral" class="summary-grid workspace-metrics"></div>
+
+    <article class="box workspace-box workspace-box--radar">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Radar do chat</h3>
+                <p class="box-subtitle">Alertas, triagem e movimentos em leitura curta.</p>
+            </div>
+        </div>
+
+        <div class="workspace-radar-grid workspace-radar-grid--chat">
+            <div id="chat-alertas-operacionais" class="stack workspace-radar-stack"></div>
+            <div id="chat-triagem" class="activity-list workspace-radar-stack"></div>
+            <div id="chat-movimentos" class="activity-list workspace-radar-stack"></div>
+        </div>
+    </article>
+</section>

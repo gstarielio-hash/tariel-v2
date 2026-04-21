@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f6f9">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Biblioteca de Modelos • Mesa Avaliadora</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/revisor/templates_biblioteca.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+
+<body class="templates-shell templates-shell-light">
+    <header class="top top-light">
+        <div class="brand-wrap">
+            <div class="brand-logo">TI</div>
+            <div class="brand-copy">
+                <strong>Tariel</strong>
+                <small>Mesa avaliadora</small>
+            </div>
+        </div>
+        <div class="links links-light">
+            <a class="chip chip-light" href="/revisao/painel">Inbox da Mesa</a>
+            <a class="chip chip-light active" href="/revisao/templates-laudo">Vitrine de modelos</a>
+        </div>
+        <form action="/revisao/logout" method="POST" class="top-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn ghost ghost-light">Sair</button>
+        </form>
+    </header>
+
+    <main class="main">
+        <section class="hero hero-light">
+            <div class="hero-copy">
+                <span class="hero-eyebrow">Modelos oficiais da mesa</span>
+                <h1>Biblioteca de modelos</h1>
+                <p>Veja cada modelo como um documento base, escolha a melhor leitura visual e deixe o preenchimento técnico com a mesa.</p>
+                <div class="hero-notes" aria-label="Como usar a galeria">
+                    <span class="hero-note">1. Escolha a base</span>
+                    <span class="hero-note">2. Veja o documento</span>
+                    <span class="hero-note">3. Complete o caso</span>
+                </div>
+            </div>
+            <div class="hero-stage" aria-hidden="true">
+                <article class="hero-poster is-green">
+                    <span class="hero-poster-band">NR 5</span>
+                    <strong class="hero-poster-title">Treinamento e rotina</strong>
+                    <div class="hero-poster-lines">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </article>
+                <article class="hero-poster is-blue">
+                    <span class="hero-poster-band">NR 6</span>
+                    <strong class="hero-poster-title">EPI e conferência</strong>
+                    <div class="hero-poster-lines">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </article>
+                <article class="hero-poster is-orange">
+                    <span class="hero-poster-band">NR 18</span>
+                    <strong class="hero-poster-title">Canteiro e segurança</strong>
+                    <div class="hero-poster-lines">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </article>
+                <article class="hero-poster is-yellow">
+                    <span class="hero-poster-band">NR 35</span>
+                    <strong class="hero-poster-title">Altura e proteção</strong>
+                    <div class="hero-poster-lines">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </article>
+            </div>
+            <div class="hero-toolbar">
+                <div class="hero-toolbar-copy">
+                    <strong>Escolha o documento pela leitura final</strong>
+                    <p>A composição técnica fica nos bastidores. A mesa vê o modelo, o documento e o que precisa completar.</p>
+                </div>
+                <div class="hero-actions">
+                    <input id="search-templates" type="search" placeholder="Buscar por nome ou código...">
+                    <select id="filter-modo">
+                        <option value="todos">Todos os formatos</option>
+                        <option value="word">Modelos editáveis</option>
+                        <option value="pdf">Modelos prontos</option>
+                    </select>
+                    <select id="filter-status-template">
+                        <option value="todos">Todos os estados</option>
+                        <option value="ativo">Pronto para preencher</option>
+                        <option value="em_teste">Em ajuste</option>
+                        <option value="rascunho">Em montagem</option>
+                        <option value="legado">Versão antiga</option>
+                        <option value="arquivado">Arquivado</option>
+                    </select>
+                    <select id="sort-templates">
+                        <option value="recentes">Mais recentes</option>
+                        <option value="ativos">Prontos primeiro</option>
+                        <option value="nome">Nome (A-Z)</option>
+                    </select>
+                    <button id="btn-refresh" class="btn ghost ghost-light" type="button">Atualizar lista</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="overview-cards" aria-label="Resumo da biblioteca">
+            <article class="overview-card">
+                <h4>Modelos na vitrine</h4>
+                <strong id="metric-total">0</strong>
+                <small>Todos os laudos visíveis para a mesa</small>
+            </article>
+            <article class="overview-card">
+                <h4>Modelos editáveis</h4>
+                <strong id="metric-word">0</strong>
+                <small>Bases que nascem no editor</small>
+            </article>
+            <article class="overview-card">
+                <h4>Prontos agora</h4>
+                <strong id="metric-ativo">0</strong>
+                <small>Laudos já estáveis para preencher</small>
+            </article>
+            <article class="overview-card">
+                <h4>Em ajuste</h4>
+                <strong id="metric-testing">0</strong>
+                <small>Modelos que ainda pedem validação</small>
+            </article>
+            <article class="overview-card">
+                <h4>Uso acumulado</h4>
+                <strong id="metric-usage">0</strong>
+                <small>Laudos já montados com essas bases</small>
+            </article>
+            <article class="overview-card">
+                <h4>Último uso</h4>
+                <strong id="metric-recente" data-metric-last-use>-</strong>
+                <small>Data mais recente de movimentação</small>
+            </article>
+        </section>
+
+        <section id="selected-template-banner" class="selected-template-banner" hidden aria-live="polite">
+            <div class="selected-template-banner__copy">
+                <span class="hero-eyebrow">Modelo escolhido</span>
+                <strong id="selected-template-name">Nenhum modelo escolhido</strong>
+                <p id="selected-template-summary">Escolha um modelo para deixar claro qual base visual a mesa vai usar como referência.</p>
+            </div>
+            <div class="selected-template-banner__actions">
+                <span id="selected-template-chip" class="badge recommended">Sem seleção</span>
+                <button id="btn-clear-selected-template" type="button" class="btn ghost">Limpar escolha</button>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <aside class="filters filters-light">
+                <h3>Como a mesa usa</h3>
+                <label class="check"><input type="checkbox" checked disabled> Escolhe a base visual</label>
+                <label class="check"><input type="checkbox" checked disabled> Abre o documento pronto</label>
+                <label class="check"><input type="checkbox" checked disabled> Vê o que ainda precisa completar</label>
+                <label class="check"><input type="checkbox" checked disabled> Não precisa abrir o editor</label>
+                <hr>
+                <h3>Filtrar estado</h3>
+                <label class="check"><input type="checkbox" id="flt-ativo" checked> Mostrar os que já estão prontos</label>
+                <label class="check"><input type="checkbox" id="flt-rascunho" checked> Incluir os que ainda estão em montagem</label>
+                <button id="btn-limpar-filtros" type="button" class="btn ghost ghost-light btn-full">Limpar filtros</button>
+                <p class="hint">Use a biblioteca para bater o olho no documento, abrir a visualização e separar rápido o que já está com cara final.</p>
+            </aside>
+
+            <section class="templates-panel templates-panel-light">
+                <div class="panel-head">
+                    <div class="panel-head-copy">
+                        <h2>Escolha a base da mesa</h2>
+                        <p>Cada card mostra a identidade da NR, a leitura do documento e os pontos que a mesa completa com os dados do caso.</p>
+                    </div>
+                    <span id="status-lista" class="status"></span>
+                </div>
+                <div id="lista" class="templates-grid"></div>
+            </section>
+        </section>
+    </main>
+
+    <section id="template-preview-modal" class="template-preview-modal" hidden aria-label="Visualização do documento da mesa">
+        <div class="template-preview-dialog">
+            <header class="template-preview-dialog__head">
+                <div class="template-preview-dialog__copy">
+                    <span id="preview-modal-code" class="template-group-code">Modelo</span>
+                    <h2 id="preview-modal-title">Documento base</h2>
+                    <p id="preview-modal-subtitle">Abra o modelo para enxergar como a mesa vê o documento antes do preenchimento.</p>
+                </div>
+                <button id="btn-close-template-preview" type="button" class="btn ghost">Fechar</button>
+            </header>
+
+            <div class="template-preview-dialog__grid">
+                <aside class="template-preview-dialog__side">
+                    <article class="template-preview-side-card">
+                        <small>Leitura da mesa</small>
+                        <strong id="preview-modal-status-note">Modelo pronto para uso</strong>
+                        <p id="preview-modal-mode-note">A estrutura do caso já fica organizada por trás deste documento.</p>
+                    </article>
+
+                    <article class="template-preview-side-card">
+                        <small>Capítulos que já aparecem</small>
+                        <div id="preview-modal-sections" class="template-preview-side-list"></div>
+                    </article>
+
+                    <article class="template-preview-side-card">
+                        <small>Estes pontos recebem os dados do caso</small>
+                        <div id="preview-modal-fields" class="template-preview-side-list"></div>
+                    </article>
+
+                    <div class="template-preview-side-actions">
+                        <button id="btn-choose-preview-template" type="button" class="btn primary">Escolher este modelo</button>
+                        <a id="link-preview-base" class="btn ghost" href="#" target="_blank" rel="noopener noreferrer">Abrir documento base</a>
+                    </div>
+                </aside>
+
+                <section class="template-preview-stage">
+                    <div class="template-preview-stage__head">
+                        <span class="template-preview-kicker">Documento base</span>
+                        <strong id="preview-modal-document-name">Visualização do documento</strong>
+                        <p>Leitura que a mesa usa para revisar a estrutura antes do preenchimento final.</p>
+                    </div>
+                    <div class="template-preview-frame-shell">
+                        <div id="preview-modal-loading" class="template-preview-loading">Abrindo o documento...</div>
+                        <iframe id="preview-modal-frame" title="Visualização do documento da mesa"></iframe>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <script nonce="{{ csp_nonce }}">
+        window.__TARIEL_TEMPLATE_CONFIG__ = {
+            csrfToken: {{ csrf_token | tojson }},
+            pdfWorkerUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js",
+            dadosPreviewExemploJson: {{ dados_preview_exemplo_json | tojson }}
+        };
+    </script>
+    <script nonce="{{ csp_nonce }}" src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <script nonce="{{ csp_nonce }}" src="/static/js/revisor/templates_biblioteca_page.js"></script>
+</body>
+
+</html>

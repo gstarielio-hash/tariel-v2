@@ -1,0 +1,27 @@
+# Owner padrão do repositório
+* @gstarielio-hash
+
+# Governança do repositório
+/AGENTS.md @gstarielio-hash
+/PROJECT_MAP.md @gstarielio-hash
+/PLANS.md @gstarielio-hash
+/.codex/ @gstarielio-hash
+/Makefile @gstarielio-hash
+/.github/ @gstarielio-hash
+
+# Backend e segurança
+/web/ @gstarielio-hash
+/web/app/shared/ @gstarielio-hash
+/web/app/core/ @gstarielio-hash
+/web/app/v2/document/ @gstarielio-hash
+/web/app/domains/admin/ @gstarielio-hash
+/web/app/domains/cliente/ @gstarielio-hash
+/web/app/domains/chat/ @gstarielio-hash
+/web/app/domains/revisor/ @gstarielio-hash
+
+# Mobile
+/android/ @gstarielio-hash
+
+# Documentação operacional
+/docs/developer-experience/ @gstarielio-hash
+/docs/roadmap_execucao_funcional_web_mobile.md @gstarielio-hash

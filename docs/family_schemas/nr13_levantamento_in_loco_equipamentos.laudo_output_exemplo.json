@@ -1,0 +1,124 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr13_levantamento_in_loco_equipamentos",
+  "template_code": "nr13_levantamento_in_loco_equipamentos",
+  "tokens": {
+    "cliente_nome": "Empresa Teste NR13",
+    "unidade_nome": "Unidade Piloto NR13",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 922024900",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "NR13_LEVANTAMENTO_IN_LOCO_EQUIPAMENTOS-2026-001",
+    "empresa_nome": "Empresa Teste NR13",
+    "unidade_nome": "Unidade Piloto NR13",
+    "data_execucao": "2026-04-08",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva",
+    "wave_portfolio": 2
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Pendencias documentais secundarias foram registradas e tratadas pela Mesa.",
+    "observacoes_mesa": "Caso mantido em nr13_levantamento_in_loco_equipamentos com rastreabilidade de escopo e evidencias."
+  },
+  "resumo_executivo": "Foi executado o servico nr13 - levantamento in loco de equipamentos com registro estruturado do objeto principal, evidencias vinculadas, documentacao de apoio e conclusao tecnica consolidada para a Mesa.",
+  "identificacao": {
+    "objeto_principal": "Levantamento in loco dos ativos NR13 da unidade norte",
+    "localizacao": "Planta industrial da unidade norte",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_001",
+        "DOC_001"
+      ],
+      "referencias_texto": "IMG_001; DOC_001",
+      "descricao": "Referencia principal do objeto identificada com apoio de evidencia visual e documento associado.",
+      "observacao": "Rastreabilidade principal confirmada para o servico."
+    },
+    "codigo_interno": "NR13_LEVANTAMENTO_IN_LOCO_EQUIPAMENTOS-001"
+  },
+  "escopo_servico": {
+    "tipo_entrega": "pacote_documental",
+    "modo_execucao": "analise_documental",
+    "ativo_tipo": "NR13",
+    "resumo_escopo": "Levantamento em campo dos equipamentos abrangidos pela NR13 com inventario inicial e consolidacao de referencias para regularizacao."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Percurso em campo, identificacao dos ativos, registro visual e consolidacao do inventario inicial.",
+    "condicoes_observadas": "Servico executado dentro do escopo previsto, com registros suficientes para revisao da Mesa e consolidacao do documento final.",
+    "parametros_relevantes": "Inventario preliminar dos equipamentos NR13 da unidade.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_010",
+        "DOC_010"
+      ],
+      "referencias_texto": "IMG_010; DOC_010",
+      "descricao": "Evidencia da execucao principal do servico.",
+      "observacao": "Registros principais consolidados."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_020"
+      ],
+      "referencias_texto": "IMG_020",
+      "descricao": "Evidencia principal que suporta a conclusao tecnica.",
+      "observacao": "Material principal vinculado ao caso."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_021"
+      ],
+      "referencias_texto": "IMG_021",
+      "descricao": "Evidencia complementar para contextualizacao do servico.",
+      "observacao": "Registro complementar sem impacto critico."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_001"
+      ],
+      "referencias_texto": "Inventario preliminar dos equipamentos NR13 da unidade.",
+      "descricao": "Documento base ou ancora principal do servico.",
+      "observacao": "Documento vinculado ao pacote final."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Inventario preliminar dos equipamentos NR13 da unidade.",
+    "documentos_emitidos": "Pacote tecnico de nr13 - levantamento in loco de equipamentos consolidado para entrega.",
+    "observacoes_documentais": "Documentacao complementar registrada e vinculada ao caso."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Divergencia entre identificacao visual de um ativo e a nomenclatura documental anteriormente utilizada.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_030"
+      ],
+      "referencias_texto": "IMG_030",
+      "descricao": "Registro relacionado aos pontos de atencao ou a ausencia declarada deles.",
+      "observacao": "Evidencia vinculada ao fechamento da analise."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Fechar o inventario oficial e alinhar a nomenclatura documental dos ativos identificados."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "O servico nr13 - levantamento in loco de equipamentos foi consolidado com rastreabilidade suficiente, evidencias principais vinculadas e conclusao tecnica formalizada.",
+    "justificativa": "A conclusao considera o escopo registrado, o metodo aplicado, a documentacao disponivel, a evidencia principal e os pontos de atencao ou sua ausencia declarada."
+  }
+}

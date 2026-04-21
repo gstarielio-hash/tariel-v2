@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>{{ mfa_titulo }} • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_auth_shell.css?v={{ v_app if v_app is defined else '' }}">
+    <link rel="stylesheet" href="/static/css/admin/admin_login.css?v={{ v_app if v_app is defined else '' }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+<body class="auth-shell auth-shell--admin">
+    <main class="auth-layout auth-layout--single">
+        <section class="auth-card">
+            <div class="auth-card-header">
+                <div class="auth-brand auth-brand--compact">
+                    <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                </div>
+                <span class="auth-eyebrow">Admin-CEO • MFA</span>
+                <h1 class="auth-card-title">{{ mfa_titulo }}</h1>
+                <p class="auth-card-subtitle">{{ mfa_subtitulo }}</p>
+            </div>
+
+            {% if erro %}
+            <div class="auth-error" role="alert" aria-live="assertive">{{ erro | e }}</div>
+            {% endif %}
+
+            {% if modo_mfa == "setup" %}
+            <section class="auth-access-policy" aria-label="Configuração do MFA">
+                <strong>Cadastre o autenticador para concluir o acesso.</strong>
+                <ul>
+                    {% if mfa_secret_grouped %}
+                    <li>Segredo TOTP: <code>{{ mfa_secret_grouped }}</code></li>
+                    <li>URI manual: <code>{{ mfa_otpauth_uri }}</code></li>
+                    <li>Depois informe o código atual.</li>
+                    {% else %}
+                    <li>Recarregue a tela de configuração para gerar novamente o QR e o segredo do autenticador.</li>
+                    <li>O código atual só pode ser validado depois que o setup for recarregado com segurança.</li>
+                    {% endif %}
+                </ul>
+            </section>
+            {% else %}
+            <section class="auth-access-policy" aria-label="Confirmação do MFA">
+                <strong>Confirme o código para continuar.</strong>
+                <ul>
+                    <li>Obrigatório para sessão nova e ações críticas.</li>
+                </ul>
+            </section>
+            {% endif %}
+
+            <form action="{{ '/admin/mfa/setup' if modo_mfa == 'setup' else ('/admin/reauth' if modo_mfa == 'reauth' else '/admin/mfa/challenge') }}" method="POST" class="auth-form" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="return_to" value="{{ return_to | e }}">
+
+                <label for="codigo">
+                    Código TOTP
+                    <div class="auth-field">
+                        <input type="text" id="codigo" name="codigo" required inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="8" placeholder="000000">
+                    </div>
+                </label>
+
+                <button type="submit" class="auth-button">
+                    {% if modo_mfa == "setup" %}
+                    Concluir cadastro do MFA
+                    {% else %}
+                    Confirmar código
+                    {% endif %}
+                </button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

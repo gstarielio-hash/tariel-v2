@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#12233C">
+    <meta name="description" content="tariel.ia — portal do inspetor com workspace de IA operacional e mesa avaliadora.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="tariel.ia">
+
+    <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
+    <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+    <link rel="manifest" href="/app/manifesto.json">
+
+    <title>{% block title %}tariel.ia{% endblock %}</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet"
+    >
+
+    {# Inspetor usa pipeline visual isolado com ordem explícita de cascade layers. #}
+    <style nonce="{{ csp_nonce }}">
+        @layer tariel.global, tariel.tokens, tariel.shell, tariel.reboot, tariel.system, tariel.chrome, tariel.history, tariel.rail, tariel.states, tariel.refinements, tariel.overrides;
+
+        @import url("/static/css/shared/global.css?v={{ v_app }}") layer(tariel.global);
+        @import url("/static/css/shared/material-symbols.css?v={{ v_app }}") layer(tariel.global);
+        @import url("/static/css/inspetor/tokens.generated.css?v={{ v_app }}") layer(tariel.tokens);
+        @import url("/static/css/inspetor/tokens.css?v={{ v_app }}") layer(tariel.tokens);
+        @import url("/static/css/shared/app_shell.css?v={{ v_app }}") layer(tariel.shell);
+        @import url("/static/css/inspetor/reboot.css?v={{ v_app }}") layer(tariel.reboot);
+        @import url("/static/css/shared/official_visual_system.css?v={{ v_app }}") layer(tariel.system);
+        @import url("/static/css/inspetor/workspace_chrome.css?v={{ v_app }}&ui_rev=20260406_mesa_channels_layout_fix") layer(tariel.chrome);
+        @import url("/static/css/inspetor/workspace_history.css?v={{ v_app }}") layer(tariel.history);
+        @import url("/static/css/inspetor/workspace_rail.css?v={{ v_app }}") layer(tariel.rail);
+        @import url("/static/css/inspetor/workspace_states.css?v={{ v_app }}&ui_rev=20260406_mesa_channels_attachment_fix") layer(tariel.states);
+        @import url("/static/css/inspetor/visual_refinements.css?v={{ v_app }}&ui_rev=20260406_mesa_channels_attachment_fix") layer(tariel.refinements);
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    <noscript>
+        <div class="noscript-alerta">
+            Este sistema requer JavaScript habilitado para funcionar.
+        </div>
+    </noscript>
+
+    <script nonce="{{ csp_nonce }}" type="application/json" id="tariel-boot">
+    {
+        "csrfToken": {{ csrf_token | tojson }},
+        "usuarioNome": {{ (usuario.nome_completo if usuario else 'Usuário') | tojson }},
+        "empresaNome": {{ (usuario.empresa.nome_fantasia if usuario and usuario.empresa else '') | tojson }},
+        "laudosMesUsados": {{ laudos_mes_usados | default(0) | int }},
+        "laudosMesLimite": {{ laudos_mes_limite | tojson }},
+        "planoUploadDoc": {{ plano_upload_doc | default(true) | tojson }},
+        "deepResearchDisponivel": {{ deep_research_disponivel | default(false) | tojson }},
+        "tenantAccessPolicy": {{ tenant_access_policy | default({}, true) | tojson }},
+        "estadoRelatorio": {{ (estado_relatorio.estado if estado_relatorio else 'sem_relatorio') | tojson }},
+        "laudoAtivoId": {{ (estado_relatorio.laudo_id if estado_relatorio and estado_relatorio.laudo_id else none) | tojson }},
+        "suporteWhatsapp": {{ suporte_whatsapp | default('5516999999999') | tojson }},
+        "ambiente": {{ ambiente | default('producao') | tojson }}
+    }
+    </script>
+
+    <div
+        id="barra-status-rede"
+        class="barra-status-rede"
+        role="status"
+        aria-live="assertive"
+        aria-atomic="true"
+    >
+        <span class="material-symbols-rounded" aria-hidden="true">wifi_off</span>
+        <span id="texto-status-rede">Sem conexão com a internet</span>
+    </div>
+
+    <div
+        id="toast-sw"
+        class="toast-sw"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+    >
+        <span class="toast-sw__texto">Nova versão disponível.</span>
+
+        <button
+            type="button"
+            id="btn-atualizar-sw"
+            class="toast-sw__btn toast-sw__btn--primary"
+        >
+            Atualizar agora
+        </button>
+
+        <button
+            type="button"
+            id="btn-fechar-sw"
+            class="toast-sw__btn toast-sw__btn--ghost"
+            aria-label="Fechar notificação"
+        >
+            ✕
+        </button>
+    </div>
+
+    {% block header %}{% endblock %}
+
+    <div class="container-app">
+        {% block sidebar %}{% endblock %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <div
+        id="inspetor-overlay-host"
+        class="inspetor-overlay-host"
+        data-overlay-active="false"
+        data-overlay-owner=""
+    >
+        {% block overlay_host %}{% endblock %}
+    </div>
+
+    <div
+        id="shell-quick-actions"
+        class="shell-quick-actions"
+        aria-label="Ações rápidas da interface"
+    >
+        <button
+            type="button"
+            id="btn-shell-home"
+            class="shell-action-btn shell-action-btn-secundario"
+            data-shell-aux="true"
+            data-action="go-home"
+            data-home-destino="/app/?home=1"
+            data-tooltip="Home"
+            aria-label="Ir para a tela inicial"
+            hidden
+        >
+            <span class="material-symbols-rounded" aria-hidden="true">home</span>
+        </button>
+
+        <button
+            type="button"
+            id="btn-shell-profile"
+            class="shell-action-btn shell-action-btn-secundario"
+            data-shell-aux="true"
+            data-tooltip="Perfil"
+            aria-label="Abrir perfil do usuário"
+            hidden
+        >
+            <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+        </button>
+
+        <button
+            type="button"
+            id="btn-toggle-ui"
+            class="shell-action-btn btn-toggle-ui"
+            data-tooltip="Ativar modo foco"
+            aria-label="Ativar modo foco"
+            aria-pressed="false"
+        >
+            <span id="icone-toggle-ui" class="material-symbols-rounded" aria-hidden="true">left_panel_close</span>
+        </button>
+    </div>
+
+    {% block footer %}{% endblock %}
+
+    <div
+        id="overlay-sidebar"
+        class="overlay-sidebar"
+        aria-hidden="true"
+        tabindex="-1"
+    ></div>
+
+    <script src="/static/js/shared/app_shell.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

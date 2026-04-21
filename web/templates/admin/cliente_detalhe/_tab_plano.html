@@ -1,0 +1,24 @@
+            <section class="secao admin-tab-panel" data-admin-tab-panel="plano" hidden>
+                <div class="secao-header">
+                    <div class="secao-header__copy">
+                        <h3>
+                            <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+                            Plano e limites
+                        </h3>
+                        <p>Impacto contratual do plano atual e preparação segura para uma eventual troca.</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="info-card">
+                        <div class="label">Plano atual</div>
+                        <div class="valor">{{ empresa.plano_ativo | e }}</div>
+                        <div class="valor-auxiliar">{{ (_plano_preview.get(empresa.plano_ativo, {}) or {}).get("resumo_confirmacao", "Sem preview") | e }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Impacto operacional</div>
+                        <div class="valor">{{ _resumo.get("uso_label", "—") | e }}</div>
+                        <div class="valor-auxiliar">Use “Alterar plano” para validar impacto antes de confirmar.</div>
+                    </div>
+                </div>
+            </section>

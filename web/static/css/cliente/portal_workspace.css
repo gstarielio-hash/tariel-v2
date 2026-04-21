@@ -1,0 +1,126 @@
+.panel--admin {
+    background:
+        radial-gradient(circle at top left, rgba(36, 92, 147, 0.08), transparent 28%),
+        linear-gradient(180deg, var(--cliente-surface), rgba(11, 18, 26, 0.98));
+}
+
+.panel--chat {
+    background:
+        radial-gradient(circle at top right, rgba(97, 153, 255, 0.12), transparent 26%),
+        linear-gradient(180deg, rgba(13, 19, 29, 0.98), rgba(8, 14, 22, 0.98));
+}
+
+.panel--mesa {
+    background:
+        radial-gradient(circle at top right, rgba(132, 216, 155, 0.12), transparent 28%),
+        linear-gradient(180deg, rgba(14, 21, 28, 0.98), rgba(8, 13, 19, 0.98));
+}
+
+.section-intro--workspace {
+    align-items: flex-end;
+}
+
+.surface-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.workspace-shell {
+    display: grid;
+    gap: 18px;
+    align-items: start;
+}
+
+.workspace-rail,
+.workspace-main,
+.workspace-context-stack {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+    min-width: 0;
+}
+
+.workspace-box {
+    min-width: 0;
+}
+
+.workspace-metrics.summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workspace-radar-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.workspace-radar-stack,
+.workspace-radar-stack.activity-list {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+}
+
+.workspace-box--radar .activity-list--section {
+    margin-top: 0;
+}
+
+.workspace-columns {
+    display: grid;
+    gap: 18px;
+    align-items: start;
+}
+
+.workspace-box--list .list {
+    max-height: clamp(280px, 44vh, 620px);
+}
+
+.workspace-box--thread .msgs {
+    max-height: clamp(340px, 54vh, 760px);
+}
+
+.workspace-box--context #chat-contexto .context-card,
+.workspace-box--context #mesa-contexto .context-card {
+    margin-bottom: 0;
+}
+
+.workspace-box--summary .summary-grid {
+    margin-top: 0;
+}
+
+@media (min-width: 1181px) {
+    .workspace-shell--chat,
+    .workspace-shell--mesa {
+        grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.5fr);
+    }
+
+    .workspace-rail {
+        position: sticky;
+        top: 88px;
+    }
+
+    .workspace-columns--chat,
+    .workspace-columns--mesa {
+        grid-template-columns: minmax(300px, 0.86fr) minmax(0, 1.34fr);
+    }
+}
+
+@media (max-width: 1320px) {
+    .workspace-metrics.summary-grid,
+    .workspace-columns,
+    .workspace-radar-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .surface-pills {
+        justify-content: flex-start;
+    }
+
+    .workspace-box--list .list,
+    .workspace-box--thread .msgs {
+        max-height: none;
+    }
+}

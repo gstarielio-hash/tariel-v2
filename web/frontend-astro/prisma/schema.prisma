@@ -1,0 +1,878 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model anexos_mesa {
+  id              Int             @id @default(autoincrement())
+  laudo_id        Int
+  mensagem_id     Int
+  enviado_por_id  Int?
+  nome_original   String          @db.VarChar(160)
+  nome_arquivo    String          @db.VarChar(220)
+  mime_type       String          @db.VarChar(120)
+  categoria       String          @db.VarChar(20)
+  tamanho_bytes   Int
+  caminho_arquivo String          @db.VarChar(600)
+  criado_em       DateTime        @db.Timestamptz(6)
+  usuarios        usuarios?       @relation(fields: [enviado_por_id], references: [id], onUpdate: NoAction)
+  laudos          laudos          @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  mensagens_laudo mensagens_laudo @relation(fields: [mensagem_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([enviado_por_id], map: "ix_anexo_mesa_enviado_por")
+  @@index([laudo_id, criado_em], map: "ix_anexo_mesa_laudo_criado")
+  @@index([mensagem_id], map: "ix_anexo_mesa_mensagem")
+  @@index([id], map: "ix_anexos_mesa_id")
+  @@index([laudo_id], map: "ix_anexos_mesa_laudo_id")
+  @@index([mensagem_id], map: "ix_anexos_mesa_mensagem_id")
+}
+
+model aprendizados_visuais_ia {
+  id                                                         Int              @id @default(autoincrement())
+  empresa_id                                                 Int
+  laudo_id                                                   Int
+  mensagem_referencia_id                                     Int?
+  criado_por_id                                              Int?
+  validado_por_id                                            Int?
+  setor_industrial                                           String           @db.VarChar(100)
+  resumo                                                     String           @db.VarChar(240)
+  descricao_contexto                                         String?
+  correcao_inspetor                                          String
+  parecer_mesa                                               String?
+  sintese_consolidada                                        String?
+  pontos_chave_json                                          Json             @db.Json
+  referencias_norma_json                                     Json             @db.Json
+  marcacoes_json                                             Json             @db.Json
+  status                                                     String           @db.VarChar(17)
+  veredito_inspetor                                          String           @db.VarChar(12)
+  veredito_mesa                                              String?          @db.VarChar(12)
+  imagem_url                                                 String?          @db.VarChar(600)
+  imagem_nome_original                                       String?          @db.VarChar(160)
+  imagem_mime_type                                           String?          @db.VarChar(120)
+  imagem_sha256                                              String?          @db.VarChar(64)
+  caminho_arquivo                                            String?          @db.VarChar(600)
+  validado_em                                                DateTime?        @db.Timestamptz(6)
+  criado_em                                                  DateTime         @db.Timestamptz(6)
+  atualizado_em                                              DateTime?        @db.Timestamptz(6)
+  usuarios_aprendizados_visuais_ia_criado_por_idTousuarios   usuarios?        @relation("aprendizados_visuais_ia_criado_por_idTousuarios", fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  empresas                                                   empresas         @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  laudos                                                     laudos           @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  mensagens_laudo                                            mensagens_laudo? @relation(fields: [mensagem_referencia_id], references: [id], onUpdate: NoAction)
+  usuarios_aprendizados_visuais_ia_validado_por_idTousuarios usuarios?        @relation("aprendizados_visuais_ia_validado_por_idTousuarios", fields: [validado_por_id], references: [id], onUpdate: NoAction)
+
+  @@index([empresa_id, status, validado_em], map: "ix_aprendizado_visual_empresa_status")
+  @@index([laudo_id, criado_em], map: "ix_aprendizado_visual_laudo_criado")
+  @@index([mensagem_referencia_id], map: "ix_aprendizado_visual_ref_msg")
+  @@index([empresa_id, setor_industrial, status], map: "ix_aprendizado_visual_setor_status")
+  @@index([imagem_sha256], map: "ix_aprendizado_visual_sha")
+  @@index([criado_por_id], map: "ix_aprendizados_visuais_ia_criado_por_id")
+  @@index([empresa_id], map: "ix_aprendizados_visuais_ia_empresa_id")
+  @@index([id], map: "ix_aprendizados_visuais_ia_id")
+  @@index([laudo_id], map: "ix_aprendizados_visuais_ia_laudo_id")
+  @@index([mensagem_referencia_id], map: "ix_aprendizados_visuais_ia_mensagem_referencia_id")
+  @@index([validado_por_id], map: "ix_aprendizados_visuais_ia_validado_por_id")
+}
+
+model auditoria_empresas {
+  id                                                    Int       @id @default(autoincrement())
+  empresa_id                                            Int
+  ator_usuario_id                                       Int?
+  alvo_usuario_id                                       Int?
+  portal                                                String    @default("cliente") @db.VarChar(30)
+  acao                                                  String    @db.VarChar(80)
+  resumo                                                String    @db.VarChar(220)
+  detalhe                                               String?
+  payload_json                                          Json?     @db.Json
+  criado_em                                             DateTime  @db.Timestamptz(6)
+  atualizado_em                                         DateTime? @db.Timestamptz(6)
+  usuarios_auditoria_empresas_alvo_usuario_idTousuarios usuarios? @relation("auditoria_empresas_alvo_usuario_idTousuarios", fields: [alvo_usuario_id], references: [id], onUpdate: NoAction)
+  usuarios_auditoria_empresas_ator_usuario_idTousuarios usuarios? @relation("auditoria_empresas_ator_usuario_idTousuarios", fields: [ator_usuario_id], references: [id], onUpdate: NoAction)
+  empresas                                              empresas  @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([ator_usuario_id, criado_em], map: "ix_auditoria_ator_criada")
+  @@index([empresa_id, criado_em], map: "ix_auditoria_empresa_criada")
+  @@index([empresa_id, portal], map: "ix_auditoria_empresa_portal")
+  @@index([alvo_usuario_id], map: "ix_auditoria_empresas_alvo_usuario_id")
+  @@index([ator_usuario_id], map: "ix_auditoria_empresas_ator_usuario_id")
+  @@index([empresa_id], map: "ix_auditoria_empresas_empresa_id")
+  @@index([id], map: "ix_auditoria_empresas_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model catalogo_metodos_inspecao {
+  id            Int       @id @default(autoincrement())
+  method_key    String    @unique(map: "ix_catalogo_metodos_inspecao_method_key") @db.VarChar(80)
+  nome_exibicao String    @db.VarChar(120)
+  categoria     String    @db.VarChar(24)
+  ativo         Boolean   @default(true)
+  criado_por_id Int?
+  criado_em     DateTime  @db.Timestamptz(6)
+  atualizado_em DateTime? @db.Timestamptz(6)
+  usuarios      usuarios? @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+
+  @@index([categoria, ativo], map: "ix_catalogo_metodo_categoria_ativo")
+  @@index([id], map: "ix_catalogo_metodos_inspecao_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model citacoes_laudo {
+  id            Int       @id @default(autoincrement())
+  laudo_id      Int
+  referencia    String    @db.VarChar(300)
+  trecho        String?
+  url           String?   @db.VarChar(500)
+  ordem         Int
+  criado_em     DateTime  @db.Timestamptz(6)
+  atualizado_em DateTime? @db.Timestamptz(6)
+  laudos        laudos    @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([laudo_id], map: "ix_citacao_laudo_id")
+  @@index([id], map: "ix_citacoes_laudo_id")
+  @@index([laudo_id], map: "ix_citacoes_laudo_laudo_id")
+}
+
+model configuracoes_plataforma {
+  chave                     String    @id @db.VarChar(80)
+  categoria                 String    @db.VarChar(40)
+  valor_json                Json?     @db.Json
+  motivo_ultima_alteracao   String?   @db.VarChar(300)
+  atualizada_por_usuario_id Int?
+  criado_em                 DateTime  @db.Timestamptz(6)
+  atualizado_em             DateTime? @db.Timestamptz(6)
+  usuarios                  usuarios? @relation(fields: [atualizada_por_usuario_id], references: [id], onUpdate: NoAction)
+
+  @@index([atualizada_por_usuario_id], map: "ix_configuracao_plataforma_atualizada_por")
+  @@index([categoria], map: "ix_configuracao_plataforma_categoria")
+}
+
+model dispositivos_push_mobile {
+  id                     Int       @id @default(autoincrement())
+  usuario_id             Int
+  empresa_id             Int
+  device_id              String    @db.VarChar(120)
+  plataforma             String    @db.VarChar(20)
+  provider               String    @db.VarChar(20)
+  push_token             String?   @db.VarChar(255)
+  permissao_notificacoes Boolean   @default(false)
+  push_habilitado        Boolean   @default(false)
+  token_status           String    @default("unavailable") @db.VarChar(40)
+  canal_build            String?   @db.VarChar(60)
+  app_version            String?   @db.VarChar(40)
+  build_number           String?   @db.VarChar(40)
+  device_label           String?   @db.VarChar(120)
+  is_emulator            Boolean   @default(false)
+  ultimo_erro            String?   @db.VarChar(220)
+  last_seen_at           DateTime  @db.Timestamptz(6)
+  criado_em              DateTime  @db.Timestamptz(6)
+  atualizado_em          DateTime? @db.Timestamptz(6)
+  empresas               empresas  @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios               usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([usuario_id, device_id, plataforma], map: "uq_push_mobile_usuario_device_plataforma")
+  @@index([empresa_id, last_seen_at], map: "ix_push_mobile_empresa_last_seen")
+  @@index([usuario_id, token_status], map: "ix_push_mobile_usuario_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model emissoes_oficiais_laudo {
+  id                            Int                            @id @default(autoincrement())
+  laudo_id                      Int
+  tenant_id                     Int
+  approval_snapshot_id          Int?
+  signatory_id                  Int?
+  issued_by_user_id             Int?
+  superseded_by_issue_id        Int?
+  issue_number                  String                         @unique(map: "ix_emissoes_oficiais_laudo_issue_number") @db.VarChar(80)
+  issue_state                   String                         @db.VarChar(20)
+  issued_at                     DateTime                       @db.Timestamptz(6)
+  superseded_at                 DateTime?                      @db.Timestamptz(6)
+  verification_hash             String?                        @db.VarChar(64)
+  public_verification_url       String?                        @db.VarChar(400)
+  package_sha256                String                         @db.VarChar(64)
+  package_fingerprint_sha256    String                         @db.VarChar(64)
+  package_filename              String?                        @db.VarChar(220)
+  package_storage_path          String?                        @db.VarChar(600)
+  package_size_bytes            Int?
+  manifest_json                 Json?                          @db.Json
+  issue_context_json            Json?                          @db.Json
+  criado_em                     DateTime                       @db.Timestamptz(6)
+  atualizado_em                 DateTime?                      @db.Timestamptz(6)
+  laudo_approved_case_snapshots laudo_approved_case_snapshots? @relation(fields: [approval_snapshot_id], references: [id], onUpdate: NoAction)
+  usuarios                      usuarios?                      @relation(fields: [issued_by_user_id], references: [id], onUpdate: NoAction)
+  laudos                        laudos                         @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  signatarios_governados_laudo  signatarios_governados_laudo?  @relation(fields: [signatory_id], references: [id], onUpdate: NoAction)
+  emissoes_oficiais_laudo       emissoes_oficiais_laudo?       @relation("emissoes_oficiais_laudoToemissoes_oficiais_laudo", fields: [superseded_by_issue_id], references: [id], onUpdate: NoAction)
+  other_emissoes_oficiais_laudo emissoes_oficiais_laudo[]      @relation("emissoes_oficiais_laudoToemissoes_oficiais_laudo")
+  empresas                      empresas                       @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([package_fingerprint_sha256], map: "ix_emissao_oficial_hash_fingerprint")
+  @@index([package_sha256], map: "ix_emissao_oficial_hash_pacote")
+  @@index([laudo_id, issue_state], map: "ix_emissao_oficial_laudo_estado")
+  @@index([tenant_id, issued_at], map: "ix_emissao_oficial_tenant_emitida")
+  @@index([approval_snapshot_id], map: "ix_emissoes_oficiais_laudo_approval_snapshot_id")
+  @@index([id], map: "ix_emissoes_oficiais_laudo_id")
+  @@index([issued_by_user_id], map: "ix_emissoes_oficiais_laudo_issued_by_user_id")
+  @@index([laudo_id], map: "ix_emissoes_oficiais_laudo_laudo_id")
+  @@index([signatory_id], map: "ix_emissoes_oficiais_laudo_signatory_id")
+  @@index([superseded_by_issue_id], map: "ix_emissoes_oficiais_laudo_superseded_by_issue_id")
+  @@index([tenant_id], map: "ix_emissoes_oficiais_laudo_tenant_id")
+  @@index([verification_hash], map: "ix_emissoes_oficiais_laudo_verification_hash")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model empresa_catalogo_laudo_ativacoes {
+  id                                Int                                @id @default(autoincrement())
+  empresa_id                        Int
+  family_id                         Int?
+  oferta_id                         Int?
+  family_key                        String                             @db.VarChar(120)
+  family_label                      String                             @db.VarChar(180)
+  group_label                       String?                            @db.VarChar(120)
+  offer_name                        String?                            @db.VarChar(180)
+  variant_key                       String                             @db.VarChar(80)
+  variant_label                     String                             @db.VarChar(120)
+  variant_ordem                     Int?
+  runtime_template_code             String                             @db.VarChar(80)
+  ativo                             Boolean
+  criado_por_id                     Int?
+  criado_em                         DateTime                           @db.Timestamptz(6)
+  atualizado_em                     DateTime?                          @db.Timestamptz(6)
+  usuarios                          usuarios?                          @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  empresas                          empresas                           @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  familias_laudo_catalogo           familias_laudo_catalogo?           @relation(fields: [family_id], references: [id], onUpdate: NoAction)
+  familias_laudo_ofertas_comerciais familias_laudo_ofertas_comerciais? @relation(fields: [oferta_id], references: [id], onUpdate: NoAction)
+
+  @@unique([empresa_id, family_key, variant_key], map: "uq_empresa_catalogo_family_variant")
+  @@index([empresa_id, ativo], map: "ix_empresa_catalogo_empresa_ativo")
+  @@index([criado_por_id], map: "ix_empresa_catalogo_laudo_ativacoes_criado_por_id")
+  @@index([empresa_id], map: "ix_empresa_catalogo_laudo_ativacoes_empresa_id")
+  @@index([family_id], map: "ix_empresa_catalogo_laudo_ativacoes_family_id")
+  @@index([id], map: "ix_empresa_catalogo_laudo_ativacoes_id")
+  @@index([oferta_id], map: "ix_empresa_catalogo_laudo_ativacoes_oferta_id")
+  @@index([empresa_id, runtime_template_code], map: "ix_empresa_catalogo_runtime")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model empresas {
+  id                               Int                                @id @default(autoincrement())
+  nome_fantasia                    String                             @db.VarChar(200)
+  cnpj                             String                             @unique(map: "ix_empresas_cnpj") @db.VarChar(18)
+  plano_ativo                      String                             @db.VarChar(20)
+  custo_gerado_reais               Decimal                            @db.Decimal(12, 4)
+  mensagens_processadas            Int
+  status_bloqueio                  Boolean
+  bloqueado_em                     DateTime?                          @db.Timestamptz(6)
+  motivo_bloqueio                  String?                            @db.VarChar(300)
+  segmento                         String?                            @db.VarChar(100)
+  cidade_estado                    String?                            @db.VarChar(100)
+  nome_responsavel                 String?                            @db.VarChar(150)
+  observacoes                      String?
+  criado_em                        DateTime                           @db.Timestamptz(6)
+  atualizado_em                    DateTime?                          @db.Timestamptz(6)
+  escopo_plataforma                Boolean
+  admin_cliente_policy_json        Json?                              @db.Json
+  aprendizados_visuais_ia          aprendizados_visuais_ia[]
+  auditoria_empresas               auditoria_empresas[]
+  dispositivos_push_mobile         dispositivos_push_mobile[]
+  emissoes_oficiais_laudo          emissoes_oficiais_laudo[]
+  empresa_catalogo_laudo_ativacoes empresa_catalogo_laudo_ativacoes[]
+  laudo_approved_case_snapshots    laudo_approved_case_snapshots[]
+  laudo_evidence_validations       laudo_evidence_validations[]
+  laudo_operational_events         laudo_operational_events[]
+  laudo_operational_irregularities laudo_operational_irregularities[]
+  laudos                           laudos[]
+  signatarios_governados_laudo     signatarios_governados_laudo[]
+  templates_laudo                  templates_laudo[]
+  tenant_family_releases           tenant_family_releases[]
+  usuarios                         usuarios[]
+
+  @@index([id], map: "ix_empresas_id")
+  @@index([nome_fantasia], map: "ix_empresas_nome_fantasia")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model familias_laudo_calibracoes {
+  id                      Int                     @id @default(autoincrement())
+  family_id               Int                     @unique(map: "uq_familia_calibracao_family")
+  calibration_status      String                  @db.VarChar(24)
+  reference_source        String?                 @db.VarChar(255)
+  last_calibrated_at      DateTime?               @db.Timestamptz(6)
+  summary_of_adjustments  String?
+  changed_fields_json     Json?                   @db.Json
+  changed_language_notes  String?
+  attachments_json        Json?                   @db.Json
+  criado_por_id           Int?
+  criado_em               DateTime                @db.Timestamptz(6)
+  atualizado_em           DateTime?               @db.Timestamptz(6)
+  usuarios                usuarios?               @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  familias_laudo_catalogo familias_laudo_catalogo @relation(fields: [family_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([calibration_status], map: "ix_familia_calibracao_status")
+  @@index([id], map: "ix_familias_laudo_calibracoes_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model familias_laudo_catalogo {
+  id                                Int                                @id @default(autoincrement())
+  family_key                        String                             @unique(map: "ix_familias_laudo_catalogo_family_key") @db.VarChar(120)
+  macro_categoria                   String?                            @db.VarChar(80)
+  nome_exibicao                     String                             @db.VarChar(180)
+  descricao                         String?
+  status_catalogo                   String                             @db.VarChar(20)
+  schema_version                    Int
+  evidence_policy_json              Json?                              @db.Json
+  review_policy_json                Json?                              @db.Json
+  output_schema_seed_json           Json?                              @db.Json
+  criado_por_id                     Int?
+  publicado_em                      DateTime?                          @db.Timestamptz(6)
+  criado_em                         DateTime                           @db.Timestamptz(6)
+  atualizado_em                     DateTime?                          @db.Timestamptz(6)
+  nr_key                            String?                            @db.VarChar(40)
+  technical_status                  String                             @db.VarChar(20)
+  catalog_classification            String                             @db.VarChar(24)
+  governance_metadata_json          Json?                              @db.Json
+  empresa_catalogo_laudo_ativacoes  empresa_catalogo_laudo_ativacoes[]
+  familias_laudo_calibracoes        familias_laudo_calibracoes?
+  usuarios                          usuarios?                          @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  familias_laudo_modos_tecnicos     familias_laudo_modos_tecnicos[]
+  familias_laudo_ofertas_comerciais familias_laudo_ofertas_comerciais?
+  tenant_family_releases            tenant_family_releases[]
+
+  @@index([catalog_classification], map: "ix_familia_catalogo_classification")
+  @@index([macro_categoria], map: "ix_familia_catalogo_macro_categoria")
+  @@index([nr_key], map: "ix_familia_catalogo_nr_key")
+  @@index([status_catalogo], map: "ix_familia_catalogo_status")
+  @@index([technical_status], map: "ix_familia_catalogo_technical_status")
+  @@index([criado_por_id], map: "ix_familias_laudo_catalogo_criado_por_id")
+  @@index([id], map: "ix_familias_laudo_catalogo_id")
+}
+
+model familias_laudo_modos_tecnicos {
+  id                                Int                                 @id @default(autoincrement())
+  family_id                         Int
+  mode_key                          String                              @db.VarChar(80)
+  nome_exibicao                     String                              @db.VarChar(120)
+  descricao                         String?
+  regras_adicionais_json            Json?                               @db.Json
+  compatibilidade_template_json     Json?                               @db.Json
+  compatibilidade_oferta_json       Json?                               @db.Json
+  ativo                             Boolean                             @default(true)
+  criado_por_id                     Int?
+  criado_em                         DateTime                            @db.Timestamptz(6)
+  atualizado_em                     DateTime?                           @db.Timestamptz(6)
+  usuarios                          usuarios?                           @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  familias_laudo_catalogo           familias_laudo_catalogo             @relation(fields: [family_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  familias_laudo_ofertas_comerciais familias_laudo_ofertas_comerciais[]
+
+  @@unique([family_id, mode_key], map: "uq_familia_modo_family_mode")
+  @@index([family_id, ativo], map: "ix_familia_modo_family_ativo")
+  @@index([id], map: "ix_familias_laudo_modos_tecnicos_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model familias_laudo_ofertas_comerciais {
+  id                               Int                                @id @default(autoincrement())
+  family_id                        Int                                @unique(map: "uq_familia_oferta_family")
+  nome_oferta                      String                             @db.VarChar(180)
+  descricao_comercial              String?
+  pacote_comercial                 String?                            @db.VarChar(80)
+  prazo_padrao_dias                Int?
+  ativo_comercial                  Boolean
+  versao_oferta                    Int
+  material_real_status             String                             @db.VarChar(20)
+  escopo_json                      Json?                              @db.Json
+  exclusoes_json                   Json?                              @db.Json
+  insumos_minimos_json             Json?                              @db.Json
+  variantes_json                   Json?                              @db.Json
+  criado_por_id                    Int?
+  publicado_em                     DateTime?                          @db.Timestamptz(6)
+  criado_em                        DateTime                           @db.Timestamptz(6)
+  atualizado_em                    DateTime?                          @db.Timestamptz(6)
+  family_mode_id                   Int?
+  offer_key                        String?                            @unique(map: "ix_familia_oferta_offer_key_unique") @db.VarChar(120)
+  lifecycle_status                 String                             @db.VarChar(20)
+  showcase_enabled                 Boolean
+  material_level                   String                             @db.VarChar(24)
+  template_default_code            String?                            @db.VarChar(120)
+  flags_json                       Json?                              @db.Json
+  empresa_catalogo_laudo_ativacoes empresa_catalogo_laudo_ativacoes[]
+  usuarios                         usuarios?                          @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  familias_laudo_catalogo          familias_laudo_catalogo            @relation(fields: [family_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  familias_laudo_modos_tecnicos    familias_laudo_modos_tecnicos?     @relation(fields: [family_mode_id], references: [id], onUpdate: NoAction, map: "fk_familia_oferta_family_mode")
+  tenant_family_releases           tenant_family_releases[]
+
+  @@index([ativo_comercial], map: "ix_familia_oferta_ativa")
+  @@index([lifecycle_status], map: "ix_familia_oferta_lifecycle")
+  @@index([material_real_status], map: "ix_familia_oferta_material_real_status")
+  @@index([pacote_comercial], map: "ix_familia_oferta_pacote")
+  @@index([showcase_enabled], map: "ix_familia_oferta_showcase")
+  @@index([criado_por_id], map: "ix_familias_laudo_ofertas_comerciais_criado_por_id")
+  @@index([family_id], map: "ix_familias_laudo_ofertas_comerciais_family_id")
+  @@index([id], map: "ix_familias_laudo_ofertas_comerciais_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model laudo_approved_case_snapshots {
+  id                           Int                        @id @default(autoincrement())
+  laudo_id                     Int
+  empresa_id                   Int
+  family_key                   String                     @db.VarChar(120)
+  approval_version             Int
+  approved_at                  DateTime                   @db.Timestamptz(6)
+  approved_by_id               Int?
+  source_status_revisao        String?                    @db.VarChar(40)
+  source_status_conformidade   String?                    @db.VarChar(40)
+  document_outcome             String?                    @db.VarChar(80)
+  laudo_output_snapshot        Json                       @db.Json
+  evidence_manifest_json       Json?                      @db.Json
+  mesa_resolution_summary_json Json?                      @db.Json
+  technical_tags_json          Json?                      @db.Json
+  snapshot_hash                String?                    @db.VarChar(64)
+  criado_em                    DateTime                   @db.Timestamptz(6)
+  atualizado_em                DateTime?                  @db.Timestamptz(6)
+  emissoes_oficiais_laudo      emissoes_oficiais_laudo[]
+  usuarios                     usuarios?                  @relation(fields: [approved_by_id], references: [id], onUpdate: NoAction)
+  empresas                     empresas                   @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  laudos                       laudos                     @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  laudo_operational_events     laudo_operational_events[]
+
+  @@unique([laudo_id, approval_version], map: "uq_approved_case_snapshot_laudo_version")
+  @@index([empresa_id, family_key], map: "ix_approved_case_snapshot_empresa_familia")
+  @@index([family_key, approved_at], map: "ix_approved_case_snapshot_family_approved")
+  @@index([laudo_id, approved_at], map: "ix_approved_case_snapshot_laudo")
+  @@index([id], map: "ix_laudo_approved_case_snapshots_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model laudo_evidence_validations {
+  id                               Int                                @id @default(autoincrement())
+  laudo_id                         Int
+  empresa_id                       Int
+  family_key                       String                             @db.VarChar(120)
+  evidence_key                     String                             @db.VarChar(160)
+  component_type                   String?                            @db.VarChar(80)
+  view_angle                       String?                            @db.VarChar(80)
+  quality_score                    Int?
+  coherence_score                  Int?
+  operational_status               String                             @db.VarChar(24)
+  mesa_status                      String                             @db.VarChar(24)
+  failure_reasons_json             Json?                              @db.Json
+  evidence_metadata_json           Json?                              @db.Json
+  replacement_evidence_key         String?                            @db.VarChar(160)
+  validated_by_user_id             Int?
+  last_evaluated_at                DateTime                           @db.Timestamptz(6)
+  criado_em                        DateTime                           @db.Timestamptz(6)
+  atualizado_em                    DateTime?                          @db.Timestamptz(6)
+  empresas                         empresas                           @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  laudos                           laudos                             @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios                         usuarios?                          @relation(fields: [validated_by_user_id], references: [id], onUpdate: NoAction)
+  laudo_operational_irregularities laudo_operational_irregularities[]
+
+  @@unique([laudo_id, evidence_key], map: "uq_evidence_validation_laudo_evidence")
+  @@index([family_key, component_type, view_angle], map: "ix_evidence_validation_component_angle")
+  @@index([empresa_id, family_key], map: "ix_evidence_validation_empresa_familia")
+  @@index([id], map: "ix_laudo_evidence_validations_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model laudo_operational_events {
+  id                                                         Int                                @id @default(autoincrement())
+  laudo_id                                                   Int
+  empresa_id                                                 Int
+  family_key                                                 String                             @db.VarChar(120)
+  snapshot_id                                                Int?
+  actor_user_id                                              Int?
+  event_type                                                 String                             @db.VarChar(64)
+  event_source                                               String                             @db.VarChar(32)
+  severity                                                   String                             @db.VarChar(16)
+  block_key                                                  String?                            @db.VarChar(120)
+  evidence_key                                               String?                            @db.VarChar(160)
+  event_metadata_json                                        Json?                              @db.Json
+  resolution_mode                                            String?                            @db.VarChar(40)
+  resolution_notes                                           String?
+  resolved_at                                                DateTime?                          @db.Timestamptz(6)
+  resolved_by_id                                             Int?
+  criado_em                                                  DateTime                           @db.Timestamptz(6)
+  atualizado_em                                              DateTime?                          @db.Timestamptz(6)
+  usuarios_laudo_operational_events_actor_user_idTousuarios  usuarios?                          @relation("laudo_operational_events_actor_user_idTousuarios", fields: [actor_user_id], references: [id], onUpdate: NoAction)
+  empresas                                                   empresas                           @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  laudos                                                     laudos                             @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios_laudo_operational_events_resolved_by_idTousuarios usuarios?                          @relation("laudo_operational_events_resolved_by_idTousuarios", fields: [resolved_by_id], references: [id], onUpdate: NoAction)
+  laudo_approved_case_snapshots                              laudo_approved_case_snapshots?     @relation(fields: [snapshot_id], references: [id], onUpdate: NoAction)
+  laudo_operational_irregularities                           laudo_operational_irregularities[]
+
+  @@index([id], map: "ix_laudo_operational_events_id")
+  @@index([empresa_id, family_key, event_type], map: "ix_operational_event_empresa_familia_tipo")
+  @@index([laudo_id, criado_em], map: "ix_operational_event_laudo_criado")
+  @@index([snapshot_id], map: "ix_operational_event_snapshot")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model laudo_operational_irregularities {
+  id                                                                      Int                         @id @default(autoincrement())
+  laudo_id                                                                Int
+  empresa_id                                                              Int
+  family_key                                                              String                      @db.VarChar(120)
+  source_event_id                                                         Int?
+  validation_id                                                           Int?
+  detected_by_user_id                                                     Int?
+  resolved_by_id                                                          Int?
+  irregularity_type                                                       String                      @db.VarChar(64)
+  severity                                                                String                      @db.VarChar(16)
+  status                                                                  String                      @db.VarChar(24)
+  detected_by                                                             String                      @db.VarChar(32)
+  block_key                                                               String?                     @db.VarChar(120)
+  evidence_key                                                            String?                     @db.VarChar(160)
+  details_json                                                            Json?                       @db.Json
+  resolution_mode                                                         String?                     @db.VarChar(40)
+  resolution_notes                                                        String?
+  resolved_at                                                             DateTime?                   @db.Timestamptz(6)
+  criado_em                                                               DateTime                    @db.Timestamptz(6)
+  atualizado_em                                                           DateTime?                   @db.Timestamptz(6)
+  usuarios_laudo_operational_irregularities_detected_by_user_idTousuarios usuarios?                   @relation("laudo_operational_irregularities_detected_by_user_idTousuarios", fields: [detected_by_user_id], references: [id], onUpdate: NoAction)
+  empresas                                                                empresas                    @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  laudos                                                                  laudos                      @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios_laudo_operational_irregularities_resolved_by_idTousuarios      usuarios?                   @relation("laudo_operational_irregularities_resolved_by_idTousuarios", fields: [resolved_by_id], references: [id], onUpdate: NoAction)
+  laudo_operational_events                                                laudo_operational_events?   @relation(fields: [source_event_id], references: [id], onUpdate: NoAction)
+  laudo_evidence_validations                                              laudo_evidence_validations? @relation(fields: [validation_id], references: [id], onUpdate: NoAction)
+
+  @@index([id], map: "ix_laudo_operational_irregularities_id")
+  @@index([empresa_id, family_key, status], map: "ix_operational_irregularity_empresa_familia_status")
+  @@index([source_event_id, validation_id], map: "ix_operational_irregularity_event_validation")
+  @@index([laudo_id, status, criado_em], map: "ix_operational_irregularity_laudo_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model laudo_revisoes {
+  id              Int      @id @default(autoincrement())
+  laudo_id        Int
+  numero_versao   Int
+  origem          String   @db.VarChar(20)
+  resumo          String?  @db.VarChar(240)
+  conteudo        String
+  confianca_geral String?  @db.VarChar(16)
+  confianca_json  Json?    @db.Json
+  criado_em       DateTime @db.Timestamptz(6)
+  laudos          laudos   @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([laudo_id, numero_versao], map: "uq_laudo_revisao_laudo_versao")
+  @@index([laudo_id, criado_em], map: "ix_laudo_revisao_criado")
+  @@index([laudo_id, numero_versao], map: "ix_laudo_revisao_laudo_versao")
+  @@index([id], map: "ix_laudo_revisoes_id")
+  @@index([laudo_id], map: "ix_laudo_revisoes_laudo_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model laudos {
+  id                                     Int                                @id @default(autoincrement())
+  empresa_id                             Int
+  usuario_id                             Int?
+  setor_industrial                       String                             @db.VarChar(100)
+  tipo_template                          String                             @db.VarChar(50)
+  status_conformidade                    String                             @db.VarChar(12)
+  status_revisao                         String                             @db.VarChar(15)
+  revisado_por                           Int?
+  motivo_rejeicao                        String?
+  dados_formulario                       Json?                              @db.Json
+  parecer_ia                             String?
+  confianca_ia_json                      Json?                              @db.Json
+  codigo_hash                            String                             @unique(map: "ix_laudos_codigo_hash") @db.VarChar(32)
+  custo_api_reais                        Decimal                            @db.Decimal(12, 4)
+  nome_arquivo_pdf                       String?                            @db.VarChar(100)
+  primeira_mensagem                      String?                            @db.VarChar(80)
+  pinado                                 Boolean
+  pinado_em                              DateTime?                          @db.Timestamptz(6)
+  modo_resposta                          String                             @db.VarChar(13)
+  is_deep_research                       Boolean
+  criado_em                              DateTime                           @db.Timestamptz(6)
+  atualizado_em                          DateTime?                          @db.Timestamptz(6)
+  encerrado_pelo_inspetor_em             DateTime?                          @db.Timestamptz(6)
+  reabertura_pendente_em                 DateTime?                          @db.Timestamptz(6)
+  reaberto_em                            DateTime?                          @db.Timestamptz(6)
+  entry_mode_preference                  String                             @default("auto_recommended") @db.VarChar(32)
+  entry_mode_effective                   String                             @default("chat_first") @db.VarChar(32)
+  entry_mode_reason                      String                             @default("default_product_fallback") @db.VarChar(40)
+  guided_inspection_draft_json           Json?                              @db.Json
+  report_pack_draft_json                 Json?                              @db.Json
+  catalog_family_key                     String?                            @db.VarChar(120)
+  catalog_family_label                   String?                            @db.VarChar(180)
+  catalog_variant_key                    String?                            @db.VarChar(80)
+  catalog_variant_label                  String?                            @db.VarChar(120)
+  catalog_selection_token                String?                            @db.VarChar(240)
+  catalog_snapshot_json                  Json?                              @db.Json
+  pdf_template_snapshot_json             Json?                              @db.Json
+  anexos_mesa                            anexos_mesa[]
+  aprendizados_visuais_ia                aprendizados_visuais_ia[]
+  citacoes_laudo                         citacoes_laudo[]
+  emissoes_oficiais_laudo                emissoes_oficiais_laudo[]
+  laudo_approved_case_snapshots          laudo_approved_case_snapshots[]
+  laudo_evidence_validations             laudo_evidence_validations[]
+  laudo_operational_events               laudo_operational_events[]
+  laudo_operational_irregularities       laudo_operational_irregularities[]
+  laudo_revisoes                         laudo_revisoes[]
+  empresas                               empresas                           @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios_laudos_revisado_porTousuarios usuarios?                          @relation("laudos_revisado_porTousuarios", fields: [revisado_por], references: [id], onUpdate: NoAction)
+  usuarios_laudos_usuario_idTousuarios   usuarios?                          @relation("laudos_usuario_idTousuarios", fields: [usuario_id], references: [id], onUpdate: NoAction)
+  mensagens_laudo                        mensagens_laudo[]
+
+  @@index([empresa_id, catalog_family_key, catalog_variant_key], map: "ix_laudo_catalog_family_variant")
+  @@index([empresa_id, criado_em], map: "ix_laudo_empresa_criado")
+  @@index([empresa_id, is_deep_research], map: "ix_laudo_empresa_deep")
+  @@index([empresa_id, pinado], map: "ix_laudo_empresa_pinado")
+  @@index([usuario_id], map: "ix_laudo_usuario_id")
+  @@index([empresa_id], map: "ix_laudos_empresa_id")
+  @@index([id], map: "ix_laudos_id")
+  @@index([usuario_id], map: "ix_laudos_usuario_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model limites_plano {
+  plano           String  @id @db.VarChar(20)
+  laudos_mes      Int?
+  usuarios_max    Int?
+  upload_doc      Boolean
+  deep_research   Boolean
+  integracoes_max Int?
+  retencao_dias   Int?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model mensagens_laudo {
+  id                                                  Int                       @id @default(autoincrement())
+  laudo_id                                            Int
+  remetente_id                                        Int?
+  tipo                                                String                    @db.VarChar(20)
+  conteudo                                            String
+  lida                                                Boolean
+  resolvida_por_id                                    Int?
+  resolvida_em                                        DateTime?                 @db.Timestamptz(6)
+  custo_api_reais                                     Decimal                   @db.Decimal(12, 4)
+  criado_em                                           DateTime                  @db.Timestamptz(6)
+  client_message_id                                   String?                   @db.VarChar(64)
+  metadata_json                                       Json?                     @db.Json
+  anexos_mesa                                         anexos_mesa[]
+  aprendizados_visuais_ia                             aprendizados_visuais_ia[]
+  laudos                                              laudos                    @relation(fields: [laudo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios_mensagens_laudo_remetente_idTousuarios     usuarios?                 @relation("mensagens_laudo_remetente_idTousuarios", fields: [remetente_id], references: [id], onUpdate: NoAction)
+  usuarios_mensagens_laudo_resolvida_por_idTousuarios usuarios?                 @relation("mensagens_laudo_resolvida_por_idTousuarios", fields: [resolvida_por_id], references: [id], onUpdate: NoAction)
+
+  @@unique([laudo_id, remetente_id, client_message_id], map: "uq_mensagem_laudo_cliente_idempotencia")
+  @@index([laudo_id, client_message_id], map: "ix_mensagem_laudo_client_message")
+  @@index([laudo_id, criado_em], map: "ix_mensagem_laudo_criado")
+  @@index([remetente_id], map: "ix_mensagem_remetente")
+  @@index([resolvida_por_id], map: "ix_mensagem_resolvida_por")
+  @@index([id], map: "ix_mensagens_laudo_id")
+  @@index([laudo_id], map: "ix_mensagens_laudo_laudo_id")
+}
+
+model preferencias_mobile_usuarios {
+  id                  Int       @id @default(autoincrement())
+  usuario_id          Int       @unique(map: "uq_preferencias_mobile_usuario")
+  notificacoes_json   Json      @db.Json
+  privacidade_json    Json      @db.Json
+  permissoes_json     Json      @db.Json
+  criado_em           DateTime  @db.Timestamptz(6)
+  atualizado_em       DateTime? @db.Timestamptz(6)
+  experiencia_ia_json Json      @default("{}") @db.Json
+  usuarios            usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([usuario_id], map: "ix_preferencias_mobile_usuario")
+  @@index([id], map: "ix_preferencias_mobile_usuarios_id")
+}
+
+model sessoes_ativas {
+  token               String    @id @db.VarChar(180)
+  usuario_id          Int
+  criada_em           DateTime  @db.Timestamptz(6)
+  expira_em           DateTime  @db.Timestamptz(6)
+  ultima_atividade_em DateTime  @db.Timestamptz(6)
+  lembrar             Boolean
+  ip_hash             String?   @db.VarChar(64)
+  user_agent_hash     String?   @db.VarChar(64)
+  portal              String?   @db.VarChar(30)
+  account_scope       String?   @db.VarChar(20)
+  device_id           String?   @db.VarChar(120)
+  mfa_level           String?   @db.VarChar(30)
+  reauth_at           DateTime? @db.Timestamptz(6)
+  usuarios            usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([expira_em], map: "ix_sessao_expira")
+  @@index([usuario_id, criada_em], map: "ix_sessao_usuario_criada")
+  @@index([usuario_id], map: "ix_sessoes_ativas_usuario_id")
+}
+
+model signatarios_governados_laudo {
+  id                       Int                       @id @default(autoincrement())
+  tenant_id                Int
+  nome                     String                    @db.VarChar(160)
+  funcao                   String                    @db.VarChar(120)
+  registro_profissional    String?                   @db.VarChar(80)
+  valid_until              DateTime?                 @db.Timestamptz(6)
+  allowed_family_keys_json Json?                     @db.Json
+  governance_metadata_json Json?                     @db.Json
+  ativo                    Boolean                   @default(true)
+  observacoes              String?
+  criado_por_id            Int?
+  criado_em                DateTime                  @db.Timestamptz(6)
+  atualizado_em            DateTime?                 @db.Timestamptz(6)
+  emissoes_oficiais_laudo  emissoes_oficiais_laudo[]
+  usuarios                 usuarios?                 @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  empresas                 empresas                  @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([tenant_id, nome, registro_profissional], map: "uq_signatario_governado_tenant_nome_registro")
+  @@index([tenant_id, ativo], map: "ix_signatario_governado_tenant_ativo")
+  @@index([tenant_id, valid_until], map: "ix_signatario_governado_tenant_validade")
+  @@index([criado_por_id], map: "ix_signatarios_governados_laudo_criado_por_id")
+  @@index([id], map: "ix_signatarios_governados_laudo_id")
+  @@index([tenant_id], map: "ix_signatarios_governados_laudo_tenant_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model templates_laudo {
+  id                     Int       @id @default(autoincrement())
+  empresa_id             Int
+  criado_por_id          Int?
+  nome                   String    @db.VarChar(180)
+  codigo_template        String    @db.VarChar(80)
+  versao                 Int
+  ativo                  Boolean
+  arquivo_pdf_base       String    @db.VarChar(500)
+  mapeamento_campos_json Json?     @db.Json
+  estilo_json            Json?     @db.Json
+  observacoes            String?
+  criado_em              DateTime  @db.Timestamptz(6)
+  atualizado_em          DateTime? @db.Timestamptz(6)
+  modo_editor            String    @db.VarChar(20)
+  documento_editor_json  Json?     @db.Json
+  assets_json            Json?     @db.Json
+  status_template        String    @db.VarChar(20)
+  base_recomendada_fixa  Boolean
+  usuarios               usuarios? @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  empresas               empresas  @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([empresa_id, codigo_template, versao], map: "uq_template_laudo_empresa_codigo_versao")
+  @@index([empresa_id, ativo], map: "ix_template_laudo_empresa_ativo")
+  @@index([empresa_id, codigo_template], map: "ix_template_laudo_empresa_codigo")
+  @@index([criado_por_id], map: "ix_templates_laudo_criado_por_id")
+  @@index([empresa_id], map: "ix_templates_laudo_empresa_id")
+  @@index([id], map: "ix_templates_laudo_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model tenant_family_releases {
+  id                                Int                                @id @default(autoincrement())
+  tenant_id                         Int
+  family_id                         Int
+  offer_id                          Int?
+  allowed_modes_json                Json?                              @db.Json
+  allowed_offers_json               Json?                              @db.Json
+  allowed_templates_json            Json?                              @db.Json
+  allowed_variants_json             Json?                              @db.Json
+  default_template_code             String?                            @db.VarChar(120)
+  release_status                    String                             @db.VarChar(20)
+  start_at                          DateTime?                          @db.Timestamptz(6)
+  end_at                            DateTime?                          @db.Timestamptz(6)
+  observacoes                       String?
+  criado_por_id                     Int?
+  criado_em                         DateTime                           @db.Timestamptz(6)
+  atualizado_em                     DateTime?                          @db.Timestamptz(6)
+  governance_policy_json            Json?                              @db.Json
+  usuarios                          usuarios?                          @relation(fields: [criado_por_id], references: [id], onUpdate: NoAction)
+  familias_laudo_catalogo           familias_laudo_catalogo            @relation(fields: [family_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  familias_laudo_ofertas_comerciais familias_laudo_ofertas_comerciais? @relation(fields: [offer_id], references: [id], onUpdate: NoAction)
+  empresas                          empresas                           @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([tenant_id, family_id], map: "uq_tenant_family_release_family")
+  @@index([tenant_id, offer_id], map: "ix_tenant_family_release_offer")
+  @@index([tenant_id, release_status], map: "ix_tenant_family_release_tenant_status")
+  @@index([id], map: "ix_tenant_family_releases_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model usuarios {
+  id                                                                                              Int                                 @id @default(autoincrement())
+  empresa_id                                                                                      Int
+  nome_completo                                                                                   String                              @db.VarChar(150)
+  email                                                                                           String                              @unique(map: "ix_usuarios_email") @db.VarChar(254)
+  crea                                                                                            String?                             @db.VarChar(40)
+  senha_hash                                                                                      String                              @db.VarChar(256)
+  nivel_acesso                                                                                    Int
+  ativo                                                                                           Boolean
+  tentativas_login                                                                                Int
+  bloqueado_ate                                                                                   DateTime?                           @db.Timestamptz(6)
+  ultimo_login                                                                                    DateTime?                           @db.Timestamptz(6)
+  ultimo_login_ip                                                                                 String?                             @db.VarChar(45)
+  status_bloqueio                                                                                 Boolean
+  senha_temporaria_ativa                                                                          Boolean
+  criado_em                                                                                       DateTime                            @db.Timestamptz(6)
+  atualizado_em                                                                                   DateTime?                           @db.Timestamptz(6)
+  telefone                                                                                        String?                             @db.VarChar(30)
+  foto_perfil_url                                                                                 String?                             @db.VarChar(512)
+  account_scope                                                                                   String                              @db.VarChar(20)
+  account_status                                                                                  String                              @db.VarChar(30)
+  allowed_portals_json                                                                            Json                                @db.Json
+  platform_role                                                                                   String?                             @db.VarChar(40)
+  mfa_required                                                                                    Boolean
+  mfa_secret_b32                                                                                  String?                             @db.VarChar(80)
+  mfa_enrolled_at                                                                                 DateTime?                           @db.Timestamptz(6)
+  can_password_login                                                                              Boolean
+  can_google_login                                                                                Boolean
+  can_microsoft_login                                                                             Boolean
+  blocked_reason                                                                                  String?                             @db.VarChar(300)
+  portal_admin_autorizado                                                                         Boolean
+  admin_identity_status                                                                           String                              @db.VarChar(40)
+  admin_identity_provider                                                                         String?                             @db.VarChar(30)
+  admin_identity_subject                                                                          String?                             @db.VarChar(255)
+  admin_identity_verified_em                                                                      DateTime?                           @db.Timestamptz(6)
+  anexos_mesa                                                                                     anexos_mesa[]
+  aprendizados_visuais_ia_aprendizados_visuais_ia_criado_por_idTousuarios                         aprendizados_visuais_ia[]           @relation("aprendizados_visuais_ia_criado_por_idTousuarios")
+  aprendizados_visuais_ia_aprendizados_visuais_ia_validado_por_idTousuarios                       aprendizados_visuais_ia[]           @relation("aprendizados_visuais_ia_validado_por_idTousuarios")
+  auditoria_empresas_auditoria_empresas_alvo_usuario_idTousuarios                                 auditoria_empresas[]                @relation("auditoria_empresas_alvo_usuario_idTousuarios")
+  auditoria_empresas_auditoria_empresas_ator_usuario_idTousuarios                                 auditoria_empresas[]                @relation("auditoria_empresas_ator_usuario_idTousuarios")
+  catalogo_metodos_inspecao                                                                       catalogo_metodos_inspecao[]
+  configuracoes_plataforma                                                                        configuracoes_plataforma[]
+  dispositivos_push_mobile                                                                        dispositivos_push_mobile[]
+  emissoes_oficiais_laudo                                                                         emissoes_oficiais_laudo[]
+  empresa_catalogo_laudo_ativacoes                                                                empresa_catalogo_laudo_ativacoes[]
+  familias_laudo_calibracoes                                                                      familias_laudo_calibracoes[]
+  familias_laudo_catalogo                                                                         familias_laudo_catalogo[]
+  familias_laudo_modos_tecnicos                                                                   familias_laudo_modos_tecnicos[]
+  familias_laudo_ofertas_comerciais                                                               familias_laudo_ofertas_comerciais[]
+  laudo_approved_case_snapshots                                                                   laudo_approved_case_snapshots[]
+  laudo_evidence_validations                                                                      laudo_evidence_validations[]
+  laudo_operational_events_laudo_operational_events_actor_user_idTousuarios                       laudo_operational_events[]          @relation("laudo_operational_events_actor_user_idTousuarios")
+  laudo_operational_events_laudo_operational_events_resolved_by_idTousuarios                      laudo_operational_events[]          @relation("laudo_operational_events_resolved_by_idTousuarios")
+  laudo_operational_irregularities_laudo_operational_irregularities_detected_by_user_idTousuarios laudo_operational_irregularities[]  @relation("laudo_operational_irregularities_detected_by_user_idTousuarios")
+  laudo_operational_irregularities_laudo_operational_irregularities_resolved_by_idTousuarios      laudo_operational_irregularities[]  @relation("laudo_operational_irregularities_resolved_by_idTousuarios")
+  laudos_laudos_revisado_porTousuarios                                                            laudos[]                            @relation("laudos_revisado_porTousuarios")
+  laudos_laudos_usuario_idTousuarios                                                              laudos[]                            @relation("laudos_usuario_idTousuarios")
+  mensagens_laudo_mensagens_laudo_remetente_idTousuarios                                          mensagens_laudo[]                   @relation("mensagens_laudo_remetente_idTousuarios")
+  mensagens_laudo_mensagens_laudo_resolvida_por_idTousuarios                                      mensagens_laudo[]                   @relation("mensagens_laudo_resolvida_por_idTousuarios")
+  preferencias_mobile_usuarios                                                                    preferencias_mobile_usuarios?
+  sessoes_ativas                                                                                  sessoes_ativas[]
+  signatarios_governados_laudo                                                                    signatarios_governados_laudo[]
+  templates_laudo                                                                                 templates_laudo[]
+  tenant_family_releases                                                                          tenant_family_releases[]
+  empresas                                                                                        empresas                            @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([admin_identity_provider, admin_identity_subject], map: "uq_usuario_admin_identity_subject")
+  @@index([portal_admin_autorizado, email], map: "ix_usuario_admin_portal_autorizado")
+  @@index([empresa_id, email], map: "ix_usuario_empresa_email")
+  @@index([account_scope, account_status, empresa_id], map: "ix_usuario_platform_scope_status")
+  @@index([empresa_id], map: "ix_usuarios_empresa_id")
+  @@index([id], map: "ix_usuarios_id")
+}

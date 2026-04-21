@@ -1,0 +1,294 @@
+{
+  "family_key": "nr13_calibracao_valvulas_manometros",
+  "nome_exibicao": "NR13 - Calibracao de valvulas e manometros",
+  "macro_categoria": "NR13",
+  "descricao": "Calibracao de valvulas de seguranca, manometros e instrumentos associados com rastreabilidade tecnica, certificados e conclusao auditavel.",
+  "schema_version": 1,
+  "scope": {
+    "family_lock": true,
+    "allowed_nrs": [
+      "nr13"
+    ],
+    "allowed_contexts": [
+      "nr13_calibracao_valvulas_manometros",
+      "nr13_calibracao",
+      "test",
+      "wave_1",
+      "nr13"
+    ],
+    "scope_signals": [
+      "instrumentos_identificados",
+      "faixas_ou_setpoints_registrados",
+      "resultado_da_calibracao_registrado",
+      "certificados_ou_registros_emitidos"
+    ],
+    "out_of_scope_examples": [
+      "inspecao_geral_sem_calibracao",
+      "teste_hidrostatico_sem_ajuste_de_instrumentos",
+      "ausencia_de_rastreabilidade_dos_certificados"
+    ],
+    "review_required": [
+      "quando_o_instrumento_nao_estiver_identificado",
+      "quando_o_resultado_da_calibracao_estiver_inconclusivo",
+      "quando_nao_houver_documento_base_sem_justificativa"
+    ]
+  },
+  "evidence_policy": {
+    "minimum_evidence": {
+      "fotos": 2,
+      "documentos": 1,
+      "textos": 1
+    },
+    "required_slots": [
+      {
+        "slot_id": "referencia_principal",
+        "label": "Referencia principal",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "identificacao.referencia_principal",
+        "purpose": "Identificar os instrumentos, a bancada ou o ativo relacionado a calibracao."
+      },
+      {
+        "slot_id": "evidencia_execucao",
+        "label": "Evidencia de execucao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "execucao_servico.evidencia_execucao",
+        "purpose": "Registrar a calibracao executada, parametros adotados e resultado observado."
+      },
+      {
+        "slot_id": "evidencia_principal",
+        "label": "Evidencia principal",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.evidencia_principal",
+        "purpose": "Consolidar o principal registro do instrumento calibrado ou do resultado obtido."
+      },
+      {
+        "slot_id": "documento_base",
+        "label": "Documento base",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.documento_base",
+        "purpose": "Vincular certificado, procedimento de bancada ou folha de calibracao."
+      },
+      {
+        "slot_id": "conclusao_servico",
+        "label": "Conclusao do servico",
+        "accepted_types": [
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "conclusao.conclusao_tecnica",
+        "purpose": "Registrar a condicao final dos instrumentos calibrados e eventuais restricoes."
+      }
+    ],
+    "optional_slots": [
+      {
+        "slot_id": "evidencia_complementar",
+        "label": "Evidencia complementar",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.evidencia_complementar",
+        "purpose": "Complementar a calibracao com registros de bancada, tags ou comparativos."
+      }
+    ],
+    "checklist_groups": [
+      {
+        "group_id": "identificacao_e_escopo",
+        "title": "Identificacao e escopo",
+        "required": true,
+        "items": [
+          {
+            "item_id": "objeto_registrado",
+            "label": "Instrumentos registrados",
+            "critical": true
+          },
+          {
+            "item_id": "escopo_registrado",
+            "label": "Escopo da calibracao registrado",
+            "critical": true
+          }
+        ]
+      },
+      {
+        "group_id": "calibracao_e_resultados",
+        "title": "Calibracao e resultados",
+        "required": true,
+        "items": [
+          {
+            "item_id": "parametros_registrados",
+            "label": "Parametros de ajuste registrados",
+            "critical": true
+          },
+          {
+            "item_id": "resultado_registrado",
+            "label": "Resultado da calibracao registrado",
+            "critical": true
+          },
+          {
+            "item_id": "certificado_vinculado",
+            "label": "Certificado ou registro vinculado",
+            "critical": true
+          }
+        ]
+      }
+    ],
+    "review_required": [
+      "quando_o_resultado_da_calibracao_estiver_sem_rastreabilidade",
+      "quando_o_documento_base_estiver_ausente"
+    ]
+  },
+  "review_policy": {
+    "requires_family_lock": true,
+    "block_on_scope_mismatch": true,
+    "block_on_missing_required_evidence": true,
+    "block_on_critical_field_absent": true,
+    "allow_override_with_reason": true,
+    "allowed_override_cases": [
+      "documento_opcional_ausente_com_justificativa_registrada",
+      "evidencia_complementar_substituida_por_registro_textual_com_rastreabilidade",
+      "limitacao_controlada_sem_impacto_na_conclusao_critica"
+    ],
+    "blocking_conditions": [
+      "ausencia_de_identificacao_dos_instrumentos",
+      "ausencia_de_documento_base",
+      "ausencia_de_conclusao_tecnica"
+    ]
+  },
+  "document_blueprint": {
+    "opening_statement": "Documento tecnico governado para calibracao de valvulas de seguranca e manometros no contexto da NR13.",
+    "section_order": [
+      "identificacao_e_escopo",
+      "calibracao_e_resultados",
+      "evidencias_e_documentos",
+      "conclusao_e_assinaturas"
+    ],
+    "signature_roles": [
+      "Engenheiro Responsavel",
+      "Inspetor Responsavel",
+      "Representante da Contratante"
+    ],
+    "section_intros": {
+      "identificacao_e_escopo": "Identifique instrumentos, ativo relacionado e o escopo efetivamente calibrado.",
+      "calibracao_e_resultados": "Consolide parametros, resultados, certificados e qualquer ajuste executado.",
+      "evidencias_e_documentos": "Amarre registros de bancada, fotos, certificados e documentacao de apoio.",
+      "conclusao_e_assinaturas": "Feche restricoes, recomendacoes e responsabilidade tecnica."
+    },
+    "blank_row_targets": {}
+  },
+  "compatible_runtime_templates": [
+    "nr13_calibracao"
+  ],
+  "compatible_template_codes": [
+    "nr13_calibracao_valvulas_manometros",
+    "nr13_calibracao"
+  ],
+  "normative_basis": {
+    "policy_version": 1,
+    "status": "official_basis_family_mapped",
+    "nr_code": "nr13",
+    "nr_title": "Caldeiras, Vasos de Pressao e Tubulacoes e Tanques Metalicos de Armazenamento",
+    "editorial_inference_notice": "A norma oficial define os requisitos de referencia; headings, ordem, linguagem editorial e acabamento visual do template sao decisoes de produto da Tariel.",
+    "implementation_note": "Retrofit oficial aplicado para calibracao de valvulas de seguranca e manometros, com anchors granulares da NR-13 para calibracao de instrumentos e controles, manutencao dos indicadores de pressao e periodicidade de inspecao das valvulas de seguranca.",
+    "sources": [
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Normas Regulamentadoras - NR",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+        "used_for": "Ponto de entrada oficial do projeto para localizar textos vigentes, anexos e atualizacoes das NRs."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Caldeiras, Vasos de Pressao e Tubulacoes e Tanques Metalicos de Armazenamento",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-13.pdf",
+        "anchors": [
+          {
+            "item_ref": "13.3.4 / 13.3.5",
+            "used_for": "Fixar a familia na manutencao preventiva/preditiva dos sistemas de controle e na execucao segura dos exames e testes."
+          },
+          {
+            "item_ref": "13.4.3.2 / 13.4.4.9 / 13.4.4.10",
+            "used_for": "Cobrir calibracao de instrumentos e controles de caldeiras e os testes periodicos das valvulas de seguranca."
+          },
+          {
+            "item_ref": "13.5.3.2 / 13.5.4.10",
+            "used_for": "Cobrir calibracao de instrumentos e controles de vasos de pressao e a manutencao/calibracao das valvulas por eles protegidas."
+          },
+          {
+            "item_ref": "13.6.1.3 / 13.6.2.1",
+            "used_for": "Amarrar os manometros de tubulacao a projeto de processo e instrumentacao e a manutencao em boas condicoes operacionais."
+          }
+        ],
+        "used_for": "Texto oficial vigente da NR-13 usado como base normativa primaria desta familia."
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "instrument_calibration_traceability",
+        "source_refs": [
+          "NR13 13.4.3.2",
+          "NR13 13.5.3.2",
+          "NR13 13.6.2.1"
+        ],
+        "maps_to": [
+          "identificacao.referencia_principal",
+          "documentacao_e_registros.documentos_emitidos",
+          "evidencias_e_anexos.documento_base"
+        ],
+        "application_note": "A calibracao deve identificar instrumento, referencia, certificado ou registro equivalente e situacao operacional do manometro ou controle."
+      },
+      {
+        "requirement_id": "safety_valve_maintenance_and_test_cycle",
+        "source_refs": [
+          "NR13 13.4.4.9",
+          "NR13 13.4.4.10",
+          "NR13 13.5.4.10"
+        ],
+        "maps_to": [
+          "execucao_servico.metodo_aplicado",
+          "evidencias_e_anexos.evidencia_principal",
+          "documentacao_e_registros.documentos_disponiveis"
+        ],
+        "application_note": "O documento deve registrar se a valvula foi desmontada, inspecionada, calibrada ou testada dentro do intervalo coerente com a inspecao do equipamento protegido."
+      },
+      {
+        "requirement_id": "maintenance_plan_and_resulting_recommendations",
+        "source_refs": [
+          "NR13 13.3.4",
+          "NR13 13.3.5",
+          "NR13 13.6.1.3"
+        ],
+        "maps_to": [
+          "nao_conformidades_ou_lacunas.descricao",
+          "recomendacoes.texto",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "A conclusao precisa apontar ajustes, pendencias e reflexos da calibracao na seguranca operacional e no plano de manutencao."
+      }
+    ]
+  }
+}

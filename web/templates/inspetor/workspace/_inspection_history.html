@@ -1,0 +1,108 @@
+<section
+    class="workspace-history-shell"
+    data-component-slice="workspace-history"
+    data-workspace-history-root
+    data-history-state="idle"
+    data-history-focus="idle"
+    aria-label="Histórico do laudo"
+>
+    <header class="workspace-history-hero">
+        <div class="workspace-history-toolbar__copy">
+            <span class="workspace-history-toolbar__eyebrow">Histórico técnico</span>
+            <h2>Conversa, anexos e eventos no mesmo eixo</h2>
+            <p>Leia o historico completo sem depender do painel lateral. Busca, filtros e retomada da conversa ficam aqui.</p>
+        </div>
+
+        <div class="workspace-history-tools__meta">
+            <span id="chat-thread-results" class="workspace-history-tools__results">0 registros</span>
+            <button
+                type="button"
+                id="btn-workspace-history-continue"
+                data-history-continue
+                class="technical-record-btn technical-record-btn--ghost"
+            >
+                Continuar conversa
+            </button>
+        </div>
+    </header>
+
+    <div class="workspace-history-toolbar__insights" aria-label="Resumo do histórico">
+        <article class="workspace-history-insight">
+            <span>Fonte</span>
+            <strong id="workspace-history-source" data-history-source>Registro principal</strong>
+        </article>
+        <article class="workspace-history-insight">
+            <span>Filtro ativo</span>
+            <strong id="workspace-history-active-filter" data-history-active-filter>Todos os registros</strong>
+        </article>
+        <article class="workspace-history-insight">
+            <span>Registros carregados</span>
+            <strong id="workspace-history-total" data-history-total>0 registros</strong>
+        </article>
+        <article
+            id="workspace-history-governance"
+            class="workspace-history-insight workspace-history-insight--warning"
+            hidden
+        >
+            <span>Governança</span>
+            <strong id="workspace-history-governance-title">Reemissão recomendada</strong>
+            <p id="workspace-history-governance-detail">PDF emitido divergente detectado no caso atual.</p>
+            <button
+                type="button"
+                id="btn-workspace-history-reissue"
+                class="workspace-history-insight__action"
+            >
+                Abrir reemissão na Mesa
+            </button>
+        </article>
+    </div>
+
+    <section class="workspace-history-filter-shell" aria-label="Filtros do histórico">
+        <label class="technical-chat-search" for="chat-thread-search">
+            <span class="material-symbols-rounded" aria-hidden="true">search</span>
+            <input
+                type="search"
+                id="chat-thread-search"
+                data-workspace-history-search
+                placeholder="Buscar no historico..."
+                autocomplete="off"
+                spellcheck="false"
+            >
+        </label>
+
+        <div class="workspace-history-filter-groups" aria-label="Filtros do histórico">
+            <div class="workspace-history-filter-group">
+                <span class="workspace-history-filter-group__label">Ator</span>
+                <div class="technical-chat-filters" role="group" aria-label="Filtrar por ator">
+                    <button type="button" class="technical-chat-filter" data-chat-filter="todos" aria-pressed="true">Todos</button>
+                    <button type="button" class="technical-chat-filter" data-chat-filter="inspetor" aria-pressed="false">Inspetor</button>
+                    <button type="button" class="technical-chat-filter" data-chat-filter="ia" aria-pressed="false">Assistente</button>
+                    <button type="button" class="technical-chat-filter" data-chat-filter="mesa" aria-pressed="false">Mesa</button>
+                    <button type="button" class="technical-chat-filter" data-chat-filter="sistema" aria-pressed="false">Sistema</button>
+                </div>
+            </div>
+
+            <div class="workspace-history-filter-group">
+                <span class="workspace-history-filter-group__label">Tipo</span>
+                <div class="technical-chat-filters technical-chat-filters--types" role="group" aria-label="Filtrar por tipo">
+                    <button type="button" class="technical-chat-filter" data-history-type-filter="todos" aria-pressed="true">Todos</button>
+                    <button type="button" class="technical-chat-filter" data-history-type-filter="mensagens" aria-pressed="false">Mensagens</button>
+                    <button type="button" class="technical-chat-filter" data-history-type-filter="eventos" aria-pressed="false">Eventos</button>
+                    <button type="button" class="technical-chat-filter" data-history-type-filter="anexos" aria-pressed="false">Anexos</button>
+                    <button type="button" class="technical-chat-filter" data-history-type-filter="decisoes" aria-pressed="false">Decisões</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="workspace-history-empty" class="technical-chat-empty technical-chat-empty--history" data-history-empty hidden>
+        <span class="material-symbols-rounded" aria-hidden="true">manage_search</span>
+        <strong>O histórico técnico aparecerá aqui</strong>
+        <p>Assim que a conversa, os anexos ou os eventos do laudo evoluirem, o historico organizado fica disponivel neste eixo.</p>
+        <button type="button" class="technical-record-btn technical-record-btn--ghost" data-history-continue>
+            Ir para conversa
+        </button>
+    </div>
+
+    <div id="workspace-history-timeline" class="workspace-history-timeline" data-history-timeline aria-live="polite"></div>
+</section>

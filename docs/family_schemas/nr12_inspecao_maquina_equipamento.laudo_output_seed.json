@@ -1,0 +1,216 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr12_inspecao_maquina_equipamento",
+  "template_code": "nr12_inspecao_maquina_equipamento",
+  "tokens": {
+    "cliente_nome": null,
+    "unidade_nome": null,
+    "engenheiro_responsavel": null,
+    "crea_art": null,
+    "revisao_template": null
+  },
+  "case_context": {
+    "laudo_id": null,
+    "empresa_nome": null,
+    "unidade_nome": null,
+    "local_documento": null,
+    "tipo_inspecao": null,
+    "data_execucao": null,
+    "data_emissao": null,
+    "status_mesa": null,
+    "wave_portfolio": 1,
+    "modalidade_laudo": "inspecao_tecnica"
+  },
+  "mesa_review": {
+    "status": null,
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": null,
+    "pendencias_resolvidas_texto": null,
+    "observacoes_mesa": null
+  },
+  "resumo_executivo": null,
+  "identificacao": {
+    "objeto_principal": null,
+    "localizacao": null,
+    "unidade_operacional": null,
+    "local_documento": null,
+    "referencia_principal": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    },
+    "codigo_interno": null,
+    "relatorio_codigo": null,
+    "numero_laudo": null,
+    "data_laudo": null,
+    "mes_inspecao": null,
+    "tipo_inspecao": null,
+    "contratante": null,
+    "executante": null,
+    "responsavel_tecnico": null,
+    "inspetor": null,
+    "funcao_equipamento": null,
+    "fabricante": null,
+    "numero_serie": null,
+    "modelo": null,
+    "tag": null,
+    "voltagem": null,
+    "comando": null,
+    "operadores_por_turno": null,
+    "art_numero": null
+  },
+  "objetivo_e_base_normativa": {
+    "objetivo": null,
+    "normas_aplicaveis": null,
+    "generalidades": null
+  },
+  "objeto_inspecao": {
+    "descricao_escopo": null,
+    "categoria_maquina": null,
+    "processo_associado": null
+  },
+  "escopo_servico": {
+    "tipo_entrega": null,
+    "modo_execucao": null,
+    "ativo_tipo": null,
+    "resumo_escopo": null
+  },
+  "execucao_servico": {
+    "metodo_aplicado": null,
+    "condicoes_observadas": null,
+    "parametros_relevantes": null,
+    "evidencia_execucao": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "metodologia_e_criterios": {
+    "metodologia": null,
+    "checklist_referencia": null,
+    "criterios_risco": null
+  },
+  "checklist_grupos": {
+    "arranjos_fisicos_instalacoes": {
+      "status": null,
+      "comentarios": null,
+      "risco_nivel": null
+    },
+    "instalacoes_eletricas_partida_parada": {
+      "status": null,
+      "comentarios": null,
+      "risco_nivel": null
+    },
+    "sistemas_seguranca_transportadores": {
+      "status": null,
+      "comentarios": null,
+      "risco_nivel": null
+    },
+    "aspectos_ergonomicos": {
+      "status": null,
+      "comentarios": null,
+      "risco_nivel": null
+    },
+    "riscos_adicionais_manutencao_sinalizacao": {
+      "status": null,
+      "comentarios": null,
+      "risco_nivel": null
+    },
+    "manuais_procedimentos_capacitacao": {
+      "status": null,
+      "comentarios": null,
+      "risco_nivel": null
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    },
+    "evidencia_complementar": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    },
+    "documento_base": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "checklist_componentes": {
+    "protecao_fixa_e_movel": {
+      "condicao": null,
+      "observacao": null
+    },
+    "comandos_e_intertravamentos": {
+      "condicao": null,
+      "observacao": null
+    },
+    "parada_de_emergencia": {
+      "condicao": null,
+      "observacao": null
+    },
+    "sinalizacao_e_identificacao": {
+      "condicao": null,
+      "observacao": null
+    },
+    "zona_de_risco_e_acesso": {
+      "condicao": null,
+      "observacao": null
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": null,
+    "documentos_emitidos": null,
+    "manual_maquina": null,
+    "inventario_nr12": null,
+    "checklist_nr12": null,
+    "apreciacao_risco": null,
+    "procedimento_loto": null,
+    "observacoes_documentais": null
+  },
+  "analise_risco": {
+    "grafico_risco_categoria": null,
+    "grau_risco_antes": null,
+    "grau_risco_apos": null,
+    "resumo_risco": null
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": null,
+    "ha_pontos_de_atencao_texto": null,
+    "descricao": null,
+    "evidencias": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    }
+  },
+  "recomendacoes": {
+    "texto": null
+  },
+  "conclusao": {
+    "status": null,
+    "status_operacional": null,
+    "parecer_final": null,
+    "conclusao_tecnica": null,
+    "justificativa": null,
+    "proxima_acao": null
+  }
+}

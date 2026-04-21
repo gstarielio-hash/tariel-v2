@@ -1,0 +1,411 @@
+---
+import { ArrowLeft, ArrowRight, ArrowUpRight, Building2, CircleAlert, Clock3, ShieldCheck } from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import KpiCard from "@/components/app/admin/kpi-card.astro";
+import StatusPill from "@/components/app/admin/status-pill.astro";
+import { getAdminClientList } from "@/lib/server/admin-clients";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+import AdminShellLayout from "@/layouts/admin-shell-layout.astro";
+
+export const prerender = false;
+
+const notice = consumeAdminNotice(Astro.cookies);
+
+const data = await getAdminClientList({
+  nome: Astro.url.searchParams.get("nome"),
+  codigo: Astro.url.searchParams.get("codigo"),
+  plano: Astro.url.searchParams.get("plano"),
+  status: Astro.url.searchParams.get("status"),
+  saude: Astro.url.searchParams.get("saude"),
+  atividade: Astro.url.searchParams.get("atividade"),
+  ordenar: Astro.url.searchParams.get("ordenar"),
+  direcao: Astro.url.searchParams.get("direcao"),
+  pagina: Astro.url.searchParams.get("pagina"),
+  porPagina: Astro.url.searchParams.get("porPagina"),
+});
+
+const numberFormatter = new Intl.NumberFormat("pt-BR");
+const dateFormatter = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
+
+function formatNumber(value: number) {
+  return numberFormatter.format(value);
+}
+
+function buildUrl(overrides: Record<string, string | number | null | undefined>) {
+  const params = new URLSearchParams();
+  const current = data.filters;
+
+  const merged = {
+    nome: current.nome,
+    codigo: current.codigo,
+    plano: current.plano,
+    status: current.status,
+    saude: current.saude,
+    atividade: current.atividade,
+    ordenar: current.ordenar,
+    direcao: current.direcao,
+    porPagina: String(current.porPagina),
+    pagina: String(current.pagina),
+    ...overrides,
+  };
+
+  for (const [key, value] of Object.entries(merged)) {
+    if (value == null || value === "" || (key === "pagina" && String(value) === "1")) {
+      continue;
+    }
+
+    params.set(key, String(value));
+  }
+
+  const query = params.toString();
+  return query ? `/admin/clientes?${query}` : "/admin/clientes";
+}
+
+const cards = [
+  {
+    icon: Building2,
+    label: "Empresas no recorte",
+    value: formatNumber(data.totals.clientesTotal),
+    detail: `${formatNumber(data.totals.ativos)} ativas e ${formatNumber(data.totals.bloqueados)} bloqueadas.`,
+    tone: "orange" as const,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Pendentes",
+    value: formatNumber(data.totals.pendentes),
+    detail: "Empresas com onboarding ou troca de senha ainda em aberto.",
+    tone: "sky" as const,
+  },
+  {
+    icon: CircleAlert,
+    label: "Em alerta",
+    value: formatNumber(data.totals.alerta),
+    detail: "Saude operacional fora do esperado, sem contar bloqueios puros.",
+    tone: "emerald" as const,
+  },
+  {
+    icon: Clock3,
+    label: "Sem atividade",
+    value: formatNumber(data.totals.semAtividade),
+    detail: "Recorte sem atividade recente nos ultimos 30 dias.",
+    tone: "slate" as const,
+  },
+];
+---
+
+<AdminShellLayout title="Empresas | Tariel Astro" activeItem="clients" userName="Admin-CEO">
+  <Fragment slot="header">
+    <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+      <div class="max-w-4xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Segunda fatia da migracao</p>
+        <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950 sm:text-5xl">
+          Listagem administrativa de empresas em Astro SSR.
+        </h1>
+        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+          Aqui a migracao sai do dashboard e entra no fluxo de operacao do Admin-CEO. Filtros, paginação e abertura do
+          detalhe agora rodam na nova stack sobre Prisma.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="/admin/novo-cliente"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          Novo cliente
+          <ArrowUpRight className="size-4" />
+        </a>
+        <a
+          href="/admin/painel"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/20 hover:bg-slate-50"
+        >
+          Voltar ao dashboard
+          <ArrowUpRight className="size-4" />
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+      <StatusPill label={`${formatNumber(data.pagination.totalItems)} empresas encontradas`} tone="info" />
+      <span>Página {data.pagination.page} de {data.pagination.totalPages}</span>
+      <span>Ordenação atual: {data.filters.ordenar} / {data.filters.direcao}</span>
+    </div>
+  </Fragment>
+
+  <AdminNotice notice={notice} />
+
+  <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+    {cards.map((card) => (
+      <KpiCard label={card.label} value={card.value} detail={card.detail} icon={card.icon} tone={card.tone} />
+    ))}
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Filtros</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Empresas assinantes</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          Nome, ID/CNPJ, plano, status, saúde e atividade recente já funcionam na nova camada server-side.
+        </p>
+      </div>
+    </div>
+
+    <form method="GET" action="/admin/clientes" class="mt-6 grid gap-4 lg:grid-cols-4">
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Nome</span>
+        <input
+          type="text"
+          name="nome"
+          value={data.filters.nome}
+          placeholder="Buscar por nome"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        />
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">ID ou CNPJ</span>
+        <input
+          type="text"
+          name="codigo"
+          value={data.filters.codigo}
+          placeholder="Código, ID ou CNPJ"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        />
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Plano</span>
+        <select name="plano" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white">
+          <option value="">Todos os planos</option>
+          <option value="Inicial" selected={data.filters.plano === "Inicial"}>Inicial</option>
+          <option value="Intermediario" selected={data.filters.plano === "Intermediario"}>Intermediário</option>
+          <option value="Ilimitado" selected={data.filters.plano === "Ilimitado"}>Ilimitado</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Status</span>
+        <select name="status" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white">
+          <option value="">Todos os status</option>
+          <option value="ativo" selected={data.filters.status === "ativo"}>Ativo</option>
+          <option value="bloqueado" selected={data.filters.status === "bloqueado"}>Bloqueado</option>
+          <option value="pendente" selected={data.filters.status === "pendente"}>Pendente</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Saúde</span>
+        <select name="saude" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white">
+          <option value="">Toda saúde</option>
+          <option value="ok" selected={data.filters.saude === "ok"}>OK</option>
+          <option value="alerta" selected={data.filters.saude === "alerta"}>Alerta</option>
+          <option value="critico" selected={data.filters.saude === "critico"}>Crítico</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Atividade</span>
+        <select name="atividade" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white">
+          <option value="">Toda atividade</option>
+          <option value="24h" selected={data.filters.atividade === "24h"}>Últimas 24h</option>
+          <option value="7d" selected={data.filters.atividade === "7d"}>Últimos 7 dias</option>
+          <option value="30d" selected={data.filters.atividade === "30d"}>Últimos 30 dias</option>
+          <option value="sem_atividade" selected={data.filters.atividade === "sem_atividade"}>Sem atividade</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ordenar</span>
+        <select name="ordenar" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white">
+          <option value="nome" selected={data.filters.ordenar === "nome"}>Nome</option>
+          <option value="criacao" selected={data.filters.ordenar === "criacao"}>Criação</option>
+          <option value="ultimo_acesso" selected={data.filters.ordenar === "ultimo_acesso"}>Último acesso</option>
+          <option value="plano" selected={data.filters.ordenar === "plano"}>Plano</option>
+          <option value="saude" selected={data.filters.ordenar === "saude"}>Saúde</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Direção</span>
+        <select name="direcao" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white">
+          <option value="asc" selected={data.filters.direcao === "asc"}>Ascendente</option>
+          <option value="desc" selected={data.filters.direcao === "desc"}>Descendente</option>
+        </select>
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Por página</span>
+        <select name="porPagina" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white">
+          {[10, 20, 50, 100].map((size) => (
+            <option value={size} selected={data.filters.porPagina === size}>{size} por página</option>
+          ))}
+        </select>
+      </label>
+
+      <div class="flex items-end gap-3 lg:col-span-4">
+        <button
+          type="submit"
+          class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          Aplicar filtros
+        </button>
+        <a
+          href="/admin/clientes"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-50"
+        >
+          Limpar
+        </a>
+      </div>
+    </form>
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Resultados</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Carteira monitorada</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          Recorte operacional para abrir o detalhe da empresa já na nova base.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <StatusPill label={`${formatNumber(data.pagination.totalItems)} empresas`} tone="neutral" />
+        <StatusPill label={`${formatNumber(data.pagination.pageSize)} por página`} tone="info" />
+      </div>
+    </div>
+
+    <div class="mt-6 overflow-x-auto">
+      <table class="min-w-full border-separate border-spacing-y-3">
+        <thead>
+          <tr class="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <th class="pb-1 pr-4">Empresa</th>
+            <th class="pb-1 pr-4">Plano</th>
+            <th class="pb-1 pr-4">Status</th>
+            <th class="pb-1 pr-4">Saúde</th>
+            <th class="pb-1 pr-4">Uso</th>
+            <th class="pb-1 pr-4">Último acesso</th>
+            <th class="pb-1 pr-4">Usuários</th>
+            <th class="pb-1 text-right">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.items.length > 0 ? data.items.map((item) => (
+            <tr class="bg-slate-50 text-sm text-slate-700">
+              <td class="rounded-l-[20px] px-4 py-4">
+                <div>
+                  <p class="font-semibold text-slate-950">{item.nomeFantasia}</p>
+                  <div class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                    <span>ID {item.id}</span>
+                    <span>CNPJ {item.cnpj}</span>
+                    <span>Cadastro {dateFormatter.format(item.criadoEm)}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-4">
+                <div>
+                  <p class="font-medium text-slate-950">{item.planoAtivo}</p>
+                  <p class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                    {item.limiteLaudos == null ? "Ilimitado" : `${item.limiteLaudos} laudos/mês`}
+                  </p>
+                </div>
+              </td>
+              <td class="px-4 py-4">
+                <StatusPill label={item.statusLabel} tone={item.statusTone} />
+                {item.motivoBloqueio ? <p class="mt-2 text-xs text-slate-500">{item.motivoBloqueio}</p> : null}
+              </td>
+              <td class="px-4 py-4">
+                <StatusPill label={item.saudeLabel} tone={item.saudeTone} />
+                <p class="mt-2 max-w-xs text-xs text-slate-500">{item.saudeRazao}</p>
+              </td>
+              <td class="px-4 py-4">
+                <p class="font-medium text-slate-950">{item.usoLabel}</p>
+                <p class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                  {item.usoPercentual == null ? "Sem teto mensal" : `${item.usoPercentual}% do plano`}
+                </p>
+              </td>
+              <td class="px-4 py-4">
+                <p class="font-medium text-slate-950">{item.ultimoAcessoLabel}</p>
+                <p class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                  {formatNumber(item.sessoesAtivasTotal)} sessões ativas
+                </p>
+              </td>
+              <td class="px-4 py-4">
+                <p class="font-medium text-slate-950">{formatNumber(item.totalUsuarios)}</p>
+                <p class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                  {item.adminsTotal} admin • {item.inspetoresTotal} campo • {item.revisoresTotal} análise
+                </p>
+              </td>
+              <td class="rounded-r-[20px] px-4 py-4 text-right">
+                <a
+                  href={`/admin/clientes/${item.id}`}
+                  class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-100"
+                >
+                  Abrir detalhe
+                  <ArrowUpRight className="size-4" />
+                </a>
+              </td>
+            </tr>
+          )) : (
+            <tr>
+              <td colspan="8" class="rounded-[24px] bg-slate-50 px-4 py-6 text-sm text-slate-500">
+                Nenhuma empresa encontrada com os filtros atuais.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-slate-500">
+        Página {data.pagination.page} de {data.pagination.totalPages} • {formatNumber(data.pagination.totalItems)} resultados
+      </p>
+
+      <nav class="flex flex-wrap items-center gap-2" aria-label="Paginação">
+        <a
+          href={data.pagination.hasPrev ? buildUrl({ pagina: data.pagination.page - 1 }) : "#"}
+          class:list={[
+            "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
+            data.pagination.hasPrev
+              ? "border-slate-950/10 bg-white text-slate-700 hover:border-slate-950/18 hover:bg-slate-50"
+              : "pointer-events-none border-slate-200 bg-slate-100 text-slate-400",
+          ]}
+        >
+          <ArrowLeft className="size-4" />
+          Anterior
+        </a>
+
+        {data.pagination.pages.map((page) => (
+          <a
+            href={buildUrl({ pagina: page })}
+            class:list={[
+              "inline-flex size-10 items-center justify-center rounded-full text-sm font-medium transition",
+              page === data.pagination.page
+                ? "bg-slate-950 text-white"
+                : "border border-slate-950/10 bg-white text-slate-700 hover:border-slate-950/18 hover:bg-slate-50",
+            ]}
+            aria-current={page === data.pagination.page ? "page" : undefined}
+          >
+            {page}
+          </a>
+        ))}
+
+        <a
+          href={data.pagination.hasNext ? buildUrl({ pagina: data.pagination.page + 1 }) : "#"}
+          class:list={[
+            "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
+            data.pagination.hasNext
+              ? "border-slate-950/10 bg-white text-slate-700 hover:border-slate-950/18 hover:bg-slate-50"
+              : "pointer-events-none border-slate-200 bg-slate-100 text-slate-400",
+          ]}
+        >
+          Próxima
+          <ArrowRight className="size-4" />
+        </a>
+      </nav>
+    </div>
+  </section>
+</AdminShellLayout>

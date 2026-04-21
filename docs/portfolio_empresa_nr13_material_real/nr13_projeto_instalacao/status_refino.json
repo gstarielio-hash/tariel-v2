@@ -1,0 +1,11 @@
+{
+  "family_key": "nr13_projeto_instalacao",
+  "status_refino": "aguardando_material_real",
+  "material_recebido": [],
+  "lacunas_abertas": [
+    "Aguardando modelo atual vazio da empresa.",
+    "Aguardando documentos finais reais para consolidar linguagem e estrutura recorrente."
+  ],
+  "proximo_passo": "Substituir ou complementar a base sintetica com material real da empresa.",
+  "base_sintetica_disponivel": true
+}

@@ -1,0 +1,669 @@
+/* ==========================================
+   TARIEL CONTROL TOWER
+   WORKSPACE_CHROME.CSS
+   Slices canônicos do topo do workspace:
+   - header do laudo
+   - faixa de resumo
+   - tabs e chrome superior
+   ========================================== */
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] {
+    --workspace-thread-column-max: 952px;
+    grid-template-columns: minmax(0, 1fr) clamp(246px, 18vw, 272px);
+    gap: 16px;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-copy {
+    display: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-header {
+    flex: 0 0 auto;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-header__row {
+    min-height: 76px;
+    gap: var(--vf-space-5);
+    padding: 12px 24px;
+    align-items: center;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .technical-record-header__row {
+    width: min(100%, var(--workspace-thread-column-max));
+    margin-inline: auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-header__main {
+    display: grid;
+    gap: var(--vf-space-5);
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-header__backline {
+    gap: var(--vf-space-3);
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-ident {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-ident h2 {
+    margin: 0;
+    color: var(--vf-text) !important;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-ident p {
+    margin: 0;
+    color: var(--vf-text-muted) !important;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-header__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-status-pill {
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(31, 94, 142, 0.16) !important;
+    background: var(--vf-accent-soft) !important;
+    color: var(--vf-accent) !important;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-hero-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-hero-stat {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    min-height: 92px;
+    padding: 16px 18px;
+    border: 1px solid var(--vf-border) !important;
+    border-radius: var(--vf-radius-lg) !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+    box-shadow: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-hero-stat span {
+    color: var(--vf-text-soft) !important;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-hero-stat strong {
+    color: var(--vf-text) !important;
+    font-size: 20px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-hero-stat--state strong {
+    color: var(--vf-accent) !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-public-verification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid rgba(31, 94, 142, 0.16) !important;
+    border-radius: var(--vf-radius-lg) !important;
+    background:
+        linear-gradient(135deg, rgba(31, 94, 142, 0.08), rgba(255, 255, 255, 0.92)) !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-public-verification__copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-public-verification__eyebrow {
+    color: var(--vf-accent) !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-public-verification__copy strong {
+    color: var(--vf-text) !important;
+    font-size: 15px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-public-verification__copy p {
+    margin: 0;
+    color: var(--vf-text-muted) !important;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-public-verification__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-official-issue {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid rgba(15, 23, 42, 0.09) !important;
+    border-radius: var(--vf-radius-lg) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-official-issue--warning {
+    border-color: rgba(160, 108, 35, 0.16) !important;
+    background:
+        linear-gradient(135deg, rgba(160, 108, 35, 0.1), rgba(255, 255, 255, 0.94)) !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-official-issue__copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-official-issue__eyebrow {
+    color: var(--vf-text-soft) !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-official-issue__copy strong {
+    color: var(--vf-text) !important;
+    font-size: 15px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-official-issue__copy p {
+    margin: 0;
+    color: var(--vf-text-muted) !important;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-status-pill--neutral {
+    border-color: rgba(15, 23, 42, 0.08) !important;
+    background: rgba(241, 245, 249, 0.92) !important;
+    color: var(--vf-text-muted) !important;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-status-pill--accepted,
+body.pagina-chat-dashboard-v2 .technical-record-status-pill.accepted {
+    border-color: rgba(38, 130, 93, 0.14) !important;
+    background: rgba(38, 130, 93, 0.12) !important;
+    color: #1f7f5b !important;
+}
+
+body.pagina-chat-dashboard-v2 .technical-record-status-pill--warning,
+body.pagina-chat-dashboard-v2 .technical-record-status-pill.warning {
+    border-color: rgba(160, 108, 35, 0.16) !important;
+    background: rgba(160, 108, 35, 0.12) !important;
+    color: #9a6520 !important;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav {
+    margin-top: 18px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .thread-nav {
+    margin-top: 12px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .thread-nav-shell {
+    width: min(100%, var(--workspace-thread-column-max));
+    margin-inline: auto;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.78) !important;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .thread-nav-copy {
+    gap: 4px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .thread-nav-copy__eyebrow {
+    font-size: 10px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .thread-nav-copy__row strong {
+    font-size: 15px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .thread-nav-status {
+    min-height: 28px;
+    padding: 0 10px;
+    font-size: 11px;
+}
+
+@media (min-width: 1200px) {
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .technical-record-header__row {
+        min-height: 60px;
+        padding-top: 10px;
+        padding-bottom: 8px;
+    }
+
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .technical-record-header__main {
+        gap: 0;
+    }
+
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .workspace-public-verification {
+        margin-top: 12px;
+    }
+
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .workspace-official-issue {
+        margin-top: 12px;
+    }
+
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .workspace-hero-strip,
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] .thread-nav {
+        display: none !important;
+    }
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .technical-record-header__row {
+    min-height: 60px;
+    padding-top: 10px;
+    padding-bottom: 8px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .technical-record-header__main {
+    gap: 0;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .workspace-hero-strip {
+    display: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .thread-nav {
+    margin-top: 10px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .thread-nav-shell {
+    gap: 0;
+    padding: 10px 16px;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    box-shadow: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .thread-nav-copy {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .technical-record-header__row {
+    min-height: 60px;
+    padding-top: 10px;
+    padding-bottom: 8px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .technical-record-header__main {
+    gap: 0;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .workspace-hero-strip {
+    display: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .technical-record-header__actions {
+    gap: 8px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .technical-record-header__actions .technical-record-status-pill {
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 10px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .thread-nav {
+    margin-top: 10px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .thread-nav-shell {
+    width: min(100%, var(--workspace-thread-column-max));
+    margin-inline: auto;
+    gap: 0;
+    padding: 8px 12px;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    box-shadow: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .thread-nav-copy {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .thread-nav-copy__eyebrow,
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] .thread-nav-copy p {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .thread-nav-inner {
+    padding: 0;
+    border-bottom: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .thread-nav-inner::-webkit-scrollbar {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_history"] .thread-tabs {
+    flex-wrap: nowrap;
+    width: max-content;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-shell {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+    padding: 18px 22px;
+    border: 1px solid var(--vf-border) !important;
+    border-radius: var(--vf-radius-xl) !important;
+    background:
+        radial-gradient(circle at top left, rgba(31, 94, 142, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 252, 0.96)) !important;
+    box-shadow: var(--vf-shadow-sm) !important;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-copy {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-copy__eyebrow {
+    color: var(--vf-text-soft) !important;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-copy__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-copy__row strong {
+    color: var(--vf-text) !important;
+    font-size: 16px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--vf-border) !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    color: var(--vf-text-muted) !important;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+body.pagina-chat-dashboard-v2 #painel-chat[data-workspace-stage="assistant"] .technical-record-header {
+    position: sticky;
+    top: 0;
+    z-index: 18;
+}
+
+body.pagina-chat-dashboard-v2 #painel-chat[data-workspace-stage="assistant"] .technical-record-header__row {
+    width: min(100%, calc(var(--chat-max-w, 1080px) + 80px));
+    justify-content: space-between;
+}
+
+@media (max-width: 1199px) {
+    body.pagina-chat-dashboard-v2 .workspace-hero-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    body.pagina-chat-dashboard-v2 .workspace-hero-strip {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-public-verification {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-official-issue {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-public-verification__actions {
+        width: 100%;
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-public-verification__actions .technical-record-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+
+    body.pagina-chat-dashboard-v2 .thread-nav-shell {
+        padding: 18px;
+        border-radius: 20px !important;
+    }
+
+    body.pagina-chat-dashboard-v2 .thread-nav-copy__row {
+        align-items: flex-start;
+    }
+
+    body.pagina-chat-dashboard-v2 .technical-record-header__row {
+        padding-right: 18px;
+        padding-left: 18px;
+    }
+}
+
+@media (max-width: 539px) {
+    body.pagina-chat-dashboard-v2 .thread-tab {
+        padding: 0 14px;
+    }
+
+    body.pagina-chat-dashboard-v2 .thread-tab__label {
+        font-size: 12px;
+    }
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid {
+    --workspace-thread-column-max: 812px;
+    --workspace-rail-width: clamp(300px, 23vw, 320px);
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-view="inspection_mesa"] {
+    --workspace-thread-column-max: 1048px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] {
+    grid-template-columns: minmax(0, 1fr) var(--workspace-rail-width);
+    gap: 20px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-header {
+    position: relative;
+    top: auto;
+    z-index: 1;
+    border: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none;
+    box-shadow: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-header__row {
+    width: min(100%, var(--workspace-thread-column-max));
+    min-height: 58px;
+    padding: 10px 0 4px;
+    gap: 12px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-header__main {
+    gap: 0;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-header__backline {
+    gap: 10px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-ident h2 {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-ident p {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-header__actions {
+    gap: 8px;
+}
+
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-header__actions .technical-record-btn,
+body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-status-pill {
+    min-height: 34px;
+    border-radius: 10px !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-hero-strip {
+    display: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav {
+    width: min(100%, var(--workspace-thread-column-max));
+    margin: 0 auto 2px;
+    padding: 0;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-shell {
+    width: 100%;
+    padding: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-copy {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 .thread-nav-inner {
+    justify-content: flex-start;
+    padding: 0 0 4px;
+    border-bottom: 0;
+}
+
+body.pagina-chat-dashboard-v2 .thread-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .thread-tab {
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 10px !important;
+    gap: 8px;
+    color: var(--vf-text-muted) !important;
+    font-weight: 600;
+}
+
+body.pagina-chat-dashboard-v2 .thread-tab__icon {
+    font-size: 16px;
+    opacity: 0.78;
+}
+
+body.pagina-chat-dashboard-v2 .thread-tab[aria-selected="true"],
+body.pagina-chat-dashboard-v2 .thread-tab.ativo {
+    border-color: rgba(31, 94, 142, 0.16) !important;
+    background: rgba(232, 242, 250, 0.84) !important;
+    color: var(--vf-text) !important;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(31, 94, 142, 0.04);
+}
+
+body.pagina-chat-dashboard-v2 .thread-tab[aria-selected="true"] .thread-tab__icon,
+body.pagina-chat-dashboard-v2 .thread-tab.ativo .thread-tab__icon {
+    opacity: 1;
+}
+
+body.pagina-chat-dashboard-v2 #btn-workspace-toggle-rail .material-symbols-rounded {
+    font-size: 16px;
+}
+
+@media (max-width: 959px) {
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid[data-workspace-layout="thread-with-rail"] {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    body.pagina-chat-dashboard-v2 .chat-dashboard-grid:not([data-workspace-view="assistant_landing"]) .technical-record-header__row {
+        width: 100%;
+        padding-right: 0;
+        padding-left: 0;
+        flex-wrap: wrap;
+    }
+
+    body.pagina-chat-dashboard-v2 .thread-tabs {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+}

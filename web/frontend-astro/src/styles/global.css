@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: hsl(28 33% 98%);
+  --foreground: hsl(222 47% 11%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222 47% 11%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(222 47% 11%);
+  --primary: hsl(22 92% 52%);
+  --primary-foreground: hsl(24 100% 98%);
+  --secondary: hsl(202 48% 94%);
+  --secondary-foreground: hsl(217 45% 19%);
+  --muted: hsl(210 25% 95%);
+  --muted-foreground: hsl(215 16% 40%);
+  --accent: hsl(48 100% 90%);
+  --accent-foreground: hsl(24 46% 16%);
+  --destructive: hsl(0 78% 57%);
+  --destructive-foreground: hsl(0 0% 98%);
+  --border: hsl(214 24% 88%);
+  --input: hsl(214 24% 88%);
+  --ring: hsl(22 92% 52%);
+  --radius: 1rem;
+}
+
+.dark {
+  --background: hsl(222 47% 8%);
+  --foreground: hsl(210 40% 98%);
+  --card: hsl(223 36% 11%);
+  --card-foreground: hsl(210 40% 98%);
+  --popover: hsl(223 36% 11%);
+  --popover-foreground: hsl(210 40% 98%);
+  --primary: hsl(24 94% 58%);
+  --primary-foreground: hsl(223 47% 8%);
+  --secondary: hsl(216 33% 18%);
+  --secondary-foreground: hsl(210 40% 98%);
+  --muted: hsl(217 19% 16%);
+  --muted-foreground: hsl(215 20% 72%);
+  --accent: hsl(217 19% 16%);
+  --accent-foreground: hsl(210 40% 98%);
+  --destructive: hsl(0 63% 51%);
+  --destructive-foreground: hsl(210 40% 98%);
+  --border: hsl(217 19% 22%);
+  --input: hsl(217 19% 22%);
+  --ring: hsl(24 94% 58%);
+}
+
+@theme inline {
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.5rem);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 247, 237, 0.92) 38%, rgba(255, 255, 255, 1) 100%),
+      radial-gradient(circle at top left, rgba(251, 146, 60, 0.18), transparent 32%),
+      radial-gradient(circle at 85% 12%, rgba(59, 130, 246, 0.15), transparent 24%);
+  }
+
+  ::selection {
+    @apply bg-primary text-primary-foreground;
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr10_implantacao_loto",
+  "template_code": "nr10_implantacao_loto",
+  "tokens": {
+    "cliente_nome": "Empresa Piloto NR10",
+    "unidade_nome": "Linha de conformacao - area de prensas",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": null,
+    "revisao_template": "v1",
+    "cliente_razao_social": "Empresa Piloto NR10",
+    "cliente_cnpj": null,
+    "cliente_localizacao": null,
+    "cliente_responsavel": null,
+    "cliente_logo_asset_id": "tenant_logo",
+    "confidencialidade_documento": "Uso controlado do cliente. Distribuicao condicionada a autorizacao do emitente.",
+    "status_assinatura": "Aguardando assinatura ou ciencia formal.",
+    "documento_codigo": "NR10_IMPLANTACAO_LOTO-1",
+    "documento_revisao": "v1",
+    "documento_titulo": "nr10_implantacao_loto",
+    "documento_tipo_mestre": "Laudo de Inspecao de Conformidade"
+  },
+  "case_context": {
+    "laudo_id": "1",
+    "empresa_nome": "Empresa Piloto NR10",
+    "unidade_nome": "Linha de conformacao - area de prensas",
+    "data_execucao": "2026-04-14",
+    "data_emissao": "2026-04-14",
+    "status_mesa": "Aprovado",
+    "wave_portfolio": 1,
+    "data_inspecao": "2026-04-14",
+    "document_code": "NR10_IMPLANTACAO_LOTO-1"
+  },
+  "mesa_review": {
+    "status": "Aprovado",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissão.",
+    "pendencias_resolvidas_texto": "Base tecnica LOTO considerada: Procedimento: DOC_410 - procedimento_loto_p07.pdf; APR: DOC_411 - apr_loto_p07.pdf; Matriz de energias: DOC_412 - matriz_energias_p07.pdf; Checklist: DOC_413 - checklist_loto_p07.pdf",
+    "observacoes_mesa": null
+  },
+  "resumo_executivo": "teste",
+  "identificacao": {
+    "objeto_principal": "Prensa hidraulica P-07",
+    "localizacao": "Linha de conformacao - area de prensas",
+    "codigo_interno": "P-07",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_810 - painel e chave seccionadora",
+        "DOC_410 - procedimento_loto_p07.pdf"
+      ],
+      "referencias_texto": "IMG_810 - painel e chave seccionadora; DOC_410 - procedimento_loto_p07.pdf",
+      "descricao": "Ativo, frente ou painel ancorado ao procedimento LOTO aplicado.",
+      "observacao": "Rastreabilidade entre ativo, procedimento e evidencia principal preservada."
+    }
+  },
+  "escopo_servico": {
+    "tipo_entrega": "implantacao_loto",
+    "modo_execucao": "in_loco",
+    "ativo_tipo": "instalacoes_eletricas",
+    "resumo_escopo": "teste"
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Aplicacao da sequencia de desenergizacao, bloqueio, etiquetagem e teste de partida.",
+    "condicoes_observadas": "Circuitos eletricos e hidraulicos identificados; sinalizacao complementar ausente no painel lateral.",
+    "parametros_relevantes": "Fontes de energia: Energia eletrica do QDL-02 e energia hidraulica da unidade de potencia da prensa.; Pontos de bloqueio: Chave seccionadora geral e valvula de alivio hidraulico identificadas e bloqueadas.; Dispositivos e sinalizacao: Cadeados individuais, hasp coletivo e etiquetas de bloqueio aplicadas em campo.; Energia zero: Teste de partida sem acionamento e descarga controlada do circuito hidraulico confirmaram energia zero.; Sequencia controlada: Seccionamento: Seccionamento eletrico confirmado na chave geral antes do inicio da intervencao.; Impedimento de reenergizacao: Travamento mecanico e etiquetagem impediram religamento acidental.; Reenergizacao controlada: Reenergizacao condicionada a retirada formal dos bloqueios e liberacao do responsavel.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_811 - cadeado principal",
+        "IMG_812 - etiqueta de bloqueio"
+      ],
+      "referencias_texto": "IMG_811 - cadeado principal; IMG_812 - etiqueta de bloqueio",
+      "descricao": "Circuitos eletricos e hidraulicos identificados; sinalizacao complementar ausente no painel lateral.",
+      "observacao": null
+    }
+  },
+  "checklist_componentes": {
+    "fontes_de_energia": {
+      "condicao": "conforme",
+      "observacao": "Energia eletrica do QDL-02 e energia hidraulica da unidade de potencia da prensa."
+    },
+    "pontos_de_bloqueio": {
+      "condicao": "conforme",
+      "observacao": "Chave seccionadora geral e valvula de alivio hidraulico identificadas e bloqueadas."
+    },
+    "dispositivos_e_sinalizacao": {
+      "condicao": "ajuste",
+      "observacao": "Cadeados individuais, hasp coletivo e etiquetas de bloqueio aplicadas em campo."
+    },
+    "verificacao_energia_zero": {
+      "condicao": "conforme",
+      "observacao": "Teste de partida sem acionamento e descarga controlada do circuito hidraulico confirmaram energia zero."
+    },
+    "sequenciamento_e_reenergizacao_controlada": {
+      "condicao": "conforme",
+      "observacao": "Seccionamento: Seccionamento eletrico confirmado na chave geral antes do inicio da intervencao.; Impedimento de reenergizacao: Travamento mecanico e etiquetagem impediram religamento acidental.; Reenergizacao controlada: Reenergizacao condicionada a retirada formal dos bloqueios e liberacao do responsavel."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_811 - cadeado principal aplicado"
+      ],
+      "referencias_texto": "IMG_811 - cadeado principal aplicado",
+      "descricao": "Registro principal do bloqueio e do impedimento de reenergizacao.",
+      "observacao": null
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_812 - etiqueta",
+        "IMG_813 - dreno hidraulico"
+      ],
+      "referencias_texto": "IMG_812 - etiqueta; IMG_813 - dreno hidraulico",
+      "descricao": null,
+      "observacao": null
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_410 - procedimento_loto_p07.pdf"
+      ],
+      "referencias_texto": "DOC_410 - procedimento_loto_p07.pdf",
+      "descricao": "Procedimento ou documento base que ancora a sequencia LOTO aplicada.",
+      "observacao": "Completar a sinalizacao lateral, revisar treinamento dos operadores e manter o procedimento versionado junto ao ativo."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Procedimento: DOC_410 - procedimento_loto_p07.pdf; APR: DOC_411 - apr_loto_p07.pdf; Matriz de energias: DOC_412 - matriz_energias_p07.pdf; Checklist: DOC_413 - checklist_loto_p07.pdf",
+    "documentos_emitidos": "Registro tecnico de implantacao LOTO e checklist de verificacao da frente.",
+    "observacoes_documentais": "Completar a sinalizacao lateral, revisar treinamento dos operadores e manter o procedimento versionado junto ao ativo."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Sinalizacao complementar da fonte hidraulica ainda nao estava posicionada no painel lateral.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_814 - painel lateral sem etiqueta"
+      ],
+      "referencias_texto": "IMG_814 - painel lateral sem etiqueta",
+      "descricao": "Sinalizacao complementar da fonte hidraulica ainda nao estava posicionada no painel lateral.",
+      "observacao": null
+    }
+  },
+  "recomendacoes": {
+    "texto": "Completar a sinalizacao lateral, revisar treinamento dos operadores e manter o procedimento versionado junto ao ativo."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "teste",
+    "justificativa": "teste"
+  }
+}

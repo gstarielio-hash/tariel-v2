@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Configurações • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_settings.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Navegação administrativa">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+                <a href="/admin/clientes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+                <a href="/admin/catalogo-laudos" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+                <a href="/admin/novo-cliente" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+                <a href="/admin/configuracoes" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="topbar topbar--compact">
+                <div class="titulo-pagina">
+                    <h1>Configurações da plataforma</h1>
+                    <p>Regras principais da plataforma, com o que esta valendo hoje e o que pode ser ajustado.</p>
+                </div>
+            </header>
+
+            {% for msg in mensagens_flash %}
+            {% set _tipo_alerta = 'success' if msg.tipo == 'success' else 'error' %}
+            <div class="alert alert-{{ _tipo_alerta }}" role="alert" aria-live="assertive">
+                {{ msg.texto | e }}
+            </div>
+            {% endfor %}
+
+            <section class="config-summary" aria-label="Resumo de governança">
+                {% for card in summary_cards %}
+                <article class="config-kpi">
+                    <p class="config-kpi__label">{{ card.label | e }}</p>
+                    <p class="config-kpi__value">{{ card.value | e }}</p>
+                    <p class="config-kpi__hint">{{ card.hint | e }}</p>
+                </article>
+                {% endfor %}
+            </section>
+
+            <section class="config-navigation" aria-label="Navegação interna das configurações">
+                <div class="config-navigation__header">
+                    <div>
+                        <h2>Navegação por área</h2>
+                        <p>Abra uma frente por vez para reduzir ruído visual e manter o foco operacional.</p>
+                    </div>
+                    <label class="config-navigation__select" for="config-section-select">
+                        <span>Seção ativa</span>
+                        <select id="config-section-select" data-config-select>
+                            {% for section in sections %}
+                            <option value="{{ section.key | e }}" {% if loop.first %}selected{% endif %}>
+                                {{ section.title | e }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+
+                <div class="config-tablist" role="tablist" aria-label="Seções de configuração">
+                    {% for section in sections %}
+                    <button
+                        type="button"
+                        class="config-tab{% if loop.first %} is-active{% endif %}"
+                        id="config-tab-{{ section.key | e }}"
+                        data-config-tab="{{ section.key | e }}"
+                        role="tab"
+                        aria-controls="config-{{ section.key | e }}"
+                        aria-selected="{{ 'true' if loop.first else 'false' }}"
+                        tabindex="{{ '0' if loop.first else '-1' }}">
+                        <span class="config-tab__label">{{ section.title | e }}</span>
+                        <span class="config-tab__meta">{{ section.badge | e }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="config-sections" aria-label="Políticas e governanças da plataforma">
+                {% for section in sections %}
+                <article
+                    class="config-group"
+                    id="config-{{ section.key | e }}"
+                    data-config-panel="{{ section.key | e }}"
+                    role="tabpanel"
+                    aria-labelledby="config-tab-{{ section.key | e }}">
+                    <div class="config-group__header">
+                        <div>
+                            <h2>{{ section.title | e }}</h2>
+                            <p>{{ section.description | e }}</p>
+                        </div>
+                        <div class="config-group__badges">
+                            <span class="config-badge">{{ section.badge | e }}</span>
+                            {% if not section.form %}
+                            <span class="config-badge config-badge--muted">Apenas consulta</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="config-group__list">
+                        {% for item in section["items"] %}
+                        <article class="config-card">
+                            <div class="config-card__meta">
+                                <span class="config-card__status config-card__status--{{ item.status_tone | e }}">
+                                    {{ item.value_label | e }}
+                                </span>
+                                <span class="config-card__origin">{{ item.source_label | e }}</span>
+                                <span class="config-card__scope">{{ item.scope_label | e }}</span>
+                            </div>
+                            <h3>{{ item.title | e }}</h3>
+                            <p>{{ item.description | e }}</p>
+                            <dl class="config-card__details">
+                                <div>
+                                    <dt>Valor efetivo</dt>
+                                    <dd>{{ item.value_label | e }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Última mudança</dt>
+                                    <dd>{{ item.last_changed_label | e }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Responsável</dt>
+                                    <dd>{{ item.last_changed_by_label | e }}</dd>
+                                </div>
+                            </dl>
+                            {% if item.reason %}
+                            <p class="config-card__reason">Motivo registrado: {{ item.reason | e }}</p>
+                            {% endif %}
+                            {% if item.impact %}
+                            <p class="config-card__impact">{{ item.impact | e }}</p>
+                            {% endif %}
+                            {% if item.technical_path %}
+                            <details class="admin-disclosure">
+                                <summary>Caminho interno</summary>
+                                <a class="config-link" href="{{ item.technical_path | e }}">{{ item.technical_path | e }}</a>
+                            </details>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+
+                    {% if section.read_only_note %}
+                    <div class="config-group__note" role="note">
+                        <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                        <p>{{ section.read_only_note | e }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if section.form %}
+                    <form method="post" action="{{ section.form.action | e }}" class="config-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <div class="config-form__header">
+                            <div>
+                                <h3>Atualizar {{ section.title | lower | e }}</h3>
+                                <p>
+                                    {% if section.form.requires_step_up %}
+                                    Esta alteracao pede nova confirmacao de acesso e fica registrada na auditoria.
+                                    {% else %}
+                                    Esta alteracao fica registrada na auditoria.
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <span class="config-form__badge">Altera configuracao</span>
+                        </div>
+
+                        <div class="config-form__grid">
+                            {% for field in section.form.fields %}
+                            <div class="campo-form {% if field.type == 'checkbox' %}campo-form--checkbox{% endif %}">
+                                {% if field.type == 'select' %}
+                                <label for="{{ field.name | e }}">{{ field.label | e }}</label>
+                                <select id="{{ field.name | e }}" name="{{ field.name | e }}">
+                                    {% for option in field.options %}
+                                    <option value="{{ option.value | e }}" {% if option.value == field.value %}selected{% endif %}>
+                                        {{ option.label | e }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% elif field.type == 'number' %}
+                                <label for="{{ field.name | e }}">{{ field.label | e }}</label>
+                                <input
+                                    id="{{ field.name | e }}"
+                                    name="{{ field.name | e }}"
+                                    type="number"
+                                    value="{{ field.value | e }}"
+                                    min="{{ field.min | e }}"
+                                    max="{{ field.max | e }}"
+                                    required>
+                                {% elif field.type == 'checkbox' %}
+                                <label class="config-checkbox" for="{{ field.name | e }}">
+                                    <input
+                                        id="{{ field.name | e }}"
+                                        name="{{ field.name | e }}"
+                                        type="checkbox"
+                                        value="1"
+                                        {% if field.value %}checked{% endif %}>
+                                    <span>{{ field.label | e }}</span>
+                                </label>
+                                {% endif %}
+                                {% if field.hint %}
+                                <p class="config-field__hint">{{ field.hint | e }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+
+                            <div class="campo-form campo-form--full">
+                                <label for="motivo_alteracao_{{ section.key | e }}">Motivo da alteracao</label>
+                                <textarea
+                                    id="motivo_alteracao_{{ section.key | e }}"
+                                    name="motivo_alteracao"
+                                    rows="3"
+                                    maxlength="300"
+                                    required
+                                    placeholder="Explique por que esta mudanca esta sendo feita."></textarea>
+                                <p class="config-field__hint">Esse motivo entra no historico administrativo do Admin-CEO.</p>
+                            </div>
+                        </div>
+
+                        <div class="config-form__actions">
+                            <button type="submit" class="btn-admin primario">{{ section.form.submit_label | e }}</button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </section>
+        </main>
+    </div>
+    <script src="/static/js/admin/admin_settings_page.js"></script>
+</body>
+</html>

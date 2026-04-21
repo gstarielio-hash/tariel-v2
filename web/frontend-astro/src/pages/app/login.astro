@@ -1,0 +1,23 @@
+---
+import AuthShell from "@/components/app/auth/auth-shell.astro";
+
+export const prerender = false;
+---
+
+<AuthShell
+  title="Portal do Inspetor | Tariel Astro"
+  description="Tela de autenticacao migrada para o portal do inspetor."
+  portalLabel="Portal do Inspetor"
+  heroTitle="Nova base visual para o workspace do inspetor."
+  heroCopy="A autenticacao do portal operacional agora tem uma base limpa em Astro, preparada para receber sessao, controles de identidade e a futura shell do workspace sem carregar o legado junto."
+  heroItems={[
+    "Mesmo padrao visual do portal atual, mas com composicao moderna e reutilizavel.",
+    "Componente compartilhado para reduzir divergencia entre inspetor, admin e mesa.",
+    "Etapa segura para plugar login real quando o backend Node/TypeScript entrar.",
+    "Serve como ponto de partida antes de migrar home, chat e mesa do inspetor.",
+  ]}
+  supportText="Quer um acesso? Fale com o administrador."
+  submitLabel="Acessar"
+  previewMessage="Layout pronto. Na proxima etapa eu ligo este formulario ao fluxo real de autenticacao e sessao do portal do inspetor."
+  variant="portal"
+/>

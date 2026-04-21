@@ -1,0 +1,272 @@
+<aside
+    id="workspace-context-rail"
+    class="chat-dashboard-rail"
+    aria-label="Painel lateral do laudo"
+    data-inspector-region="context-rail"
+    data-component-slice="workspace-rail"
+    data-workspace-rail-root
+    data-workspace-rail-visible="false"
+    aria-hidden="true"
+    hidden
+>
+    <div class="chat-dashboard-rail__panel">
+        <section class="technical-record-card technical-record-card--navigation" aria-label="Navegação do laudo">
+            <div class="technical-record-card__header">
+                <h3>Navegação</h3>
+            </div>
+            <div class="workspace-rail-card__body workspace-rail-card__body--navigation">
+                <span class="workspace-rail-card__eyebrow">Acesso rápido</span>
+                <div class="workspace-rail-nav" role="tablist" aria-label="Ir para seções do laudo">
+                    <button type="button" class="workspace-rail-nav__button" data-rail-thread-tab="conversa" aria-pressed="true">Conversa</button>
+                    <button type="button" class="workspace-rail-nav__button" data-rail-thread-tab="historico" aria-pressed="false">Histórico</button>
+                    <button type="button" class="workspace-rail-nav__button" data-rail-thread-tab="anexos" aria-pressed="false">Anexos</button>
+                    <button type="button" class="workspace-rail-nav__button" data-rail-thread-tab="mesa" aria-pressed="false">Mesa</button>
+                </div>
+                <div class="workspace-rail-actions">
+                    <button
+                        type="button"
+                        id="btn-workspace-preview-rail"
+                        class="technical-record-btn technical-record-btn--ghost"
+                    >
+                        Pré-visualizar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="workspace-progress-card" class="technical-record-card technical-record-card--progress">
+            <div class="technical-record-card__header">
+                <h3>Estado da Inspeção</h3>
+                <div class="technical-record-card__header-meta">
+                    <span id="workspace-progress-percent">65%</span>
+                    <button type="button" class="workspace-rail-toggle" data-rail-toggle="progress" aria-expanded="true">
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                </div>
+            </div>
+            <div class="workspace-rail-card__body" data-rail-body="progress">
+                <span class="workspace-rail-card__eyebrow">Leitura operacional</span>
+                <p class="workspace-rail-card__description">Acompanhe a saude do laudo e os marcos mais recentes.</p>
+
+                <div class="technical-progress" role="progressbar" aria-label="Progresso da inspeção" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65">
+                    <span id="workspace-progress-bar" class="technical-progress__bar"></span>
+                </div>
+
+                <div class="technical-progress__meta">
+                    <span id="workspace-progress-evidencias">8 evidências</span>
+                    <span id="workspace-progress-pendencias">0 pendências</span>
+                </div>
+
+                <div class="workspace-rail-mini-section">
+                    <div class="workspace-rail-mini-section__head">
+                        <strong>Marcos recentes</strong>
+                        <span>historico curto</span>
+                    </div>
+                    <ul id="workspace-activity-list" class="technical-activity-list technical-activity-list--compact">
+                        <li><span></span><div><strong>Evidência adicionada</strong><small>há 30min</small></div></li>
+                        <li><span></span><div><strong>Pendência criada</strong><small>há 1h</small></div></li>
+                        <li><span></span><div><strong>Resumo gerado</strong><small>há 1h 30min</small></div></li>
+                        <li><span></span><div><strong>Sessão iniciada</strong><small>há 2h</small></div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="workspace-context-card" class="technical-record-card technical-record-card--context">
+            <div class="technical-record-card__header">
+                <h3>Contexto do laudo</h3>
+                <div class="technical-record-card__header-meta">
+                    <button type="button" class="workspace-rail-toggle" data-rail-toggle="context" aria-expanded="false">
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                </div>
+            </div>
+            <div class="workspace-rail-card__body" data-rail-body="context" hidden>
+                <span class="workspace-rail-card__eyebrow">Base ativa do laudo</span>
+                <p class="workspace-rail-card__description">Modelo, operacao e sintese atual no mesmo painel.</p>
+
+                <div class="technical-record-card__actions-inline">
+                    <button type="button" id="btn-workspace-context-copy" class="portal-link-button">Copiar resumo</button>
+                    <button type="button" id="btn-workspace-context-clear" class="portal-link-button">Limpar fixados</button>
+                </div>
+
+                <div class="workspace-context-grid">
+                    <article class="workspace-context-kpi">
+                        <span>Modelo</span>
+                        <strong id="workspace-context-template">Caldeira Industrial</strong>
+                    </article>
+                    <article class="workspace-context-kpi">
+                        <span>Evidências</span>
+                        <strong id="workspace-context-evidencias">0</strong>
+                    </article>
+                    <article class="workspace-context-kpi">
+                        <span>Pendências</span>
+                        <strong id="workspace-context-pendencias">0</strong>
+                    </article>
+                    <article class="workspace-context-kpi">
+                        <span>Mesa</span>
+                        <strong id="workspace-context-mesa">Canal disponível</strong>
+                    </article>
+                </div>
+
+                <dl class="workspace-context-facts">
+                    <div>
+                        <dt>Equipamento</dt>
+                        <dd id="workspace-context-equipment">Caldeira B-202</dd>
+                    </div>
+                    <div>
+                        <dt>Operação</dt>
+                        <dd id="workspace-context-operation">Petrobras - REPLAN</dd>
+                    </div>
+                    <div>
+                        <dt>Última síntese</dt>
+                        <dd id="workspace-context-summary">A ultima resposta consolidada do assistente aparecera aqui.</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <section id="painel-pendencias-mesa" class="technical-record-card technical-record-card--pendencias" aria-live="polite">
+            <div class="technical-record-card__header">
+                <h3>Pendências</h3>
+                <div class="technical-record-card__header-meta">
+                    <button type="button" class="workspace-rail-toggle" data-rail-toggle="pendencias" aria-expanded="false">
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                </div>
+            </div>
+            <div class="workspace-rail-card__body" data-rail-body="pendencias" hidden>
+                <span class="workspace-rail-card__eyebrow">Fila documental</span>
+                <p class="workspace-rail-card__description">Veja o que a mesa pediu sem inflar a leitura principal.</p>
+
+                <div class="acoes-pendencias" hidden>
+                    <button type="button" id="btn-exportar-pendencias-pdf">Exportar PDF</button>
+                    <button type="button" id="btn-marcar-pendencias-lidas">Marcar lidas</button>
+                    <button type="button" id="btn-fechar-pendencias-mesa">Fechar</button>
+                </div>
+
+                <div class="filtros-pendencias" role="group" aria-label="Filtro de pendências" hidden>
+                    <button type="button" class="chip-filtro-pendencia ativo" data-filtro-pendencias="abertas" aria-pressed="true">Abertas</button>
+                    <button type="button" class="chip-filtro-pendencia" data-filtro-pendencias="resolvidas" aria-pressed="false">Resolvidas</button>
+                    <button type="button" class="chip-filtro-pendencia" data-filtro-pendencias="todas" aria-pressed="false">Todas</button>
+                </div>
+
+                <div
+                    id="estado-loading-pendencias-mesa"
+                    class="technical-chat-empty technical-chat-empty--rail"
+                    aria-live="polite"
+                    aria-hidden="true"
+                    hidden
+                >
+                    <span class="material-symbols-rounded" aria-hidden="true">progress_activity</span>
+                    <strong>Carregando pendencias</strong>
+                    <p>Buscando as pendencias atuais deste laudo.</p>
+                </div>
+
+                <div
+                    id="texto-vazio-pendencias-mesa"
+                    class="technical-chat-empty technical-chat-empty--rail"
+                    aria-live="polite"
+                    aria-hidden="true"
+                    hidden
+                >
+                    <span class="material-symbols-rounded" aria-hidden="true">task_alt</span>
+                    <strong>Nenhuma pendencia encontrada</strong>
+                    <p data-pendencias-empty-text>Nenhuma pendência enviada pela mesa avaliadora neste laudo.</p>
+                </div>
+
+                <div
+                    id="estado-erro-pendencias-mesa"
+                    class="technical-chat-empty technical-chat-empty--rail"
+                    aria-live="polite"
+                    aria-hidden="true"
+                    hidden
+                >
+                    <span class="material-symbols-rounded" aria-hidden="true">error</span>
+                    <strong>Falha ao carregar pendências</strong>
+                    <p data-pendencias-error-text>Não foi possível carregar as pendências da mesa agora.</p>
+                </div>
+
+                <p id="resumo-pendencias-mesa" class="resumo-pendencias-mesa" hidden></p>
+
+                <ul id="lista-pendencias-mesa" class="lista-pendencias-mesa" hidden></ul>
+
+                <button
+                    type="button"
+                    id="btn-carregar-mais-pendencias"
+                    class="portal-link-button"
+                    hidden
+                >
+                    Carregar mais
+                </button>
+            </div>
+        </section>
+
+        <section class="technical-record-card technical-record-card--mesa">
+            <div class="technical-record-card__header">
+                <h3>Mesa Técnica</h3>
+                <div class="technical-record-card__header-meta">
+                    <button
+                        type="button"
+                        id="btn-mesa-widget-toggle"
+                        class="technical-record-btn btn-mesa-widget-toggle"
+                        data-inspector-entry="rail-open-mesa"
+                        aria-expanded="false"
+                    >
+                        <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+                        <span class="label-btn-mesa-widget" data-mesa-toggle-label>Abrir canal</span>
+                    </button>
+                    <button type="button" class="workspace-rail-toggle" data-rail-toggle="mesa" aria-expanded="false">
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                </div>
+            </div>
+            <div class="workspace-rail-card__body" data-rail-body="mesa" hidden>
+                <span class="workspace-rail-card__eyebrow">Revisão externa</span>
+                <p class="workspace-rail-card__description" id="workspace-mesa-card-text">Envie para revisao quando concluir a coleta de evidencias.</p>
+
+                <div class="workspace-mesa-card__chips">
+                    <span id="workspace-mesa-card-status" class="workspace-mesa-card-chip">Canal disponível</span>
+                    <span id="workspace-mesa-card-unread" class="workspace-mesa-card-chip workspace-mesa-card-chip--alert" hidden>0 novas</span>
+                </div>
+
+                <div class="technical-record-card__actions">
+                    <button
+                        type="button"
+                        id="btn-rail-finalizar-inspecao"
+                        class="technical-record-btn technical-record-btn--outline"
+                        data-finalizar-inspecao
+                        data-inspector-entry="rail-send-mesa"
+                    >
+                        Enviar para Mesa
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="workspace-pinned-card" class="technical-record-card technical-record-card--pinned">
+            <div class="technical-record-card__header">
+                <h3>Contexto fixado</h3>
+                <div class="technical-record-card__header-meta">
+                    <button type="button" class="workspace-rail-toggle" data-rail-toggle="pinned" aria-expanded="false">
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                </div>
+            </div>
+            <div class="workspace-rail-card__body" data-rail-body="pinned" hidden>
+                <span class="workspace-rail-card__eyebrow">Memória curta</span>
+                <p class="workspace-rail-card__description">Fixe fatos críticos para que a conversa e a revisão não percam contexto relevante.</p>
+
+                <div class="workspace-context-pinned-block">
+                    <div class="workspace-context-pinned-head">
+                        <strong>Itens preservados</strong>
+                        <span id="workspace-context-pinned-count">0 itens</span>
+                    </div>
+                    <div id="workspace-context-pinned-list" class="workspace-context-pinned-list">
+                        <p class="workspace-context-pinned-empty">Fixe mensagens importantes para manter fatos críticos sempre à vista.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</aside>

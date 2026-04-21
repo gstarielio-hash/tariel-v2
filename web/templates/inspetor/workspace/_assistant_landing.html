@@ -1,0 +1,38 @@
+<section
+    id="workspace-assistant-landing"
+    class="workspace-assistant-landing"
+    {% if not workspace_assistant_inicial %}hidden{% endif %}
+    aria-label="Novo chat com o assistente"
+>
+    <div class="workspace-assistant-landing__shell">
+        <div class="workspace-assistant-landing__hero">
+            <span class="workspace-assistant-landing__eyebrow">Assistente Tariel IA</span>
+            <h1 class="workspace-assistant-landing__headline">
+                <span class="workspace-assistant-landing__headline-greeting">
+                    Olá,
+                    <span
+                        id="workspace-assistant-greeting-name"
+                        data-workspace-user-greeting-name
+                    >{{ (usuario_nome or "Inspetor").split(" ")[0] }}</span>
+                </span>
+                <span class="workspace-assistant-landing__headline-question">Por onde começamos?</span>
+            </h1>
+
+            <section
+                id="workspace-assistant-governance"
+                class="workspace-official-issue workspace-official-issue--warning"
+                aria-label="Governança documental no ponto de entrada"
+                {% if not portal_governance_summary.visible %}hidden{% endif %}
+            >
+                <div class="workspace-official-issue__copy">
+                    <span class="workspace-official-issue__eyebrow">Governança documental</span>
+                    <strong id="workspace-assistant-governance-title">{{ portal_governance_summary.label | default('', true) }}</strong>
+                    <p id="workspace-assistant-governance-detail">{{ portal_governance_summary.detail | default('', true) }}</p>
+                </div>
+                <span class="technical-record-status-pill technical-record-status-pill--warning">
+                    REEMITIR
+                </span>
+            </section>
+        </div>
+    </div>
+</section>

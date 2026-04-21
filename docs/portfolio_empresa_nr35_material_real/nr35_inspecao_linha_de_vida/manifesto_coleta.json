@@ -1,0 +1,173 @@
+{
+  "family_key": "nr35_inspecao_linha_de_vida",
+  "nome_exibicao": "NR35 - Inspecao linha de vida",
+  "macro_categoria": "NR35",
+  "kind": "inspection",
+  "wave": 1,
+  "template_codes": [
+    "nr35_inspecao_linha_de_vida",
+    "nr35_linha_vida"
+  ],
+  "required_slots_snapshot": [
+    {
+      "item_id": "slot_referencia_principal",
+      "label": "Referencia principal",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento"
+      ],
+      "purpose": "Vincular a referencia principal do objeto do servico nr35_inspecao_linha_de_vida.",
+      "binding_path": "identificacao.referencia_principal",
+      "drop_folder": "coleta_entrada/slots_reais/referencia_principal"
+    },
+    {
+      "item_id": "slot_evidencia_execucao",
+      "label": "Evidencia de execucao",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento",
+        "texto"
+      ],
+      "purpose": "Registrar a execucao principal do servico com evidencia rastreavel.",
+      "binding_path": "execucao_servico.evidencia_execucao",
+      "drop_folder": "coleta_entrada/slots_reais/evidencia_execucao"
+    },
+    {
+      "item_id": "slot_evidencia_principal",
+      "label": "Evidencia principal",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento",
+        "texto"
+      ],
+      "purpose": "Consolidar a evidencia principal que sustenta a conclusao do servico.",
+      "binding_path": "evidencias_e_anexos.evidencia_principal",
+      "drop_folder": "coleta_entrada/slots_reais/evidencia_principal"
+    },
+    {
+      "item_id": "slot_conclusao_servico",
+      "label": "Conclusao do servico",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "texto"
+      ],
+      "purpose": "Registrar a conclusao tecnica estruturada para revisao.",
+      "binding_path": "conclusao.conclusao_tecnica",
+      "drop_folder": "coleta_entrada/slots_reais/conclusao_servico"
+    }
+  ],
+  "output_sections_snapshot": [
+    "Identificacao geral",
+    "Objeto da inspecao",
+    "Componentes e acessorios inspecionados",
+    "Registros fotograficos",
+    "Conclusao",
+    "Governanca da Mesa"
+  ],
+  "review_blocking_snapshot": [
+    "escopo_principal_divergente_da_familia",
+    "troca_silenciosa_da_familia_principal",
+    "ausencia_de_objeto_principal",
+    "ausencia_de_localizacao",
+    "ausencia_de_slot_obrigatorio",
+    "ausencia_de_conclusao_tecnica"
+  ],
+  "material_real_checklist": [
+    {
+      "item_id": "modelo_atual_vazio",
+      "label": "Modelo atual vazio usado pela empresa",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".docx",
+        ".pdf"
+      ],
+      "purpose": "Comparar a estrutura real do laudo NR35 com o overlay canonico da familia.",
+      "drop_folder": "coleta_entrada/modelo_atual_vazio"
+    },
+    {
+      "item_id": "documentos_finais_reais",
+      "label": "Documentos finais reais ja emitidos",
+      "required": true,
+      "min_items": 3,
+      "accepted_examples": [
+        ".pdf",
+        ".docx"
+      ],
+      "purpose": "Extrair linguagem, paginação, anexos e variacoes recorrentes do laudo real.",
+      "drop_folder": "coleta_entrada/documentos_finais_reais"
+    },
+    {
+      "item_id": "padrao_linguagem_tecnica",
+      "label": "Padrao de linguagem tecnica e conclusao",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".md",
+        ".txt",
+        ".pdf",
+        ".docx"
+      ],
+      "purpose": "Fixar parecer, ressalvas, assinatura tecnica e clausulas recorrentes do engenheiro responsavel.",
+      "drop_folder": "coleta_entrada/padrao_linguagem_tecnica"
+    },
+    {
+      "item_id": "regras_comerciais_e_operacionais",
+      "label": "Regras comerciais e operacionais do servico",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".md",
+        ".txt",
+        ".pdf",
+        ".docx",
+        ".xlsx"
+      ],
+      "purpose": "Capturar o que muda por cliente, tipo de linha de vida, bloqueio, periodicidade e contratacao.",
+      "drop_folder": "coleta_entrada/regras_comerciais_e_operacionais"
+    },
+    {
+      "item_id": "evidencias_reais_associadas",
+      "label": "Evidencias reais associadas aos documentos finais",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".pdf",
+        ".zip"
+      ],
+      "purpose": "Validar slots fotograficos, anexos, laudos base e criterios reais de evidencia por componente.",
+      "drop_folder": "coleta_entrada/evidencias_reais_associadas"
+    }
+  ],
+  "open_questions": [
+    "Qual PDF atual a empresa considera referencia principal para NR35 linha de vida?",
+    "Quais anexos ficam no corpo do laudo e quais ficam apenas em acervo?",
+    "Quais componentes sempre aparecem no checklist final mesmo quando nao ha nao conformidade?",
+    "Como a empresa expressa bloqueio, reprovacao e proxima inspecao periodica no texto final?",
+    "Quais fotos entram obrigatoriamente no PDF final para linha de vida vertical?",
+    "Que combinacoes de contratante, contratada, ART e laudo do fabricante precisam sempre aparecer na capa?"
+  ],
+  "ingest_layout": {
+    "raw_input_dir": "coleta_entrada",
+    "reference_package_dir": "pacote_referencia",
+    "status_file": "status_refino.json",
+    "briefing_file": "briefing_real.md"
+  },
+  "ready_for_refinement_when": [
+    "Existe ao menos 1 modelo atual vazio da empresa para a familia.",
+    "Existem ao menos 3 documentos finais reais ou equivalentes para comparacao.",
+    "Existe definicao de linguagem tecnica e conclusao que a empresa quer preservar.",
+    "Cada slot obrigatorio do family_schema tem exemplo real ou lacuna explicitamente anotada.",
+    "O material bruto ja foi separado do futuro pacote de filled_reference."
+  ]
+}

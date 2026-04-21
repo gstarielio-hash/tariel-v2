@@ -1,0 +1,76 @@
+name: devkit-operational-baseline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - "checkpoint/**"
+      - "feature/**"
+      - "codex/**"
+    paths:
+      - "android/**"
+      - "scripts/dev/**"
+      - "docs/developer-experience/**"
+      - ".github/workflows/devkit-operational-baseline.yml"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    paths:
+      - "android/**"
+      - "scripts/dev/**"
+      - "docs/developer-experience/**"
+      - ".github/workflows/devkit-operational-baseline.yml"
+      - ".github/workflows/ci.yml"
+
+concurrency:
+  group: devkit-operational-baseline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  devkit-baseline:
+    if: ${{ vars.ENABLE_HOSTED_CI == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      AMBIENTE: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: "pip"
+          cache-dependency-path: web/requirements.txt
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: android/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: web
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Install Android dependencies
+        working-directory: android
+        run: npm ci
+
+      - name: Run DevKit CI baseline
+        run: ./scripts/dev/check_ci_baseline.sh
+
+      - name: Upload DevKit runtime status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: devkit-runtime-status
+          path: .tmp_online/devkit
+          if-no-files-found: ignore

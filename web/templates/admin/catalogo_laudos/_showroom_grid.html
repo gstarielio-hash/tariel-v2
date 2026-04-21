@@ -1,0 +1,294 @@
+<section class="catalog-home-layout catalog-home-layout--single">
+    <article class="catalog-panel catalog-panel--focus catalog-panel--primary-flow catalog-panel--showroom">
+        <div class="catalog-showroom-grid catalog-family-gallery" role="list" aria-label="Famílias do catálogo">
+            {% for row in catalog_rows %}
+            {% set tone_seed = ((row.nr_key | default(row.macro_category, true) | string) ~ ' ' ~ (row.family_key | string)) | lower %}
+            {% set nr_seed = (row.nr_key | default(row.macro_category, true) | string | lower | replace(' ', '') | replace('-', '')) %}
+            {% set nr_number = nr_seed | replace('nr', '') | int %}
+            {% set tone_class = 'catalog-family-card--slate' %}
+            {% if nr_number == 35 or 'altura' in tone_seed %}
+            {% set tone_class = 'catalog-family-card--yellow' %}
+            {% elif nr_number == 33 %}
+            {% set tone_class = 'catalog-family-card--wine' %}
+            {% elif nr_number == 26 %}
+            {% set tone_class = 'catalog-family-card--cyan' %}
+            {% elif nr_number == 23 or nr_number == 12 or 'quimic' in tone_seed or 'inflam' in tone_seed %}
+            {% set tone_class = 'catalog-family-card--red' %}
+            {% elif nr_number == 20 %}
+            {% set tone_class = 'catalog-family-card--teal' %}
+            {% elif nr_number == 18 or 'obra' in tone_seed or 'construcao' in tone_seed %}
+            {% set tone_class = 'catalog-family-card--orange' %}
+            {% elif nr_number == 13 or 'vaso' in tone_seed or 'pressao' in tone_seed %}
+            {% set tone_class = 'catalog-family-card--copper' %}
+            {% elif nr_number == 10 %}
+            {% set tone_class = 'catalog-family-card--amber' %}
+            {% elif nr_number == 6 or 'epi' in tone_seed %}
+            {% set tone_class = 'catalog-family-card--blue' %}
+            {% elif nr_number == 5 or 'cipa' in tone_seed %}
+            {% set tone_class = 'catalog-family-card--green' %}
+            {% endif %}
+            {% set cover_code = row.nr_key | upper if row.nr_key else (row.macro_category | upper if row.macro_category else 'LAUDO') %}
+            {% set template_label = row.template_default_code | default('A definir', true) %}
+            {% set document_preview = row.document_preview | default({}) %}
+            {% set preview_status = document_preview.showcase_status if document_preview.showcase_status is defined else {'tone': 'idle', 'label': 'Em montagem'} %}
+            {% set material_status = document_preview.material_status if document_preview.material_status is defined else {'tone': 'idle', 'label': 'Sem material real'} %}
+            {% set preview_objective = document_preview.objective if document_preview.objective is defined else {'title': 'Objetivo do modelo', 'summary': 'Mostrar como este laudo aparece antes do preenchimento final.'} %}
+            {% set preview_sections = document_preview.sections if document_preview.sections is defined else [] %}
+            {% set preview_features = document_preview.premium_features if document_preview.premium_features is defined else [] %}
+            {% if row.active_release_count | int > 0 %}
+            {% set insight_title = 'Ja esta liberada para clientes' %}
+            {% set insight_body = (row.active_release_count | int) ~ ' cliente(s) ativos usando esta familia hoje.' %}
+            {% elif row.commercial_status.key == 'active' %}
+            {% set insight_title = 'Pacote comercial pronto para ampliar uso' %}
+            {% set insight_body = 'O pacote ja esta ativo e a familia pode seguir para novas liberacoes.' %}
+            {% elif row.offer_name %}
+            {% set insight_title = 'Pacote comercial montado' %}
+            {% set insight_body = 'Vale revisar modelo principal, validacao e decidir quem vai receber acesso.' %}
+            {% elif preview_status.key == 'demonstration_ready' %}
+            {% set insight_title = 'Modelo demonstrativo pronto' %}
+            {% set insight_body = 'O laudo ja abre como documento e pode entrar na vitrine mesmo antes do material real.' %}
+            {% elif row.artifact_snapshot.has_template_seed %}
+            {% set insight_title = 'Base pronta, falta empacotar' %}
+            {% set insight_body = 'O documento base ja existe; o proximo passo e fechar o pacote comercial e a liberacao.' %}
+            {% else %}
+            {% set insight_title = 'Ainda precisa de acabamento' %}
+            {% set insight_body = 'Defina modelo principal, pacote comercial e liberacao para levar esta familia ao uso real.' %}
+            {% endif %}
+            {% set bundle = row.commercial_bundle | default({}) %}
+            {% set bundle_label = bundle.bundle_label | default(row.offer_package, true) | default('Sem bundle comercial', true) %}
+            {% set bundle_summary = bundle.summary | default(row.release_channel.label, true) %}
+            {% set plan_distribution = row.plan_distribution | default({'summary_label': 'Todos os planos', 'summary_hint': 'Sem restricao explicita de assinatura nesta familia.', 'items': []}) %}
+            {% set contract_features = row.contract_entitlements.effective_features if row.contract_entitlements is defined else [] %}
+            {% set document_ready = row.artifact_snapshot.has_laudo_output_exemplo or row.artifact_snapshot.has_laudo_output_seed %}
+            {% set preview_section_count = preview_sections | length %}
+            {% set preview_summary = bundle.summary | default(document_preview.subtitle, true) | default('Template pronto para receber evidencias e compor o laudo final.', true) %}
+            {% set distribution_copy = plan_distribution.enabled_labels_text | default(plan_distribution.summary_label, true) %}
+            <article class="catalog-family-card catalog-showroom-card {{ tone_class }}" role="listitem">
+                <div class="catalog-showroom-card__rail">
+                    <span class="catalog-showroom-card__rail-code">{{ cover_code | e }}</span>
+                    <span class="catalog-showroom-card__rail-kicker">{{ row.classification_label | e }}</span>
+                    <strong class="catalog-showroom-card__rail-title">{{ ((row.nr_key | upper) if row.nr_key else row.macro_category) | e }}</strong>
+                    <p class="catalog-showroom-card__rail-text">{{ row.macro_category | e }}</p>
+                </div>
+
+                <div class="catalog-showroom-card__content">
+                    <div class="catalog-showroom-card__topline">
+                        <div class="catalog-showroom-card__identity">
+                            <div class="catalog-showroom-card__meta-row">
+                                <span class="catalog-showroom-card__family-key">{{ row.family_key | e }}</span>
+                            </div>
+                            <h3>{{ row.display_name | e }}</h3>
+                            <p>{{ preview_summary | e }}</p>
+                            <p class="catalog-showroom-card__signal">{{ insight_body | e }}</p>
+                        </div>
+                        <div class="catalog-showroom-card__status-stack">
+                            {{ catalogo.status_badge(preview_status, 'catalog-showroom-card__status-badge') }}
+                            {{ catalogo.status_badge(row.commercial_status, 'catalog-showroom-card__status-badge') }}
+                        </div>
+                    </div>
+
+                    <div class="catalog-showroom-card__spec-grid">
+                        <article class="catalog-showroom-card__spec catalog-showroom-card__spec--feature">
+                            <span>Pacote comercial</span>
+                            <strong>{{ bundle_label | e }}</strong>
+                            <small>{{ bundle_summary | e }}</small>
+                        </article>
+                        <article class="catalog-showroom-card__spec">
+                            <span>Documento base</span>
+                            <strong>{{ 'Documento base disponível' if document_ready else 'Preview em montagem' }}</strong>
+                            <small>{{ material_status.label | e }}</small>
+                        </article>
+                        <article class="catalog-showroom-card__spec">
+                            <span>Liberação</span>
+                            <strong>{{ row.release_channel.label | e }}</strong>
+                            <small>{{ row.active_release_count | int }} cliente(s) ativos</small>
+                        </article>
+                    </div>
+
+                    <div class="catalog-showroom-card__plans">
+                        <div class="catalog-showroom-card__plans-head">
+                            <strong>Disponível para assinatura</strong>
+                            <span>{{ distribution_copy | e }}</span>
+                        </div>
+                        <div class="catalog-showroom-card__plan-list">
+                            {% for plan in plan_distribution['items'] %}
+                            <span class="catalog-plan-pill{% if plan.enabled %} is-enabled{% endif %}{% if plan.access_level == 'full' %} is-full{% endif %}" aria-label="{{ plan.label | e }} {{ 'disponivel' if plan.enabled else 'indisponivel' }}">
+                                <span class="catalog-plan-pill__mark" aria-hidden="true">{{ '✓' if plan.enabled else '–' }}</span>
+                                {{ plan.short_label | e }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        <p class="catalog-showroom-card__plans-note">{{ plan_distribution.summary_hint | e }}</p>
+                    </div>
+
+                    <div class="catalog-showroom-card__fact-list">
+                        <span>{{ preview_section_count | int }} seção(ões)</span>
+                        <span>{{ document_preview.required_slot_count | default(0, true) | int }} item(ns) obrigatórios</span>
+                        <span>{{ document_preview.minimum_evidence.fotos | default(0, true) | int }} foto(s) mínimas</span>
+                        {% if contract_features %}
+                        {% for item in contract_features[:1] %}
+                        <span>{{ item.label | e }}</span>
+                        {% endfor %}
+                        {% else %}
+                        <span>QR / hash público</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="catalog-showroom-card__actions">
+                        <button
+                            type="button"
+                            class="catalog-btn catalog-btn--primary js-open-catalog-preview"
+                            data-preview-url="/admin/catalogo-laudos/familias/{{ row.family_key | e }}/preview.pdf"
+                            data-preview-family-url="/admin/catalogo-laudos/familias/{{ row.family_key | e }}"
+                            data-preview-title="{{ document_preview.title | default(row.display_name, true) | e }}"
+                            data-preview-subtitle="{{ document_preview.subtitle | default('Documento base pronto para receber dados e emitir o laudo final.', true) | e }}"
+                            data-preview-note="{{ document_preview.preview_note | default('Documento pronto para apresentação interna.', true) | e }}"
+                            data-preview-code="{{ cover_code | e }}"
+                            data-preview-tone="{{ tone_class | e }}"
+                            data-preview-status-label="{{ preview_status.label | e }}"
+                            data-preview-status-tone="{{ preview_status.tone | e }}"
+                            data-preview-objective-title="{{ preview_objective.title | e }}"
+                            data-preview-objective-text="{{ preview_objective.summary | e }}"
+                            data-preview-meta='{{ [
+                                material_status.label,
+                                (document_preview.required_slot_count | default(0, true) | int) ~ " item(ns) obrigatórios",
+                                (document_preview.minimum_evidence.fotos | default(0, true) | int) ~ " foto(s) mínimas",
+                                "Modelo: " ~ (document_preview.template_default_code | default(template_label, true))
+                            ] | tojson | forceescape }}'
+                            data-preview-sections='{{ preview_sections[:4] | tojson | forceescape }}'
+                            data-preview-fields='{{ (document_preview.required_slots | default([]))[:6] | tojson | forceescape }}'
+                            data-preview-features='{{ preview_features[:5] | tojson | forceescape }}'
+                        >
+                            Ver documento
+                        </button>
+                        <a href="/admin/catalogo-laudos/familias/{{ row.family_key | e }}" class="catalog-btn catalog-btn--secondary">Abrir família</a>
+                        <a href="/admin/catalogo-laudos/familias/{{ row.family_key | e }}?tab=ofertas#ofertas" class="catalog-btn catalog-btn--secondary">Pacote comercial</a>
+                        <a href="/admin/catalogo-laudos/familias/{{ row.family_key | e }}?tab=liberacao#liberacao" class="catalog-btn catalog-btn--secondary">Clientes</a>
+                        <details class="catalog-overflow">
+                            <summary class="catalog-btn catalog-btn--ghost">Mais ações</summary>
+                            <div class="catalog-overflow__menu">
+                                <a href="/admin/catalogo-laudos/familias/{{ row.family_key | e }}?tab=calibracao#calibracao" class="catalog-overflow__action">Ver validação</a>
+                                <a href="/admin/catalogo-laudos/familias/{{ row.family_key | e }}?tab=templates#templates" class="catalog-overflow__action">Ver modelos</a>
+                                <a href="/admin/catalogo-laudos/familias/{{ row.family_key | e }}?tab=liberacao#liberacao" class="catalog-overflow__action">Liberar para cliente</a>
+                                {% if row.technical_status.key != 'ready' %}
+                                <form method="POST" action="/admin/catalogo-laudos/familias/{{ row.family_key | e }}/technical-status" class="catalog-overflow__form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="technical_status" value="ready">
+                                    <button type="submit" class="catalog-overflow__action">Marcar como pronta</button>
+                                </form>
+                                {% endif %}
+                                {% if row.offer_name %}
+                                <form method="POST" action="/admin/catalogo-laudos/familias/{{ row.family_key | e }}/offer-lifecycle" class="catalog-overflow__form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="lifecycle_status" value="{{ 'paused' if row.commercial_status.key == 'active' else 'active' }}">
+                                    <button type="submit" class="catalog-overflow__action">
+                                        {{ 'Pausar pacote' if row.commercial_status.key == 'active' else 'Ativar pacote' }}
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="catalog-showroom-card__preview">
+                    <div class="catalog-template-preview">
+                        <div class="catalog-template-preview__topbar">
+                            <span>Prévia do documento</span>
+                            <span>{{ 'Primeira pagina' if document_ready else 'Estrutura inicial' }}</span>
+                        </div>
+                        <div class="catalog-template-preview__frame">
+                            <div class="catalog-template-preview__paper{% if not document_ready %} is-skeleton{% endif %}">
+                                <div class="catalog-template-preview__paper-bar">
+                                    <span class="catalog-template-preview__paper-chip">Tariel oficial</span>
+                                    <span class="catalog-template-preview__paper-chip">{{ 'Documento base' if document_ready else 'Em montagem' }}</span>
+                                </div>
+                                <div class="catalog-template-preview__paper-head">
+                                    <span class="catalog-template-preview__paper-code">{{ cover_code | e }}</span>
+                                    <div>
+                                        <strong>{{ document_preview.title | default(row.display_name, true) | e }}</strong>
+                                        <p>{{ row.release_channel.label | e }} • {{ material_status.label | e }}</p>
+                                    </div>
+                                </div>
+                                <div class="catalog-template-preview__paper-meta">
+                                    <span>{{ bundle_label | e }}</span>
+                                    <span>{{ preview_section_count | int }} seções</span>
+                                    <span>{{ document_preview.required_slot_count | default(0, true) | int }} itens guiados</span>
+                                </div>
+                                <section class="catalog-template-preview__section catalog-template-preview__section--hero">
+                                    <span class="catalog-template-preview__section-label">Identificação da primeira página</span>
+                                    <div class="catalog-template-preview__paper-lines">
+                                        <span class="is-long"></span>
+                                        <span></span>
+                                        <span class="is-short"></span>
+                                    </div>
+                                </section>
+                                <section class="catalog-template-preview__section">
+                                    <div class="catalog-template-preview__section-head">
+                                        <strong>{{ preview_objective.title | e }}</strong>
+                                        <span>{{ row.classification_label | e }}</span>
+                                    </div>
+                                    <p>{{ preview_objective.summary | e }}</p>
+                                </section>
+                                <div class="catalog-template-preview__outline">
+                                {% if preview_sections %}
+                                {% for section in preview_sections[:3] %}
+                                <article class="catalog-template-preview__outline-item">
+                                    <span class="catalog-template-preview__outline-index">{{ '%02d' % loop.index }}</span>
+                                    <div class="catalog-template-preview__outline-copy">
+                                        <div class="catalog-template-preview__outline-head">
+                                            <strong>{{ section.title | e }}</strong>
+                                            <span>{{ section.status.label | e }}</span>
+                                        </div>
+                                        <p>{{ section.bullets[0] | default('Trecho do laudo preparado para orientar o preenchimento.', true) | e }}</p>
+                                        <div class="catalog-template-preview__outline-lines">
+                                            <span class="is-long"></span>
+                                            <span></span>
+                                        </div>
+                                    </div>
+                                </article>
+                                {% endfor %}
+                                {% else %}
+                                {% for _ in range(3) %}
+                                <article class="catalog-template-preview__outline-item is-placeholder">
+                                    <span class="catalog-template-preview__outline-index">{{ '%02d' % loop.index }}</span>
+                                    <div class="catalog-template-preview__outline-copy">
+                                        <div class="catalog-template-preview__outline-head">
+                                            <strong>Bloco do laudo</strong>
+                                            <span>Estrutura inicial</span>
+                                        </div>
+                                        <p>Estrutura aguardando composição do preview.</p>
+                                        <div class="catalog-template-preview__outline-lines">
+                                            <span class="is-long"></span>
+                                            <span></span>
+                                        </div>
+                                    </div>
+                                </article>
+                                {% endfor %}
+                                {% endif %}
+                                </div>
+                                <div class="catalog-template-preview__footer">
+                                    <span>{{ preview_section_count | int }} seções</span>
+                                    <span>{{ document_preview.minimum_evidence.fotos | default(0, true) | int }} fotos mínimas</span>
+                                    <span>Assinatura / QR / hash</span>
+                                </div>
+                                <div class="catalog-template-preview__signature">
+                                    <span>Responsável técnico</span>
+                                    <span>Validação pública</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="catalog-template-preview__note">{{ document_preview.preview_note | default('Modelo demonstrativo pronto para vitrine.', true) | e }}</p>
+                </div>
+            </article>
+            {% else %}
+            <div class="catalog-empty-state catalog-empty-state--panel">
+                <strong>Nenhuma família encontrada para o recorte aplicado.</strong>
+                <p>Revise os filtros ou abra o painel lateral para cadastrar uma nova família.</p>
+                <button type="button" class="catalog-btn catalog-btn--primary" data-catalog-open-drawer="family-create">Nova família</button>
+            </div>
+            {% endfor %}
+        </div>
+    </article>
+</section>

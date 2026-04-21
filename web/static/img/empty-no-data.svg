@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" fill="none">
+  <title>Empty state — no data</title>
+  <desc>Brand-aligned no-data illustration for TARIEL.</desc>
+
+<defs>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+    <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.10"/>
+  </filter>
+  <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%">
+    <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#0F172A" flood-opacity="0.08"/>
+  </filter>
+  <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#60A5FA"/>
+    <stop offset="100%" stop-color="#2563EB"/>
+  </linearGradient>
+  <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#4ADE80"/>
+    <stop offset="100%" stop-color="#16A34A"/>
+  </linearGradient>
+  <linearGradient id="redGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#F87171"/>
+    <stop offset="100%" stop-color="#DC2626"/>
+  </linearGradient>
+  <radialGradient id="orbBlue" cx="50%" cy="50%" r="60%">
+    <stop offset="0%" stop-color="#DBEAFE" stop-opacity="0.95"/>
+    <stop offset="100%" stop-color="#DBEAFE" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="orbGreen" cx="50%" cy="50%" r="60%">
+    <stop offset="0%" stop-color="#DCFCE7" stop-opacity="0.95"/>
+    <stop offset="100%" stop-color="#DCFCE7" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="orbRed" cx="50%" cy="50%" r="60%">
+    <stop offset="0%" stop-color="#FEE2E2" stop-opacity="0.95"/>
+    <stop offset="100%" stop-color="#FEE2E2" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+
+    <g opacity="0.08" transform="translate(760 70) scale(0.42)">
+      <g transform="translate(64.000,146.168) scale(0.825806452)">
+        <path d="M 0.00 0.00 L 128.00 201.00 L 339.00 203.00 L 339.00 654.00 L 628.00 886.00 L 1038.00 474.00 L 1038.00 227.00 L 562.00 226.00 L 562.00 571.00 L 719.00 414.00 L 846.00 416.00 L 845.00 456.00 L 634.00 665.00 L 538.00 588.00 L 538.00 200.00 L 893.00 199.00 L 1085.00 0.00 Z M 362.00 478.00 L 516.00 601.00 L 515.00 768.00 L 361.00 644.00 Z M 1015.00 247.00 L 1016.00 467.00 L 626.00 858.00 L 538.00 787.00 L 538.00 618.00 L 639.00 694.00 L 867.00 463.00 L 867.00 393.00 L 712.00 392.00 L 584.00 520.00 L 582.00 249.00 Z M 37.00 20.00 L 1038.00 23.00 L 885.00 177.00 L 517.00 177.00 L 515.00 572.00 L 361.00 450.00 L 360.00 180.00 L 140.00 180.00 Z" fill="none" stroke="#2563EB" stroke-width="10" />
+      </g>
+    </g>
+
+  <ellipse cx="600" cy="700" rx="210" ry="28" fill="#CBD5E1" opacity="0.35"/>
+  <circle cx="600" cy="370" r="230" fill="url(#orbBlue)"/>
+  <g filter="url(#shadow)">
+    <rect x="318" y="208" width="564" height="360" rx="32" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+    <rect x="352" y="246" width="150" height="18" rx="9" fill="#DBEAFE"/>
+    <rect x="352" y="298" width="430" height="16" rx="8" fill="#E2E8F0"/>
+    <rect x="352" y="336" width="362" height="16" rx="8" fill="#E2E8F0"/>
+    <rect x="352" y="374" width="284" height="16" rx="8" fill="#E2E8F0"/>
+    <rect x="352" y="432" width="170" height="90" rx="18" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="3"/>
+    <path d="M391 468h92" stroke="#94A3B8" stroke-width="10" stroke-linecap="round"/>
+    <path d="M391 493h68" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <g filter="url(#softShadow)">
+    <circle cx="730" cy="470" r="88" fill="#FFFFFF" stroke="#2563EB" stroke-width="8"/>
+    <circle cx="730" cy="470" r="44" fill="#DBEAFE" stroke="#2563EB" stroke-width="6"/>
+    <path d="M790 530l52 52" stroke="#2563EB" stroke-width="18" stroke-linecap="round"/>
+  </g>
+  <g filter="url(#softShadow)">
+    <rect x="260" y="290" width="106" height="46" rx="16" fill="#FFFFFF" stroke="#DBEAFE" stroke-width="3"/>
+    <circle cx="296" cy="313" r="8" fill="#2563EB"/>
+    <path d="M320 313h24" stroke="#94A3B8" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <circle cx="270" cy="460" r="10" fill="#DBEAFE"/>
+  <circle cx="915" cy="320" r="12" fill="#DBEAFE"/>
+  <circle cx="930" cy="604" r="8" fill="#93C5FD" opacity="0.8"/>
+  <path d="M880 610c34-34 82-34 116 0" stroke="#93C5FD" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
+  <path d="M235 565c26 26 68 26 94 0" stroke="#DBEAFE" stroke-width="6" stroke-linecap="round"/>
+</svg>

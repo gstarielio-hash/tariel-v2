@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exec npx -y -p node@22.12.0 -p npm@11 npm "$@"

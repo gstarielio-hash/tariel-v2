@@ -1,0 +1,1130 @@
+{
+  "generated_at": "2026-04-17T20:43:01.980674+00:00",
+  "monitoring_mode": "manual_admin_review",
+  "source_count": 61,
+  "sources": [
+    {
+      "url": "https://www.gov.br/gestao/pt-br/central-de-conteudo/publicacoes/notas-informativas/2019/nr20_nota_informativa.pdf",
+      "status_code": 200,
+      "content_length": 1626476,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "39300c96acd083a42da84d13ff8cefb5968a92f38b03a36792aa0f9d2552e159",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:36.195622+00:00",
+      "title": "Mudancas na NR-20: inflamaveis e combustiveis",
+      "authority": "Governo Federal",
+      "families": [
+        "nr20_inspecao_instalacoes_inflamaveis",
+        "nr20_prontuario_instalacoes_inflamaveis"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/gestao/pt-br/central-de-conteudo/publicacoes/notas-informativas/2020/nr18_10_02_2020.pdf",
+      "status_code": 200,
+      "content_length": 588501,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "4855757975c46e60dd3488a803e51643cae52f140410e5447b2ca2276bb9af33",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:36.621284+00:00",
+      "title": "Nota informativa - Nova NR 18",
+      "authority": "Ministerio da Gestao e da Inovacao em Servicos Publicos",
+      "families": [
+        "nr18_inspecao_canteiro_obra",
+        "nr18_inspecao_frente_construcao"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/pt-br/servicos/solicitar-licenca-previa-para-prorrogacao-de-jornada-em-atividade-insalubre",
+      "status_code": 200,
+      "content_length": 114482,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "777b384515b60fa8016456aba6e6fd0883f61c478875022952d03ae98ffff7cc",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:36.775675+00:00",
+      "title": "Solicitar Licenca Previa para Prorrogacao de Jornada em Atividade Insalubre",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr15_laudo_insalubridade"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-04.pdf",
+      "status_code": 200,
+      "content_length": 736605,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "35a7c512c2ea9579863d44ac0e4b0a0cc9e4638618acd1c4cec2a4367678488f",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:37.275619+00:00",
+      "title": "Servicos Especializados em Seguranca e em Medicina do Trabalho",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr04_diagnostico_sesmt"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-08.pdf",
+      "status_code": 200,
+      "content_length": 163600,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "d0db483c5c78ccca888fa411158eebf2fc6243bf622590766a2d5ff4e0a6b700",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:37.465485+00:00",
+      "title": "Edificacoes",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr08_inspecao_edificacao_industrial"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-10.pdf",
+      "status_code": 200,
+      "content_length": 343048,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "a6870fdc75dedacdfec71feba20f210cc4d63842b22771d539d26f6cf1e07350",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:37.651352+00:00",
+      "title": "NR 10 - Seguranca em Instalacoes e Servicos em Eletricidade",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr10_implantacao_loto",
+        "nr10_inspecao_instalacoes_eletricas",
+        "nr10_inspecao_spda",
+        "nr10_prontuario_instalacoes_eletricas"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-11.pdf",
+      "status_code": 200,
+      "content_length": 317097,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "425884c97110eb1f3fa8a63137d1ab1cca6c975c0a86fc5d88cb80d2934c739b",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:37.896261+00:00",
+      "title": "Transporte, Movimentacao, Armazenagem e Manuseio de Materiais",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr11_inspecao_equipamento_icamento",
+        "nr11_inspecao_movimentacao_armazenagem"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-12.pdf",
+      "status_code": 200,
+      "content_length": 2643062,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "c256b79b3390d32fac4ccbc34a6a1ff994acdab5db8ecc50999da2d8b2c7c79b",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:38.990729+00:00",
+      "title": "Seguranca no Trabalho em Maquinas e Equipamentos",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr12_apreciacao_risco_maquina",
+        "nr12_inspecao_maquina_equipamento"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-13-atualizada-2022-retificada.pdf",
+      "status_code": 200,
+      "content_length": 407140,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "382b6c30179a8e7bb974873ae289f4dc2b1141006b08bc6aece158e8fbc12035",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:39.425644+00:00",
+      "title": "Caldeiras, Vasos de Pressao e Tubulacoes e Tanques Metalicos de Armazenamento",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr13_abertura_livro_registro_seguranca",
+        "nr13_adequacao_planta_industrial",
+        "nr13_calculo_espessura_minima_caldeira",
+        "nr13_calculo_espessura_minima_tubulacao",
+        "nr13_calculo_espessura_minima_vaso_pressao",
+        "nr13_calculo_pmta_vaso_pressao",
+        "nr13_fluxograma_linhas_acessorios",
+        "nr13_inspecao_vaso_pressao",
+        "nr13_levantamento_in_loco_equipamentos",
+        "nr13_par_projeto_alteracao_reparo",
+        "nr13_projeto_instalacao",
+        "nr13_reconstituicao_prontuario",
+        "nr13_treinamento_operacao_caldeira",
+        "nr13_treinamento_operacao_unidades_processo"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-13.pdf",
+      "status_code": 200,
+      "content_length": 465779,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "4ffd600945cebed5279f22056a58d56313af940e587b78c8dd8286dbeee8ca95",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:39.970878+00:00",
+      "title": "Caldeiras, Vasos de Pressao e Tubulacoes e Tanques Metalicos de Armazenamento",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr13_calibracao_valvulas_manometros",
+        "nr13_inspecao_caldeira",
+        "nr13_inspecao_tubulacao",
+        "nr13_integridade_caldeira",
+        "nr13_teste_estanqueidade_tubulacao_gas",
+        "nr13_teste_hidrostatico"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-14.pdf",
+      "status_code": 200,
+      "content_length": 153409,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "8afff8392d82d7b4c7f462deb5b3d7d1647d2b557efb8aae27b82706dcc573de",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:40.145458+00:00",
+      "title": "Fornos",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr14_inspecao_forno_industrial"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-17-atualizada-2022.pdf",
+      "status_code": 200,
+      "content_length": 304519,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "d0ce5ebfd2f44869d6ffe5cb8880c1b7127ec7614e1f558ef74450cae095c311",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:40.333929+00:00",
+      "title": "Ergonomia",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr17_analise_ergonomica_trabalho",
+        "nr17_checklist_ergonomia"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-17_manual_de_aplicacao_da_nr_17.pdf",
+      "status_code": 200,
+      "content_length": 369924,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "d61b92bd741a81c2a2ab83b44d475bf94780eaf41e1cdfdfb4e2882129e87a5f",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:40.548202+00:00",
+      "title": "Manual de Aplicacao da NR-17",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr17_analise_ergonomica_trabalho",
+        "nr17_checklist_ergonomia"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-19.pdf",
+      "status_code": 200,
+      "content_length": 341116,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "1f4fcf2706def24a278df7ffbd03524640cd4620b22fabfb92d6e15851130765",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:40.739774+00:00",
+      "title": "Explosivos",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr19_inspecao_area_explosivos"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-20.pdf",
+      "status_code": 200,
+      "content_length": 329236,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "d19e0b0f3b45ad14a75cf2fd984dde77d7662e85aa8fecddc55a9523509a9b9f",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:41.026379+00:00",
+      "title": "Seguranca e Saude no Trabalho com Inflamaveis e Combustiveis",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr20_inspecao_instalacoes_inflamaveis",
+        "nr20_prontuario_instalacoes_inflamaveis"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-21.pdf",
+      "status_code": 200,
+      "content_length": 143110,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "6ca3b96ca93b7059d2c39a237e1108753b2ecfc36b86bcd5ac7dfc2e0f56c3c1",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:41.215078+00:00",
+      "title": "Trabalhos a Ceu Aberto",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr21_condicoes_trabalho_ceu_aberto"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-23.pdf",
+      "status_code": 200,
+      "content_length": 168495,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "4ff18b3fe81e4b6bdd419bf2f06f8e524a30cebef689003f077d165b098f1276",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:41.422401+00:00",
+      "title": "Protecao Contra Incendios",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr23_inspecao_protecao_incendios"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-24-atualizada-2022.pdf",
+      "status_code": 200,
+      "content_length": 895341,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "91ede35a55f819f97327d5f7a99e572afb0df14925d6cac760338b92d3d9483b",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:41.737421+00:00",
+      "title": "Condicoes Sanitarias e de Conforto nos Locais de Trabalho",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr24_condicoes_sanitarias_conforto"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-25.pdf",
+      "status_code": 200,
+      "content_length": 159596,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "b29b74901271b58c95423a892db49d64e4f1069555e42f91ef0319c92c39ddf4",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:41.929972+00:00",
+      "title": "Residuos Industriais",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr25_gestao_residuos_industriais"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-26.pdf",
+      "status_code": 200,
+      "content_length": 171770,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "695fd93e85e31285202981929349c05cd71f73b41c57ec9e85cb0c884fd44633",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:42.086084+00:00",
+      "title": "Sinalizacao de Seguranca",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr26_sinalizacao_seguranca"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-29.pdf",
+      "status_code": 200,
+      "content_length": 1047706,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "739fe2ae8908848c18f9e3ab4c76017e1fabd134653f7aa6876d911b2254d98e",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:42.890690+00:00",
+      "title": "Norma Regulamentadora de Seguranca e Saude no Trabalho Portuario",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr29_inspecao_operacao_portuaria"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-30.pdf",
+      "status_code": 200,
+      "content_length": 808061,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "97cbbc1ed064d4ec7dc2386a5c91ed466394c6c97a341260c4cb43ed1e56c430",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:43.416769+00:00",
+      "title": "Seguranca e Saude no Trabalho Aquaviario",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr30_inspecao_trabalho_aquaviario"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-31.pdf",
+      "status_code": 200,
+      "content_length": 1362665,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "1dede39522d7e9607fcf0ee5eade7421a507e4533a981e5a4a1d5b5329a0aaea",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:44.110996+00:00",
+      "title": "Seguranca e Saude no Trabalho na Agricultura, Pecuaria Silvicultura, Exploracao Florestal e Aquicultura",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr31_inspecao_frente_rural"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-32.pdf",
+      "status_code": 200,
+      "content_length": 748858,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "7554b3ffc3b3f5b002aba516887e39144e7495b66dbc9397bde023b5510d632b",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:44.380929+00:00",
+      "title": "Seguranca e Saude no Trabalho em Servicos de Saude",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr32_inspecao_servico_saude",
+        "nr32_plano_risco_biologico"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-33.pdf",
+      "status_code": 200,
+      "content_length": 401092,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "394478bc622b5e53f23c20f507fb2c83b19288a2bd95cc3f2e7998b152cfed81",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:44.661279+00:00",
+      "title": "Seguranca e Saude nos Trabalhos em Espacos Confinados",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr33_avaliacao_espaco_confinado",
+        "nr33_permissao_entrada_trabalho"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-34.pdf",
+      "status_code": 200,
+      "content_length": 607606,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "ae84be6c6c51530a0d02beea1d1802b6eec6939e495ab78b134f5344daba1f39",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:45.103925+00:00",
+      "title": "Condicoes e Meio Ambiente de Trabalho na Industria da Construcao, Reparacao e Desmonte Naval",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr34_inspecao_frente_naval"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-36.pdf",
+      "status_code": 200,
+      "content_length": 1222459,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "3b60b23e6c4d9b258277d374090b52168cb82b34cb7104f302cd87039c960ec2",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:46.068719+00:00",
+      "title": "Seguranca e Saude no Trabalho em Empresas de Abate e Processamento de Carnes e Derivados",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr36_inspecao_unidade_abate_processamento"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-37.pdf",
+      "status_code": 200,
+      "content_length": 836781,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "a3a740066f31ab82e969c3331f9169dc4cb60e5b9515a06383a90288cb63a5c9",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:46.594985+00:00",
+      "title": "Seguranca e Saude em Plataformas de Petroleo",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr37_inspecao_plataforma_petroleo"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-38.pdf",
+      "status_code": 200,
+      "content_length": 702448,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "d6f5e553d59a3e043e7e815bbbb6a2917e263ad31b26444dd0f3db7d0b42e23f",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:47.056891+00:00",
+      "title": "Seguranca e Saude no Trabalho nas Atividades de Limpeza Urbana e Manejo de Residuos Solidos",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr38_inspecao_limpeza_urbana_residuos"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/guia-nr-01-revisado.pdf",
+      "status_code": 200,
+      "content_length": 985144,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "6f713c2b73743516794ec591a7e98daeecbdfc6ca7e19877b682d29b8c21a063",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:47.645061+00:00",
+      "title": "Guia NR-01 Revisado",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr01_gro_pgr",
+        "nr01_ordem_servico_sst"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-11-nr-11",
+      "status_code": 200,
+      "content_length": 212364,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "a8f5cf82e351a5f32796bc2ab241c48e12f1a5a3f46d33ce13836796910aaf68",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:47.812630+00:00",
+      "title": "Norma Regulamentadora No. 11 (NR-11)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr11_inspecao_equipamento_icamento",
+        "nr11_inspecao_movimentacao_armazenagem"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-13-nr-13",
+      "status_code": 200,
+      "content_length": 219524,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "09f8d155cbfc49658d2a6e92b45126f3576cc17b26db8fb21fa93503c927b6e7",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:48.036686+00:00",
+      "title": "Norma Regulamentadora No. 13 (NR-13)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr13_abertura_livro_registro_seguranca",
+        "nr13_adequacao_planta_industrial",
+        "nr13_calculo_espessura_minima_caldeira",
+        "nr13_calculo_espessura_minima_tubulacao",
+        "nr13_calculo_espessura_minima_vaso_pressao",
+        "nr13_calculo_pmta_vaso_pressao",
+        "nr13_fluxograma_linhas_acessorios",
+        "nr13_inspecao_vaso_pressao",
+        "nr13_levantamento_in_loco_equipamentos",
+        "nr13_par_projeto_alteracao_reparo",
+        "nr13_projeto_instalacao",
+        "nr13_reconstituicao_prontuario",
+        "nr13_treinamento_operacao_caldeira",
+        "nr13_treinamento_operacao_unidades_processo"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-17-nr-17",
+      "status_code": 200,
+      "content_length": 213857,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "1101de53d559bac0c4ab536fa07b959b5d806a6171aa0f305f06a0cdfa84580d",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:48.253673+00:00",
+      "title": "Norma Regulamentadora No. 17 (NR-17)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr17_analise_ergonomica_trabalho",
+        "nr17_checklist_ergonomia"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-18-nr-18",
+      "status_code": 200,
+      "content_length": 224961,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "85cc2c41b9605043a53fa9748f0d0e05d8790a36b622bbe36d17b4f371371a10",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:48.533841+00:00",
+      "title": "Norma Regulamentadora No. 18 (NR-18)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr18_inspecao_canteiro_obra",
+        "nr18_inspecao_frente_construcao"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-22-nr-22",
+      "status_code": 200,
+      "content_length": 220441,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "40858c623419b8f8e9285f924f9eb9e7aaa01b32175a77426b4ed7a793fe23c6",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:48.704627+00:00",
+      "title": "Norma Regulamentadora No. 22 (NR-22)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr22_inspecao_area_mineracao",
+        "nr22_inspecao_instalacao_mineira"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-24-nr-24",
+      "status_code": 200,
+      "content_length": 218196,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "90683a564d898eadd8f3c418e9f7c7422cf35394914859cef19a6b42a7c3b24f",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:48.890293+00:00",
+      "title": "Norma Regulamentadora No. 24 (NR-24)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr24_condicoes_sanitarias_conforto"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-7-nr-7",
+      "status_code": 200,
+      "content_length": 221220,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "168f509357ef1b3aafaacfe8c3377b9f651c16af10c5c5a00a2927b01854c982",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:49.126887+00:00",
+      "title": "Norma Regulamentadora No. 7 (NR-7)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr07_pcmso"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-9-nr-9",
+      "status_code": 200,
+      "content_length": 229072,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "f6856e8420e99b825b76703f265074a8a20a2adb8105b98f52bc44ddf2a93f0b",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:49.363571+00:00",
+      "title": "Norma Regulamentadora No. 9 (NR-9)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr09_avaliacao_exposicoes_ocupacionais"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-01-atualizada-2025-i.pdf",
+      "status_code": 200,
+      "content_length": 384361,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "ab9f6627d16d96d4d4a742f79fcbd4363a345b2ddd8f0028d5bdcc750be46fc2",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:49.686670+00:00",
+      "title": "Disposicoes Gerais e Gerenciamento de Riscos Ocupacionais",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr01_gro_pgr",
+        "nr01_ordem_servico_sst"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-05-atualizada-2023.pdf",
+      "status_code": 200,
+      "content_length": 309052,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "bb8489103f643790dea7fbb371ec8661876cc64eb8a677e01abeda1e541bc8e9",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:49.975381+00:00",
+      "title": "Comissao Interna de Prevencao de Acidentes e de Assedio - CIPA",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr05_auditoria_cipa",
+        "nr05_implantacao_cipa"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-06-atualizada-2025-ii.pdf",
+      "status_code": 200,
+      "content_length": 298107,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "1af315ea42668d5e37ef63da7007f065be30ad53bd3faaf03ff926e5465147eb",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:50.176791+00:00",
+      "title": "NR 06 - Equipamentos de Protecao Individual - EPI",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr06_gestao_epi"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-07-atualizada-2022-1.pdf",
+      "status_code": 200,
+      "content_length": 754137,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "f27b63bbe7cc1532810911d9fa5a56409ec955ab41e0d8eb66cd7869be938b63",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:50.458928+00:00",
+      "title": "NR 7 - Programa de Controle Medico de Saude Ocupacional - PCMSO",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr07_pcmso"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-09-atualizada-2026.pdf",
+      "status_code": 200,
+      "content_length": 483218,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "9cc608eb7766ca7565234d2069d3491d2714e26d0c76de3aa043105521a8d584",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:50.826283+00:00",
+      "title": "NR-09 - Avaliacao e Controle das Exposicoes Ocupacionais a Agentes Fisicos, Quimicos e Biologicos",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr09_avaliacao_exposicoes_ocupacionais"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-15-atualizada-2025.pdf",
+      "status_code": 200,
+      "content_length": 2421847,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "d3b04a284837f1965a4f32491a2ce8e688db4131eae6a647a2354aae6459b97e",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:51.500864+00:00",
+      "title": "NR 15 - Atividades e Operacoes Insalubres",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr15_laudo_insalubridade"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-16-atualizada-2025-ii.pdf",
+      "status_code": 200,
+      "content_length": 399810,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "4072fa8243d650c41713e72de23b804470696a6d955503aee7372edd7a822c68",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:51.972265+00:00",
+      "title": "Atividades e Operacoes Perigosas",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr16_laudo_periculosidade"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-18-atualizada-2025.pdf",
+      "status_code": 200,
+      "content_length": 617285,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "893852dc9fd15371e7b687bdc77649ecf75ddc056a604bb308ce8923fc502aa6",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:52.250176+00:00",
+      "title": "Seguranca e Saude no Trabalho na Industria da Construcao",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr18_inspecao_canteiro_obra",
+        "nr18_inspecao_frente_construcao"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-22-atualizada-2026.pdf",
+      "status_code": 200,
+      "content_length": 789900,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "70cf7c59595074eec39c0861510036d00bd667c305320311281a1c19b6874835",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:52.772759+00:00",
+      "title": "Seguranca e Saude Ocupacional na Mineracao",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr22_inspecao_area_mineracao",
+        "nr22_inspecao_instalacao_mineira"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-35-atualizada-2025.pdf",
+      "status_code": 200,
+      "content_length": 332726,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "de13004ccad398f96a83cad27d2ca82aa1d307f4ad2d86ffe8953e46039d21db",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:53.086621+00:00",
+      "title": "Trabalho em Altura",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr35_inspecao_linha_de_vida",
+        "nr35_inspecao_ponto_ancoragem",
+        "nr35_montagem_linha_de_vida",
+        "nr35_projeto_protecao_queda"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/escola/e-biblioteca/guia-tecnico-da-nr-33-ano-2013.pdf/@@download/file",
+      "status_code": 200,
+      "content_length": 1523450,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "b2df3474f00d52a62ab4ec38aec117375c0a95a3717b2d7f549e62e9b8b61b51",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:53.557080+00:00",
+      "title": "Guia Tecnico da NR-33 (ano 2013)",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr33_avaliacao_espaco_confinado",
+        "nr33_permissao_entrada_trabalho"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/guia_tecnico_de_riscos_biologicos_nr_32.pdf",
+      "status_code": 200,
+      "content_length": 266872,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "38a1492bef980c6836fc510d45e83ef5dd2a0a9f87f9acef1a197524fe97349b",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:53.749626+00:00",
+      "title": "Guia Tecnico de Riscos Biologicos da NR-32",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr32_inspecao_servico_saude",
+        "nr32_plano_risco_biologico"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/manual-de-aplicacao-da-nr-12.pdf/%40%40download/file",
+      "status_code": 200,
+      "content_length": 6057681,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "9e855ff93ce41d4b37b42478c3649701b67766e9791748e6a5ab1c5e5f033988",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:55.340258+00:00",
+      "title": "Manual de Aplicacao da NR-12",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr12_apreciacao_risco_maquina",
+        "nr12_inspecao_maquina_equipamento"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/manual_consolidado_da_nr_35.pdf",
+      "status_code": 200,
+      "content_length": 3375622,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "8349f712ff1038f5f11ce136698851254e41407160092a0b569632225be51d6c",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:56.229127+00:00",
+      "title": "Manual Consolidado da NR-35",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr35_inspecao_linha_de_vida",
+        "nr35_inspecao_ponto_ancoragem",
+        "nr35_montagem_linha_de_vida",
+        "nr35_projeto_protecao_queda"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/manual_de_auxilio_na_interpretacao_e_aplicacao_da_nr_10.pdf",
+      "status_code": 200,
+      "content_length": 2577202,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "5144744e6aa0cdb7a951c6d26fc496d2c7b6aaa796305af456841613a50cc244",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:56.947682+00:00",
+      "title": "Manual de Auxilio na Interpretacao e Aplicacao da NR10",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr10_implantacao_loto",
+        "nr10_inspecao_instalacoes_eletricas",
+        "nr10_inspecao_spda",
+        "nr10_prontuario_instalacoes_eletricas"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+      "status_code": 200,
+      "content_length": 221542,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "ad45a281d38b0cb1d15a1e75661c716fa7cec7f754ffd362ecda558d512a10a7",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:57.129964+00:00",
+      "title": "Normas Regulamentadoras - NR",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr01_gro_pgr",
+        "nr01_ordem_servico_sst",
+        "nr04_diagnostico_sesmt",
+        "nr05_auditoria_cipa",
+        "nr05_implantacao_cipa",
+        "nr06_gestao_epi",
+        "nr07_pcmso",
+        "nr08_inspecao_edificacao_industrial",
+        "nr09_avaliacao_exposicoes_ocupacionais",
+        "nr10_implantacao_loto",
+        "nr10_inspecao_instalacoes_eletricas",
+        "nr10_inspecao_spda",
+        "nr10_prontuario_instalacoes_eletricas",
+        "nr11_inspecao_equipamento_icamento",
+        "nr11_inspecao_movimentacao_armazenagem",
+        "nr12_apreciacao_risco_maquina",
+        "nr12_inspecao_maquina_equipamento",
+        "nr13_abertura_livro_registro_seguranca",
+        "nr13_adequacao_planta_industrial",
+        "nr13_calculo_espessura_minima_caldeira",
+        "nr13_calculo_espessura_minima_tubulacao",
+        "nr13_calculo_espessura_minima_vaso_pressao",
+        "nr13_calculo_pmta_vaso_pressao",
+        "nr13_calibracao_valvulas_manometros",
+        "nr13_fluxograma_linhas_acessorios",
+        "nr13_inspecao_caldeira",
+        "nr13_inspecao_tubulacao",
+        "nr13_inspecao_vaso_pressao",
+        "nr13_integridade_caldeira",
+        "nr13_levantamento_in_loco_equipamentos",
+        "nr13_par_projeto_alteracao_reparo",
+        "nr13_projeto_instalacao",
+        "nr13_reconstituicao_prontuario",
+        "nr13_teste_estanqueidade_tubulacao_gas",
+        "nr13_teste_hidrostatico",
+        "nr13_treinamento_operacao_caldeira",
+        "nr13_treinamento_operacao_unidades_processo",
+        "nr14_inspecao_forno_industrial",
+        "nr15_laudo_insalubridade",
+        "nr16_laudo_periculosidade",
+        "nr17_analise_ergonomica_trabalho",
+        "nr17_checklist_ergonomia",
+        "nr18_inspecao_canteiro_obra",
+        "nr18_inspecao_frente_construcao",
+        "nr19_inspecao_area_explosivos",
+        "nr20_inspecao_instalacoes_inflamaveis",
+        "nr20_prontuario_instalacoes_inflamaveis",
+        "nr21_condicoes_trabalho_ceu_aberto",
+        "nr22_inspecao_area_mineracao",
+        "nr22_inspecao_instalacao_mineira",
+        "nr23_inspecao_protecao_incendios",
+        "nr24_condicoes_sanitarias_conforto",
+        "nr25_gestao_residuos_industriais",
+        "nr26_sinalizacao_seguranca",
+        "nr29_inspecao_operacao_portuaria",
+        "nr30_inspecao_trabalho_aquaviario",
+        "nr31_inspecao_frente_rural",
+        "nr32_inspecao_servico_saude",
+        "nr32_plano_risco_biologico",
+        "nr33_avaliacao_espaco_confinado",
+        "nr33_permissao_entrada_trabalho",
+        "nr34_inspecao_frente_naval",
+        "nr35_inspecao_linha_de_vida",
+        "nr35_inspecao_ponto_ancoragem",
+        "nr35_montagem_linha_de_vida",
+        "nr35_projeto_protecao_queda",
+        "nr36_inspecao_unidade_abate_processamento",
+        "nr37_inspecao_plataforma_petroleo",
+        "nr38_inspecao_limpeza_urbana_residuos"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/equipamentos-de-protecao-individual",
+      "status_code": 200,
+      "content_length": 222201,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "f801573d3f50697e7685894e5a04bdc45c5ef0cf76b2e95283ab4ba193f61802",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:42:57.427638+00:00",
+      "title": "Equipamentos de Protecao Individual - EPI",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr06_gestao_epi"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/relatorios-air/air_nr-21_trabalho-a-ceu-aberto.pdf",
+      "status_code": 200,
+      "content_length": 3114921,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "366ff064c13061234177b8e4c65762114ec40256d87184c00e30aacf447ebcad",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:42:58.249654+00:00",
+      "title": "Analise de Impacto Regulatorio da revisao da NR-21 - Trabalho a Ceu Aberto",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr21_condicoes_trabalho_ceu_aberto"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/relatorios-air/relatorio-air-nr-13.pdf",
+      "status_code": 200,
+      "content_length": 6408253,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "afbe232e5eac2c33177a065ecf12b0ca3f958a9022d5523c3c40f6445c667b61",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:43:00.256924+00:00",
+      "title": "Relatorio AIR da NR-13",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr13_abertura_livro_registro_seguranca",
+        "nr13_adequacao_planta_industrial",
+        "nr13_calculo_espessura_minima_caldeira",
+        "nr13_calculo_espessura_minima_tubulacao",
+        "nr13_calculo_espessura_minima_vaso_pressao",
+        "nr13_calculo_pmta_vaso_pressao",
+        "nr13_fluxograma_linhas_acessorios",
+        "nr13_inspecao_vaso_pressao",
+        "nr13_levantamento_in_loco_equipamentos",
+        "nr13_par_projeto_alteracao_reparo",
+        "nr13_projeto_instalacao",
+        "nr13_reconstituicao_prontuario",
+        "nr13_treinamento_operacao_caldeira",
+        "nr13_treinamento_operacao_unidades_processo"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/relatorios-air/relatorio_air_nr-11_com_despacho_decisorio.pdf",
+      "status_code": 200,
+      "content_length": 1492615,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "277961c97644a8db7d620465b6d0c13d2a91a13fbe04752fb4fce24f076aa04b",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:43:01.095622+00:00",
+      "title": "Relatorio AIR da NR-11",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr11_inspecao_equipamento_icamento",
+        "nr11_inspecao_movimentacao_armazenagem"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/sst-portarias/2024/portaria-mte-no-225-nova-nr-22.pdf",
+      "status_code": 200,
+      "content_length": 590316,
+      "content_type": "application/pdf",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "ea9ab7c66924990b945806a7df4a48d8056b2d551e8cf684b6fc5a8592873397",
+      "hash_mode": "raw_bytes",
+      "checked_at": "2026-04-17T20:43:01.538207+00:00",
+      "title": "Portaria MTE nº 225 - Nova NR-22",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr22_inspecao_area_mineracao",
+        "nr22_inspecao_instalacao_mineira"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/itens-para-verificar/uncategorised/norma-regulamentadora-n-15-atividades-e-operacoes-insalubres",
+      "status_code": 200,
+      "content_length": 201687,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "08ac4bff5faac5e3c440074998c4239812a1b97a01136a696008e06993a5f1ac",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:43:01.746282+00:00",
+      "title": "Norma Regulamentadora Nº 15 - Atividades e Operacoes Insalubres",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr15_laudo_insalubridade"
+      ]
+    },
+    {
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2025/dezembro/mte-atualiza-nr-16-e-fortalece-protecao-para-trabalhadores-que-utilizam-motocicletas",
+      "status_code": 200,
+      "content_length": 205648,
+      "content_type": "text/html;charset=utf-8",
+      "etag": null,
+      "last_modified": null,
+      "sha256": "b013ad5062184888c2609a3ae2835c77b9304f5e70ac2252ae3a12ff3fbf0fe7",
+      "hash_mode": "normalized_html_text",
+      "checked_at": "2026-04-17T20:43:01.980640+00:00",
+      "title": "MTE atualiza NR 16 e fortalece protecao para trabalhadores que utilizam motocicletas",
+      "authority": "Ministerio do Trabalho e Emprego",
+      "families": [
+        "nr16_laudo_periculosidade"
+      ]
+    }
+  ]
+}

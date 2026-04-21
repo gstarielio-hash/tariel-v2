@@ -1,0 +1,120 @@
+<section id="panel-chat" class="panel panel--chat{% if (cliente_tab_inicial | default('admin')) == 'chat' %} active{% endif %}">
+    {% set chat_secao_inicial = cliente_chat_section_inicial | default('overview') %}
+    <div class="section-intro section-intro--surface">
+        <div>
+            <h2>Chat operacional</h2>
+            <p>Abra laudos, acompanhe a fila e trate o caso ativo sem sobrecarregar a tela.</p>
+        </div>
+    </div>
+
+    <div
+        class="surface-nav surface-nav--chat"
+        data-surface-nav="chat"
+        data-surface-active-section="{{ cliente_chat_section_inicial | default('overview') | e }}"
+    >
+        <div class="surface-nav__intro">
+            <span class="surface-nav__eyebrow">Chat operacional</span>
+            <strong>Uma tarefa dominante por tela</strong>
+            <p>Abertura, fila e caso ativo em etapas distintas.</p>
+        </div>
+        <div id="chat-section-summary" class="surface-nav__status" aria-live="polite">
+            <span class="surface-nav__status-label">Seção ativa</span>
+            <strong id="chat-section-summary-title">
+                {% if chat_secao_inicial == 'new' %}
+                    Novo laudo
+                {% elif chat_secao_inicial == 'queue' %}
+                    Fila operacional
+                {% elif chat_secao_inicial == 'case' %}
+                    Caso ativo
+                {% else %}
+                    Visao geral
+                {% endif %}
+            </strong>
+            <span id="chat-section-summary-meta">
+                {% if chat_secao_inicial == 'new' %}
+                    Abertura em tela dedicada.
+                {% elif chat_secao_inicial == 'queue' %}
+                    Busca do caso certo.
+                {% elif chat_secao_inicial == 'case' %}
+                    Contexto e conversa em foco.
+                {% else %}
+                    Radar do chat.
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="surface-tabs" role="tablist" aria-label="Seções do chat operacional">
+            <a
+                href="{{ cliente_surface_routes.chat | default('/cliente/chat') | e }}?sec=overview"
+                class="surface-tab{% if (cliente_chat_section_inicial | default('overview')) == 'overview' %} is-active{% endif %}"
+                id="chat-section-tab-overview"
+                data-chat-section-tab="overview"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_chat_section_inicial | default('overview')) == 'overview' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_chat_section_inicial | default('overview')) == 'overview' else 'false' }}"
+                tabindex="{{ '0' if (cliente_chat_section_inicial | default('overview')) == 'overview' else '-1' }}"
+            >
+                <span class="surface-tab__label">Visao geral</span>
+                <span class="surface-tab__meta">Radar do chat</span>
+                <span class="surface-tab__footer">
+                    <span id="chat-section-count-overview" class="surface-tab__count">radar inicial</span>
+                </span>
+            </a>
+            <a
+                href="{{ cliente_surface_routes.chat | default('/cliente/chat') | e }}?sec=new"
+                class="surface-tab{% if (cliente_chat_section_inicial | default('overview')) == 'new' %} is-active{% endif %}"
+                id="chat-section-tab-new"
+                data-chat-section-tab="new"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_chat_section_inicial | default('overview')) == 'new' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_chat_section_inicial | default('overview')) == 'new' else 'false' }}"
+                tabindex="{{ '0' if (cliente_chat_section_inicial | default('overview')) == 'new' else '-1' }}"
+            >
+                <span class="surface-tab__label">Novo laudo</span>
+                <span class="surface-tab__meta">Abertura em tela dedicada</span>
+                <span class="surface-tab__footer">
+                    <span id="chat-section-count-new" class="surface-tab__count">capacidade de abertura</span>
+                </span>
+            </a>
+            <a
+                href="{{ cliente_surface_routes.chat | default('/cliente/chat') | e }}?sec=queue"
+                class="surface-tab{% if (cliente_chat_section_inicial | default('overview')) == 'queue' %} is-active{% endif %}"
+                id="chat-section-tab-queue"
+                data-chat-section-tab="queue"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_chat_section_inicial | default('overview')) == 'queue' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_chat_section_inicial | default('overview')) == 'queue' else 'false' }}"
+                tabindex="{{ '0' if (cliente_chat_section_inicial | default('overview')) == 'queue' else '-1' }}"
+            >
+                <span class="surface-tab__label">Fila operacional</span>
+                <span class="surface-tab__meta">Busca e selecao do caso</span>
+                <span class="surface-tab__footer">
+                    <span id="chat-section-count-queue" class="surface-tab__count">casos na fila</span>
+                </span>
+            </a>
+            <a
+                href="{{ cliente_surface_routes.chat | default('/cliente/chat') | e }}?sec=case"
+                class="surface-tab{% if (cliente_chat_section_inicial | default('overview')) == 'case' %} is-active{% endif %}"
+                id="chat-section-tab-case"
+                data-chat-section-tab="case"
+                role="tab"
+                aria-selected="{{ 'true' if (cliente_chat_section_inicial | default('overview')) == 'case' else 'false' }}"
+                aria-current="{{ 'page' if (cliente_chat_section_inicial | default('overview')) == 'case' else 'false' }}"
+                tabindex="{{ '0' if (cliente_chat_section_inicial | default('overview')) == 'case' else '-1' }}"
+            >
+                <span class="surface-tab__label">Caso ativo</span>
+                <span class="surface-tab__meta">Contexto e conversa em foco</span>
+                <span class="surface-tab__footer">
+                    <span id="chat-section-count-case" class="surface-tab__count">caso ativo em foco</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <div class="surface-stage-panels">
+        {% include "cliente/chat/_overview.html" %}
+        {% include "cliente/chat/_new_report.html" %}
+        {% include "cliente/chat/_queue.html" %}
+        {% include "cliente/chat/_case.html" %}
+    </div>
+</section>

@@ -1,0 +1,114 @@
+            <section class="secao admin-tab-panel" data-admin-tab-panel="usuarios" hidden>
+                <div class="secao-bloco">
+                    <div class="secao-header">
+                        <div class="secao-header__copy">
+                            <h3>
+                                <span class="material-symbols-rounded" aria-hidden="true">manage_accounts</span>
+                                Administradores da empresa ({{ admins_cliente | length }})
+                            </h3>
+                            <p>O Admin-CEO gerencia apenas os acessos administrativos da empresa. A equipe de campo e a equipe de analise ficam sob gestao da propria empresa.</p>
+                        </div>
+                    </div>
+
+                <table class="tabela-admin" aria-label="Lista de administradores da empresa">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">E-mail</th>
+                            <th scope="col">Último acesso</th>
+                            <th scope="col">Status</th>
+                            <th scope="col"><span class="sr-only">Ações</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in admins_cliente %}
+                        <tr>
+                            <td>
+                                <strong>{{ u.nome_completo | e }}</strong>
+                                <div class="texto-suave">{{ u.session_count | int }} sessões ativas</div>
+                            </td>
+                            <td class="texto-suave">{{ u.email | e }}</td>
+                            <td>{{ u.ultimo_acesso_label | e }}</td>
+                            <td>
+                                {% if not u.ativo or u.status_bloqueio %}
+                                <span class="badge critico">Bloqueado</span>
+                                {% elif u.senha_temporaria_ativa %}
+                                <span class="badge atencao">Troca de senha pendente</span>
+                                {% else %}
+                                <span class="badge conforme">Ativo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="acoes-linha">
+                                    <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/resetar-senha/{{ u.id | int }}"
+                                        class="js-reset-form" data-usuario="{{ u.nome_completo | e }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <button type="submit" class="btn-reset">Forçar troca de senha</button>
+                                    </form>
+
+                                    <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/usuarios/{{ u.id | int }}/bloquear"
+                                        class="js-user-block-form" data-usuario="{{ u.nome_completo | e }}"
+                                        data-ativo="{{ 'true' if u.ativo and not u.status_bloqueio else 'false' }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <button type="submit" class="btn-user-toggle {{ 'btn-block' if u.ativo and not u.status_bloqueio else 'btn-unblock' }}">
+                                            {{ 'Bloquear usuário' if u.ativo and not u.status_bloqueio else 'Reativar usuário' }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="estado-vazio-tabela">Nenhum administrador da empresa cadastrado até agora.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/adicionar-admin-cliente" class="form-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="campo-form">
+                        <label for="novo-admin-cliente-nome">Nome</label>
+                        <input id="novo-admin-cliente-nome" type="text" name="nome" maxlength="150" placeholder="Nome completo" required>
+                    </div>
+                    <div class="campo-form">
+                        <label for="novo-admin-cliente-email">E-mail</label>
+                        <input id="novo-admin-cliente-email" type="email" name="email" maxlength="254" placeholder="usuario@empresa.com" required>
+                    </div>
+                    <button type="submit" class="btn-add">
+                        <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                        Adicionar administrador
+                    </button>
+                </form>
+                </div>
+
+                <div class="secao-bloco">
+                    <div class="secao-header">
+                        <div class="secao-header__copy">
+                            <h3>
+                                <span class="material-symbols-rounded" aria-hidden="true">privacy_tip</span>
+                                Equipe operacional privada da empresa
+                            </h3>
+                            <p>A equipe de campo e a equipe de analise sao geridas pela propria empresa dentro do portal dela.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid-3">
+                        <div class="info-card">
+                            <div class="label">Equipe de campo</div>
+                            <div class="valor">{{ _resumo.get("inspetores_total", 0) | int }}</div>
+                            <div class="valor-auxiliar">Total informado apenas para acompanhamento do contrato.</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">Equipe de analise</div>
+                            <div class="valor">{{ _resumo.get("revisores_total", 0) | int }}</div>
+                            <div class="valor-auxiliar">A equipe de análise segue protegida por privacidade operacional.</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label">Como o suporte funciona</div>
+                            <div class="valor">Via portal da empresa</div>
+                            <div class="valor-auxiliar">O Admin-CEO apoia o administrador da empresa, sem atuar diretamente na equipe operacional.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>

@@ -1,0 +1,1111 @@
+---
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  Binary,
+  Building2,
+  Clock3,
+  FileStack,
+  KeySquare,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import KpiCard from "@/components/app/admin/kpi-card.astro";
+import StatusPill from "@/components/app/admin/status-pill.astro";
+import { getAdminClientDetail } from "@/lib/server/admin-clients";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+import AdminShellLayout from "@/layouts/admin-shell-layout.astro";
+
+export const prerender = false;
+
+const companyId = Number(Astro.params.id ?? "");
+const detail = await getAdminClientDetail(companyId);
+const notice = consumeAdminNotice(Astro.cookies);
+
+if (!detail) {
+  Astro.response.status = 404;
+}
+
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+const detailPath = detail ? `/admin/clientes/${detail.company.id}` : "/admin/clientes";
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("pt-BR").format(value);
+}
+
+function formatCurrency(value: number) {
+  return currencyFormatter.format(value);
+}
+
+function startCase(value: string) {
+  return value
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function reviewTone(status: string) {
+  switch (status) {
+    case "aprovado":
+      return "success";
+    case "rejeitado":
+      return "danger";
+    default:
+      return "warning";
+  }
+}
+
+function complianceTone(status: string) {
+  if (status.includes("nao")) {
+    return "danger";
+  }
+
+  if (status.includes("conforme")) {
+    return "success";
+  }
+
+  return "info";
+}
+
+function catalogStateLabel(state: string) {
+  switch (state) {
+    case "managed_active":
+      return "Catálogo ativo";
+    case "managed_empty":
+      return "Catálogo vazio";
+    default:
+      return "Modo legado";
+  }
+}
+
+function catalogStateTone(state: string) {
+  switch (state) {
+    case "managed_active":
+      return "success";
+    case "managed_empty":
+      return "warning";
+    default:
+      return "neutral";
+  }
+}
+
+function releaseTone(status: string) {
+  switch (status) {
+    case "active":
+      return "success";
+    case "paused":
+      return "warning";
+    case "expired":
+      return "danger";
+    default:
+      return "neutral";
+  }
+}
+
+function variantStateLabel(variant: {
+  isActive: boolean;
+  availabilityState: "active" | "blocked" | "available" | "unmapped";
+}) {
+  if (variant.isActive) {
+    return "Ativo";
+  }
+
+  switch (variant.availabilityState) {
+    case "blocked":
+      return "Bloqueado";
+    case "available":
+      return "Disponível";
+    default:
+      return "Mapeamento pendente";
+  }
+}
+
+function variantStateTone(variant: {
+  isActive: boolean;
+  availabilityState: "active" | "blocked" | "available" | "unmapped";
+}) {
+  if (variant.isActive) {
+    return "success";
+  }
+
+  switch (variant.availabilityState) {
+    case "blocked":
+      return "warning";
+    case "available":
+      return "info";
+    default:
+      return "neutral";
+  }
+}
+
+function releaseTemplateChecked(
+  family: {
+    tenantRelease: { allowedTemplates: string[] };
+    variants: Array<{ isActive: boolean; runtimeTemplateCode: string | null }>;
+  },
+  templateCode: string,
+) {
+  if (family.tenantRelease.allowedTemplates.length > 0) {
+    return family.tenantRelease.allowedTemplates.includes(templateCode);
+  }
+
+  return family.variants.some(
+    (variant) => variant.isActive && variant.runtimeTemplateCode === templateCode,
+  );
+}
+
+function releaseVariantChecked(
+  family: {
+    tenantRelease: { allowedVariants: string[] };
+  },
+  variant: { isActive: boolean; selectionToken: string },
+) {
+  if (family.tenantRelease.allowedVariants.length > 0) {
+    return family.tenantRelease.allowedVariants.includes(variant.selectionToken);
+  }
+
+  return variant.isActive;
+}
+
+const cards = detail
+  ? [
+      {
+        icon: Users,
+        label: "Usuários gerenciáveis",
+        value: formatNumber(detail.summary.totalUsuarios),
+        detail: `${detail.summary.adminsTotal} admins, ${detail.summary.inspetoresTotal} campo e ${detail.summary.revisoresTotal} análise.`,
+        tone: "orange" as const,
+      },
+      {
+        icon: Clock3,
+        label: "Sessões ativas",
+        value: formatNumber(detail.summary.sessoesAtivasTotal),
+        detail: `${detail.summary.usuariosComSessaoAtiva} usuários com sessão aberta agora.`,
+        tone: "sky" as const,
+      },
+      {
+        icon: FileStack,
+        label: "Laudos",
+        value: formatNumber(detail.summary.totalLaudos),
+        detail: `${detail.summary.templates} templates e ${detail.summary.activeReleases} liberações ativas.`,
+        tone: "slate" as const,
+      },
+      {
+        icon: ShieldCheck,
+        label: "Custo acumulado",
+        value: formatCurrency(detail.summary.custoTotal),
+        detail: `${detail.summary.activeSignatories} signatários ativos vinculados ao tenant.`,
+        tone: "emerald" as const,
+      },
+    ]
+  : [];
+---
+
+{detail ? (
+  <AdminShellLayout
+    title={`${detail.company.nomeFantasia} | Tariel Astro`}
+    activeItem="clients"
+    userName="Admin-CEO"
+  >
+    <Fragment slot="header">
+      <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+        <div class="max-w-4xl">
+          <a
+            href="/admin/clientes"
+            class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+          >
+            <ArrowLeft className="size-4" />
+            Empresas assinantes
+          </a>
+
+          <p class="mt-4 text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Detalhe migrado</p>
+          <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950 sm:text-5xl">
+            {detail.company.nomeFantasia}
+          </h1>
+          <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+            Empresa #{detail.company.id} • CNPJ {detail.company.cnpj} • Cadastro {dateTimeFormatter.format(detail.company.criadoEm)}
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <StatusPill label={detail.status.label} tone={detail.status.tone} />
+          <StatusPill label={detail.health.label} tone={detail.health.tone} />
+          <a
+            href={detail.firstAccess.loginPrefillUrl}
+            class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-50"
+          >
+            Ver entrada do cliente
+            <ArrowUpRight className="size-4" />
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+        <span>{detail.health.reason}</span>
+        <span>Última atividade: {detail.summary.ultimoAcessoLabel}</span>
+        <span>Uso atual: {detail.summary.usoLabel}</span>
+      </div>
+    </Fragment>
+
+    <AdminNotice notice={notice} />
+
+    <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+      {cards.map((card) => (
+        <KpiCard label={card.label} value={card.value} detail={card.detail} icon={card.icon} tone={card.tone} />
+      ))}
+    </section>
+
+    <section class="mt-8 grid gap-6 xl:grid-cols-3">
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Bloqueio do tenant</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">
+          {detail.company.statusBloqueio ? "Desbloquear empresa" : "Bloquear empresa"}
+        </h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          {detail.company.statusBloqueio
+            ? "O tenant já está bloqueado. Ao desbloquear, o acesso volta a obedecer somente as regras normais de login."
+            : "Use este fluxo para interromper o acesso inteiro da empresa e invalidar as sessões ativas do tenant."}
+        </p>
+
+        <form method="POST" action={`${detailPath}/bloquear`} class="mt-6 space-y-4">
+          <input type="hidden" name="returnTo" value={detailPath} />
+
+          {detail.company.statusBloqueio ? (
+            <>
+              <input type="hidden" name="confirmarDesbloqueio" value="1" />
+              <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
+                Motivo atual: <strong class="text-slate-950">{detail.company.motivoBloqueio ?? "não informado"}</strong>
+              </div>
+            </>
+          ) : (
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Motivo</span>
+              <textarea
+                name="motivo"
+                rows="4"
+                placeholder="Descreva por que a empresa está sendo bloqueada."
+                class="w-full rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+              />
+            </label>
+          )}
+
+          <button
+            type="submit"
+            class:list={[
+              "inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white transition",
+              detail.company.statusBloqueio ? "bg-emerald-700 hover:bg-emerald-600" : "bg-red-700 hover:bg-red-600",
+            ]}
+          >
+            {detail.company.statusBloqueio ? "Confirmar desbloqueio" : "Bloquear empresa"}
+          </button>
+        </form>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Plano contratado</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Trocar plano</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          A atualização reflete direto em limites, leitura de uso e próximas permissões provisionadas no tenant.
+        </p>
+
+        <form method="POST" action={`${detailPath}/trocar-plano`} class="mt-6 space-y-4">
+          <input type="hidden" name="returnTo" value={detailPath} />
+
+          <label class="block space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Plano atual</span>
+            <select
+              name="plano"
+              class="w-full rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+            >
+              <option value="Inicial" selected={detail.company.planoAtivo === "Inicial"}>Inicial</option>
+              <option value="Intermediario" selected={detail.company.planoAtivo === "Intermediario"}>Intermediário</option>
+              <option value="Ilimitado" selected={detail.company.planoAtivo === "Ilimitado"}>Ilimitado</option>
+            </select>
+          </label>
+
+          <button
+            type="submit"
+            class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+          >
+            Salvar plano
+          </button>
+        </form>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Primeiro acesso</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Adicionar admin cliente</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          Cria um novo administrador do tenant com senha temporária e acesso ao portal do cliente.
+        </p>
+
+        <form method="POST" action={`${detailPath}/adicionar-admin-cliente`} class="mt-6 space-y-4">
+          <input type="hidden" name="returnTo" value={detailPath} />
+
+          <label class="block space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Nome</span>
+            <input
+              type="text"
+              name="nome"
+              placeholder="Nome completo do administrador"
+              class="w-full rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+            />
+          </label>
+
+          <label class="block space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">E-mail</span>
+            <input
+              type="email"
+              name="email"
+              placeholder="acesso@empresa.com.br"
+              class="w-full rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+            />
+          </label>
+
+          <button
+            type="submit"
+            class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+          >
+            Criar administrador
+          </button>
+        </form>
+      </article>
+    </section>
+
+    <section class="mt-8 grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Resumo executivo</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Visão administrativa da empresa</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          O detalhe migrado já combina leitura do tenant com os principais comandos de operação do Admin-CEO.
+        </p>
+
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
+          <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Primeiro acesso</p>
+            <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">{detail.firstAccess.statusLabel}</h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              {detail.firstAccess.hasAdmin
+                ? `${detail.firstAccess.adminName} • ${detail.firstAccess.adminEmail || "sem e-mail"}`
+                : "Nenhum administrador de cliente cadastrado para este tenant."}
+            </p>
+          </div>
+
+          <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Plano ativo</p>
+            <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">{detail.company.planoAtivo}</h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              {detail.limits.laudosMes == null ? "Laudos ilimitados" : `${detail.limits.laudosMes} laudos/mês`} •{" "}
+              {detail.limits.usuariosMax == null ? "Usuários sem teto" : `${detail.limits.usuariosMax} usuários`}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
+          <div class="rounded-[26px] border border-slate-950/8 bg-white p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Perfil da empresa</p>
+            <dl class="mt-4 space-y-3 text-sm text-slate-700">
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Responsável</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.company.nomeResponsavel ?? "Não informado"}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Segmento</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.company.segmento ?? "Não informado"}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Cidade/Estado</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.company.cidadeEstado ?? "Não informado"}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Observações</dt>
+                <dd class="max-w-sm text-right font-medium text-slate-950">{detail.company.observacoes ?? "Sem observações administrativas"}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="rounded-[26px] border border-slate-950/8 bg-white p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Capacidades do plano</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <StatusPill label={detail.limits.uploadDoc ? "Upload liberado" : "Sem upload"} tone={detail.limits.uploadDoc ? "success" : "neutral"} />
+              <StatusPill label={detail.limits.deepResearch ? "Deep research" : "Deep research off"} tone={detail.limits.deepResearch ? "info" : "neutral"} />
+              <StatusPill label={detail.company.adminPolicyJson ? "Política admin aplicada" : "Sem política customizada"} tone={detail.company.adminPolicyJson ? "warning" : "neutral"} />
+            </div>
+            <dl class="mt-4 space-y-3 text-sm text-slate-700">
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Integrações máximas</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.limits.integracoesMax ?? "Sem teto"}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Retenção</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.limits.retencaoDias == null ? "Padrão da plataforma" : `${detail.limits.retencaoDias} dias`}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Bloqueio vigente</dt>
+                <dd class="max-w-sm text-right font-medium text-slate-950">{detail.status.blockedReason ?? "Sem bloqueio vigente"}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-slate-950 p-6 text-white shadow-[0_18px_60px_rgba(15,23,42,0.16)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-orange-200">Operação atual</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight">Leitura rápida do tenant</h2>
+
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div class="rounded-[26px] border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Uso do plano</p>
+            <p class="mt-3 font-display text-4xl text-white">{detail.summary.usoPercentual == null ? "Livre" : `${detail.summary.usoPercentual}%`}</p>
+          </div>
+          <div class="rounded-[26px] border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Troca de senha</p>
+            <p class="mt-3 font-display text-4xl text-white">{formatNumber(detail.summary.trocaSenhaPendente)}</p>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-[28px] border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300">
+          <p>
+            {detail.summary.usuariosBloqueados > 0
+              ? `${detail.summary.usuariosBloqueados} usuários estão bloqueados ou inativos nesta empresa.`
+              : "Nenhum usuário bloqueado foi identificado nesta empresa."}
+          </p>
+          <p class="mt-3">
+            {detail.summary.activeReleases > 0
+              ? `${detail.summary.activeReleases} liberações de família já estão ativas no catálogo deste tenant.`
+              : "Ainda não há liberações ativas de catálogo para este tenant."}
+          </p>
+        </div>
+
+        <div class="mt-6 grid gap-3 text-sm leading-6 text-slate-300">
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            Última atividade: <strong class="text-white">{detail.summary.ultimoAcessoLabel}</strong>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            Custo acumulado de laudos: <strong class="text-white">{formatCurrency(detail.summary.custoTotal)}</strong>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            Signatários ativos: <strong class="text-white">{formatNumber(detail.summary.activeSignatories)}</strong>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">
+            <Binary className="size-4" />
+            Catálogo operacional
+          </div>
+          <h2 class="mt-4 font-display text-3xl tracking-tight text-slate-950">Portfólio de laudos liberados</h2>
+          <p class="mt-3 text-sm leading-7 text-slate-600">
+            Este bloco controla quais modelos comerciais podem abrir laudos operacionais para a empresa dentro da stack nova.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <StatusPill
+            label={catalogStateLabel(detail.catalogPortfolio.catalogState)}
+            tone={catalogStateTone(detail.catalogPortfolio.catalogState)}
+          />
+          <StatusPill
+            label={detail.catalogPortfolio.managedByAdminCeo ? "Admin-CEO governa" : "Sem governança ativa"}
+            tone={detail.catalogPortfolio.managedByAdminCeo ? "info" : "neutral"}
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Modelos ativos</p>
+          <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">
+            {formatNumber(detail.catalogPortfolio.activeActivationCount)}
+          </p>
+          <p class="mt-3 text-sm leading-6 text-slate-600">Variantes já liberadas para abrir laudos no tenant.</p>
+        </div>
+
+        <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Famílias ativas</p>
+          <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">
+            {formatNumber(detail.catalogPortfolio.activeFamilyCount)}
+          </p>
+          <p class="mt-3 text-sm leading-6 text-slate-600">Linhas de serviço que já têm ao menos um modelo habilitado.</p>
+        </div>
+
+        <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Modelos publicados</p>
+          <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">
+            {formatNumber(detail.catalogPortfolio.availableVariantCount)}
+          </p>
+          <p class="mt-3 text-sm leading-6 text-slate-600">Variantes comerciais disponíveis no catálogo oficial.</p>
+        </div>
+
+        <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Modelos operacionais</p>
+          <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">
+            {formatNumber(detail.catalogPortfolio.operationalVariantCount)}
+          </p>
+          <p class="mt-3 text-sm leading-6 text-slate-600">Variantes já conectadas a um template operacional válido.</p>
+        </div>
+      </div>
+
+      <form id="tenant-catalog-sync-form" method="POST" action={`${detailPath}/catalogo-laudos`} class="mt-6">
+        <input type="hidden" name="returnTo" value={detailPath} />
+      </form>
+
+      <div class="mt-6 flex flex-col gap-4 rounded-[28px] border border-slate-950/8 bg-slate-50 p-5 lg:flex-row lg:items-center lg:justify-between">
+        <div class="max-w-3xl">
+          <p class="text-sm font-medium text-slate-950">
+            Selecione as variantes que a empresa pode usar e sincronize o portfólio comercial.
+          </p>
+          <p class="mt-2 text-sm leading-7 text-slate-600">
+            Variantes sem runtime operacional ou fora da liberação atual aparecem bloqueadas. As já ativas permanecem preservadas no envio mesmo quando estão indisponíveis para nova seleção.
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          form="tenant-catalog-sync-form"
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          Sincronizar portfólio
+        </button>
+      </div>
+
+      {detail.catalogPortfolio.families.length > 0 ? (
+        <div class="mt-6 grid gap-4 2xl:grid-cols-2">
+          {detail.catalogPortfolio.families.map((family) => (
+            <article class="rounded-[28px] border border-slate-950/8 bg-white p-5">
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div class="max-w-2xl">
+                  <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{family.groupLabel}</p>
+                  <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">{family.familyLabel}</h3>
+                  <p class="mt-2 text-sm font-medium text-slate-700">{family.offerName}</p>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <StatusPill
+                    label={`${formatNumber(family.activeVariantsCount)} ativas`}
+                    tone={family.activeVariantsCount > 0 ? "success" : "neutral"}
+                  />
+                  <StatusPill label={family.releaseStatus.label} tone={releaseTone(family.releaseStatus.key)} />
+                </div>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                {family.offerPackage ? <StatusPill label={family.offerPackage} tone="neutral" /> : null}
+                {family.offerDeadlineDays ? <StatusPill label={`${family.offerDeadlineDays} dias`} tone="info" /> : null}
+                {family.templateDefaultCode ? <StatusPill label={`Template ${family.templateDefaultCode}`} tone="info" /> : null}
+              </div>
+
+              {family.familyDescription ? (
+                <p class="mt-4 text-sm leading-7 text-slate-600">{family.familyDescription}</p>
+              ) : null}
+
+              <div class="mt-5 space-y-3">
+                {family.variants.map((variant) => (
+                  <label
+                    class:list={[
+                      "block rounded-[24px] border p-4 transition",
+                      variant.isActive
+                        ? "border-emerald-500/20 bg-emerald-500/8"
+                        : variant.isSelectableForTenant
+                          ? "border-slate-950/8 bg-slate-50 hover:border-slate-950/18 hover:bg-white"
+                          : "border-slate-950/8 bg-slate-100/80 opacity-80",
+                    ]}
+                  >
+                    {variant.isActive && !variant.isSelectableForTenant ? (
+                      <input
+                        type="hidden"
+                        name="catalog_variant"
+                        value={variant.selectionToken}
+                        form="tenant-catalog-sync-form"
+                      />
+                    ) : null}
+
+                    <div class="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        name="catalog_variant"
+                        value={variant.selectionToken}
+                        form="tenant-catalog-sync-form"
+                        checked={variant.isActive}
+                        disabled={!variant.isSelectableForTenant}
+                        class="mt-1 size-4 rounded border-slate-300 text-slate-950 focus:ring-slate-950"
+                      />
+
+                      <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <p class="font-semibold text-slate-950">{variant.variantLabel}</p>
+                          <StatusPill label={variantStateLabel(variant)} tone={variantStateTone(variant)} />
+                        </div>
+
+                        <p class="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                          Runtime {variant.runtimeTemplateLabel}
+                        </p>
+                        <p class="mt-2 text-sm leading-7 text-slate-600">
+                          {variant.recommendedUse ??
+                            (variant.isOperational
+                              ? "Modelo pronto para uso operacional nesta empresa."
+                              : "Modelo ainda em preparação para uso operacional.")}
+                        </p>
+
+                        {variant.availabilityReason ? (
+                          <p class="mt-2 text-sm leading-6 text-amber-700">{variant.availabilityReason}</p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <details class="mt-5 rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-950">
+                  Ajustes desta empresa
+                </summary>
+
+                <form
+                  method="POST"
+                  action={`/admin/catalogo-laudos/familias/${family.familyKey}/liberacao-tenant`}
+                  class="mt-4 space-y-4"
+                >
+                  <input type="hidden" name="tenant_id" value={detail.company.id} />
+                  <input type="hidden" name="returnTo" value={detailPath} />
+
+                  <div class="grid gap-4 md:grid-cols-2">
+                    <label class="block space-y-2">
+                      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        Situação da liberação
+                      </span>
+                      <select
+                        name="release_status"
+                        class="w-full rounded-[20px] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20"
+                      >
+                        <option value="draft" selected={family.tenantRelease.releaseStatus.key === "draft"}>Em preparo</option>
+                        <option value="active" selected={family.tenantRelease.releaseStatus.key === "active"}>Ativa</option>
+                        <option value="paused" selected={family.tenantRelease.releaseStatus.key === "paused"}>Pausada</option>
+                        <option value="expired" selected={family.tenantRelease.releaseStatus.key === "expired"}>Encerrada</option>
+                      </select>
+                    </label>
+
+                    <label class="block space-y-2">
+                      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        Template default da empresa
+                      </span>
+                      <select
+                        name="default_template_code"
+                        class="w-full rounded-[20px] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20"
+                      >
+                        <option value="">Herdar template da família</option>
+                        {family.templateOptions.map((template) => (
+                          <option
+                            value={template.code}
+                            selected={family.tenantRelease.defaultTemplateCode === template.code}
+                          >
+                            {template.label} ({template.code})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  {family.templateOptions.length > 0 ? (
+                    <div class="space-y-2">
+                      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        Templates liberados
+                      </p>
+                      <div class="grid gap-2 md:grid-cols-2">
+                        {family.templateOptions.map((template) => (
+                          <label class="flex items-start gap-3 rounded-[20px] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                            <input
+                              type="checkbox"
+                              name="allowed_templates"
+                              value={template.code}
+                              checked={releaseTemplateChecked(family, template.code)}
+                              class="mt-1 size-4 rounded border-slate-300 text-slate-950 focus:ring-slate-950"
+                            />
+                            <span>
+                              <strong class="text-slate-950">{template.label}</strong>
+                              <small class="mt-1 block uppercase tracking-[0.16em] text-slate-500">{template.code}</small>
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div class="space-y-2">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                      Variantes liberadas
+                    </p>
+                    <div class="grid gap-2">
+                      {family.variants.map((variant) => (
+                        <label
+                          class:list={[
+                            "flex items-start gap-3 rounded-[20px] border px-4 py-3 text-sm",
+                            variant.isOperational
+                              ? "border-slate-200 bg-white text-slate-700"
+                              : "border-slate-200 bg-slate-100 text-slate-500 opacity-80",
+                          ]}
+                        >
+                          <input
+                            type="checkbox"
+                            name="allowed_variants"
+                            value={variant.selectionToken}
+                            checked={releaseVariantChecked(family, variant)}
+                            disabled={!variant.isOperational}
+                            class="mt-1 size-4 rounded border-slate-300 text-slate-950 focus:ring-slate-950"
+                          />
+                          <span>
+                            <strong class="text-slate-950">{variant.variantLabel}</strong>
+                            <small class="mt-1 block text-slate-500">
+                              {variant.runtimeTemplateCode
+                                ? `Runtime ${variant.runtimeTemplateLabel}`
+                                : "Modelo ainda sem runtime operacional"}
+                            </small>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <label class="block space-y-2">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                      Observações
+                    </span>
+                    <textarea
+                      name="observacoes"
+                      rows="3"
+                      placeholder="Explique janela, restrição ou motivo desta regra."
+                      class="w-full rounded-[20px] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20"
+                    >
+                      {family.tenantRelease.observations ?? ""}
+                    </textarea>
+                  </label>
+
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap gap-2">
+                      <StatusPill
+                        label={family.tenantRelease.exists ? "Regra registrada" : "Sem regra dedicada"}
+                        tone={family.tenantRelease.exists ? "info" : "neutral"}
+                      />
+                      <StatusPill
+                        label={`Default atual: ${family.tenantRelease.defaultTemplateCode ?? family.templateDefaultCode ?? "herdado"}`}
+                        tone="neutral"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                    >
+                      Salvar liberação
+                    </button>
+                  </div>
+                </form>
+              </details>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="mt-6 rounded-[28px] border border-slate-950/8 bg-slate-50 p-5 text-sm leading-7 text-slate-600">
+          Nenhuma família publicada do catálogo oficial foi encontrada para sincronização.
+        </div>
+      )}
+    </section>
+
+    <section class="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Usuários</p>
+            <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Administradores da empresa</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              Reset de senha, bloqueio e reativação do admin cliente agora rodam direto na nova stack.
+            </p>
+          </div>
+          <StatusPill label={`${formatNumber(detail.admins.length)} admins`} tone="info" />
+        </div>
+
+        <div class="mt-6 space-y-3">
+          {detail.admins.length > 0 ? detail.admins.map((user) => (
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-slate-950">{user.nomeCompleto}</p>
+                  <p class="mt-1 text-sm text-slate-600">{user.email}</p>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <StatusPill
+                    label={!user.ativo || user.statusBloqueio ? "Bloqueado" : user.senhaTemporariaAtiva ? "Troca de senha" : "Ativo"}
+                    tone={!user.ativo || user.statusBloqueio ? "danger" : user.senhaTemporariaAtiva ? "warning" : "success"}
+                  />
+                </div>
+              </div>
+
+              <div class="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Perfil</p>
+                  <p class="mt-1 font-medium text-slate-950">{user.roleLabel}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Último acesso</p>
+                  <p class="mt-1 font-medium text-slate-950">{user.ultimoAcessoLabel}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Sessões abertas</p>
+                  <p class="mt-1 font-medium text-slate-950">{formatNumber(user.sessionCount)}</p>
+                </div>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-3">
+                <form method="POST" action={`${detailPath}/resetar-senha/${user.id}`}>
+                  <input type="hidden" name="returnTo" value={detailPath} />
+                  <button
+                    type="submit"
+                    class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-100"
+                  >
+                    Resetar senha
+                  </button>
+                </form>
+
+                <form method="POST" action={`${detailPath}/usuarios/${user.id}/bloquear`}>
+                  <input type="hidden" name="returnTo" value={detailPath} />
+                  <button
+                    type="submit"
+                    class:list={[
+                      "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white transition",
+                      !user.ativo || user.statusBloqueio
+                        ? "bg-emerald-700 hover:bg-emerald-600"
+                        : "bg-slate-950 hover:bg-slate-800",
+                    ]}
+                  >
+                    {!user.ativo || user.statusBloqueio ? "Reativar admin" : "Bloquear admin"}
+                  </button>
+                </form>
+              </div>
+            </article>
+          )) : (
+            <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+              Nenhum administrador de cliente foi encontrado.
+            </div>
+          )}
+        </div>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Equipe operacional</p>
+            <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Campo e análise</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              A plataforma continua respeitando a separação operacional, mas o Admin-CEO já consegue enxergar o recorte.
+            </p>
+          </div>
+          <StatusPill label={`${formatNumber(detail.operationalUsers.length)} usuários`} tone="neutral" />
+        </div>
+
+        <div class="mt-6 space-y-3">
+          {detail.operationalUsers.length > 0 ? detail.operationalUsers.map((user) => (
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-slate-950">{user.nomeCompleto}</p>
+                  <p class="mt-1 text-sm text-slate-600">{user.email}</p>
+                </div>
+                <StatusPill label={user.roleLabel} tone={user.nivelAcesso === 50 ? "info" : "neutral"} />
+              </div>
+
+              <div class="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Status</p>
+                  <p class="mt-1 font-medium text-slate-950">{!user.ativo || user.statusBloqueio ? "Bloqueado" : "Ativo"}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Último acesso</p>
+                  <p class="mt-1 font-medium text-slate-950">{user.ultimoAcessoLabel}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Sessões abertas</p>
+                  <p class="mt-1 font-medium text-slate-950">{formatNumber(user.sessionCount)}</p>
+                </div>
+              </div>
+            </article>
+          )) : (
+            <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+              Nenhum usuário operacional foi encontrado.
+            </div>
+          )}
+        </div>
+      </article>
+    </section>
+
+    <section class="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Segurança</p>
+            <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Sessões ativas</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              O detalhe novo já consegue ler portal, expiração e atividade das sessões em aberto.
+            </p>
+          </div>
+          <StatusPill label={`${formatNumber(detail.sessions.length)} sessões`} tone="info" />
+        </div>
+
+        <div class="mt-6 space-y-3">
+          {detail.sessions.length > 0 ? detail.sessions.slice(0, 10).map((session) => (
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-slate-950">{session.usuarioNome}</p>
+                  <p class="mt-1 text-sm text-slate-600">{session.usuarioEmail}</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <StatusPill label={session.roleLabel} tone="neutral" />
+                  <StatusPill label={session.portal ?? "portal n/d"} tone="info" />
+                </div>
+              </div>
+              <div class="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Última atividade</p>
+                  <p class="mt-1 font-medium text-slate-950">{session.ultimaAtividadeLabel}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Expira em</p>
+                  <p class="mt-1 font-medium text-slate-950">{session.expiraEmLabel}</p>
+                </div>
+              </div>
+            </article>
+          )) : (
+            <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+              Nenhuma sessão ativa registrada para esta empresa.
+            </div>
+          )}
+        </div>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Operação</p>
+            <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Laudos recentes</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              Este recorte substitui a leitura inicial do detalhe antigo antes da migração dos fluxos críticos.
+            </p>
+          </div>
+          <StatusPill label={`${formatNumber(detail.recentReports.length)} no recorte`} tone="neutral" />
+        </div>
+
+        <div class="mt-6 space-y-3">
+          {detail.recentReports.length > 0 ? detail.recentReports.map((report) => (
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-slate-950">{report.template}</p>
+                  <p class="mt-1 text-sm text-slate-600">{report.setor}</p>
+                </div>
+                <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{dateTimeFormatter.format(report.criadoEm)}</p>
+              </div>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <StatusPill label={startCase(report.revisao)} tone={reviewTone(report.revisao)} />
+                <StatusPill label={startCase(report.conformidade)} tone={complianceTone(report.conformidade)} />
+                <StatusPill label={startCase(report.entryMode)} tone="neutral" />
+              </div>
+            </article>
+          )) : (
+            <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+              Nenhum laudo recente foi encontrado.
+            </div>
+          )}
+        </div>
+      </article>
+    </section>
+
+    <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Auditoria</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Eventos administrativos recentes</h2>
+          <p class="mt-3 text-sm leading-7 text-slate-600">
+            Linha do tempo inicial para manter visibilidade administrativa conforme os comandos já migram para Astro.
+          </p>
+        </div>
+        <StatusPill label={`${formatNumber(detail.recentAudit.length)} eventos`} tone="info" />
+      </div>
+
+      <div class="mt-6 grid gap-3">
+        {detail.recentAudit.length > 0 ? detail.recentAudit.map((audit) => (
+          <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="rounded-2xl bg-slate-950 p-3 text-orange-300">
+                  <Binary className="size-4" />
+                </div>
+                <div>
+                  <p class="font-semibold text-slate-950">{audit.acao}</p>
+                  <p class="mt-1 text-sm text-slate-600">{audit.resumo}</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <StatusPill label={audit.portal} tone="neutral" />
+                <StatusPill label={dateTimeFormatter.format(audit.criadoEm)} tone="info" />
+              </div>
+            </div>
+          </article>
+        )) : (
+          <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+            Nenhum evento de auditoria foi encontrado para este tenant.
+          </div>
+        )}
+      </div>
+    </section>
+  </AdminShellLayout>
+) : (
+  <AdminShellLayout title="Empresa não encontrada | Tariel Astro" activeItem="clients" userName="Admin-CEO">
+    <Fragment slot="header">
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Detalhe indisponível</p>
+        <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950">Empresa não encontrada</h1>
+        <p class="mt-4 text-sm leading-7 text-slate-600">
+          O ID informado não existe no banco atual ou não pôde ser carregado nesta execução.
+        </p>
+      </div>
+    </Fragment>
+
+    <AdminNotice notice={notice} />
+
+    <section class="rounded-[32px] border border-slate-950/8 bg-white p-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div class="max-w-2xl">
+        <div class="w-fit rounded-2xl bg-slate-950 p-3 text-orange-300">
+          <Building2 className="size-5" />
+        </div>
+        <h2 class="mt-6 font-display text-3xl tracking-tight text-slate-950">Voltar para a listagem</h2>
+        <p class="mt-4 text-sm leading-7 text-slate-600">
+          Reabra a carteira administrativa e selecione outra empresa para continuar a migração por partes.
+        </p>
+        <a
+          href="/admin/clientes"
+          class="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          <KeySquare className="size-4" />
+          Ir para empresas
+        </a>
+      </div>
+    </section>
+  </AdminShellLayout>
+)}

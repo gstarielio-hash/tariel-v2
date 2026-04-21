@@ -1,0 +1,572 @@
+{
+  "source": {
+    "reference_title": "Normas Regulamentadoras Vigentes",
+    "reference_url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes",
+    "reference_updated_at": "2024-10-08T15:34:00-03:00",
+    "captured_for_project_on": "2026-04-08"
+  },
+  "implementation_standard": {
+    "policy_name": "nr_family_hardening_from_official_basis",
+    "policy_version": 1,
+    "summary": "Toda implementacao ou endurecimento de familia NR deve partir de pesquisa em fonte oficial vigente e registrar claramente o que e requisito normativo versus decisao editorial do template.",
+    "source_priority": [
+      "Texto oficial da NR vigente no portal gov.br do Ministerio do Trabalho e Emprego",
+      "Manuais oficiais de interpretacao, guias tecnicos e materiais oficiais publicados em gov.br/Fundacentro/MTE",
+      "Normas tecnicas e anexos expressamente citados pela NR, quando houver acesso oficial ou licenciado"
+    ],
+    "required_schema_metadata": [
+      "normative_basis"
+    ],
+    "rules": [
+      "Nao deduzir requisito obrigatorio sem ancora em fonte oficial pesquisada",
+      "Separar no schema a base normativa da estrutura editorial do documento",
+      "Quando a NR remeter a norma tecnica externa indisponivel, registrar a remissao sem inventar clausulas nao acessadas",
+      "Ao tocar uma familia existente, retrofitar sua base normativa oficial no mesmo pacote",
+      "Mudanca detectada em fonte oficial nao autoriza atualizacao automatica de template; o fluxo padrao e diff tecnico com revisao manual do admin/CEO"
+    ]
+  },
+  "status_legend": [
+    "planned",
+    "implemented_core",
+    "support_only",
+    "revoked"
+  ],
+  "strategy_legend": [
+    "family_with_variants",
+    "documental_base",
+    "module_or_annex",
+    "support_only",
+    "revogada"
+  ],
+  "waves": [
+    {
+      "wave_id": "wave_0",
+      "title": "Plataforma transversal",
+      "scope": "Mesa, family_schema, catalogo Admin-CEO, template profissional, emissao versionada e variantes controladas."
+    },
+    {
+      "wave_id": "wave_1",
+      "title": "Nucleo vendavel de inspecao",
+      "scope": "NR10, NR12, NR13, NR20, NR33 e NR35."
+    },
+    {
+      "wave_id": "wave_2",
+      "title": "Verticais setoriais",
+      "scope": "NR18, NR22, NR29, NR30, NR31, NR32, NR34, NR36, NR37 e NR38."
+    },
+    {
+      "wave_id": "wave_3",
+      "title": "Documental, programa e apoio",
+      "scope": "NR1, NR4, NR5, NR6, NR7, NR8, NR9, NR11, NR14, NR15, NR16, NR17, NR19, NR21, NR23, NR24, NR25 e NR26."
+    },
+    {
+      "wave_id": "wave_4",
+      "title": "Governanca e excecoes",
+      "scope": "NR2 e NR27 revogadas; NR3 e NR28 como apoio ou compliance."
+    }
+  ],
+  "normas": [
+    {
+      "nr": 1,
+      "code": "nr01",
+      "title": "Disposicoes Gerais e Gerenciamento de Riscos Ocupacionais",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr01_gro_pgr",
+        "nr01_ordem_servico_sst"
+      ]
+    },
+    {
+      "nr": 2,
+      "code": "nr02",
+      "title": "Inspecao Previa",
+      "official_status": "revogada",
+      "product_strategy": "revogada",
+      "programming_wave": "wave_4",
+      "priority": "none",
+      "current_status": "revoked",
+      "suggested_families": []
+    },
+    {
+      "nr": 3,
+      "code": "nr03",
+      "title": "Embargo e Interdicao",
+      "official_status": "vigente",
+      "product_strategy": "support_only",
+      "programming_wave": "wave_4",
+      "priority": "low",
+      "current_status": "support_only",
+      "suggested_families": []
+    },
+    {
+      "nr": 4,
+      "code": "nr04",
+      "title": "Servicos Especializados em Seguranca e em Medicina do Trabalho",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr04_diagnostico_sesmt"
+      ]
+    },
+    {
+      "nr": 5,
+      "code": "nr05",
+      "title": "Comissao Interna de Prevencao de Acidentes e de Assedio - CIPA",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr05_implantacao_cipa",
+        "nr05_auditoria_cipa"
+      ]
+    },
+    {
+      "nr": 6,
+      "code": "nr06",
+      "title": "Equipamento de Protecao Individual - EPI",
+      "official_status": "vigente",
+      "product_strategy": "module_or_annex",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr06_gestao_epi"
+      ]
+    },
+    {
+      "nr": 7,
+      "code": "nr07",
+      "title": "Programa de Controle Medico de Saude Ocupacional",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr07_pcmso"
+      ]
+    },
+    {
+      "nr": 8,
+      "code": "nr08",
+      "title": "Edificacoes",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr08_inspecao_edificacao_industrial"
+      ]
+    },
+    {
+      "nr": 9,
+      "code": "nr09",
+      "title": "Avaliacao e Controle das Exposicoes Ocupacionais a Agentes Fisicos, Quimicos e Biologicos",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr09_avaliacao_exposicoes_ocupacionais"
+      ]
+    },
+    {
+      "nr": 10,
+      "code": "nr10",
+      "title": "Seguranca em Instalacoes e Servicos em Eletricidade",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_1",
+      "priority": "critical",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr10_implantacao_loto",
+        "nr10_inspecao_instalacoes_eletricas",
+        "nr10_inspecao_spda",
+        "nr10_prontuario_instalacoes_eletricas"
+      ]
+    },
+    {
+      "nr": 11,
+      "code": "nr11",
+      "title": "Transporte, Movimentacao, Armazenagem e Manuseio de Materiais",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr11_inspecao_movimentacao_armazenagem",
+        "nr11_inspecao_equipamento_icamento"
+      ]
+    },
+    {
+      "nr": 12,
+      "code": "nr12",
+      "title": "Seguranca no Trabalho em Maquinas e Equipamentos",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_1",
+      "priority": "critical",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr12_inspecao_maquina_equipamento",
+        "nr12_apreciacao_risco_maquina"
+      ]
+    },
+    {
+      "nr": 13,
+      "code": "nr13",
+      "title": "Caldeiras, Vasos de Pressao e Tubulacoes e Tanques Metalicos de Armazenamento",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_1",
+      "priority": "critical",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr13_inspecao_caldeira",
+        "nr13_inspecao_vaso_pressao",
+        "nr13_inspecao_tubulacao"
+      ]
+    },
+    {
+      "nr": 14,
+      "code": "nr14",
+      "title": "Fornos",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr14_inspecao_forno_industrial"
+      ]
+    },
+    {
+      "nr": 15,
+      "code": "nr15",
+      "title": "Atividades e Operacoes Insalubres",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr15_laudo_insalubridade"
+      ]
+    },
+    {
+      "nr": 16,
+      "code": "nr16",
+      "title": "Atividades e Operacoes Perigosas",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr16_laudo_periculosidade"
+      ]
+    },
+    {
+      "nr": 17,
+      "code": "nr17",
+      "title": "Ergonomia",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr17_analise_ergonomica_trabalho",
+        "nr17_checklist_ergonomia"
+      ]
+    },
+    {
+      "nr": 18,
+      "code": "nr18",
+      "title": "Seguranca e Saude no Trabalho na Industria da Construcao",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr18_inspecao_canteiro_obra",
+        "nr18_inspecao_frente_construcao"
+      ]
+    },
+    {
+      "nr": 19,
+      "code": "nr19",
+      "title": "Explosivos",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr19_inspecao_area_explosivos"
+      ]
+    },
+    {
+      "nr": 20,
+      "code": "nr20",
+      "title": "Seguranca e Saude no Trabalho com Inflamaveis e Combustiveis",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_1",
+      "priority": "critical",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr20_inspecao_instalacoes_inflamaveis",
+        "nr20_prontuario_instalacoes_inflamaveis"
+      ]
+    },
+    {
+      "nr": 21,
+      "code": "nr21",
+      "title": "Trabalhos a Ceu Aberto",
+      "official_status": "vigente",
+      "product_strategy": "module_or_annex",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr21_condicoes_trabalho_ceu_aberto"
+      ]
+    },
+    {
+      "nr": 22,
+      "code": "nr22",
+      "title": "Seguranca e Saude Ocupacional na Mineracao",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr22_inspecao_area_mineracao",
+        "nr22_inspecao_instalacao_mineira"
+      ]
+    },
+    {
+      "nr": 23,
+      "code": "nr23",
+      "title": "Protecao Contra Incendios",
+      "official_status": "vigente",
+      "product_strategy": "module_or_annex",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr23_inspecao_protecao_incendios"
+      ]
+    },
+    {
+      "nr": 24,
+      "code": "nr24",
+      "title": "Condicoes Sanitarias e de Conforto nos Locais de Trabalho",
+      "official_status": "vigente",
+      "product_strategy": "module_or_annex",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr24_condicoes_sanitarias_conforto"
+      ]
+    },
+    {
+      "nr": 25,
+      "code": "nr25",
+      "title": "Residuos Industriais",
+      "official_status": "vigente",
+      "product_strategy": "documental_base",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr25_gestao_residuos_industriais"
+      ]
+    },
+    {
+      "nr": 26,
+      "code": "nr26",
+      "title": "Sinalizacao de Seguranca",
+      "official_status": "vigente",
+      "product_strategy": "module_or_annex",
+      "programming_wave": "wave_3",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr26_sinalizacao_seguranca"
+      ]
+    },
+    {
+      "nr": 27,
+      "code": "nr27",
+      "title": "Registro Profissional do Tecnico de Seguranca do Trabalho",
+      "official_status": "revogada",
+      "product_strategy": "revogada",
+      "programming_wave": "wave_4",
+      "priority": "none",
+      "current_status": "revoked",
+      "suggested_families": []
+    },
+    {
+      "nr": 28,
+      "code": "nr28",
+      "title": "Fiscalizacao e Penalidades",
+      "official_status": "vigente",
+      "product_strategy": "support_only",
+      "programming_wave": "wave_4",
+      "priority": "low",
+      "current_status": "support_only",
+      "suggested_families": []
+    },
+    {
+      "nr": 29,
+      "code": "nr29",
+      "title": "Norma Regulamentadora de Seguranca e Saude no Trabalho Portuario",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr29_inspecao_operacao_portuaria"
+      ]
+    },
+    {
+      "nr": 30,
+      "code": "nr30",
+      "title": "Seguranca e Saude no Trabalho Aquaviario",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr30_inspecao_trabalho_aquaviario"
+      ]
+    },
+    {
+      "nr": 31,
+      "code": "nr31",
+      "title": "Seguranca e Saude no Trabalho na Agricultura, Pecuaria Silvicultura, Exploracao Florestal e Aquicultura",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr31_inspecao_frente_rural"
+      ]
+    },
+    {
+      "nr": 32,
+      "code": "nr32",
+      "title": "Seguranca e Saude no Trabalho em Servicos de Saude",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr32_inspecao_servico_saude",
+        "nr32_plano_risco_biologico"
+      ]
+    },
+    {
+      "nr": 33,
+      "code": "nr33",
+      "title": "Seguranca e Saude nos Trabalhos em Espacos Confinados",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_1",
+      "priority": "critical",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr33_avaliacao_espaco_confinado",
+        "nr33_permissao_entrada_trabalho"
+      ]
+    },
+    {
+      "nr": 34,
+      "code": "nr34",
+      "title": "Condicoes e Meio Ambiente de Trabalho na Industria da Construcao, Reparacao e Desmonte Naval",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr34_inspecao_frente_naval"
+      ]
+    },
+    {
+      "nr": 35,
+      "code": "nr35",
+      "title": "Trabalho em Altura",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_1",
+      "priority": "critical",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr35_inspecao_linha_de_vida",
+        "nr35_inspecao_ponto_ancoragem"
+      ]
+    },
+    {
+      "nr": 36,
+      "code": "nr36",
+      "title": "Seguranca e Saude no Trabalho em Empresas de Abate e Processamento de Carnes e Derivados",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr36_inspecao_unidade_abate_processamento"
+      ]
+    },
+    {
+      "nr": 37,
+      "code": "nr37",
+      "title": "Seguranca e Saude em Plataformas de Petroleo",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "high",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr37_inspecao_plataforma_petroleo"
+      ]
+    },
+    {
+      "nr": 38,
+      "code": "nr38",
+      "title": "Seguranca e Saude no Trabalho nas Atividades de Limpeza Urbana e Manejo de Residuos Solidos",
+      "official_status": "vigente",
+      "product_strategy": "family_with_variants",
+      "programming_wave": "wave_2",
+      "priority": "medium",
+      "current_status": "implemented_core",
+      "suggested_families": [
+        "nr38_inspecao_limpeza_urbana_residuos"
+      ]
+    }
+  ]
+}

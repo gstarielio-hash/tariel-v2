@@ -1,0 +1,116 @@
+<aside
+    id="painel-mesa-widget"
+    class="painel-mesa-widget"
+    data-inspector-region="mesa-widget"
+    aria-label="Canal de revisão com a mesa avaliadora"
+    hidden
+>
+    <header class="cabecalho-mesa-widget">
+        <div class="cabecalho-mesa-widget-texto">
+            <strong>Mesa Avaliadora</strong>
+            <p class="mesa-widget-subtitulo">Conversa e ajustes do caso</p>
+            <div
+                id="status-conexao-mesa-widget"
+                class="status-conexao-mesa-widget"
+                data-conexao="conectado"
+                aria-live="polite"
+            >
+                <span class="ponto-conexao-mesa-widget" aria-hidden="true"></span>
+                <span id="texto-conexao-mesa-widget">Conectado</span>
+            </div>
+        </div>
+
+        <button
+            type="button"
+            id="btn-fechar-mesa-widget"
+            class="btn-fechar-mesa-widget"
+            aria-label="Fechar canal da mesa avaliadora"
+        >
+            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+        </button>
+    </header>
+
+    <section
+        id="mesa-widget-resumo"
+        class="mesa-widget-resumo"
+        aria-live="polite"
+        data-status-operacional="pronta"
+    >
+        <strong id="mesa-widget-resumo-titulo">Revisão pronta para alinhamento</strong>
+        <p id="mesa-widget-resumo-texto">
+            Abra o canal para alinhar dúvidas, pendências e evidências com a mesa.
+        </p>
+        <div class="mesa-widget-resumo-chips">
+            <span id="mesa-widget-chip-status" class="mesa-widget-chip">Canal disponível</span>
+            <span id="mesa-widget-chip-pendencias" class="mesa-widget-chip" hidden>0 pendências abertas</span>
+            <span id="mesa-widget-chip-nao-lidas" class="mesa-widget-chip" hidden>0 retornos novos</span>
+        </div>
+    </section>
+
+    <div id="mesa-widget-ref-ativa" class="mesa-widget-ref-ativa" hidden>
+        <div>
+            <strong id="mesa-widget-ref-titulo">Respondendo mensagem</strong>
+            <p id="mesa-widget-ref-texto"></p>
+        </div>
+        <button type="button" id="mesa-widget-ref-limpar" aria-label="Remover referência">×</button>
+    </div>
+
+    <div id="mesa-widget-lista" class="mesa-widget-lista" role="log" aria-live="polite"></div>
+
+    <button type="button" id="mesa-widget-carregar-mais" class="mesa-widget-carregar-mais" hidden>
+        Carregar anteriores
+    </button>
+
+    <div
+        id="mesa-widget-preview-anexo"
+        class="mesa-widget-preview-anexo"
+        role="status"
+        aria-live="polite"
+        hidden
+    ></div>
+
+    <div class="rodape-mesa-widget">
+        <input
+            type="file"
+            id="mesa-widget-input-anexo"
+            accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            hidden
+            aria-hidden="true"
+            tabindex="-1"
+        >
+        <div class="mesa-widget-composer-main">
+            <textarea
+                id="mesa-widget-input"
+                rows="2"
+                maxlength="8000"
+                placeholder="Escreva para a mesa, responda uma pendência ou envie um anexo..."
+                aria-label="Mensagem para mesa avaliadora"
+            ></textarea>
+            <div class="mesa-widget-attachment-actions" aria-label="Ações de anexo da mesa">
+                <button
+                    type="button"
+                    id="mesa-widget-btn-anexo"
+                    class="mesa-widget-action-btn"
+                    aria-label="Anexar arquivo no chat da mesa"
+                    title="Anexar arquivo no chat da mesa"
+                >
+                    <span class="material-symbols-rounded" aria-hidden="true">attach_file</span>
+                    <span>Anexar</span>
+                </button>
+                <button
+                    type="button"
+                    id="mesa-widget-btn-foto"
+                    class="mesa-widget-action-btn"
+                    aria-label="Enviar foto no chat da mesa"
+                    title="Enviar foto no chat da mesa"
+                >
+                    <span class="material-symbols-rounded" aria-hidden="true">photo_camera</span>
+                    <span>Foto</span>
+                </button>
+            </div>
+        </div>
+        <button type="button" id="mesa-widget-enviar" class="mesa-widget-enviar">
+            <span class="material-symbols-rounded" aria-hidden="true">send</span>
+        </button>
+    </div>
+</aside>

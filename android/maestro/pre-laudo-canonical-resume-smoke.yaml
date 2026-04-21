@@ -1,0 +1,50 @@
+appId: com.tarielia.inspetor
+tags:
+  - smoke
+  - pre-laudo
+  - canonical
+  - resume
+---
+- launchApp:
+    clearState: false
+
+- extendedWaitUntil:
+    visible:
+      id: chat-report-pack-card
+    timeout: 15000
+
+- assertVisible:
+    id: chat-report-pack-card-open-quality-gate
+
+- assertVisible:
+    id: chat-report-pack-card-open-mesa
+
+- takeScreenshot: canonical-pre-laudo-live-chat
+
+- tapOn:
+    id: chat-report-pack-card-open-mesa
+
+- extendedWaitUntil:
+    visible:
+      id: mesa-thread-surface
+    timeout: 15000
+
+- takeScreenshot: canonical-pre-laudo-mesa
+
+- tapOn:
+    id: chat-tab-button
+
+- extendedWaitUntil:
+    visible:
+      id: chat-report-pack-card
+    timeout: 15000
+
+- tapOn:
+    id: chat-report-pack-card-open-quality-gate
+
+- extendedWaitUntil:
+    visible:
+      id: quality-gate-report-pack-section
+    timeout: 20000
+
+- takeScreenshot: canonical-pre-laudo-quality-gate

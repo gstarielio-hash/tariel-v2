@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#F4F7FB">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    {# Segurança ideal:
+    - Enviar X-Content-Type-Options: nosniff por header HTTP.
+    - Enviar X-Frame-Options: DENY por header HTTP.
+    - Enviar CSP por header HTTP no backend.
+    #}
+
+    <title>Admin-CEO • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+
+    <link rel="manifest" href="/app/manifesto.json">
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+
+    <link rel="stylesheet" href="/static/css/admin/admin_dashboard.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+
+<body class="admin-body">
+    {% set _qtd_clientes = dados.qtd_clientes | default(0) | int %}
+    {% set _total_inspecoes = dados.total_inspecoes | default(0) | int %}
+    {% set _receita_total = dados.receita_ia_total | default(0) | float %}
+    {% set _governanca = dados.governance_rollup | default({}) %}
+    {% set _fila_calibracao = dados.calibration_queue_rollup | default({}) %}
+    {% set _escala_comercial = dados.commercial_scale_rollup | default({}) %}
+
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Menu principal">
+                <a href="/admin/painel" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+
+                <a href="/admin/clientes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+
+                <a href="/admin/catalogo-laudos" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+
+                <a href="/admin/novo-cliente" class="item-menu destaque">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+
+                <form action="/admin/logout" method="POST" class="menu-admin__form" id="form-logout">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+
+            {% if usuario %}
+            <div class="usuario-painel" aria-label="Usuário conectado">
+                <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+                <div>
+                    <strong class="usuario-painel__nome">{{ usuario.nome_completo | e }}</strong>
+                    <span class="usuario-painel__cargo">Admin-CEO</span>
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="topbar">
+                <div class="titulo-pagina">
+                    <h1>Painel Admin-CEO</h1>
+                    <p>Clientes, receita e volume operacional da plataforma em uma leitura direta.</p>
+                </div>
+
+                <a href="/admin/novo-cliente" class="btn-novo-cliente" aria-label="Provisionar nova empresa assinante">
+                    <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                    Nova empresa
+                </a>
+            </header>
+
+            {% for msg in mensagens_flash %}
+            {% set _tipo_alerta = 'success' if msg.tipo == 'success' else 'error' %}
+            <div class="alert alert-{{ _tipo_alerta }}" role="alert" aria-live="assertive">
+                {{ msg.texto | e }}
+                <button class="alert-fechar" aria-label="Fechar alerta" type="button">×</button>
+            </div>
+            {% endfor %}
+
+            <section class="cards-kpi" aria-label="Indicadores principais">
+                <div class="card">
+                    <div class="icone-card icone-card--clientes" aria-hidden="true">
+                        <span class="material-symbols-rounded">domain</span>
+                    </div>
+                    <div class="dados-card">
+                        <h3>Empresas ativas</h3>
+                        <p class="valor" aria-label="{{ _qtd_clientes }} clientes ativos">
+                            {{ _qtd_clientes }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="icone-card icone-card--inspecoes" aria-hidden="true">
+                        <span class="material-symbols-rounded">analytics</span>
+                    </div>
+                    <div class="dados-card">
+                        <h3>Laudos processados</h3>
+                        <p class="valor" aria-label="{{ _total_inspecoes }} inspeções">
+                            {{ _total_inspecoes }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="icone-card icone-card--receita" aria-hidden="true">
+                        <span class="material-symbols-rounded">payments</span>
+                    </div>
+                    <div class="dados-card">
+                        <h3>Receita acumulada</h3>
+                        <p class="valor">R$ {{ "%.2f" | format(_receita_total) }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="governance-overview" aria-label="Governança operacional da plataforma">
+                <div class="governance-panel governance-panel--hero">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Governança operacional</h3>
+                            <p class="box-subtitulo">Resumo das empresas com acesso liberado e das familias ja em uso, seguindo a mesma regra do app e da Mesa.</p>
+                        </div>
+                        <div class="governance-overview__meta">
+                            <strong>{{ _governanca.active_release_count | default(0) | int }}</strong>
+                            <span>liberações ativas</span>
+                            <small>{{ _governanca.tenant_count | default(0) | int }} empresas com regra ativa</small>
+                        </div>
+                    </div>
+                    <div class="governance-mode-cards">
+                        {% for item in _governanca.tenant_strictest_modes | default([]) %}
+                        <article class="governance-mode-card">
+                            <span class="badge {% if item.mode.key == 'mesa_required' %}critico{% elif item.mode.key == 'mobile_review_allowed' %}atencao{% else %}conforme{% endif %}">
+                                {{ item.mode.label | e }}
+                            </span>
+                            <strong>{{ item.count | int }}</strong>
+                            <span>{{ item.share | int }}% das empresas neste recorte</span>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="area-dados" aria-label="Análise de laudos e clientes">
+                <div class="box-grafico">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Ritmo operacional</h3>
+                            <p class="box-subtitulo">Laudos gerados nos últimos 7 dias.</p>
+                        </div>
+                    </div>
+                    <div class="container-canvas">
+                        <canvas id="graficoInspecoes" role="img"
+                            aria-label="Gráfico de barras: laudos gerados nos últimos 7 dias"
+                            data-labels='{{ dados.labels_grafico | default([]) | tojson }}'
+                            data-valores='{{ dados.valores_grafico | default([]) | tojson }}'>
+                        </canvas>
+                    </div>
+                </div>
+
+                <div class="box-tabela">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Carteira monitorada</h3>
+                            <p class="box-subtitulo">Situacao rapida das empresas com acesso ao detalhe completo.</p>
+                        </div>
+                    </div>
+                    <table class="tabela-admin" aria-label="Lista de clientes cadastrados">
+                        <thead>
+                            <tr>
+                                <th scope="col">Empresa</th>
+                                <th scope="col">Plano</th>
+                                <th scope="col">Status</th>
+                                <th scope="col"><span class="sr-only">Ações</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cliente in dados.clientes %}
+                            {% set _plano = cliente.plano_ativo | default('—', true) %}
+                            {% set _bloqueado = cliente.status_bloqueio %}
+                            <tr>
+                                <td><strong>{{ cliente.nome_fantasia | e }}</strong></td>
+
+                                <td>
+                                    <span
+                                        class="badge {% if _plano == 'Ilimitado' %}atencao{% else %}conforme{% endif %}"
+                                        aria-label="Plano: {{ _plano | e }}">
+                                        {{ _plano | e }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {% if _bloqueado %}
+                                    <span class="badge critico" aria-label="Status: Bloqueado">Bloqueado</span>
+                                    {% else %}
+                                    <span class="badge conforme" aria-label="Status: Ativo">Ativo</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <a href="/admin/clientes/{{ cliente.id | int }}" class="link-acao-tabela"
+                                        aria-label="Ver detalhes de {{ cliente.nome_fantasia | e }}">
+                                        <span class="material-symbols-rounded icon-inline-md" aria-hidden="true">open_in_new</span>
+                                        Ver
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="texto-vazio-tabela" aria-live="polite">
+                                    Nenhum cliente cadastrado ainda.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="governance-grid" aria-label="Detalhe de governança">
+                <div class="governance-panel">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Empresas com regra mais rígida</h3>
+                            <p class="box-subtitulo">Resumo por empresa para localizar quem depende mais da Mesa ou de revisao humana.</p>
+                        </div>
+                    </div>
+                    <table class="tabela-admin" aria-label="Regras por empresa">
+                        <thead>
+                            <tr>
+                                <th scope="col">Empresa</th>
+                                <th scope="col">Postura</th>
+                                <th scope="col">Cobertura</th>
+                                <th scope="col"><span class="sr-only">Ações</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tenant in _governanca.tenant_highlights | default([]) %}
+                            <tr>
+                                <td>
+                                    <strong>{{ tenant.tenant_label | e }}</strong>
+                                    <div class="governance-table__meta">
+                                        <span>{{ tenant.plan_label | e }}</span>
+                                        {% if tenant.blocked %}
+                                        <span class="badge critico">Bloqueado</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if tenant.strictest_mode.key == 'mesa_required' %}critico{% elif tenant.strictest_mode.key == 'mobile_review_allowed' %}atencao{% else %}conforme{% endif %}">
+                                        {{ tenant.strictest_mode.label | e }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="governance-table__detail">{{ tenant.active_release_count | int }} famílias ativas</span>
+                                    <span class="governance-table__detail governance-table__detail--soft">{{ tenant.mode_breakdown_label | e }}</span>
+                                </td>
+                                <td>
+                                    <a href="/admin/clientes/{{ tenant.tenant_id | int }}" class="link-acao-tabela" aria-label="Abrir empresa {{ tenant.tenant_label | e }}">
+                                        <span class="material-symbols-rounded icon-inline-md" aria-hidden="true">open_in_new</span>
+                                        Ver
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="texto-vazio-tabela" aria-live="polite">
+                                    Nenhuma empresa com regra ativa ainda.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="governance-panel">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Famílias com regra ativa</h3>
+                            <p class="box-subtitulo">As familias mais distribuidas e a forma de revisao que mais aparece no catalogo ativo.</p>
+                        </div>
+                    </div>
+                    <div class="governance-family-list">
+                        {% for family in _governanca.family_highlights | default([]) %}
+                        <article class="governance-family-item">
+                            <div class="governance-family-item__header">
+                                <div>
+                                    <strong>{{ family.family_label | e }}</strong>
+                                    <span>{{ family.tenant_count | int }} empresas • {{ family.active_release_count | int }} liberações</span>
+                                </div>
+                                <a href="/admin/catalogo-laudos/familias/{{ family.family_key | e }}" class="link-acao-tabela" aria-label="Abrir família {{ family.family_label | e }}">
+                                    <span class="material-symbols-rounded icon-inline-md" aria-hidden="true">open_in_new</span>
+                                    Abrir
+                                </a>
+                            </div>
+                            <div class="governance-family-item__badges">
+                                <span class="badge {% if family.default_review_mode.key == 'mesa_required' %}critico{% elif family.default_review_mode.key == 'mobile_review_allowed' %}atencao{% else %}conforme{% endif %}">
+                                    {{ family.default_review_mode.label | e }}
+                                </span>
+                                <span class="badge {% if family.dominant_mode.key == 'mesa_required' %}critico{% elif family.dominant_mode.key == 'mobile_review_allowed' %}atencao{% else %}conforme{% endif %}">
+                                    {{ family.dominant_mode.label | e }}
+                                </span>
+                                {% if family.red_flags_count %}
+                                <span class="badge atencao">{{ family.red_flags_count | int }} alerta(s)</span>
+                                {% endif %}
+                            </div>
+                            <span class="governance-family-item__detail">{{ family.mode_breakdown_label | e }}</span>
+                        </article>
+                        {% else %}
+                        <div class="texto-vazio-tabela" aria-live="polite">
+                            Nenhuma familia com regra ativa ainda.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="governance-grid" aria-label="Fila de calibração e evolução dos modelos">
+                <div class="governance-panel">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Fila de calibração por família</h3>
+                            <p class="box-subtitulo">Material real sai da leitura e vira fila executável: qual família calibrar, por que calibrar e qual próximo passo destrava o produto.</p>
+                        </div>
+                        <div class="governance-overview__meta">
+                            <strong>{{ _fila_calibracao.queue_count | default(0) | int }}</strong>
+                            <span>famílias acionáveis</span>
+                        </div>
+                    </div>
+                    <div class="governance-mode-cards">
+                        {% for item in _fila_calibracao.priority_modes | default([]) %}
+                        {% if item.count %}
+                        <article class="governance-mode-card">
+                            <span class="badge {% if item.status.key == 'immediate' %}critico{% elif item.status.key in ('active_queue', 'waiting_material') %}atencao{% else %}info{% endif %}">
+                                {{ item.status.label | e }}
+                            </span>
+                            <strong>{{ item.count | int }}</strong>
+                            <span>famílias na fila</span>
+                        </article>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="governance-family-list">
+                        {% for item in _fila_calibracao.highlights | default([]) %}
+                        <article class="governance-family-item">
+                            <div class="governance-family-item__header">
+                                <div>
+                                    <strong>{{ item.display_name | e }}</strong>
+                                    <span>{{ item.active_release_count | int }} empresas • {{ item.variant_count | int }} variantes</span>
+                                </div>
+                                <a href="/admin/catalogo-laudos/familias/{{ item.family_key | e }}?tab=calibracao#calibracao" class="link-acao-tabela" aria-label="Abrir fila de calibração da família {{ item.display_name | e }}">
+                                    <span class="material-symbols-rounded icon-inline-md" aria-hidden="true">open_in_new</span>
+                                    Abrir
+                                </a>
+                            </div>
+                            <div class="governance-family-item__badges">
+                                <span class="badge {% if item.priority.status.key == 'immediate' %}critico{% elif item.priority.status.key in ('active_queue', 'waiting_material') %}atencao{% else %}info{% endif %}">
+                                    {{ item.priority.status.label | e }}
+                                </span>
+                                <span class="badge {% if item.template_refinement_target.status.key == 'refinement_due' %}atencao{% elif item.template_refinement_target.status.key == 'continuous' %}conforme{% else %}info{% endif %}">
+                                    {{ item.template_refinement_target.label | e }}
+                                </span>
+                            </div>
+                            <span class="governance-family-item__detail">{{ item.queue_reason | e }}</span>
+                            {% if item.execution_track.track_label %}
+                            <span class="governance-family-item__detail governance-family-item__detail--soft">{{ item.execution_track.track_label | e }} • {{ item.worklist_pending_count | int }} pendência(s)</span>
+                            {% endif %}
+                            <span class="governance-family-item__detail governance-family-item__detail--soft">{{ item.next_action | e }}</span>
+                            {% if item.next_checkpoint %}
+                            <span class="governance-family-item__detail governance-family-item__detail--soft">Checkpoint {{ item.next_checkpoint | e }}</span>
+                            {% endif %}
+                        </article>
+                        {% else %}
+                        <div class="texto-vazio-tabela" aria-live="polite">
+                            Nenhuma família pendente na fila de calibração.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="governance-panel">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Modelos oficiais com prioridade de melhoria</h3>
+                            <p class="box-subtitulo">Mostra quais modelos oficiais concentram a próxima rodada de melhoria, priorizados por famílias, empresas ativas e variantes em uso.</p>
+                        </div>
+                    </div>
+                    <div class="governance-family-list">
+                        {% for item in _fila_calibracao.template_targets | default([]) %}
+                        <article class="governance-family-item">
+                            <div class="governance-family-item__header">
+                                <div>
+                                    <strong>{{ item.label | e }}</strong>
+                                    <span>Modelo oficial priorizado</span>
+                                </div>
+                                <span class="badge {% if item.status.key == 'refinement_due' %}atencao{% elif item.status.key == 'continuous' %}conforme{% else %}info{% endif %}">
+                                    {{ item.status.label | e }}
+                                </span>
+                            </div>
+                            <div class="governance-family-item__badges">
+                                <span class="badge info">{{ item.family_count | int }} famílias</span>
+                                <span class="badge info">{{ item.active_release_count | int }} empresas</span>
+                                <span class="badge info">{{ item.variant_count | int }} variantes</span>
+                            </div>
+                            {% if item.families %}
+                            <span class="governance-family-item__detail governance-family-item__detail--soft">{{ item.families | join(' • ') | e }}</span>
+                            {% endif %}
+                        </article>
+                        {% else %}
+                        <div class="texto-vazio-tabela" aria-live="polite">
+                            Nenhum modelo com melhoria prioritária neste momento.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="governance-grid" aria-label="Escala comercial">
+                <div class="governance-panel">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Pacotes e etapas de liberacao</h3>
+                            <p class="box-subtitulo">Leitura geral de como os laudos estao empacotados e em que etapa de liberacao eles estao.</p>
+                        </div>
+                    </div>
+                    <div class="governance-mode-cards">
+                        {% for item in _escala_comercial.release_channels | default([]) %}
+                        {% if item.count %}
+                        <article class="governance-mode-card">
+                            <span class="badge {% if item.channel.key == 'pilot' %}info{% elif item.channel.key == 'limited_release' %}atencao{% else %}conforme{% endif %}">
+                                {{ item.channel.label | e }}
+                            </span>
+                            <strong>{{ item.count | int }}</strong>
+                            <span>{{ item.share | round(1) }}% das ofertas</span>
+                        </article>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="governance-family-list">
+                        {% for item in _escala_comercial.bundle_highlights | default([]) %}
+                        <article class="governance-family-item">
+                            <div class="governance-family-item__header">
+                                <div>
+                                    <strong>{{ item.bundle_label | e }}</strong>
+                                    <span>{{ item.family_count | int }} famílias</span>
+                                </div>
+                            </div>
+                            {% if item.summary %}
+                            <span class="governance-family-item__detail">{{ item.summary | e }}</span>
+                            {% endif %}
+                            {% if item.highlights %}
+                            <span class="governance-family-item__detail governance-family-item__detail--soft">{{ item.highlights | join(' • ') | e }}</span>
+                            {% endif %}
+                        </article>
+                        {% else %}
+                        <div class="texto-vazio-tabela" aria-live="polite">
+                            Nenhum pacote comercial estruturado ainda.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="governance-panel">
+                    <div class="box-cabecalho">
+                        <div>
+                            <h3>Recursos mais usados nos pacotes</h3>
+                            <p class="box-subtitulo">O que mais aparece nos pacotes e tende a virar diferenca entre planos.</p>
+                        </div>
+                    </div>
+                    <div class="governance-family-list">
+                        {% for item in _escala_comercial.feature_highlights | default([]) %}
+                        <article class="governance-family-item">
+                            <div class="governance-family-item__header">
+                                <div>
+                                    <strong>{{ item.feature.label | e }}</strong>
+                                    <span>{{ item.feature.key | e }}</span>
+                                </div>
+                                <span class="badge info">{{ item.count | int }}</span>
+                            </div>
+                            <span class="governance-family-item__detail">{{ item.share | round(1) }}% dos recursos extras neste recorte.</span>
+                        </article>
+                        {% else %}
+                        <div class="texto-vazio-tabela" aria-live="polite">
+                            Nenhum recurso extra estruturado ainda.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/admin/chart.umd.min.js" defer nonce="{{ csp_nonce }}"></script>
+    <script src="/static/js/admin/painel.js" defer nonce="{{ csp_nonce }}"></script>
+    <script src="/static/js/admin/admin_dashboard_page.js" defer nonce="{{ csp_nonce }}"></script>
+</body>
+
+</html>

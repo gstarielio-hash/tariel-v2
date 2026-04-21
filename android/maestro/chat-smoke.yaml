@@ -1,0 +1,69 @@
+appId: com.tarielia.inspetor
+tags:
+  - smoke
+  - chat
+env:
+  LOGIN_EMAIL: ${MAESTRO_LOGIN_EMAIL}
+  LOGIN_PASSWORD: ${MAESTRO_LOGIN_PASSWORD}
+  TEST_MESSAGE: Automacao Maestro no chat
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: login-email-input
+    timeout: 30000
+
+- tapOn:
+    id: login-email-input
+
+- inputText: ${LOGIN_EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-password-input
+
+- inputText: ${LOGIN_PASSWORD}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-submit-button
+
+- extendedWaitUntil:
+    visible:
+      id: free-chat-start-button
+    timeout: 20000
+
+- tapOn:
+    id: free-chat-start-button
+
+- extendedWaitUntil:
+    visible:
+      id: chat-composer-input
+    timeout: 20000
+
+- tapOn:
+    id: chat-composer-input
+
+- inputText: ${TEST_MESSAGE}
+
+- takeScreenshot: chat-keyboard-layout
+
+- tapOn:
+    id: chat-send-button
+
+- extendedWaitUntil:
+    visible: ${TEST_MESSAGE}
+    timeout: 10000
+
+- assertVisible:
+    id: chat-tab-button
+
+- assertVisible:
+    id: chat-composer-input
+
+- assertVisible:
+    id: open-history-button

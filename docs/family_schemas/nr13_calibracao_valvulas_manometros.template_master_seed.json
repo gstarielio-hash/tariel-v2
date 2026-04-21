@@ -1,0 +1,28 @@
+{
+  "family_key": "nr13_calibracao_valvulas_manometros",
+  "template_code": "nr13_calibracao_valvulas_manometros",
+  "nome_template": "NR13 - Calibracao de valvulas e manometros - Template Governado",
+  "versao": 1,
+  "modo_editor": "editor_rico",
+  "observacoes": "Template governado para calibracao de valvulas de seguranca e manometros.",
+  "documento_editor_json": {
+    "version": 1,
+    "doc": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "NR13 - Calibracao de valvulas e manometros"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

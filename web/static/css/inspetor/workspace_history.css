@@ -1,0 +1,521 @@
+/* ==========================================
+   TARIEL CONTROL TOWER
+   WORKSPACE_HISTORY.CSS
+   Histórico técnico focado em leitura:
+   - hero e filtros na coluna principal
+   - timeline única para conversa, anexos e eventos
+   - cards leves, sem chrome lateral duplicado
+   ========================================== */
+
+body.pagina-chat-dashboard-v2 .workspace-view-root--history {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+body.pagina-chat-dashboard-v2 [data-workspace-history-root] {
+    display: grid;
+    gap: 16px;
+    width: min(100%, var(--workspace-thread-column-max, 812px));
+    margin: 0 auto;
+    padding: 8px 0 24px;
+}
+
+body.pagina-chat-dashboard-v2 [data-workspace-history-root][data-history-focus="reading"] {
+    padding-top: 4px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: end;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-toolbar__copy {
+    display: grid;
+    gap: 8px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-toolbar__eyebrow,
+body.pagina-chat-dashboard-v2 .workspace-history-filter-group__label {
+    color: var(--vf-text-soft) !important;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-toolbar__copy h2 {
+    margin: 0;
+    color: var(--vf-text) !important;
+    font-size: clamp(28px, 3.1vw, 38px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-toolbar__copy p {
+    margin: 0;
+    max-width: 620px;
+    color: var(--vf-text-muted) !important;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-tools__meta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-tools__results {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 13px;
+    border: 1px solid rgba(186, 201, 217, 0.92) !important;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86) !important;
+    color: var(--vf-text-muted) !important;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-toolbar__insights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-insight {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    padding: 16px 18px;
+    border: 1px solid rgba(186, 201, 217, 0.88) !important;
+    border-radius: 18px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 252, 0.96)) !important;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-insight span {
+    color: var(--vf-text-soft) !important;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-insight strong {
+    color: var(--vf-text) !important;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-insight p {
+    margin: 0;
+    color: var(--vf-text-muted) !important;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-insight--warning {
+    border-color: rgba(160, 108, 35, 0.16) !important;
+    background:
+        linear-gradient(180deg, rgba(255, 249, 239, 0.98), rgba(255, 252, 246, 0.96)) !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-insight__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid rgba(160, 108, 35, 0.18) !important;
+    border-radius: 999px;
+    background: rgba(250, 240, 224, 0.98) !important;
+    color: var(--vf-warning) !important;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-insight__action:hover {
+    border-color: rgba(160, 108, 35, 0.24) !important;
+    background: rgba(245, 233, 212, 0.98) !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-filter-shell {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid rgba(186, 201, 217, 0.88) !important;
+    border-radius: 20px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.04);
+}
+
+body.pagina-chat-dashboard-v2 [data-workspace-history-root] .technical-chat-search {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    border-radius: 14px !important;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-filter-groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-filter-group {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-filter-group .technical-chat-filters {
+    gap: 8px;
+}
+
+body.pagina-chat-dashboard-v2 .technical-chat-empty--history {
+    display: grid;
+    justify-items: start;
+    gap: 10px;
+    min-height: 156px;
+    padding: 24px;
+    border: 1px dashed rgba(186, 201, 217, 0.96) !important;
+    border-radius: 20px !important;
+    background: linear-gradient(180deg, rgba(249, 251, 253, 0.98), rgba(243, 247, 251, 0.96)) !important;
+}
+
+body.pagina-chat-dashboard-v2 .technical-chat-empty--history strong {
+    color: var(--vf-text) !important;
+}
+
+body.pagina-chat-dashboard-v2 .technical-chat-empty--history p {
+    color: var(--vf-text-muted) !important;
+    max-width: 560px;
+}
+
+body.pagina-chat-dashboard-v2 .technical-chat-empty--history .technical-record-btn {
+    margin-top: 2px;
+}
+
+body.pagina-chat-dashboard-v2 [data-workspace-history-root][data-history-state="empty"] [data-history-timeline] {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 [data-history-timeline] {
+    display: grid;
+    gap: 14px;
+    padding-bottom: 12px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-group {
+    display: grid;
+    gap: 10px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-group__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--vf-text-soft) !important;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-group__header::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: rgba(186, 201, 217, 0.72);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-group__items {
+    display: grid;
+    gap: 12px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px solid rgba(186, 201, 217, 0.9);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-role="ia"] {
+    border-color: rgba(31, 94, 142, 0.16);
+    background:
+        radial-gradient(circle at top left, rgba(31, 94, 142, 0.08), transparent 32%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 249, 252, 0.98));
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-role="mesa"],
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-type="decisoes"] {
+    border-color: rgba(138, 100, 37, 0.18);
+    background:
+        linear-gradient(180deg, rgba(252, 248, 241, 0.98), rgba(255, 252, 246, 0.98));
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-reissue="true"] {
+    border-color: rgba(160, 108, 35, 0.18);
+    background:
+        linear-gradient(180deg, rgba(255, 248, 236, 0.98), rgba(255, 252, 245, 0.98));
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-role="sistema"],
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-type="eventos"] {
+    background: rgba(244, 247, 250, 0.96);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(186, 201, 217, 0.92);
+    border-radius: 14px;
+    background: rgba(248, 251, 253, 0.98);
+    color: var(--vf-text);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-role="ia"] .workspace-history-card__icon {
+    border-color: rgba(31, 94, 142, 0.16);
+    background: rgba(232, 242, 250, 0.96);
+    color: var(--vf-accent);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-role="mesa"] .workspace-history-card__icon,
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-type="decisoes"] .workspace-history-card__icon {
+    border-color: rgba(138, 100, 37, 0.16);
+    background: rgba(250, 240, 224, 0.98);
+    color: var(--vf-warning);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-role="sistema"] .workspace-history-card__icon,
+body.pagina-chat-dashboard-v2 .workspace-history-card[data-history-type="eventos"] .workspace-history-card__icon {
+    background: rgba(235, 240, 245, 0.92);
+    color: var(--vf-text-muted);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__body {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__identity {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__identity strong {
+    color: var(--vf-text);
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__identity span,
+body.pagina-chat-dashboard-v2 .workspace-history-card__meta small {
+    color: var(--vf-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__text {
+    margin: 0;
+    color: var(--vf-text);
+    font-size: 14px;
+    line-height: 1.68;
+    white-space: pre-wrap;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__attachments,
+body.pagina-chat-dashboard-v2 .workspace-history-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__attachment,
+body.pagina-chat-dashboard-v2 .workspace-history-card__action,
+body.pagina-chat-dashboard-v2 .workspace-history-card__more summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(186, 201, 217, 0.9);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--vf-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__attachment:hover,
+body.pagina-chat-dashboard-v2 .workspace-history-card__action:hover,
+body.pagina-chat-dashboard-v2 .workspace-history-card__more summary:hover {
+    border-color: var(--vf-border-strong);
+    background: var(--vf-surface-raised);
+    color: var(--vf-text);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__action[data-history-action="mesa"] {
+    border-color: rgba(138, 100, 37, 0.16);
+    background: rgba(250, 240, 224, 0.98);
+    color: var(--vf-warning);
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__action[data-history-action="reissue"] {
+    border-color: rgba(160, 108, 35, 0.18);
+    background: rgba(255, 241, 214, 0.98);
+    color: var(--vf-warning);
+    font-weight: 700;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__action[data-history-action="citar"] {
+    border-color: rgba(31, 94, 142, 0.16);
+    background: rgba(232, 242, 250, 0.96);
+    color: var(--vf-accent);
+}
+
+body.pagina-chat-dashboard-v2 a.workspace-history-card__attachment {
+    text-decoration: none;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__details {
+    border: 1px solid rgba(186, 201, 217, 0.9);
+    border-radius: 16px;
+    background: rgba(243, 246, 249, 0.88);
+    overflow: hidden;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__details summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 14px;
+    color: var(--vf-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__details summary::-webkit-details-marker,
+body.pagina-chat-dashboard-v2 .workspace-history-card__more summary::-webkit-details-marker {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__details-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 14px 14px;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__details-body span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(232, 242, 250, 0.96);
+    color: var(--vf-accent);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__more {
+    position: relative;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__more summary {
+    list-style: none;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__more[open] .workspace-history-card__more-menu {
+    display: flex;
+}
+
+body.pagina-chat-dashboard-v2 .workspace-history-card__more-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 132px;
+    padding: 10px;
+    border: 1px solid rgba(186, 201, 217, 0.92);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+    z-index: 2;
+}
+
+@media (max-width: 959px) {
+    body.pagina-chat-dashboard-v2 .workspace-history-toolbar__insights,
+    body.pagina-chat-dashboard-v2 .workspace-history-filter-groups {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    body.pagina-chat-dashboard-v2 [data-workspace-history-root] {
+        gap: 14px;
+        padding-bottom: 18px;
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-history-hero {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-history-tools__meta {
+        justify-content: flex-start;
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-history-filter-shell,
+    body.pagina-chat-dashboard-v2 .technical-chat-empty--history {
+        padding: 16px;
+        border-radius: 18px !important;
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-history-card {
+        grid-template-columns: 1fr;
+        padding: 15px 16px;
+    }
+
+    body.pagina-chat-dashboard-v2 .workspace-history-card__icon {
+        width: 40px;
+        height: 40px;
+    }
+}

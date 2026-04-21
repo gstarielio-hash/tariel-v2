@@ -1,0 +1,312 @@
+{
+  "family_key": "nr35_montagem_linha_de_vida",
+  "nome_exibicao": "NR35 - Montagem e fabricacao de linha de vida",
+  "macro_categoria": "NR35",
+  "descricao": "Montagem, fabricacao ou instalacao de sistema de linha de vida com rastreabilidade dos componentes, fixacoes, ajustes e condicao final de liberacao.",
+  "schema_version": 1,
+  "scope": {
+    "family_lock": true,
+    "allowed_nrs": [
+      "nr35"
+    ],
+    "allowed_contexts": [
+      "nr35_montagem_linha_de_vida",
+      "nr35_montagem",
+      "execution",
+      "wave_1",
+      "nr35"
+    ],
+    "scope_signals": [
+      "componentes_instalados_registrados",
+      "fixacoes_e_suportes_registrados",
+      "ajustes_finais_registrados",
+      "liberacao_ou_restricao_formalizada"
+    ],
+    "out_of_scope_examples": [
+      "projeto_sem_execucao_de_montagem",
+      "inspecao_periodica_sem_registro_da_instalacao",
+      "ausencia_de_rastreabilidade_dos_componentes"
+    ],
+    "review_required": [
+      "quando_nao_houver_registro_das_fixacoes",
+      "quando_a_liberacao_para_uso_estiver_inconclusiva",
+      "quando_houver_pendencias_criticas_de_montagem"
+    ]
+  },
+  "evidence_policy": {
+    "minimum_evidence": {
+      "fotos": 4,
+      "documentos": 0,
+      "textos": 1
+    },
+    "required_slots": [
+      {
+        "slot_id": "referencia_principal",
+        "label": "Referencia principal",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "identificacao.referencia_principal",
+        "purpose": "Ancorar o trecho, sistema ou frente onde a montagem foi executada."
+      },
+      {
+        "slot_id": "evidencia_execucao",
+        "label": "Evidencia de execucao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "execucao_servico.evidencia_execucao",
+        "purpose": "Registrar a montagem, fabricacao, fixacao e ajustes do sistema."
+      },
+      {
+        "slot_id": "evidencia_principal",
+        "label": "Evidencia principal",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.evidencia_principal",
+        "purpose": "Consolidar o principal registro do sistema montado."
+      },
+      {
+        "slot_id": "conclusao_servico",
+        "label": "Conclusao do servico",
+        "accepted_types": [
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "conclusao.conclusao_tecnica",
+        "purpose": "Registrar a condicao de liberacao, restricao ou retrabalho do sistema montado."
+      }
+    ],
+    "optional_slots": [
+      {
+        "slot_id": "evidencia_complementar",
+        "label": "Evidencia complementar",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.evidencia_complementar",
+        "purpose": "Complementar a frente com detalhes de fixacao, tensionamento ou fabricacao."
+      },
+      {
+        "slot_id": "documento_base",
+        "label": "Documento base",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.documento_base",
+        "purpose": "Vincular lista de materiais, desenho de montagem ou instrucao tecnica quando disponiveis."
+      }
+    ],
+    "checklist_groups": [
+      {
+        "group_id": "identificacao_e_escopo",
+        "title": "Identificacao e escopo",
+        "required": true,
+        "items": [
+          {
+            "item_id": "objeto_registrado",
+            "label": "Trecho ou sistema registrado",
+            "critical": true
+          },
+          {
+            "item_id": "escopo_registrado",
+            "label": "Escopo da montagem registrado",
+            "critical": true
+          }
+        ]
+      },
+      {
+        "group_id": "montagem_e_liberacao",
+        "title": "Montagem e liberacao",
+        "required": true,
+        "items": [
+          {
+            "item_id": "componentes_registrados",
+            "label": "Componentes instalados registrados",
+            "critical": true
+          },
+          {
+            "item_id": "fixacoes_registradas",
+            "label": "Fixacoes e suportes registrados",
+            "critical": true
+          },
+          {
+            "item_id": "liberacao_registrada",
+            "label": "Liberacao ou restricao registrada",
+            "critical": true
+          }
+        ]
+      }
+    ],
+    "review_required": [
+      "quando_nao_houver_evidencia_da_fixacao",
+      "quando_a_liberacao_final_estiver_ausente"
+    ]
+  },
+  "review_policy": {
+    "requires_family_lock": true,
+    "block_on_scope_mismatch": true,
+    "block_on_missing_required_evidence": true,
+    "block_on_critical_field_absent": true,
+    "allow_override_with_reason": true,
+    "allowed_override_cases": [
+      "documento_opcional_ausente_com_justificativa_registrada",
+      "evidencia_complementar_substituida_por_registro_textual_com_rastreabilidade",
+      "limitacao_controlada_sem_impacto_na_conclusao_critica"
+    ],
+    "blocking_conditions": [
+      "ausencia_de_registro_dos_componentes_instalados",
+      "ausencia_de_registro_das_fixacoes",
+      "ausencia_de_conclusao_tecnica"
+    ]
+  },
+  "document_blueprint": {
+    "opening_statement": "Documento tecnico governado para montagem e fabricacao de linha de vida com foco em execucao, fixacoes e condicao final do sistema.",
+    "section_order": [
+      "identificacao_e_escopo",
+      "montagem_e_liberacao",
+      "evidencias_e_documentos",
+      "conclusao_e_assinaturas"
+    ],
+    "signature_roles": [
+      "Engenheiro Responsavel",
+      "Inspetor Responsavel",
+      "Representante da Contratante"
+    ],
+    "section_intros": {
+      "identificacao_e_escopo": "Identifique a frente, o trecho e o escopo executado de montagem ou fabricacao.",
+      "montagem_e_liberacao": "Consolide componentes, fixacoes, ajustes finais e a condicao de liberacao do sistema.",
+      "evidencias_e_documentos": "Organize evidencias visuais, anexos tecnicos e registros complementares.",
+      "conclusao_e_assinaturas": "Feche recomendacoes, pendencias e responsabilidade tecnica."
+    },
+    "blank_row_targets": {}
+  },
+  "compatible_runtime_templates": [
+    "nr35_montagem"
+  ],
+  "compatible_template_codes": [
+    "nr35_montagem_linha_de_vida",
+    "nr35_montagem"
+  ],
+  "normative_basis": {
+    "policy_version": 1,
+    "status": "official_basis_family_mapped",
+    "nr_code": "nr35",
+    "nr_title": "Trabalho em Altura",
+    "editorial_inference_notice": "A norma oficial define os requisitos de referencia; headings, ordem, linguagem editorial e acabamento visual do template sao decisoes de produto da Tariel.",
+    "implementation_note": "Retrofit oficial aplicado para montagem de linha de vida, com anchors granulares da NR-35 e do manual oficial para planejamento, documentacao operacional, instalacao, inspecao inicial e procedimento de montagem do sistema de ancoragem.",
+    "sources": [
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Normas Regulamentadoras - NR",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+        "used_for": "Ponto de entrada oficial do projeto para localizar textos vigentes, anexos e atualizacoes das NRs."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Trabalho em Altura",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-35-atualizada-2025.pdf",
+        "anchors": [
+          {
+            "item_ref": "35.3.1 / 35.4.1 / 35.5.1 / 35.5.5",
+            "used_for": "Fixar a montagem na obrigacao de planejamento, autorizacao dos trabalhadores e analise de risco antes da execucao."
+          },
+          {
+            "item_ref": "35.5.6 / 35.5.7 / 35.5.8",
+            "used_for": "Amarrar procedimento operacional de atividade rotineira e PT para situacoes nao rotineiras durante montagem ou alteracao do sistema."
+          },
+          {
+            "item_ref": "35.6.1 / 35.6.2 / 35.6.6",
+            "used_for": "Cobrir selecao do SPQ e sistematica de inspecao dos elementos instalados ou utilizados durante a montagem."
+          },
+          {
+            "item_ref": "Anexo II 4.1 / 4.1.1 / 4.2 / 4.3 / 5.1 / 6.1",
+            "used_for": "Cobrir inspecao inicial apos instalacao, diferenca entre sistemas temporarios e permanentes, projeto e procedimento operacional de montagem e utilizacao."
+          }
+        ],
+        "used_for": "Texto oficial vigente da NR-35 usado como base normativa primaria desta familia."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Manual Consolidado da NR-35",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/manual_consolidado_da_nr_35.pdf",
+        "anchors": [
+          {
+            "item_ref": "Comentarios 35.3 / 35.5",
+            "used_for": "Apoiar a interpretacao oficial sobre documentacao, avaliacao previa, AR e procedimentos durante a execucao."
+          },
+          {
+            "item_ref": "Comentarios ao Anexo II",
+            "used_for": "Apoiar a interpretacao sobre selecao dos pontos de ancoragem, projeto, montagem e responsabilidades tecnicas do sistema."
+          }
+        ],
+        "used_for": "Fonte oficial interpretativa de apoio para consolidar o fluxo de montagem da linha de vida sem inovar obrigacoes."
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "assembly_risk_planning_and_authorization",
+        "source_refs": [
+          "NR35 35.3.1",
+          "NR35 35.4.1",
+          "NR35 35.5.1",
+          "NR35 35.5.5"
+        ],
+        "maps_to": [
+          "escopo_servico.resumo_escopo",
+          "execucao_servico.metodo_aplicado",
+          "documentacao_e_registros.documentos_disponiveis"
+        ],
+        "application_note": "A montagem deve mostrar quem estava autorizado, qual AR orientou a atividade e quais medidas de prevencao foram adotadas antes da liberacao."
+      },
+      {
+        "requirement_id": "initial_inspection_and_installation_release",
+        "source_refs": [
+          "NR35 Anexo II 4.1",
+          "NR35 Anexo II 4.1.1",
+          "NR35 Anexo II 4.3"
+        ],
+        "maps_to": [
+          "evidencias_e_anexos.evidencia_principal",
+          "documentacao_e_registros.documentos_emitidos",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "O fechamento da montagem precisa demonstrar inspecao inicial, compatibilidade do sistema e eventual liberacao por responsabilidade tecnica."
+      },
+      {
+        "requirement_id": "assembly_procedure_and_project_specification",
+        "source_refs": [
+          "NR35 35.5.6",
+          "NR35 35.5.8",
+          "NR35 Anexo II 5.1",
+          "NR35 Anexo II 6.1"
+        ],
+        "maps_to": [
+          "documentacao_e_registros.documentos_emitidos",
+          "recomendacoes.texto",
+          "document_blueprint"
+        ],
+        "application_note": "O documento deve amarrar procedimento de montagem, projeto/especificacao e eventuais condicoes impeditivas ou pendencias de liberacao."
+      }
+    ]
+  }
+}

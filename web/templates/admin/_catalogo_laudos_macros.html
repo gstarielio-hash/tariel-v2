@@ -1,0 +1,65 @@
+{% macro status_badge(meta, extra_class='') -%}
+<span class="catalog-status catalog-status--{{ meta.tone | default('draft', true) }} {{ extra_class }}">
+    {{ meta.label | e }}
+</span>
+{%- endmacro %}
+
+{% macro kpi_card(label, value, hint) -%}
+<article class="catalog-kpi-card">
+    <span class="catalog-kpi-card__label">{{ label | e }}</span>
+    <strong class="catalog-kpi-card__value">{{ value }}</strong>
+    <span class="catalog-kpi-card__hint">{{ hint | e }}</span>
+</article>
+{%- endmacro %}
+
+{% macro tab_button(key, label, href, active=False, meta='') -%}
+<a
+    href="{{ href | e }}"
+    class="catalog-tab{% if active %} is-active{% endif %}"
+    id="catalog-tab-{{ key | e }}"
+    data-catalog-tab="{{ key | e }}"
+    data-catalog-tab-link="true"
+    role="tab"
+    aria-controls="catalog-panel-{{ key | e }}"
+    aria-selected="{{ 'true' if active else 'false' }}"
+    tabindex="{{ '0' if active else '-1' }}">
+    <span>{{ label | e }}</span>
+    {% if meta %}
+    <small>{{ meta | e }}</small>
+    {% endif %}
+</a>
+{%- endmacro %}
+
+{% macro string_list_editor(name, items, placeholder='', add_label='Adicionar item') -%}
+{% set values = items if items is not none else [] %}
+<div
+    class="catalog-list-editor"
+    data-list-editor="strings"
+    data-placeholder="{{ placeholder | e }}"
+    data-add-label="{{ add_label | e }}">
+    <input type="hidden" name="{{ name | e }}" value="{{ values | tojson | e }}">
+    <div class="catalog-list-editor__rows" data-list-editor-rows></div>
+    <div class="catalog-list-editor__toolbar">
+        <input type="text" data-list-editor-draft placeholder="{{ placeholder | e }}">
+        <button type="button" class="catalog-btn catalog-btn--ghost" data-list-editor-add>{{ add_label | e }}</button>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro variant_editor(name, items) -%}
+{% set values = items if items is not none else [] %}
+<div class="catalog-variant-editor" data-list-editor="variants">
+    <input type="hidden" name="{{ name | e }}" value="{{ values | tojson | e }}">
+    <div class="catalog-variant-editor__rows" data-variant-editor-rows></div>
+    <button type="button" class="catalog-btn catalog-btn--ghost" data-variant-editor-add>Adicionar opcao</button>
+</div>
+{%- endmacro %}
+
+{% macro red_flag_editor(name, items) -%}
+{% set values = items if items is not none else [] %}
+<div class="catalog-red-flag-editor" data-list-editor="red-flags">
+    <input type="hidden" name="{{ name | e }}" value="{{ values | tojson | e }}">
+    <div class="catalog-red-flag-editor__rows" data-red-flag-editor-rows></div>
+    <button type="button" class="catalog-btn catalog-btn--ghost" data-red-flag-editor-add>Adicionar alerta</button>
+</div>
+{%- endmacro %}

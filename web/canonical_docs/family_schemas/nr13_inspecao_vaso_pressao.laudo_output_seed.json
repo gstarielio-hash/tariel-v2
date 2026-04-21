@@ -1,0 +1,149 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr13_inspecao_vaso_pressao",
+  "template_code": "nr13_vaso_pressao",
+  "tokens": {
+    "cliente_nome": null,
+    "unidade_nome": null,
+    "engenheiro_responsavel": null,
+    "crea_art": null,
+    "revisao_template": null
+  },
+  "case_context": {
+    "laudo_id": null,
+    "empresa_nome": null,
+    "unidade_nome": null,
+    "data_inspecao": null,
+    "data_emissao": null,
+    "status_mesa": null
+  },
+  "mesa_review": {
+    "status": null,
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": null,
+    "pendencias_resolvidas_texto": null,
+    "observacoes_mesa": null
+  },
+  "resumo_executivo": null,
+  "identificacao": {
+    "identificacao_do_vaso": null,
+    "localizacao": null,
+    "placa_identificacao": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null,
+      "observacao": null
+    },
+    "tag_patrimonial": null
+  },
+  "caracterizacao_do_equipamento": {
+    "vista_geral_equipamento": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    },
+    "descricao_sumaria": null,
+    "condicao_de_operacao_no_momento": null
+  },
+  "inspecao_visual": {
+    "condicao_geral": null,
+    "integridade_aparente": null,
+    "area_instalacao": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    },
+    "acessibilidade_para_inspecao": null,
+    "pontos_de_corrosao": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    },
+    "vazamentos": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    },
+    "isolamento_termico": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    }
+  },
+  "dispositivos_e_acessorios": {
+    "dispositivos_de_seguranca": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    },
+    "leitura_dos_dispositivos_de_seguranca": null,
+    "manometro": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    },
+    "valvula_seguranca_detalhe": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    },
+    "suportes_e_fixacao": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    }
+  },
+  "documentacao_e_registros": {
+    "registros_disponiveis_no_local": null,
+    "prontuario": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "observacao": null
+    },
+    "certificado": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "observacao": null
+    },
+    "relatorio_anterior": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "observacao": null
+    }
+  },
+  "nao_conformidades": {
+    "ha_nao_conformidades": null,
+    "ha_nao_conformidades_texto": null,
+    "descricao": null,
+    "evidencias": {
+      "disponivel": null,
+      "referencias": [],
+      "referencias_texto": null,
+      "descricao": null
+    }
+  },
+  "recomendacoes": {
+    "texto": null
+  },
+  "conclusao": {
+    "status": null,
+    "conclusao_tecnica": null,
+    "justificativa": null
+  }
+}

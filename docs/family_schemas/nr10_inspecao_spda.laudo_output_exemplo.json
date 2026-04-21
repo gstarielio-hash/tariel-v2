@@ -1,0 +1,155 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr10_inspecao_spda",
+  "template_code": "nr10_inspecao_spda",
+  "tokens": {
+    "cliente_nome": "Empresa Piloto NR10",
+    "unidade_nome": "Centro Logistico Sul - cobertura do galpao 01",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": null,
+    "revisao_template": "v1",
+    "cliente_razao_social": "Empresa Piloto NR10",
+    "cliente_cnpj": null,
+    "cliente_localizacao": null,
+    "cliente_responsavel": null,
+    "cliente_logo_asset_id": "tenant_logo",
+    "confidencialidade_documento": "Uso controlado do cliente. Distribuicao condicionada a autorizacao do emitente.",
+    "status_assinatura": "Aguardando assinatura ou ciencia formal.",
+    "documento_codigo": "NR10_INSPECAO_SPDA-1",
+    "documento_revisao": "v1",
+    "documento_titulo": "NR10 · SPDA",
+    "documento_tipo_mestre": "Laudo de Inspecao de Conformidade"
+  },
+  "case_context": {
+    "laudo_id": "1",
+    "empresa_nome": "Empresa Piloto NR10",
+    "unidade_nome": "Centro Logistico Sul - cobertura do galpao 01",
+    "data_execucao": "2026-04-14",
+    "data_emissao": "2026-04-14",
+    "status_mesa": "Aprovado",
+    "wave_portfolio": 1,
+    "data_inspecao": "2026-04-14",
+    "document_code": "NR10_INSPECAO_SPDA-1"
+  },
+  "mesa_review": {
+    "status": "Aprovado",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissão.",
+    "pendencias_resolvidas_texto": "Base documental SPDA considerada: Medicao/relatorio: DOC_510 - medicao_aterramento_2025.pdf; Projeto/croqui: DOC_511 - croqui_spda_galpao01.pdf; Historico anterior: DOC_512 - relatorio_spda_2024.pdf",
+    "observacoes_mesa": null
+  },
+  "resumo_executivo": "SPDA com leitura tecnica suficiente, restando ajuste localizado em conexao de descida.",
+  "identificacao": {
+    "objeto_principal": "SPDA do galpao principal",
+    "localizacao": "Centro Logistico Sul - cobertura do galpao 01",
+    "codigo_interno": "SPDA-G01",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_910 - vista geral da cobertura"
+      ],
+      "referencias_texto": "IMG_910 - vista geral da cobertura",
+      "descricao": "Frente principal do SPDA, cobertura ou estrutura inspecionada.",
+      "observacao": "Rastreabilidade do sistema SPDA preservada pela evidencia principal."
+    }
+  },
+  "escopo_servico": {
+    "tipo_entrega": "inspecao_tecnica",
+    "modo_execucao": "in_loco",
+    "ativo_tipo": "spda_edificacao",
+    "resumo_escopo": "SPDA com leitura tecnica suficiente, restando ajuste localizado em conexao de descida."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Vistoria guiada com registro fotografico dos subsistemas e conferencia visual de continuidade aparente.",
+    "condicoes_observadas": "Captacao e descidas em condicao geral adequada, com conexao lateral apresentando necessidade de reaperto.",
+    "parametros_relevantes": "Captacao: Captacao periferica e conexoes principais visualmente integras na cobertura.; Descidas: Descidas identificadas e continuas, com ponto lateral leste demandando reaperto em conexao aparente.; Aterramento/equipotencializacao: Barramento de equipotencializacao identificado e acessivel, sem sinais aparentes de corrosao critica.; Medicoes/testes: Historico de medicao de resistencia do aterramento anexado como referencia documental complementar.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_911 - descida lateral",
+        "IMG_912 - barramento de equipotencializacao"
+      ],
+      "referencias_texto": "IMG_911 - descida lateral; IMG_912 - barramento de equipotencializacao",
+      "descricao": "Captacao e descidas em condicao geral adequada, com conexao lateral apresentando necessidade de reaperto.",
+      "observacao": null
+    }
+  },
+  "checklist_componentes": {
+    "captacao": {
+      "condicao": "conforme",
+      "observacao": "Captacao periferica e conexoes principais visualmente integras na cobertura."
+    },
+    "descidas": {
+      "condicao": "ajuste",
+      "observacao": "Descidas identificadas e continuas, com ponto lateral leste demandando reaperto em conexao aparente."
+    },
+    "aterramento_e_equipotencializacao": {
+      "condicao": "conforme",
+      "observacao": "Barramento de equipotencializacao identificado e acessivel, sem sinais aparentes de corrosao critica."
+    },
+    "medicoes_ou_testes": {
+      "condicao": "conforme",
+      "observacao": "Historico de medicao de resistencia do aterramento anexado como referencia documental complementar."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_911 - conexao lateral da descida"
+      ],
+      "referencias_texto": "IMG_911 - conexao lateral da descida",
+      "descricao": "Registro principal do ponto mais sensivel identificado no SPDA.",
+      "observacao": null
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_910 - cobertura",
+        "IMG_912 - barramento"
+      ],
+      "referencias_texto": "IMG_910 - cobertura; IMG_912 - barramento",
+      "descricao": null,
+      "observacao": null
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_510 - medicao_aterramento_2025.pdf"
+      ],
+      "referencias_texto": "DOC_510 - medicao_aterramento_2025.pdf",
+      "descricao": "Relatorio, medicao ou documento base utilizado para sustentar a inspeção do SPDA.",
+      "observacao": "Executar reaperto da conexao lateral leste, repetir a conferencia de continuidade e atualizar o historico do sistema."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Medicao/relatorio: DOC_510 - medicao_aterramento_2025.pdf; Projeto/croqui: DOC_511 - croqui_spda_galpao01.pdf; Historico anterior: DOC_512 - relatorio_spda_2024.pdf",
+    "documentos_emitidos": "Laudo tecnico de inspecao do SPDA do galpao 01.",
+    "observacoes_documentais": "Executar reaperto da conexao lateral leste, repetir a conferencia de continuidade e atualizar o historico do sistema."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Conexao lateral da descida leste com necessidade de reaperto e revisao local.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_911 - conexao lateral da descida"
+      ],
+      "referencias_texto": "IMG_911 - conexao lateral da descida",
+      "descricao": "Conexao lateral da descida leste com necessidade de reaperto e revisao local.",
+      "observacao": null
+    }
+  },
+  "recomendacoes": {
+    "texto": "Executar reaperto da conexao lateral leste, repetir a conferencia de continuidade e atualizar o historico do sistema."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "SPDA com leitura tecnica suficiente, restando ajuste localizado em conexao de descida.",
+    "justificativa": "SPDA com leitura tecnica suficiente, restando ajuste localizado em conexao de descida."
+  }
+}

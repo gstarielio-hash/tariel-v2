@@ -1,0 +1,16 @@
+{
+  "schema_type": "filled_reference_package_manifest",
+  "schema_version": 1,
+  "family_key": "nr13_inspecao_tubulacao",
+  "package_status": "synthetic_baseline",
+  "source_kind": "synthetic_repo_baseline",
+  "bundle_file": "tariel_filled_reference_bundle.json",
+  "reference_count": 1,
+  "notes": [
+    "Pacote sintetico interno gerado pelo proprio repositorio Tariel.",
+    "Manifest promovido a partir de baseline sintetica externa validada.",
+    "Os assets e o PDF referenciados pelo bundle oficial foram descompactados em pacote_referencia/."
+  ],
+  "imported_on": "2026-04-10",
+  "imported_from": "coleta_entrada/referencia_sintetica_externa/nr13_inspecao_tubulacao.zip"
+}

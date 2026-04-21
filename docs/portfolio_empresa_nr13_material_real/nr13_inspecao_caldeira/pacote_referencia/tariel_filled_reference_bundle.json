@@ -1,0 +1,217 @@
+{
+  "schema_type": "tariel_filled_reference_bundle",
+  "schema_version": 1,
+  "family_key": "nr13_inspecao_caldeira",
+  "template_code": "nr13_caldeira",
+  "reference_id": "nr13_inspecao_caldeira.synthetic.v1",
+  "source_kind": "synthetic_repo_baseline",
+  "reference_summary": {
+    "title": "Baseline sintético - inspeção periódica de caldeira industrial",
+    "document_code": "RT-WF-NR13-CAL017-UN-2026-042",
+    "status_final": "ajuste",
+    "pdf_file": "pdf/nr13_inspecao_caldeira_referencia_sintetica.pdf",
+    "asset_files": [
+      "assets/IMG_021_vista_geral_caldeira.png",
+      "assets/IMG_022_painel_comandos.png",
+      "assets/IMG_023_indicador_nivel.png",
+      "assets/IMG_024_fuligem_exaustao.png",
+      "assets/IMG_025_isolamento_termico.png",
+      "assets/IMG_026_queimador_sistema_termico.png",
+      "assets/IMG_027_dispositivo_seguranca.png",
+      "assets/IMG_028_manometro.png"
+    ],
+    "resumo": "Caso sintético de caldeira flamotubular horizontal CAL-017 com prontuário disponível, dispositivos presentes, marcas leves de fuligem na exaustão, desgaste localizado do revestimento externo do isolamento térmico e certificado não apresentado em campo, concluído com status ajuste."
+  },
+  "required_slots_snapshot": {
+    "tipo_equipamento": "caldeira_flamotubular_horizontal",
+    "codigo_ativo": "CAL-017",
+    "tag_patrimonial": "TAG-CAL-017",
+    "local_instalacao": "Casa de caldeiras, área térmica principal, Unidade Norte",
+    "identificacao_registrada": true,
+    "vista_geral_registrada": true,
+    "painel_comandos_registrado": true,
+    "indicador_nivel_presente": true,
+    "manometro_presente": true,
+    "dispositivo_seguranca_presente": true,
+    "condicao_geral_estrutural": "adequada",
+    "integridade_aparente": "preservada",
+    "fuligem_trecho_exaustao": "leve",
+    "desgaste_revestimento_isolamento": "localizado",
+    "queimador_registrado": true,
+    "prontuario_disponivel": true,
+    "certificado_apresentado_campo": false,
+    "relatorio_anterior_disponivel": true,
+    "status_final": "ajuste"
+  },
+  "documental_sections_snapshot": [
+    "capa / folha de rosto",
+    "controle documental / ficha da inspeção",
+    "objeto, escopo, base normativa e limitações",
+    "metodologia, condições operacionais e equipe",
+    "identificação técnica da caldeira",
+    "inspeção visual e integridade aparente",
+    "dispositivos de segurança e controles",
+    "documentação, registros e evidências",
+    "não conformidades, criticidade e recomendações",
+    "conclusão, parecer e próxima ação",
+    "governança da Mesa",
+    "assinaturas e responsabilidade técnica",
+    "anexos e referências"
+  ],
+  "notes": [
+    "Conteúdo integralmente sintético, produzido para baseline de referência visual e documental da família nr13_inspecao_caldeira.",
+    "Ultrassom, calibração, testes e livro de registro permanecem apenas como apoio documental / histórico, sem mistura de famílias no documento principal.",
+    "Conclusão amarrada às Figuras 1, 4, 5, 2, 3, 6, 7 e 8, ao prontuário e ao relatório anterior."
+  ],
+  "laudo_output_snapshot": {
+    "tokens": {
+      "document_code": "RT-WF-NR13-CAL017-UN-2026-042",
+      "laudo_id": "LT-WF-NR13-CAL017-UN-2026-042",
+      "art": "ART MG2026/4832719",
+      "crea": "CREA-MG 2457813690-D",
+      "status_final": "ajuste",
+      "cliente": "WF Engenharia e Inspeções Industriais - Cliente Piloto",
+      "unidade": "Casa de Caldeiras - Unidade Norte",
+      "responsavel_tecnico": "Eng. Marcelo Vinícius Andrade",
+      "inspetor_lider": "Caio Eduardo Pires"
+    },
+    "case_context": {
+      "local": "Casa de caldeiras, área térmica principal, Unidade Norte",
+      "ativo": "CAL-017",
+      "tag": "TAG-CAL-017",
+      "tipo": "Caldeira flamotubular horizontal de médio porte",
+      "servico": "Vapor saturado",
+      "combustivel": "Gás natural",
+      "data_inspecao": "18/03/2026",
+      "data_emissao": "24/03/2026",
+      "condicao_operacao": "Operação assistida em baixa carga no momento da inspeção"
+    },
+    "mesa_review": {
+      "mesa": "Mesa WF de Integridade Térmica e Equipamentos Pressurizados",
+      "criterio_deliberacao": "coerência entre achados visuais, rastreabilidade mínima, materialidade do risco e adequação do regime operacional",
+      "deliberacao": "baseline sintético aprovado com status ajuste e acompanhamento corretivo programado"
+    },
+    "resumo_executivo": {
+      "sintese": "Caldeira CAL-017 em condição geral estrutural adequada, integridade aparente preservada e dispositivos principais visíveis presentes.",
+      "status": "ajuste",
+      "fundamentos": [
+        "desgaste localizado do revestimento externo do isolamento térmico",
+        "marcas leves de fuligem em trecho da exaustão",
+        "certificado não apresentado em campo"
+      ]
+    },
+    "identificacao": {
+      "cliente": "WF Engenharia e Inspeções Industriais - Cliente Piloto",
+      "unidade": "Casa de Caldeiras - Unidade Norte",
+      "local": "Casa de caldeiras, área térmica principal, Unidade Norte",
+      "documento": "RT-WF-NR13-CAL017-UN-2026-042",
+      "revisao": "00",
+      "responsavel_tecnico": "Eng. Marcelo Vinícius Andrade",
+      "inspetor_lider": "Caio Eduardo Pires",
+      "art": "ART MG2026/4832719",
+      "crea": "CREA-MG 2457813690-D"
+    },
+    "caracterizacao_do_equipamento": {
+      "tipo": "Caldeira flamotubular horizontal de médio porte",
+      "codigo_ativo": "CAL-017",
+      "tag": "TAG-CAL-017",
+      "fabricante": "Térmica do Vale Equipamentos Ltda.",
+      "modelo": "FT-4000 GN",
+      "ano_fabricacao": "2019",
+      "capacidade_nominal": "4.000 kg/h de vapor saturado",
+      "pmta": "10,5 bar",
+      "servico": "Vapor saturado",
+      "combustivel": "Gás natural",
+      "placa_ou_identificador": "Identificação física CAL-017 confirmada em campo e no prontuário",
+      "vista_geral": "Figura 1",
+      "descricao_sumaria": "Caldeira horizontal de médio porte instalada em casa de caldeiras com queimador frontal, painel lateral, indicador de nível, manômetro e dispositivo de segurança visíveis."
+    },
+    "inspecao_visual": {
+      "condicao_operacao_no_momento": "Operação assistida em baixa carga no momento da inspeção",
+      "condicao_geral": "adequada",
+      "integridade_aparente": "preservada",
+      "vista_geral_da_caldeira": "Figura 1",
+      "painel_e_comandos": "presentes e sem dano estrutural aparente",
+      "indicador_de_nivel": "presente e visualmente legível",
+      "queimador_ou_sistema_termico": "registrado na frente térmica, sem desalinhamento visual evidente",
+      "manometro": "presente e legível",
+      "dispositivos_de_seguranca": "presentes, com verificação apenas visual nesta emissão",
+      "pontos_de_vazamento_ou_fuligem": "sem vazamento aparente; marcas leves de fuligem em trecho da exaustão",
+      "isolamento_termico": "desgaste localizado do revestimento externo do isolamento térmico",
+      "evidencias_fotograficas": [
+        "Figura 1",
+        "Figura 4",
+        "Figura 5",
+        "Figura 2",
+        "Figura 3",
+        "Figura 6",
+        "Figura 7",
+        "Figura 8"
+      ]
+    },
+    "dispositivos_e_controles": {
+      "painel_principal": "presente",
+      "indicador_nivel": "presente",
+      "manometro": "presente e legível",
+      "dispositivo_seguranca": "presente",
+      "queimador": "registrado",
+      "observacao": "verificação visual, sem substituir calibração ou teste funcional"
+    },
+    "documentacao_e_registros": {
+      "prontuario": "PRT-CAL017-2023-006",
+      "prontuario_disponivel": true,
+      "certificado": "não apresentado em campo",
+      "relatorio_anterior": "RIP-CAL017-2025-019",
+      "relatorio_anterior_disponivel": true,
+      "livro_de_registro": "LR-CAL017-2026",
+      "ultrassom_historico": "UT-WF-CAL017-2025-014",
+      "calibracao_valvula": "CSV-WF-CAL017-2025-022",
+      "teste_hidrostatico_ou_estanqueidade": "TH-WF-CAL017-2024-003"
+    },
+    "nao_conformidades": [
+      {
+        "codigo": "NC-01",
+        "tipo": "ajuste localizado",
+        "descricao": "desgaste localizado do revestimento externo do isolamento térmico",
+        "evidencia": "Figura 5"
+      },
+      {
+        "codigo": "OBS-01",
+        "tipo": "acompanhamento",
+        "descricao": "marcas leves de fuligem em trecho aparente da exaustão",
+        "evidencia": "Figura 4"
+      },
+      {
+        "codigo": "LD-01",
+        "tipo": "lacuna documental",
+        "descricao": "certificado não apresentado em campo",
+        "evidencia": "registro documental"
+      }
+    ],
+    "recomendacoes": [
+      "recompor o revestimento externo do isolamento térmico no ponto registrado",
+      "acompanhar o trecho com fuligem e correlacionar com ajuste de queima / limpeza programada",
+      "anexar o certificado pendente ao dossiê do ativo",
+      "registrar a tratativa no livro de registro e executar reinspeção de fechamento do ajuste"
+    ],
+    "conclusao": {
+      "status_final": "ajuste",
+      "parecer": "continuidade operacional condicionada a ajuste programado",
+      "conclusao_tecnica": "A caldeira apresentou condição geral estrutural adequada, integridade aparente preservada e dispositivos visíveis presentes, porém requer recomposição do revestimento externo do isolamento térmico e acompanhamento do trecho com fuligem.",
+      "justificativa": "Status definido pela soma do achado principal no isolamento térmico, da observação de fuligem e da lacuna documental do certificado não apresentado, contrabalançados pela ausência de deformações aparentes, pela condição geral preservada e pela disponibilidade do prontuário e do relatório anterior.",
+      "amarracao_evidencias": [
+        "Figura 1",
+        "Figura 4",
+        "Figura 5",
+        "Figura 2",
+        "Figura 3",
+        "Figura 6",
+        "Figura 7",
+        "Figura 8",
+        "PRT-CAL017-2023-006",
+        "RIP-CAL017-2025-019"
+      ],
+      "proxima_acao": "reinspeção de fechamento do ajuste preferencialmente em até 45 dias após a recomposição do revestimento externo do isolamento térmico"
+    }
+  }
+}

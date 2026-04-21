@@ -1,0 +1,35 @@
+---
+import type { AdminWeeklyPoint } from "@/lib/server/admin-dashboard";
+
+interface Props {
+  series: AdminWeeklyPoint[];
+}
+
+const { series } = Astro.props;
+const maxValue = Math.max(1, ...series.map((point) => point.value));
+---
+
+<div class="grid grid-cols-7 gap-3">
+  {series.map((point) => {
+    const height = point.value === 0 ? 10 : Math.max(18, Math.round((point.value / maxValue) * 100));
+
+    return (
+      <div class="flex flex-col items-center gap-3">
+        <div
+          class="flex h-52 w-full items-end justify-center rounded-[24px] border border-slate-950/6 bg-[linear-gradient(180deg,rgba(248,250,252,0.96),rgba(241,245,249,0.88))] px-2 py-3"
+          aria-label={`${point.label}: ${point.value} laudos`}
+        >
+          <div class="flex w-full flex-col items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500">{point.value}</span>
+            <div
+              class="w-full rounded-[18px] bg-[linear-gradient(180deg,rgba(15,23,42,0.92),rgba(249,115,22,0.92))] shadow-[0_16px_28px_rgba(249,115,22,0.18)]"
+              style={`height: ${height}%`}
+            ></div>
+          </div>
+        </div>
+
+        <span class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{point.label}</span>
+      </div>
+    );
+  })}
+</div>

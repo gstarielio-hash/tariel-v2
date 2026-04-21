@@ -1,0 +1,106 @@
+appId: com.tarielia.inspetor
+tags:
+  - smoke
+  - pre-laudo
+  - canonical
+env:
+  LOGIN_EMAIL: ${MAESTRO_LOGIN_EMAIL}
+  LOGIN_PASSWORD: ${MAESTRO_LOGIN_PASSWORD}
+  TARGET_LAUDO_ID: ${MAESTRO_TARGET_LAUDO_ID}
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: login-email-input
+    timeout: 30000
+
+- tapOn:
+    id: login-email-input
+
+- inputText: ${LOGIN_EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-password-input
+
+- inputText: ${LOGIN_PASSWORD}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-submit-button
+
+- extendedWaitUntil:
+    visible:
+      id: guided-entry-open-button
+    timeout: 25000
+
+- tapOn:
+    id: guided-entry-open-button
+
+- scrollUntilVisible:
+    element:
+      id: guided-inspection-template-nr35_linha_vida-button
+    direction: DOWN
+    visibilityPercentage: 60
+    timeout: 15000
+
+- tapOn:
+    id: guided-inspection-template-nr35_linha_vida-button
+
+- extendedWaitUntil:
+    visible:
+      id: open-history-button
+    timeout: 25000
+
+- tapOn:
+    id: open-history-button
+
+- extendedWaitUntil:
+    visible:
+      id: history-search-input
+    timeout: 15000
+
+- tapOn:
+    id: history-search-input
+
+- inputText: ${TARGET_LAUDO_ID}
+
+- extendedWaitUntil:
+    visible:
+      id: history-item-${TARGET_LAUDO_ID}
+    timeout: 15000
+
+- scrollUntilVisible:
+    element:
+      id: history-item-${TARGET_LAUDO_ID}
+    direction: DOWN
+    timeout: 15000
+
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: history-item-${TARGET_LAUDO_ID}
+          retryTapIfNoChange: true
+          waitToSettleTimeoutMs: 1800
+      - extendedWaitUntil:
+          visible:
+            id: chat-report-pack-card
+          timeout: 12000
+
+- extendedWaitUntil:
+    visible:
+      id: chat-report-pack-card
+    timeout: 15000
+
+- assertVisible:
+    id: chat-report-pack-card-open-quality-gate
+
+- assertVisible:
+    id: chat-report-pack-card-open-mesa
+
+- takeScreenshot: canonical-pre-laudo-card

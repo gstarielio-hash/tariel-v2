@@ -1,0 +1,349 @@
+                <section class="catalog-tab-panel" id="catalog-panel-ofertas">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Produto comercial</p>
+                                <h2>Pacote comercial</h2>
+                                <p class="catalog-panel__description">O pacote aparece primeiro em leitura simples. Opcoes, escopo e insumos ficam visiveis sem abrir o formulario.</p>
+                            </div>
+                            <button type="button" class="catalog-btn catalog-btn--primary" data-catalog-open-disclosure="offer-form">{{ 'Editar pacote' if offer else 'Novo pacote' }}</button>
+                        </div>
+
+                        <div class="catalog-state-grid">
+                            <article class="catalog-card">
+                                <h3>Estado atual</h3>
+                                {% if offer %}
+                                <p><strong>{{ offer.offer_name | e }}</strong></p>
+                                <p>{{ offer.lifecycle_status.label | e }} • {{ offer.material_level.label | e }}</p>
+                                <p class="catalog-card__meta">Responsavel: {{ offer.actor_label | e }} • {{ offer.updated_at_label | e }}</p>
+                                {% else %}
+                                <p>Nenhum pacote comercial montado para esta família.</p>
+                                <p class="catalog-card__meta">O próximo passo é definir posicionamento, modelo principal e escopo de entrega.</p>
+                                {% endif %}
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Modelo principal</h3>
+                                <p>{{ offer_model_label | e }}</p>
+                                <p>{{ offer.package_name | default('Sem pacote comercial definido', true) | e }}</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Opcoes de venda</h3>
+                                <p>{{ offer.variants | length if offer else 0 }} opcoes configuradas.</p>
+                                <p class="catalog-card__meta">
+                                    {% if offer and offer.variants %}
+                                    As opções aparecem primeiro em leitura simples para facilitar a decisão comercial.
+                                    {% else %}
+                                    As opções surgem quando o pacote ganha recortes claros de uso.
+                                    {% endif %}
+                                </p>
+                            </article>
+                        </div>
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Opcoes disponiveis</h3>
+                                <ul class="catalog-inline-list">
+                                    <li>{{ variant_library.variant_count | int }} opcao(oes) catalogada(s)</li>
+                                    <li>{{ variant_library.template_mapped_count | int }} com modelo ligado</li>
+                                    <li>{{ variant_library.operational_count | int }} pronta(s) para uso</li>
+                                    <li>{{ variant_library.unique_template_count | int }} modelo(s) diferentes</li>
+                                </ul>
+                                <p class="catalog-card__meta">{{ variant_library.selection_guidance | e }}</p>
+                                <p class="catalog-card__meta">{{ variant_library.release_signal | e }}</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Como o documento se apresenta</h3>
+                                <p>{{ document_preview.subtitle | e }}</p>
+                                <div class="catalog-chip-row">
+                                    {% for item in document_preview.premium_features %}
+                                    <span class="catalog-chip">{{ item | e }}</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="catalog-card-grid catalog-card-grid--compact">
+                            <article class="catalog-card">
+                                <h3>O que esta incluido</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in offer.scope_items if offer %}
+                                    <span class="catalog-chip">{{ item | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem itens registrados</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>O que fica fora</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in offer.exclusion_items if offer %}
+                                    <span class="catalog-chip">{{ item | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem exclusões registradas</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>O que precisa receber</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in offer.minimum_inputs if offer %}
+                                    <span class="catalog-chip">{{ item | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem insumos mínimos registrados</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="catalog-card-grid catalog-card-grid--compact">
+                            {% for item in variant_library.variants %}
+                            <article class="catalog-card">
+                                <div class="catalog-card__header">
+                                    <div>
+                                        <strong>{{ item.label | e }}</strong>
+                                        <span class="catalog-card__caption">{{ item.usage | default('Uso em definição', true) | e }}</span>
+                                    </div>
+                                    <span class="catalog-status catalog-status--{{ item.status.tone | e }}">{{ item.status.label | e }}</span>
+                                </div>
+                                <div class="catalog-chip-row">
+                                    {% if item.template_label %}
+                                    <span class="catalog-chip">{{ item.template_label | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--warning">Modelo pendente</span>
+                                    {% endif %}
+                                </div>
+                                <p>{{ item.usage | default('Sem uso recomendado registrado.', true) | e }}</p>
+                            </article>
+                            {% else %}
+                            <article class="catalog-empty-card">
+                                <strong>Sem opcoes configuradas.</strong>
+                                <p>As opcoes aparecem quando a oferta ganha recortes claros de uso.</p>
+                            </article>
+                            {% endfor %}
+                        </div>
+
+                        <div class="catalog-record-table">
+                            <div class="catalog-record-table__header">
+                                <strong>Opcoes existentes</strong>
+                            </div>
+                                <div class="catalog-record-table__body">
+                                    {% for item in offer.variants if offer %}
+                                    <article class="catalog-record-row">
+                                        <div>
+                                            <strong>{{ item.nome_exibicao | default(item.variant_key, true) | e }}</strong>
+                                            <span>{{ item.uso_recomendado | default('Uso recomendado em definição', true) | e }}</span>
+                                        </div>
+                                    <div>{{ ((item.template_code | replace('_', ' ') | replace('-', ' ') | title) if item.template_code else 'Modelo em definição') | e }}</div>
+                                    <div>{{ item.uso_recomendado | default('Sem uso recomendado', true) | e }}</div>
+                                </article>
+                                {% else %}
+                                <article class="catalog-empty-card">
+                                    <strong>Sem opcoes configuradas.</strong>
+                                    <p>A oferta pode existir sem precisar abrir um formulario grande o tempo todo.</p>
+                                </article>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Pacote comercial</h3>
+                                <div class="catalog-governance-pill-row">
+                                    {% if offer and offer.release_channel %}
+                                    <span class="catalog-status catalog-status--{{ offer.release_channel.tone | e }}">{{ offer.release_channel.label | e }}</span>
+                                    {% endif %}
+                                    {% if offer_bundle %}
+                                    <span class="catalog-chip">{{ offer_bundle.bundle_label | e }}</span>
+                                    {% endif %}
+                                </div>
+                                <ul class="catalog-inline-list">
+                                    {% if offer_bundle %}
+                                    <li><strong>Pacote:</strong> {{ offer_bundle.bundle_label | e }}</li>
+                                    {% if offer_bundle.audience %}
+                                    <li><strong>Publico:</strong> {{ offer_bundle.audience | e }}</li>
+                                    {% endif %}
+                                    {% if offer_bundle.summary %}
+                                    <li><strong>Resumo:</strong> {{ offer_bundle.summary | e }}</li>
+                                    {% endif %}
+                                    {% else %}
+                                    <li>Sem pacote comercial estruturado.</li>
+                                    {% endif %}
+                                </ul>
+                                <div class="catalog-chip-row">
+                                    {% for item in (offer_bundle.highlights if offer_bundle else []) %}
+                                    <span class="catalog-chip">{{ item | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem destaques do pacote</span>
+                                    {% endfor %}
+                                </div>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Recursos incluidos</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in (offer_entitlements.effective_features if offer_entitlements else []) %}
+                                    <span class="catalog-chip">{{ item.label | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem recursos explicitos</span>
+                                    {% endfor %}
+                                </div>
+                                <ul class="catalog-inline-list">
+                                    {% for item in (offer_entitlements.limits if offer_entitlements else []) %}
+                                    <li><strong>{{ item.label | e }}:</strong> {{ item.value | int }}</li>
+                                    {% else %}
+                                    <li>Sem limites estruturados nesta oferta.</li>
+                                    {% endfor %}
+                                </ul>
+                            </article>
+                        </div>
+
+                        <details class="catalog-disclosure" id="offer-form">
+                            <summary>{{ 'Editar pacote' if offer else 'Novo pacote' }}</summary>
+                            <form class="catalog-form" method="POST" action="/admin/catalogo-laudos/ofertas-comerciais">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="return_to" value="{{ family_detail_base }}?tab=ofertas#ofertas">
+                                <input type="hidden" name="family_key" value="{{ family.family_key | e }}">
+                                <div class="catalog-form__grid">
+                                    <label>
+                                        <span>Referencia do pacote</span>
+                                        <input type="text" name="offer_key" maxlength="120" value="{{ offer.offer_key | default(family.family_key, true) | e }}">
+                                    </label>
+                                    <label>
+                                        <span>Nome da oferta</span>
+                                        <input type="text" name="nome_oferta" maxlength="180" value="{{ offer.offer_name | default(family.display_name, true) | e }}">
+                                    </label>
+                                    <label>
+                                        <span>Nome do pacote</span>
+                                        <input type="text" name="pacote_comercial" maxlength="80" value="{{ offer.package_name | default('', true) | e }}">
+                                    </label>
+                                    <label>
+                                        <span>Situacao do pacote</span>
+                                        <select name="lifecycle_status">
+                                            <option value="draft" {% if not offer or offer.lifecycle_status.key == 'draft' %}selected{% endif %}>Em preparo</option>
+                                            <option value="testing" {% if offer and offer.lifecycle_status.key == 'testing' %}selected{% endif %}>Em validacao</option>
+                                            <option value="active" {% if offer and offer.lifecycle_status.key == 'active' %}selected{% endif %}>Ativa</option>
+                                            <option value="paused" {% if offer and offer.lifecycle_status.key == 'paused' %}selected{% endif %}>Pausada</option>
+                                            <option value="archived" {% if offer and offer.lifecycle_status.key == 'archived' %}selected{% endif %}>Arquivada</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Canal de liberacao</span>
+                                        <select name="release_channel">
+                                            <option value="">Seguir a situacao do pacote</option>
+                                            <option value="pilot" {% if offer and offer.release_channel.key == 'pilot' %}selected{% endif %}>Piloto</option>
+                                            <option value="limited_release" {% if offer and offer.release_channel.key == 'limited_release' %}selected{% endif %}>Liberacao controlada</option>
+                                            <option value="general_release" {% if offer and offer.release_channel.key == 'general_release' %}selected{% endif %}>Liberacao ampla</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Prazo padrão (dias)</span>
+                                        <input type="number" name="prazo_padrao_dias" min="0" step="1" value="{{ family_entity.oferta_comercial.prazo_padrao_dias if family_entity.oferta_comercial else '' }}">
+                                    </label>
+                                    <label>
+                                        <span>Nivel de validacao</span>
+                                        <select name="material_level">
+                                            <option value="synthetic" {% if not offer or offer.material_level.key == 'synthetic_only' %}selected{% endif %}>Base inicial</option>
+                                            <option value="partial" {% if offer and offer.material_level.key == 'partial_real' %}selected{% endif %}>Em validacao</option>
+                                            <option value="real_calibrated" {% if offer and offer.material_level.key == 'real_calibrated' %}selected{% endif %}>Validada com material real</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Status antigo do material</span>
+                                        <select name="material_real_status">
+                                            <option value="sintetico" {% if not family_entity.oferta_comercial or family_entity.oferta_comercial.material_real_status == 'sintetico' %}selected{% endif %}>Sintético</option>
+                                            <option value="parcial" {% if family_entity.oferta_comercial and family_entity.oferta_comercial.material_real_status == 'parcial' %}selected{% endif %}>Parcial</option>
+                                            <option value="calibrado" {% if family_entity.oferta_comercial and family_entity.oferta_comercial.material_real_status == 'calibrado' %}selected{% endif %}>Calibrado</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Referencia interna do modelo principal</span>
+                                        <input type="text" name="template_default_code" maxlength="120" value="{{ offer.template_default_code | default('', true) | e }}" placeholder="nr13">
+                                    </label>
+                                    <label>
+                                        <span>Referencia curta do pacote</span>
+                                        <input type="text" name="bundle_key" maxlength="80" value="{{ offer_bundle.bundle_key | default('', true) | e }}" placeholder="nr13_core">
+                                    </label>
+                                    <label>
+                                        <span>Nome curto do pacote</span>
+                                        <input type="text" name="bundle_label" maxlength="120" value="{{ offer_bundle.bundle_label | default('', true) | e }}" placeholder="NR13 Core">
+                                    </label>
+                                    <label>
+                                        <span>Publico do pacote</span>
+                                        <input type="text" name="bundle_audience" maxlength="120" value="{{ offer_bundle.audience | default('', true) | e }}" placeholder="Operação industrial crítica">
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Resumo do pacote</span>
+                                        <textarea name="bundle_summary" rows="3">{{ offer_bundle.summary | default('', true) | e }}</textarea>
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--toggle">
+                                        <span>Exibir no catalogo interno</span>
+                                        <div class="catalog-switch">
+                                            <input type="checkbox" name="showcase_enabled" value="on" {% if offer and offer.showcase_enabled %}checked{% endif %}>
+                                            <small>Controla se o pacote aparece nesta visao comercial interna.</small>
+                                        </div>
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Descrição comercial</span>
+                                        <textarea name="descricao_comercial" rows="4">{{ offer.description | default('', true) | e }}</textarea>
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Escopo comercial</span>
+                                        {{ catalogo.string_list_editor('escopo_comercial', offer.scope_items if offer else [], 'Adicionar item de escopo', 'Adicionar item') }}
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Exclusões</span>
+                                        {{ catalogo.string_list_editor('exclusoes', offer.exclusion_items if offer else [], 'Adicionar exclusão', 'Adicionar exclusão') }}
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Insumos mínimos</span>
+                                        {{ catalogo.string_list_editor('insumos_minimos', offer.minimum_inputs if offer else [], 'Adicionar insumo mínimo', 'Adicionar insumo') }}
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Destaques do pacote</span>
+                                        {{ catalogo.string_list_editor('bundle_highlights', offer_bundle.highlights if offer_bundle else [], 'Destaque do pacote', 'Adicionar destaque') }}
+                                    </label>
+                                    <label class="catalog-form__field">
+                                        <span>Recursos incluidos</span>
+                                        {{ catalogo.string_list_editor('included_features', offer_entitlements.included_features | map(attribute='key') | list if offer_entitlements else [], 'Recurso incluido', 'Adicionar recurso') }}
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Opcoes de venda</span>
+                                        {{ catalogo.variant_editor('variantes_comerciais', offer.variants if offer else []) }}
+                                    </label>
+                                    {% set _offer_limits = offer_entitlements.limits if offer_entitlements else [] %}
+                                    <label>
+                                        <span>Emissões/mês</span>
+                                        <input type="number" name="entitlement_monthly_issues" min="0" step="1" value="{{ (_offer_limits | selectattr('key', 'equalto', 'monthly_issues') | map(attribute='value') | first) | default('', true) }}">
+                                    </label>
+                                    <label>
+                                        <span>Administradores da empresa</span>
+                                        <input type="number" name="entitlement_max_admin_clients" min="0" step="1" value="{{ (_offer_limits | selectattr('key', 'equalto', 'max_admin_clients') | map(attribute='value') | first) | default('', true) }}">
+                                    </label>
+                                    <label>
+                                        <span>Equipe de campo</span>
+                                        <input type="number" name="entitlement_max_inspectors" min="0" step="1" value="{{ (_offer_limits | selectattr('key', 'equalto', 'max_inspectors') | map(attribute='value') | first) | default('', true) }}">
+                                    </label>
+                                    <label>
+                                        <span>Equipe de analise</span>
+                                        <input type="number" name="entitlement_max_reviewers" min="0" step="1" value="{{ (_offer_limits | selectattr('key', 'equalto', 'max_reviewers') | map(attribute='value') | first) | default('', true) }}">
+                                    </label>
+                                    <label>
+                                        <span>Versoes ativas do servico</span>
+                                        <input type="number" name="entitlement_max_active_variants" min="0" step="1" value="{{ (_offer_limits | selectattr('key', 'equalto', 'max_active_variants') | map(attribute='value') | first) | default('', true) }}">
+                                    </label>
+                                    <label>
+                                        <span>Integrações</span>
+                                        <input type="number" name="entitlement_max_integrations" min="0" step="1" value="{{ (_offer_limits | selectattr('key', 'equalto', 'max_integrations') | map(attribute='value') | first) | default('', true) }}">
+                                    </label>
+                                </div>
+                                <details class="catalog-advanced">
+                                    <summary>Ver sinais avançados da oferta</summary>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Sinais da oferta</span>
+                                        <textarea name="flags_json" rows="6">{{ family_entity.oferta_comercial.flags_json | tojson if family_entity.oferta_comercial and family_entity.oferta_comercial.flags_json is not none else '' }}</textarea>
+                                    </label>
+                                </details>
+                                <button type="submit" class="catalog-btn catalog-btn--primary">Salvar pacote</button>
+                            </form>
+                        </details>
+                    </div>
+                </section>

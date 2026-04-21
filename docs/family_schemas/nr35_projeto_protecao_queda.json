@@ -1,0 +1,305 @@
+{
+  "family_key": "nr35_projeto_protecao_queda",
+  "nome_exibicao": "NR35 - Projeto de protecao contra queda",
+  "macro_categoria": "NR35",
+  "descricao": "Projeto, dimensionamento e consolidacao documental de solucao de protecao contra queda com premissas, layout, memoria de calculo e conclusao tecnica.",
+  "schema_version": 1,
+  "scope": {
+    "family_lock": true,
+    "allowed_nrs": [
+      "nr35"
+    ],
+    "allowed_contexts": [
+      "nr35_projeto_protecao_queda",
+      "nr35_projeto",
+      "design",
+      "wave_1",
+      "nr35"
+    ],
+    "scope_signals": [
+      "premissas_de_projeto_registradas",
+      "layout_ou_arranjo_registrado",
+      "memoria_de_calculo_registrada",
+      "art_ou_documentos_vinculados"
+    ],
+    "out_of_scope_examples": [
+      "montagem_sem_memoria_de_calculo",
+      "inspecao_periodica_sem_escopo_de_projeto",
+      "ausencia_de_documentacao_base"
+    ],
+    "review_required": [
+      "quando_nao_houver_memoria_de_calculo",
+      "quando_as_premissas_de_uso_estiverem_incompletas",
+      "quando_a_art_ou_documento_equivalente_nao_estiver_vinculado"
+    ]
+  },
+  "evidence_policy": {
+    "minimum_evidence": {
+      "fotos": 1,
+      "documentos": 1,
+      "textos": 1
+    },
+    "required_slots": [
+      {
+        "slot_id": "referencia_principal",
+        "label": "Referencia principal",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "identificacao.referencia_principal",
+        "purpose": "Ancorar a area, estrutura ou layout principal do projeto."
+      },
+      {
+        "slot_id": "evidencia_execucao",
+        "label": "Evidencia de execucao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "execucao_servico.evidencia_execucao",
+        "purpose": "Registrar o desenvolvimento, compatibilizacao ou revisao do projeto."
+      },
+      {
+        "slot_id": "documento_base",
+        "label": "Documento base",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.documento_base",
+        "purpose": "Vincular memorial, memoria de calculo, desenho, ART ou documento equivalente."
+      },
+      {
+        "slot_id": "conclusao_servico",
+        "label": "Conclusao do servico",
+        "accepted_types": [
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "conclusao.conclusao_tecnica",
+        "purpose": "Registrar a condicao de liberacao do projeto e eventuais pendencias documentais."
+      }
+    ],
+    "optional_slots": [
+      {
+        "slot_id": "evidencia_principal",
+        "label": "Evidencia principal",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.evidencia_principal",
+        "purpose": "Consolidar layout, detalhe estrutural ou pranchas principais do projeto."
+      }
+    ],
+    "checklist_groups": [
+      {
+        "group_id": "premissas_e_layout",
+        "title": "Premissas e layout",
+        "required": true,
+        "items": [
+          {
+            "item_id": "premissas_registradas",
+            "label": "Premissas de uso registradas",
+            "critical": true
+          },
+          {
+            "item_id": "layout_registrado",
+            "label": "Layout ou arranjo registrado",
+            "critical": true
+          },
+          {
+            "item_id": "escopo_registrado",
+            "label": "Escopo do projeto registrado",
+            "critical": true
+          }
+        ]
+      },
+      {
+        "group_id": "documentacao_e_calculo",
+        "title": "Documentacao e calculo",
+        "required": true,
+        "items": [
+          {
+            "item_id": "memoria_registrada",
+            "label": "Memoria de calculo registrada",
+            "critical": true
+          },
+          {
+            "item_id": "art_vinculada",
+            "label": "ART ou documento equivalente vinculado",
+            "critical": true
+          }
+        ]
+      }
+    ],
+    "review_required": [
+      "quando_a_memoria_de_calculo_estiver_ausente",
+      "quando_nao_houver_documento_base_do_projeto"
+    ]
+  },
+  "review_policy": {
+    "requires_family_lock": true,
+    "block_on_scope_mismatch": true,
+    "block_on_missing_required_evidence": true,
+    "block_on_critical_field_absent": true,
+    "allow_override_with_reason": true,
+    "allowed_override_cases": [
+      "documento_opcional_ausente_com_justificativa_registrada",
+      "evidencia_complementar_substituida_por_registro_textual_com_rastreabilidade",
+      "limitacao_controlada_sem_impacto_na_conclusao_critica"
+    ],
+    "blocking_conditions": [
+      "ausencia_de_memoria_de_calculo",
+      "ausencia_de_documento_base",
+      "ausencia_de_conclusao_tecnica"
+    ]
+  },
+  "document_blueprint": {
+    "opening_statement": "Documento tecnico governado para projeto de protecao contra queda com premissas, calculos, layout e conclusao tecnica.",
+    "section_order": [
+      "premissas_e_layout",
+      "documentacao_e_calculo",
+      "evidencias_e_documentos",
+      "conclusao_e_assinaturas"
+    ],
+    "signature_roles": [
+      "Engenheiro Responsavel",
+      "Projetista Responsavel",
+      "Representante da Contratante"
+    ],
+    "section_intros": {
+      "premissas_e_layout": "Consolide escopo, premissas de uso, layout e trechos abrangidos pela solucao.",
+      "documentacao_e_calculo": "Amarre memoria de calculo, ART e documentos estruturantes do projeto.",
+      "evidencias_e_documentos": "Organize desenhos, memoriais, referencias de campo e anexos tecnicos.",
+      "conclusao_e_assinaturas": "Feche pendencias, recomendacoes e responsabilidade tecnica."
+    },
+    "blank_row_targets": {}
+  },
+  "compatible_runtime_templates": [
+    "nr35_projeto"
+  ],
+  "compatible_template_codes": [
+    "nr35_projeto_protecao_queda",
+    "nr35_projeto"
+  ],
+  "normative_basis": {
+    "policy_version": 1,
+    "status": "official_basis_family_mapped",
+    "nr_code": "nr35",
+    "nr_title": "Trabalho em Altura",
+    "editorial_inference_notice": "A norma oficial define os requisitos de referencia; headings, ordem, linguagem editorial e acabamento visual do template sao decisoes de produto da Tariel.",
+    "implementation_note": "Retrofit oficial aplicado para projeto de protecao contra queda, com anchors granulares da NR-35 e do manual oficial para hierarquia de controle, AR, selecao do SPQ, projeto do sistema de ancoragem e procedimentos operacionais.",
+    "sources": [
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Normas Regulamentadoras - NR",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+        "used_for": "Ponto de entrada oficial do projeto para localizar textos vigentes, anexos e atualizacoes das NRs."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Trabalho em Altura",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-35-atualizada-2025.pdf",
+        "anchors": [
+          {
+            "item_ref": "35.1.1 / 35.3.1 / 35.5.1 / 35.5.2",
+            "used_for": "Fixar o projeto na obrigacao de planejar o trabalho em altura pela hierarquia de controle e nas medidas de prevencao da organizacao."
+          },
+          {
+            "item_ref": "35.5.5 / 35.5.5.1 / 35.5.6.1 / 35.5.8.1",
+            "used_for": "Amarrar AR, requisitos minimos do procedimento e medidas da PT ao desenho da solucao de protecao contra queda."
+          },
+          {
+            "item_ref": "35.6.1 / 35.6.2 / 35.6.3 / 35.6.3.1 / 35.6.11",
+            "used_for": "Cobrir selecao do SPCQ/SPIQ, criterios de projeto e aspectos que precisam aparecer no calculo e na memoria tecnica."
+          },
+          {
+            "item_ref": "Anexo II 4.3 / 5.1 / 5.1.1 / 6.1",
+            "used_for": "Cobrir exigencia de projeto por PLH, especificacoes tecnicas, dimensionamento e procedimento operacional do sistema de ancoragem."
+          },
+          {
+            "item_ref": "35.7.1",
+            "used_for": "Vincular o projeto ao planejamento de resgate, tempo de salvamento e meios de resposta a emergencias."
+          }
+        ],
+        "used_for": "Texto oficial vigente da NR-35 usado como base normativa primaria desta familia."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Manual Consolidado da NR-35",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/manual_consolidado_da_nr_35.pdf",
+        "anchors": [
+          {
+            "item_ref": "Comentarios 35.1 / 35.3 / 35.5",
+            "used_for": "Apoiar a interpretacao oficial sobre planejamento, AR, avaliacao previa e documentacao necessaria ao projeto."
+          },
+          {
+            "item_ref": "Comentarios 35.6 e ao Anexo II",
+            "used_for": "Apoiar a leitura oficial sobre selecao de SPQ, projeto do SPIQ/SPCQ e requisitos dos sistemas de ancoragem."
+          }
+        ],
+        "used_for": "Fonte oficial interpretativa de apoio para consolidar o racional tecnico do projeto de protecao contra queda sem inovar obrigacoes."
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "design_hierarchy_and_risk_assessment",
+        "source_refs": [
+          "NR35 35.5.1",
+          "NR35 35.5.2",
+          "NR35 35.5.5",
+          "NR35 35.5.5.1"
+        ],
+        "maps_to": [
+          "escopo_servico.resumo_escopo",
+          "premissas_e_layout",
+          "documentacao_e_calculo"
+        ],
+        "application_note": "O projeto deve explicitar como a hierarquia de controle e a AR conduziram a escolha da solucao contra queda."
+      },
+      {
+        "requirement_id": "spq_selection_and_structural_design_parameters",
+        "source_refs": [
+          "NR35 35.6.1",
+          "NR35 35.6.2",
+          "NR35 35.6.3.1",
+          "NR35 Anexo II 5.1",
+          "NR35 Anexo II 5.1.1"
+        ],
+        "maps_to": [
+          "documentacao_e_calculo",
+          "evidencias_e_documentos",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "A memoria do projeto deve trazer criterios de selecao do SPQ, esforcos, zona livre de queda e estruturas consideradas no sistema."
+      },
+      {
+        "requirement_id": "operational_procedure_and_rescue_interface",
+        "source_refs": [
+          "NR35 35.5.6.1",
+          "NR35 35.5.8.1",
+          "NR35 Anexo II 6.1",
+          "NR35 35.7.1"
+        ],
+        "maps_to": [
+          "documentacao_e_calculo",
+          "recomendacoes.texto",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "O projeto precisa prever procedimento operacional, premissas de uso e interface com o plano de emergencia e resgate."
+      }
+    ]
+  }
+}

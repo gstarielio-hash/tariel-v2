@@ -1,0 +1,34 @@
+{
+  "schema_type": "filled_reference_package_manifest",
+  "schema_version": "1",
+  "family_key": "nr10_inspecao_instalacoes_eletricas",
+  "package_status": "synthetic_baseline",
+  "source_kind": "synthetic_repo_baseline",
+  "bundle_file": "tariel_filled_reference_bundle.json",
+  "reference_count": 1,
+  "references": [
+    {
+      "reference_id": "nr10_inspecao_instalacoes_eletricas.synthetic.v1",
+      "pdf_file": "pdf/nr10_inspecao_instalacoes_eletricas_referencia_sintetica.pdf",
+      "assets_dir": "assets",
+      "document_code": "NR10-UIL-IEBT-2026-018",
+      "status_final": "ajuste"
+    }
+  ],
+  "files": [
+    "assets/IMG_301_vista_geral_sala_eletrica.png",
+    "assets/IMG_302_painel_principal_frontal.png",
+    "assets/IMG_303_painel_interno.png",
+    "assets/IMG_304_nao_conformidade_identificacao_ou_abertura.png",
+    "assets/IMG_305_barramento_aterramento.png",
+    "assets/IMG_306_documento_base_unifilar.png",
+    "pdf/nr10_inspecao_instalacoes_eletricas_referencia_sintetica.pdf",
+    "tariel_filled_reference_bundle.json"
+  ],
+  "imported_on": "2026-04-10",
+  "imported_from": "coleta_entrada/referencia_sintetica_externa/nr10_inspecao_instalacoes_eletricas.zip",
+  "notes": [
+    "Manifest promovido a partir de baseline sintetica externa validada.",
+    "Os assets e o PDF referenciados pelo bundle oficial foram descompactados em pacote_referencia/."
+  ]
+}

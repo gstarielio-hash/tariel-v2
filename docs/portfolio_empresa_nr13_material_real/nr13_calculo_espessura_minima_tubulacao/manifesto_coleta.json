@@ -1,0 +1,186 @@
+{
+  "family_key": "nr13_calculo_espessura_minima_tubulacao",
+  "nome_exibicao": "NR13 - Calculo de Espessura Minima de Tubulacao",
+  "macro_categoria": "NR13",
+  "kind": "calculation",
+  "wave": 3,
+  "template_codes": [
+    "nr13_calculo_espessura_minima_tubulacao"
+  ],
+  "required_slots_snapshot": [
+    {
+      "item_id": "slot_referencia_principal",
+      "label": "Referencia principal",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento"
+      ],
+      "purpose": "Vincular a referencia principal do objeto do servico nr13_calculo_espessura_minima_tubulacao.",
+      "binding_path": "identificacao.referencia_principal",
+      "drop_folder": "coleta_entrada/slots_reais/referencia_principal"
+    },
+    {
+      "item_id": "slot_evidencia_execucao",
+      "label": "Evidencia de execucao",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento",
+        "texto"
+      ],
+      "purpose": "Registrar a execucao principal do servico com evidencia rastreavel.",
+      "binding_path": "execucao_servico.evidencia_execucao",
+      "drop_folder": "coleta_entrada/slots_reais/evidencia_execucao"
+    },
+    {
+      "item_id": "slot_evidencia_principal",
+      "label": "Evidencia principal",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "foto",
+        "documento",
+        "texto"
+      ],
+      "purpose": "Consolidar a evidencia principal que sustenta a conclusao do servico.",
+      "binding_path": "evidencias_e_anexos.evidencia_principal",
+      "drop_folder": "coleta_entrada/slots_reais/evidencia_principal"
+    },
+    {
+      "item_id": "slot_documento_base",
+      "label": "Documento base",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "documento"
+      ],
+      "purpose": "Vincular o documento base ou memoria principal do servico.",
+      "binding_path": "evidencias_e_anexos.documento_base",
+      "drop_folder": "coleta_entrada/slots_reais/documento_base"
+    },
+    {
+      "item_id": "slot_conclusao_servico",
+      "label": "Conclusao do servico",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        "texto"
+      ],
+      "purpose": "Registrar a conclusao tecnica estruturada para revisao.",
+      "binding_path": "conclusao.conclusao_tecnica",
+      "drop_folder": "coleta_entrada/slots_reais/conclusao_servico"
+    }
+  ],
+  "output_sections_snapshot": [
+    "Identificacao do Calculo",
+    "Escopo do Calculo",
+    "Dados e Premissas",
+    "Memoria e Referencias",
+    "Documentacao e Registros",
+    "Lacunas Tecnicas",
+    "Recomendacoes",
+    "Conclusao"
+  ],
+  "review_blocking_snapshot": [
+    "escopo_principal_divergente_da_familia",
+    "troca_silenciosa_da_familia_principal",
+    "ausencia_de_objeto_principal",
+    "ausencia_de_localizacao",
+    "ausencia_de_slot_obrigatorio",
+    "ausencia_de_conclusao_tecnica"
+  ],
+  "material_real_checklist": [
+    {
+      "item_id": "modelo_atual_vazio",
+      "label": "Modelo atual vazio usado pela empresa",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".docx",
+        ".pdf"
+      ],
+      "purpose": "Comparar a estrutura atual com o template_master canonico.",
+      "drop_folder": "coleta_entrada/modelo_atual_vazio"
+    },
+    {
+      "item_id": "documentos_finais_reais",
+      "label": "Documentos finais reais ja emitidos",
+      "required": true,
+      "min_items": 2,
+      "accepted_examples": [
+        ".pdf",
+        ".docx"
+      ],
+      "purpose": "Extrair linguagem, estrutura efetiva e variacoes recorrentes do documento real.",
+      "drop_folder": "coleta_entrada/documentos_finais_reais"
+    },
+    {
+      "item_id": "padrao_linguagem_tecnica",
+      "label": "Padrao de linguagem tecnica e conclusao",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".md",
+        ".txt",
+        ".pdf",
+        ".docx"
+      ],
+      "purpose": "Fixar tom, parecer, ressalvas, clausulas e assinatura que a empresa realmente usa.",
+      "drop_folder": "coleta_entrada/padrao_linguagem_tecnica"
+    },
+    {
+      "item_id": "regras_comerciais_e_operacionais",
+      "label": "Regras comerciais e operacionais do servico",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".md",
+        ".txt",
+        ".pdf",
+        ".docx",
+        ".xlsx"
+      ],
+      "purpose": "Capturar o que varia por cliente, ativo, escopo e contratacao.",
+      "drop_folder": "coleta_entrada/regras_comerciais_e_operacionais"
+    },
+    {
+      "item_id": "documentos_base_e_memoria",
+      "label": "Documentos base, memoria ou planilhas de apoio",
+      "required": true,
+      "min_items": 1,
+      "accepted_examples": [
+        ".pdf",
+        ".docx",
+        ".xlsx",
+        ".dwg",
+        ".png"
+      ],
+      "purpose": "Entender dados de entrada, memoria tecnica e dependencia de anexos externos.",
+      "drop_folder": "coleta_entrada/documentos_base_e_memoria"
+    }
+  ],
+  "open_questions": [
+    "Qual documento atual a empresa considera referencia principal para esta familia?",
+    "Quais anexos ou evidencias sao obrigatorios na pratica, mesmo quando nao estao escritos no modelo vazio?",
+    "Quais campos sempre aparecem no documento final, mesmo quando o inspetor nao preencheu explicitamente em campo?",
+    "Quais trechos de linguagem precisam seguir o padrao exato do engenheiro responsavel?",
+    "Quais planilhas, memoria de calculo ou aprovacoes externas alimentam o documento final?",
+    "Quais premissas tecnicas precisam ficar registradas em texto e quais podem ir so em anexo?"
+  ],
+  "ingest_layout": {
+    "raw_input_dir": "coleta_entrada",
+    "reference_package_dir": "pacote_referencia",
+    "status_file": "status_refino.json",
+    "briefing_file": "briefing_real.md"
+  },
+  "ready_for_refinement_when": [
+    "Existe ao menos 1 modelo atual vazio da empresa para a familia.",
+    "Existem ao menos 2 documentos finais reais ou equivalentes para comparacao.",
+    "Existe definicao de linguagem tecnica e conclusao que a empresa quer preservar.",
+    "Cada slot obrigatorio do family_schema tem exemplo real ou lacuna explicitamente anotada.",
+    "O material bruto ja foi separado do futuro pacote de filled_reference."
+  ]
+}

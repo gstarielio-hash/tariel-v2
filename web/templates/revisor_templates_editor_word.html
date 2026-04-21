@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f6f9">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Editor de Modelos • Mesa Avaliadora</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/revisor/templates_laudo.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+
+<body class="templates-shell templates-shell-editor">
+    <header class="top">
+        <div class="brand-wrap">
+            <div class="brand-logo">TI</div>
+            <div class="brand-copy">
+                <strong>Tariel</strong>
+                <small>Editor de modelos</small>
+            </div>
+        </div>
+        <div class="links">
+            <a class="chip" href="/revisao/painel">Inbox da Mesa</a>
+            <a class="chip" href="/revisao/templates-laudo">Biblioteca de Modelos</a>
+            <a class="chip active" href="/revisao/templates-laudo/editor">Editor visual</a>
+        </div>
+        <form action="/revisao/logout" method="POST" class="top-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn ghost">Sair</button>
+        </form>
+    </header>
+
+    <main class="main main-editor">
+        <article class="card word-workspace-card" id="card-editor-word">
+            <div class="head word-head">
+                <div class="word-head-title">
+                    <span class="section-eyebrow">Edição guiada</span>
+                    <strong>Editor da mesa</strong>
+                    <small>Comandos no topo, folha A4 ao centro e painel de apoio à direita.</small>
+                    <div class="word-head-pills">
+                        <span class="word-head-pill">Folha A4 central</span>
+                        <span class="word-head-pill">Atalhos Ctrl+B / Ctrl+I / Ctrl+K / Ctrl+S</span>
+                        <span class="word-head-pill word-head-pill--muted">Comparação, visualização e publicação no mesmo ambiente</span>
+                    </div>
+                </div>
+                <div class="word-head-actions">
+                    <div class="word-head-actions-group word-head-actions-group--workflow">
+                        <button type="button" id="btn-editor-save" class="btn ghost">Salvar</button>
+                        <button type="button" id="btn-editor-preview" class="btn ghost">Visualizar PDF</button>
+                        <button type="button" id="btn-editor-publish" class="btn primary">Publicar versão</button>
+                    </div>
+                    <span id="word-save-indicator" class="save-indicator">Sem alterações</span>
+                </div>
+            </div>
+
+            <div class="body editor-word word-layout">
+                <section class="word-workspace-shell">
+                    <section class="word-left-rail" aria-label="Faixa de comandos do editor">
+                        <div class="word-ribbon-topbar">
+                            <div class="word-ribbon-topbar-left">
+                                <button type="button" id="btn-word-file" class="word-file-tab is-active" data-ribbon="file">Arquivo</button>
+                                <nav class="word-ribbon-nav" aria-label="Faixa do editor">
+                                    <button type="button" class="word-ribbon-tab active" data-ribbon="home">Página Inicial</button>
+                                    <button type="button" class="word-ribbon-tab" data-ribbon="insert">Inserir</button>
+                                    <button type="button" class="word-ribbon-tab" data-ribbon="layout-page">Layout</button>
+                                </nav>
+                            </div>
+                            <div class="word-ribbon-topbar-right">
+                                <span class="word-ribbon-state">A4</span>
+                                <span class="word-ribbon-state">Edição visual</span>
+                                <button type="button" id="btn-word-toggle-tools" class="btn ghost">Ocultar faixa</button>
+                                <button type="button" id="btn-word-toggle-side" class="btn ghost">Ocultar painel lateral</button>
+                            </div>
+                        </div>
+
+                        <div class="word-ribbon-panel-wrap">
+                            <section class="word-ribbon-panel active" data-ribbon-panel="file">
+                                <article class="word-ribbon-group word-ribbon-group--document">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Modelo</strong>
+                                        <small>Abra, crie ou volte para a biblioteca de modelos.</small>
+                                    </div>
+                                    <div class="word-ribbon-stack">
+                                        <div class="word-head-actions-group word-head-actions-group--document">
+                                            <label class="word-head-select-wrap" for="editor-template-select">
+                                                <span class="word-head-select-label">Modelo</span>
+                                                <select id="editor-template-select">
+                                                    <option value="">Selecione...</option>
+                                                </select>
+                                            </label>
+                                            <button type="button" id="btn-editor-load" class="btn ghost">Abrir</button>
+                                        </div>
+                                        <div class="word-ribbon-inline-actions">
+                                            <button type="button" id="btn-open-editor-a4" class="btn primary">Criar modelo (A4) <span class="sr-only">Novo documento</span></button>
+                                            <button type="button" id="btn-open-editor-legacy" class="btn ghost">Biblioteca</button>
+                                            <a href="/revisao/templates-laudo" class="btn ghost">Voltar para biblioteca</a>
+                                        </div>
+                                        <div id="status-create-word" class="status"></div>
+                                    </div>
+                                </article>
+
+                                <article class="word-ribbon-group word-ribbon-group--meta">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Identificação</strong>
+                                        <small>Dados principais do modelo ativo.</small>
+                                    </div>
+                                    <div class="word-ribbon-meta-grid">
+                                        <div class="field">
+                                            <label for="editor-nome">Nome</label>
+                                            <input id="editor-nome" type="text" maxlength="180" placeholder="Modelo técnico de inspeção">
+                                        </div>
+                                        <div class="field">
+                                            <label for="editor-codigo">Código</label>
+                                            <input id="editor-codigo" type="text" maxlength="80" placeholder="rti_eletrica">
+                                        </div>
+                                        <div class="field word-field-small">
+                                            <label for="editor-versao">Versão</label>
+                                            <input id="editor-versao" type="number" min="1" value="1">
+                                        </div>
+                                        <div class="field word-field-wide">
+                                            <label for="editor-obs">Observações</label>
+                                            <input id="editor-obs" type="text" placeholder="Observações de uso do modelo">
+                                        </div>
+                                    </div>
+                                </article>
+                            </section>
+
+                            <section class="word-ribbon-panel" data-ribbon-panel="home" hidden>
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Área de Transferência</strong>
+                                        <small>Ações rápidas de edição.</small>
+                                    </div>
+                                    <div class="word-tool-grid word-tool-grid--ribbon">
+                                        <button type="button" id="btn-ed-undo" class="btn ghost"><span class="toolbar-icon">↶</span>Desfazer</button>
+                                        <button type="button" id="btn-ed-redo" class="btn ghost"><span class="toolbar-icon">↷</span>Refazer</button>
+                                        <button type="button" id="btn-ed-clear-format" class="btn ghost"><span class="toolbar-icon">Tx</span>Limpar</button>
+                                    </div>
+                                </article>
+
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Fonte</strong>
+                                        <small>Tipografia e marcações inline.</small>
+                                    </div>
+                                    <div class="word-ribbon-font-grid">
+                                        <label class="word-ribbon-field">
+                                            <span>Fonte</span>
+                                            <select id="editor-font-family">
+                                                <option value="">Padrão do documento</option>
+                                                <option value="Calibri">Calibri</option>
+                                                <option value="Aptos">Aptos</option>
+                                                <option value="IBM Plex Sans">IBM Plex Sans</option>
+                                                <option value="Georgia">Georgia</option>
+                                                <option value="'Courier New'">Courier New</option>
+                                            </select>
+                                        </label>
+                                        <label class="word-ribbon-field word-ribbon-field--size">
+                                            <span>Tamanho</span>
+                                            <select id="editor-font-size">
+                                                <option value="">Padrão</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="14">14</option>
+                                                <option value="16">16</option>
+                                                <option value="18">18</option>
+                                                <option value="22">22</option>
+                                                <option value="28">28</option>
+                                            </select>
+                                        </label>
+                                        <label class="word-ribbon-color">
+                                            <span>Cor</span>
+                                            <input id="btn-ed-text-color" type="color" value="#16212d" aria-label="Cor do texto">
+                                        </label>
+                                        <label class="word-ribbon-color">
+                                            <span>Marca-texto</span>
+                                            <input id="btn-ed-highlight-color" type="color" value="#fff2a8" aria-label="Cor do destaque">
+                                        </label>
+                                    </div>
+                                    <div class="word-tool-grid word-tool-grid--ribbon">
+                                        <button type="button" id="btn-ed-bold" class="btn ghost"><span class="toolbar-icon">B</span>Negrito</button>
+                                        <button type="button" id="btn-ed-italic" class="btn ghost"><span class="toolbar-icon italic">I</span>Itálico</button>
+                                        <button type="button" id="btn-ed-underline" class="btn ghost"><span class="toolbar-icon underline">U</span>Sublinhar</button>
+                                        <button type="button" id="btn-ed-strike" class="btn ghost"><span class="toolbar-icon">S</span>Tachado</button>
+                                        <button type="button" id="btn-ed-link" class="btn ghost"><span class="toolbar-icon">∞</span>Link</button>
+                                        <button type="button" id="btn-ed-unlink" class="btn ghost"><span class="toolbar-icon">×</span>Remover link</button>
+                                    </div>
+                                </article>
+
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Parágrafo</strong>
+                                        <small>Estrutura, listas e alinhamento.</small>
+                                    </div>
+                                    <div class="word-tool-grid word-tool-grid--ribbon">
+                                        <button type="button" id="btn-ed-ul" class="btn ghost"><span class="toolbar-icon">•</span>Lista</button>
+                                        <button type="button" id="btn-ed-ol" class="btn ghost"><span class="toolbar-icon">1.</span>Lista num.</button>
+                                        <button type="button" id="btn-ed-align-left" class="btn ghost"><span class="toolbar-icon">≡</span>Esquerda</button>
+                                        <button type="button" id="btn-ed-align-center" class="btn ghost"><span class="toolbar-icon">≣</span>Centro</button>
+                                        <button type="button" id="btn-ed-align-right" class="btn ghost"><span class="toolbar-icon">≢</span>Direita</button>
+                                        <button type="button" id="btn-ed-align-justify" class="btn ghost"><span class="toolbar-icon">☰</span>Justificar</button>
+                                        <button type="button" id="btn-ed-blockquote" class="btn ghost"><span class="toolbar-icon">❝</span>Citação</button>
+                                        <button type="button" id="btn-ed-hr" class="btn ghost"><span class="toolbar-icon">―</span>Linha</button>
+                                    </div>
+                                </article>
+
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Estilos</strong>
+                                        <small>Hierarquia editorial do laudo.</small>
+                                    </div>
+                                    <div class="word-tool-grid word-tool-grid--ribbon">
+                                        <button type="button" id="btn-ed-style-normal" class="btn ghost"><span class="toolbar-icon">N</span>Normal</button>
+                                        <button type="button" id="btn-ed-style-title1" class="btn ghost"><span class="toolbar-icon">T1</span>Título 1</button>
+                                        <button type="button" id="btn-ed-style-title2" class="btn ghost"><span class="toolbar-icon">T2</span>Título 2</button>
+                                        <button type="button" id="btn-ed-h2" class="btn ghost"><span class="toolbar-icon">ST</span>Subtítulo</button>
+                                    </div>
+                                </article>
+                            </section>
+
+                            <section class="word-ribbon-panel" data-ribbon-panel="insert" hidden>
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Tabelas</strong>
+                                        <small>Estruturas técnicas para checklist e plano de ação.</small>
+                                    </div>
+                                    <div class="word-tool-grid word-tool-grid--ribbon">
+                                        <button type="button" id="btn-ed-table" class="btn ghost"><span class="toolbar-icon">▦</span>Tabela</button>
+                                        <button type="button" id="btn-ed-table-row-add" class="btn ghost"><span class="toolbar-icon">+L</span>Linha +</button>
+                                        <button type="button" id="btn-ed-table-col-add" class="btn ghost"><span class="toolbar-icon">+C</span>Coluna +</button>
+                                        <button type="button" id="btn-ed-table-row-del" class="btn ghost"><span class="toolbar-icon">−L</span>Linha -</button>
+                                        <button type="button" id="btn-ed-table-col-del" class="btn ghost"><span class="toolbar-icon">−C</span>Coluna -</button>
+                                        <button type="button" id="btn-ed-table-del" class="btn ghost"><span class="toolbar-icon">×</span>Excluir tabela</button>
+                                    </div>
+                                </article>
+
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Campos dinâmicos</strong>
+                                        <small>Marcadores e dados do caso.</small>
+                                    </div>
+                                    <div class="word-tool-grid word-tool-grid--ribbon">
+                                        <button type="button" id="btn-ed-placeholder-json" class="btn ghost"><span class="toolbar-icon">{ }</span>Campo do caso</button>
+                                        <button type="button" id="btn-ed-placeholder-token" class="btn ghost"><span class="toolbar-icon">@</span>Token</button>
+                                        <button type="button" class="btn ghost js-insert-placeholder-quick" data-mode="token" data-key="cliente_nome">Cliente</button>
+                                        <button type="button" class="btn ghost js-insert-placeholder-quick" data-mode="token" data-key="unidade_nome">Unidade</button>
+                                        <button type="button" class="btn ghost js-insert-placeholder-quick" data-mode="json_path" data-key="informacoes_gerais.data_inspecao">Data</button>
+                                        <button type="button" class="btn ghost js-insert-placeholder-quick" data-mode="json_path" data-key="resumo_executivo">Resumo</button>
+                                    </div>
+                                </article>
+
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Ilustrações e blocos</strong>
+                                        <small>Assets, blocos técnicos e bases prontas.</small>
+                                    </div>
+                                    <div class="word-ribbon-inline-actions">
+                                        <div class="word-upload-row word-upload-row--compact">
+                                            <input id="editor-image-file" type="file" accept="image/png,image/jpeg,image/webp">
+                                            <button type="button" id="btn-ed-upload-image" class="btn ghost">Imagem</button>
+                                        </div>
+                                        <button type="button" class="btn ghost js-insert-block" data-block="escopo_objetivo">Escopo</button>
+                                        <button type="button" class="btn ghost js-insert-block" data-block="quadro_conformidade">Quadro</button>
+                                        <button type="button" class="btn ghost js-insert-block" data-block="evidencias_fotograficas">Evidências</button>
+                                        <button type="button" class="btn ghost js-insert-block" data-block="achados_recomendacoes">Achados</button>
+                                        <button type="button" class="btn ghost js-insert-block" data-block="plano_acao">Plano</button>
+                                        <button type="button" class="btn ghost js-insert-block" data-block="assinatura_art">Assinatura</button>
+                                    </div>
+                                </article>
+
+                                <article class="word-ribbon-group">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Presets</strong>
+                                        <small>Comece por uma base pronta da Tariel.</small>
+                                    </div>
+                                    <div class="word-ribbon-inline-actions">
+                                        <button type="button" class="btn ghost js-apply-preset" data-preset="inspecao_geral">Inspeção Geral</button>
+                                        <button type="button" class="btn ghost js-apply-preset" data-preset="nr12_maquinas">NR-12</button>
+                                        <button type="button" class="btn ghost js-apply-preset" data-preset="rti_eletrica">RTI Elétrica</button>
+                                        <button type="button" class="btn ghost js-apply-preset" data-preset="avcb_bombeiros">AVCB</button>
+                                    </div>
+                                </article>
+                            </section>
+
+                            <section class="word-ribbon-panel" data-ribbon-panel="layout-page" hidden>
+                                <article class="word-ribbon-group word-ribbon-group--layout-callout">
+                                    <div class="word-ribbon-group-copy">
+                                        <strong>Layout da página</strong>
+                                        <small>Cabeçalho, rodapé, margens, marca d'água e visualização continuam no painel auxiliar à direita.</small>
+                                    </div>
+                                    <div class="word-ribbon-inline-actions">
+                                        <button type="button" class="btn ghost word-side-jump" data-tab-target="layout">Abrir layout</button>
+                                        <button type="button" class="btn ghost word-side-jump" data-tab-target="preview">Abrir visualização</button>
+                                        <button type="button" class="btn ghost word-side-jump" data-tab-target="comparar">Comparar versões</button>
+                                    </div>
+                                </article>
+                            </section>
+                        </div>
+                    </section>
+
+                    <section class="word-stage" id="word-stage">
+                        <div class="word-canvas">
+                            <div class="word-canvas-toolbar">
+                                <div class="word-canvas-toolbar-copy">
+                                    <span class="canvas-chip">Folha A4</span>
+                                    <span class="canvas-chip muted">Folha central de trabalho</span>
+                                    <span class="canvas-chip muted">Modelo visual próximo ao Word, com foco em bases editáveis</span>
+                                </div>
+                            </div>
+                            <div class="word-page-shell">
+                                <div id="page-watermark-ghost" class="page-watermark-ghost" aria-hidden="true"></div>
+                                <div id="page-header-ghost" class="page-header-ghost" aria-hidden="true"></div>
+                                <div class="word-page-content">
+                                    <div id="editor-word-surface" class="editor-surface"></div>
+                                </div>
+                                <div id="page-footer-ghost" class="page-footer-ghost" aria-hidden="true"></div>
+                            </div>
+                        </div>
+
+                        <aside class="word-inspector word-side-panel" aria-label="Painel lateral do editor">
+                            <div class="word-inspector-head">
+                                <div class="word-inspector-head-copy">
+                                    <span class="section-eyebrow">Painel lateral</span>
+                                    <strong>Apoio da revisão</strong>
+                                    <small>Dados, layout, comparação entre versões e visualização ficam ao alcance sem roubar o foco da folha.</small>
+                                </div>
+                            </div>
+
+                            <nav class="word-tabs" aria-label="Abas do painel lateral">
+                                <button type="button" class="word-tab active" data-tab="documento">Modelo</button>
+                                <button type="button" class="word-tab" data-tab="layout">Layout</button>
+                                <button type="button" class="word-tab" data-tab="comparar">Comparar</button>
+                                <button type="button" class="word-tab" data-tab="preview">Visualizar</button>
+                            </nav>
+
+                            <section class="word-inspector-panel" data-panel="documento">
+                                <div class="word-inspector-panel-head">
+                                    <strong>Resumo do documento</strong>
+                                    <small>Os metadados ficam em Arquivo. Aqui o foco é o estado atual da edição.</small>
+                                </div>
+                                <div class="word-doc-summary">
+                                    <article class="word-doc-summary-card">
+                                        <small>Base ativa</small>
+                                        <strong>Modelo editável</strong>
+                                        <p>Use a faixa superior para formatar e inserir blocos. Use Layout, Comparar e Visualizar no painel lateral.</p>
+                                    </article>
+                                    <article class="word-doc-summary-card">
+                                        <small>Fluxo recomendado</small>
+                                        <strong>Arquivo -> Página Inicial -> Inserir</strong>
+                                        <p>Abra uma base, ajuste a tipografia, insira marcadores e publique depois de validar a visualização.</p>
+                                    </article>
+                                </div>
+                                <div id="status-editor-word" class="status"></div>
+                            </section>
+
+                            <section class="word-inspector-panel" data-panel="layout" hidden>
+                                <div class="word-inspector-panel-head">
+                                    <strong>Precisão do A4</strong>
+                                    <small>Ajuste margens, cabeçalho, rodapé e marca d’água sem sair da folha.</small>
+                                </div>
+                                <div class="field">
+                                    <label for="editor-header">Cabeçalho</label>
+                                    <input id="editor-header" type="text" maxlength="200" placeholder='Ex: Tariel • {% raw %}{{token:cliente_nome}}{% endraw %}'>
+                                </div>
+                                <div class="field">
+                                    <label for="editor-footer">Rodapé</label>
+                                    <input id="editor-footer" type="text" maxlength="200" placeholder="Ex: Documento oficial do cliente">
+                                </div>
+                                <div class="ribbon-mini-grid">
+                                    <div class="field">
+                                        <label for="editor-margin-top">Topo</label>
+                                        <input id="editor-margin-top" type="number" min="5" max="40" value="18">
+                                    </div>
+                                    <div class="field">
+                                        <label for="editor-margin-right">Direita</label>
+                                        <input id="editor-margin-right" type="number" min="5" max="40" value="14">
+                                    </div>
+                                    <div class="field">
+                                        <label for="editor-margin-bottom">Baixo</label>
+                                        <input id="editor-margin-bottom" type="number" min="5" max="40" value="18">
+                                    </div>
+                                    <div class="field">
+                                        <label for="editor-margin-left">Esquerda</label>
+                                        <input id="editor-margin-left" type="number" min="5" max="40" value="14">
+                                    </div>
+                                </div>
+                                <div class="ribbon-mini-grid">
+                                    <div class="field">
+                                        <label for="editor-watermark">Marca d'água</label>
+                                        <input id="editor-watermark" type="text" maxlength="120" placeholder="CONFIDENCIAL">
+                                    </div>
+                                    <div class="field">
+                                        <label for="editor-watermark-opacity">Opacidade</label>
+                                        <input id="editor-watermark-opacity" type="number" min="0.02" max="0.35" step="0.01" value="0.08">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="word-inspector-panel" data-panel="comparar" hidden>
+                                <div class="word-compare-shell" aria-label="Comparação estrutural entre versões">
+                                    <div class="word-compare-head">
+                                        <div class="word-compare-head-copy">
+                                            <span class="section-eyebrow">Comparação estrutural</span>
+                                            <strong>Diff visual por bloco</strong>
+                                            <small>Compare títulos, tabelas, listas e campos dinâmicos sem depender só do diff textual linear.</small>
+                                        </div>
+                                        <div class="word-compare-controls">
+                                            <select id="editor-compare-template-select">
+                                                <option value="">Abra um modelo para comparar...</option>
+                                            </select>
+                                            <button type="button" id="btn-editor-compare" class="btn ghost">Comparar versão</button>
+                                            <button type="button" id="btn-editor-compare-clear" class="btn ghost">Limpar</button>
+                                        </div>
+                                    </div>
+
+                                    <section id="editor-compare-summary" class="word-compare-summary" hidden aria-label="Resumo da comparação">
+                                        <article class="word-compare-summary-card">
+                                            <small>Blocos alterados</small>
+                                            <strong id="editor-compare-summary-changed">0</strong>
+                                        </article>
+                                        <article class="word-compare-summary-card">
+                                            <small>Blocos adicionados</small>
+                                            <strong id="editor-compare-summary-added">0</strong>
+                                        </article>
+                                        <article class="word-compare-summary-card">
+                                            <small>Blocos removidos</small>
+                                            <strong id="editor-compare-summary-removed">0</strong>
+                                        </article>
+                                        <article class="word-compare-summary-card">
+                                            <small>Blocos estáveis</small>
+                                            <strong id="editor-compare-summary-unchanged">0</strong>
+                                        </article>
+                                    </section>
+
+                                    <div id="status-editor-compare" class="status"></div>
+                                    <div id="editor-compare-blocks" class="word-compare-blocks">
+                                        <div class="word-compare-empty">Abra um modelo editável e selecione outra versão do mesmo código para comparar.</div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="word-inspector-panel" data-panel="preview" hidden>
+                                <div class="word-inspector-panel-head">
+                                    <strong>Visualização do documento</strong>
+                                    <small>Use dados reais ou simulados para revisar o PDF sem sair do editor.</small>
+                                </div>
+                                <div class="field">
+                                    <label for="editor-preview-dados">Dados de exemplo para visualizar</label>
+                                    <textarea id="editor-preview-dados">{{ dados_preview_exemplo_json | e }}</textarea>
+                                </div>
+                                <iframe id="frame-editor-preview" title="Visualização do editor"></iframe>
+                            </section>
+                        </aside>
+                    </section>
+
+                    <footer class="word-statusbar" aria-label="Barra de status do editor">
+                        <div class="word-statusbar-section">
+                            <span class="word-status-item" id="word-status-document">Sem documento ativo</span>
+                            <span class="word-status-item">Página 1</span>
+                        </div>
+                        <div class="word-statusbar-section">
+                            <span class="word-status-item">A4</span>
+                            <span class="word-status-item">Zoom 100%</span>
+                            <span class="word-status-item" id="word-status-mode">Página Inicial</span>
+                        </div>
+                    </footer>
+                </section>
+            </div>
+        </article>
+    </main>
+
+    <script nonce="{{ csp_nonce }}">
+        window.__TARIEL_TEMPLATE_CONFIG__ = {
+            csrfToken: {{ csrf_token | tojson }},
+            dadosPreviewExemploJson: {{ dados_preview_exemplo_json | tojson }}
+        };
+    </script>
+    <script type="module" nonce="{{ csp_nonce }}" src="/static/js/revisor/templates_editor_word.js"></script>
+</body>
+
+</html>

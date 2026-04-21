@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Auditoria • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="stylesheet" href="/static/css/admin/admin_audit.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Navegacao administrativa">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+                <a href="/admin/clientes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+                <a href="/admin/catalogo-laudos" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+                <a href="/admin/novo-cliente" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                    Nova empresa
+                </a>
+                <a href="/admin/auditoria" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="topbar topbar--compact">
+                <div class="titulo-pagina">
+                    <h1>Auditoria</h1>
+                    <p>Registro das acoes administrativas criticas.</p>
+                </div>
+            </header>
+
+            <section class="audit-shell">
+                <div class="audit-summary" aria-label="Resumo de auditoria">
+                    <article class="audit-kpi">
+                        <p class="audit-kpi__label">Eventos carregados</p>
+                        <p class="audit-kpi__value">{{ itens | length }}</p>
+                        <p class="audit-kpi__hint">Ultimos registros administrativos do recorte atual.</p>
+                    </article>
+                    <article class="audit-kpi">
+                        <p class="audit-kpi__label">Recorte atual</p>
+                        <p class="audit-kpi__value">{{ limite_filtro or 30 }}</p>
+                        <p class="audit-kpi__hint">Limite máximo de linhas carregadas por consulta.</p>
+                    </article>
+                    <article class="audit-kpi">
+                        <p class="audit-kpi__label">Filtro de empresa</p>
+                        <p class="audit-kpi__value">{{ empresa_id_filtro or 'Todas' }}</p>
+                        <p class="audit-kpi__hint">Use uma empresa especifica quando quiser investigar um caso pontual.</p>
+                    </article>
+                </div>
+
+                <form class="audit-toolbar" method="get" action="/admin/auditoria">
+                    <label>
+                        Empresa
+                        <input type="number" min="1" name="empresa_id" value="{{ empresa_id_filtro or '' }}">
+                    </label>
+                    <label>
+                        Limite
+                        <input type="number" min="1" max="100" name="limite" value="{{ limite_filtro or 30 }}">
+                    </label>
+                    <button type="submit">Atualizar</button>
+                </form>
+
+                <div class="audit-list">
+                    {% for item in itens %}
+                    <article class="audit-item">
+                        <div class="audit-meta">
+                            <span class="audit-chip">{{ item.empresa_nome | e }}</span>
+                            <span class="audit-chip">{{ item.acao | e }}</span>
+                            <span class="audit-chip">{{ item.criado_em_label | e }}</span>
+                        </div>
+                        <h2 class="audit-title">{{ item.resumo | e }}</h2>
+                        <p class="audit-detail">
+                            {{ item.detalhe | default('Sem detalhe adicional.', true) | e }}
+                        </p>
+                        <p class="audit-detail">
+                            Ator: {{ item.ator_nome | e }}{% if item.alvo_nome %} • Alvo: {{ item.alvo_nome | e }}{% endif %}
+                        </p>
+                        {% if item.payload %}
+                        <details class="admin-disclosure">
+                            <summary>Detalhes do registro</summary>
+                            <pre>{{ item.payload | tojson(indent=2) }}</pre>
+                        </details>
+                        {% endif %}
+                    </article>
+                    {% else %}
+                    <article class="audit-item audit-empty">
+                        <h2 class="audit-title">Nenhuma acao encontrada</h2>
+                        <p class="audit-detail">A trilha administrativa aparece aqui assim que o portal executa bloqueios, trocas de plano ou resets em empresas.</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

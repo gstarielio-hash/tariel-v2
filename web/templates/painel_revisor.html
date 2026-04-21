@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f6f9">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta name="tariel-perf-mode" content="{{ '1' if perf_mode | default(false) else '0' }}">
+    <title>Mesa de Avaliação • Tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+
+    <link rel="stylesheet" href="/static/css/revisor/painel_revisor.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app }}">
+</head>
+
+<body class="mesa-shell">
+    {% set responder_agora_count = totais_operacao.get("responder_agora", 0) + totais_operacao.get("validar_aprendizado", 0) %}
+    {% set aguardando_avaliacao_count = totais_operacao.get("fechamento_mesa", 0) %}
+    {% set acompanhamento_count = totais_operacao.get("aguardando_inspetor", 0) + totais_operacao.get("acompanhamento", 0) %}
+    {% set historico_count = laudos_avaliados|length %}
+    {% macro render_mesa_queue_item(laudo) %}
+    <article class="item-lista mesa-queue-item js-item-laudo" data-id="{{ laudo.id }}"
+        data-whispers-nao-lidos="{{ laudo.whispers_nao_lidos or 0 }}"
+        data-pendencias-abertas="{{ laudo.pendencias_abertas or 0 }}"
+        data-aprendizados-pendentes="{{ laudo.aprendizados_pendentes or 0 }}"
+        data-collaboration-summary='{{ laudo.collaboration_summary | default({}, true) | tojson | forceescape }}'
+        data-case-lifecycle-status="{{ laudo.case_lifecycle_status | default('', true) | e }}"
+        data-active-owner-role="{{ laudo.active_owner_role | default('', true) | e }}"
+        data-status-visual-label="{{ laudo.status_visual_label | default('', true) | e }}"
+        data-sla-status="{{ laudo.tempo_em_campo_status | default('', true) | e }}"
+        data-fila-operacional="{{ laudo.fila_operacional | default('', true) | e }}"
+        data-prioridade-operacional="{{ laudo.prioridade_operacional | default('', true) | e }}"
+        data-inspetor-nome="{{ laudo.inspetor_nome | default('', true) | e }}"
+        data-setor-industrial="{{ laudo.setor_industrial | default('', true) | e }}"
+        data-tempo-em-campo="{{ laudo.tempo_em_campo | default('', true) | e }}"
+        data-proxima-acao="{{ laudo.proxima_acao | default('', true) | e }}"
+        tabindex="0" role="button" aria-label="Abrir laudo #{{ laudo.hash_curto | default(laudo.id, true) }}">
+        <div class="item-topo">
+            <span class="item-hash">#{{ laudo.hash_curto | default(laudo.id, true) | e }}</span>
+            <span class="item-data">{{ (laudo.atualizado_em or laudo.criado_em).strftime('%d/%m %H:%M') if (laudo.atualizado_em or laudo.criado_em) else '--/-- --:--' }}</span>
+        </div>
+        <div class="item-preview">{{ laudo.primeira_mensagem | default(laudo.setor_industrial | default('Caso técnico da mesa', true), true) | truncate(86) }}</div>
+        <div class="item-responsavel">{{ laudo.inspetor_nome | default('Inspetor não identificado', true) | e }} · {{ laudo.setor_industrial | default('Operação técnica', true) | truncate(32) | e }}</div>
+        <div class="item-operacao-resumo">
+            <span class="badge fila-operacional {{ laudo.fila_operacional | default('', true) | e }}">{{ laudo.fila_operacional_label | default('Operação', true) | e }}</span>
+            <span class="badge prioridade {{ laudo.prioridade_operacional | default('', true) | e }}">Prioridade {{ laudo.prioridade_operacional_label | default('Média', true) | e }}</span>
+            {% if laudo.tempo_em_campo %}
+            <span class="sla-pill {{ laudo.tempo_em_campo_status | default('sla-ok', true) | e }}">Em campo há {{ laudo.tempo_em_campo | e }}</span>
+            {% endif %}
+        </div>
+        <div class="item-proxima-acao js-proxima-acao">Próxima: {{ laudo.proxima_acao | default('Abrir caso e definir o próximo passo', true) | e }}</div>
+        <div class="item-meta-rodape">
+            <div class="item-indicadores">
+                <span class="badge indicador-whisper js-indicador-whispers">{{ laudo.whispers_nao_lidos or 0 }} chamado(s)</span>
+                <span class="badge indicador-pendencia js-indicador-pendencias" {% if (laudo.pendencias_abertas or 0) <= 0 %}hidden{% endif %}>{{ laudo.pendencias_abertas or 0 }} pend.</span>
+                <span class="badge indicador-aprendizado js-indicador-aprendizados" {% if (laudo.aprendizados_pendentes or 0) <= 0 %}hidden{% endif %}>{{ laudo.aprendizados_pendentes or 0 }} aprend.</span>
+            </div>
+            <span class="item-status-inline js-status-visual-label">{{ laudo.status_visual_label | default('Em análise', true) | e }}</span>
+        </div>
+    </article>
+    {% endmacro %}
+    <header class="topbar">
+        <div class="topbar-logo">
+            <span class="topbar-mark" aria-hidden="true">TI</span>
+            <div class="topbar-brandcopy">
+                <span class="topbar-eyebrow">Tariel Plataforma</span>
+                <span class="topbar-title">Mesa Avaliadora</span>
+            </div>
+            <button type="button" id="btn-home-mesa" class="btn-link-topbar btn-link-topbar--home">
+                <span class="material-symbols-rounded icon-topbar" aria-hidden="true">home</span>
+                <span>Home</span>
+            </button>
+        </div>
+
+        <div class="topbar-usuario">
+            <a href="/revisao/templates-laudo" class="btn-link-topbar">
+                <span class="material-symbols-rounded icon-topbar" aria-hidden="true">library_books</span>
+                <span>Modelos</span>
+            </a>
+            {% for item in portal_switch_links | default([], true) %}
+            <a href="{{ item.url | e }}" class="btn-link-topbar">
+                <span class="material-symbols-rounded icon-topbar" aria-hidden="true">switch_account</span>
+                <span>{{ item.label | e }}</span>
+            </a>
+            {% endfor %}
+            <span class="topbar-usuario-nome">{{ usuario.nome_completo }}</span>
+            <form action="/revisao/logout" method="POST" class="topbar-form">
+                <input type="hidden" name="csrf_token" id="global-csrf" value="{{ csrf_token }}">
+                <button type="submit" class="btn-sair">
+                    <span class="material-symbols-rounded icon-topbar" aria-hidden="true">logout</span>
+                    <span>Sair</span>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    {% set total_fila = (laudos_em_andamento|length) + (laudos_pendentes|length) + (laudos_avaliados|length) %}
+    <section class="mesa-flow-strip" aria-label="Contexto do inbox da mesa avaliadora">
+        <div class="mesa-flow-overview">
+            <div class="mesa-flow-copy">
+                <span class="mesa-flow-label">Inbox da Mesa</span>
+                <strong>{{ totais_operacao.get("responder_agora", 0) }} caso(s) exigem resposta agora</strong>
+            </div>
+            <div class="mesa-flow-badges">
+                <span class="mesa-flow-badge">{{ total_fila }} no contexto atual</span>
+                <span class="mesa-flow-badge">{{ laudos_em_andamento|length }} em campo</span>
+                <span class="mesa-flow-badge">{{ total_aprendizados_pendentes }} aprendizados pendentes</span>
+            </div>
+        </div>
+        <p class="mesa-flow-sessao">
+            <span class="material-symbols-rounded" aria-hidden="true">verified_user</span>
+            Sessão ativa na <strong>fila da mesa</strong>
+        </p>
+    </section>
+
+    <div class="layout-inbox">
+        <aside class="coluna-lista" aria-label="Lista de laudos">
+            <section class="mesa-lista-intro">
+                <div class="mesa-lista-intro-topo">
+                    <span class="mesa-lista-eyebrow">Operação Técnica</span>
+                    <h1>Fila da Mesa</h1>
+                    <p>Selecione um caso para responder, validar pendências e fechar a revisão sem perder o contexto de campo.</p>
+                </div>
+                <div class="mesa-lista-metricas" aria-label="Resumo operacional da mesa">
+                    <article class="mesa-metrica-card">
+                        <strong>{{ totais_operacao.get("responder_agora", 0) }}</strong>
+                        <span>responder agora</span>
+                    </article>
+                    <article class="mesa-metrica-card" aria-label="Aguardando Avaliação">
+                        <strong>{{ laudos_pendentes|length }}</strong>
+                        <span>aguardando avaliação</span>
+                    </article>
+                    <article class="mesa-metrica-card" aria-label="Em Andamento em Campo ({{ laudos_em_andamento|length }})">
+                        <strong>{{ laudos_em_andamento|length }}</strong>
+                        <span>em campo</span>
+                    </article>
+                </div>
+                <div class="mesa-lista-links" aria-label="Biblioteca no fluxo operacional">
+                    <span class="sr-only">Biblioteca no fluxo operacional</span>
+                    <a href="/revisao/templates-laudo" class="mesa-inline-link">Abrir vitrine de modelos <span class="sr-only">Vitrine visual de modelos</span></a>
+                </div>
+                {% if templates_operacao %}
+                <p class="mesa-lista-links-summary">
+                    {{ templates_operacao.get("total_codigos_em_operacao_sem_ativo", 0) }} frente(s) aguardando publicacao do modelo ·
+                    {{ templates_operacao.get("total_bases_manuais", 0) }} base(s) complementares em uso
+                </p>
+                {% endif %}
+            </section>
+
+            <section id="container-whispers" class="whisper-box" {% if not whispers_pendentes %}hidden{% endif %} aria-live="polite">
+                <div class="lista-header whisper-header whisper-header--flush">
+                    <span>Chamados recentes</span>
+                    <div class="ping-bolinha" aria-hidden="true"></div>
+                </div>
+                <div id="lista-whispers">
+                    {% for whisper in whispers_pendentes %}
+                    <article class="item-lista whisper-item js-item-laudo" data-id="{{ whisper.laudo_id }}" data-whispers-nao-lidos="1"
+                        data-pendencias-abertas="{{ pendencias_abertas_por_laudo.get(whisper.laudo_id, 0) }}"
+                        data-aprendizados-pendentes="{{ aprendizados_pendentes_por_laudo.get(whisper.laudo_id, 0) }}"
+                        data-collaboration-summary='{{ whisper.collaboration_summary | default({}, true) | tojson | forceescape }}'
+                        data-case-lifecycle-status="{{ whisper.case_lifecycle_status | default('', true) | e }}"
+                        data-active-owner-role="{{ whisper.active_owner_role | default('', true) | e }}"
+                        data-status-visual-label="{{ whisper.status_visual_label | default('', true) | e }}"
+                        data-fila-operacional="responder_agora"
+                        data-prioridade-operacional="critica"
+                        tabindex="0" role="button"
+                        aria-label="Abrir chamado urgente #{{ whisper.hash | e }}">
+                        <div class="item-topo">
+                            <span class="item-hash">#{{ whisper.hash | e }}</span>
+                            <span class="badge urgente">Urgente</span>
+                        </div>
+                        <div class="item-preview">{{ whisper.texto | default('', true) | truncate(60) }}</div>
+                        <div class="item-operacao-resumo">
+                            <span class="badge fila-operacional responder_agora">Responder agora</span>
+                            <span class="badge prioridade critica">Prioridade crítica</span>
+                        </div>
+                        <div class="item-proxima-acao js-proxima-acao">Próxima: Responder inspetor</div>
+                        <div class="item-meta-rodape">
+                            <div class="item-indicadores">
+                                <span class="badge indicador-whisper js-indicador-whispers">1 chamado</span>
+                                <span class="badge indicador-pendencia js-indicador-pendencias"
+                                    {% if pendencias_abertas_por_laudo.get(whisper.laudo_id, 0) <= 0 %}hidden{% endif %}>
+                                    {{ pendencias_abertas_por_laudo.get(whisper.laudo_id, 0) }} pend.
+                                </span>
+                                <span class="badge indicador-aprendizado js-indicador-aprendizados"
+                                    {% if aprendizados_pendentes_por_laudo.get(whisper.laudo_id, 0) <= 0 %}hidden{% endif %}>
+                                    {{ aprendizados_pendentes_por_laudo.get(whisper.laudo_id, 0) }} aprend.
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <form method="get" action="/revisao/painel" class="filtros-mesa" aria-label="Filtros da mesa avaliadora">
+                <div class="filtros-topo">
+                    <strong>Refinar fila</strong>
+                    <span>{{ total_fila }} caso(s)</span>
+                </div>
+                <p class="filtros-subtexto">Reduza ruído e deixe na frente só o que pede decisão imediata.</p>
+                {% if filtro_inspetor_id or filtro_busca or filtro_aprendizados or filtro_operacao %}
+                <div class="filtros-resumo" aria-label="Filtros ativos">
+                    {% if filtro_inspetor_id %}
+                    <span class="filtro-tag">Inspetor #{{ filtro_inspetor_id }}</span>
+                    {% endif %}
+                    {% if filtro_busca %}
+                    <span class="filtro-tag">Busca: {{ filtro_busca | e }}</span>
+                    {% endif %}
+                    {% if filtro_aprendizados %}
+                    <span class="filtro-tag">Aprendizados pendentes</span>
+                    {% endif %}
+                    {% if filtro_operacao %}
+                    <span class="filtro-tag">Fluxo: {{ filtro_operacao | replace("_", " ") | e }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <label class="filtro-label" for="filtro-busca">Busca rápida</label>
+                <div class="filtro-linha filtro-linha--busca">
+                    <input id="filtro-busca" type="search" name="q" class="filtro-texto"
+                        placeholder="Hash, descrição, setor ou modalidade"
+                        value="{{ filtro_busca | default('', true) | e }}">
+                    <button type="submit" class="btn-buscar-filtro">Buscar</button>
+                </div>
+                <div class="filtros-grid">
+                    <div class="filtro-bloco">
+                        <label class="filtro-label" for="filtro-operacao">Fluxo operacional</label>
+                        <div class="filtro-linha">
+                            <select id="filtro-operacao" name="operacao" class="filtro-select" onchange="this.form.submit()">
+                                <option value="">Toda a fila</option>
+                                <option value="responder_agora" {% if filtro_operacao == "responder_agora" %}selected{% endif %}>Responder agora</option>
+                                <option value="validar_aprendizado" {% if filtro_operacao == "validar_aprendizado" %}selected{% endif %}>Validar aprendizado</option>
+                                <option value="aguardando_inspetor" {% if filtro_operacao == "aguardando_inspetor" %}selected{% endif %}>Aguardando campo</option>
+                                <option value="fechamento_mesa" {% if filtro_operacao == "fechamento_mesa" %}selected{% endif %}>Fechamento</option>
+                                <option value="acompanhamento" {% if filtro_operacao == "acompanhamento" %}selected{% endif %}>Acompanhamento</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filtro-bloco">
+                        <label class="filtro-label" for="filtro-inspetor">Inspetor</label>
+                        <div class="filtro-linha">
+                            <select id="filtro-inspetor" name="inspetor" class="filtro-select" onchange="this.form.submit()">
+                                <option value="">Todos os inspetores</option>
+                                {% for inspetor in inspetores_empresa %}
+                                <option value="{{ inspetor.id }}" {% if filtro_inspetor_id == inspetor.id %}selected{% endif %}>
+                                    {{ inspetor.nome | e }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filtro-bloco">
+                        <label class="filtro-label" for="filtro-aprendizados">Aprendizados</label>
+                        <div class="filtro-linha">
+                            <select id="filtro-aprendizados" name="aprendizados" class="filtro-select" onchange="this.form.submit()">
+                                <option value="">Todos os laudos</option>
+                                <option value="pendentes" {% if filtro_aprendizados == "pendentes" %}selected{% endif %}>
+                                    Com aprendizados pendentes
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% if filtro_inspetor_id or filtro_busca or filtro_aprendizados or filtro_operacao %}
+                <div class="filtro-acoes">
+                    <a href="/revisao/painel" class="btn-limpar-filtro">Limpar filtros</a>
+                </div>
+                {% endif %}
+            </form>
+
+            <div class="lista-scroll lista-scroll--queue" id="lista-laudos">
+                <section class="mesa-queue-group" aria-labelledby="mesa-queue-group-reply">
+                    <div class="lista-header lista-header--section" id="mesa-queue-group-reply">Responder agora</div>
+                    <div class="mesa-queue-group-body">
+                        {% set ns = namespace(rendered=0) %}
+                        {% for laudo in laudos_em_andamento %}
+                        {% if (laudo.fila_operacional | default('', true)) in ['responder_agora', 'validar_aprendizado'] %}
+                        {{ render_mesa_queue_item(laudo) }}
+                        {% set ns.rendered = ns.rendered + 1 %}
+                        {% endif %}
+                        {% endfor %}
+                        {% for laudo in laudos_pendentes %}
+                        {% if (laudo.fila_operacional | default('', true)) in ['responder_agora', 'validar_aprendizado'] %}
+                        {{ render_mesa_queue_item(laudo) }}
+                        {% set ns.rendered = ns.rendered + 1 %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if ns.rendered == 0 %}
+                        <p class="mesa-queue-empty">Nenhum caso pede resposta imediata agora.</p>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="mesa-queue-group" aria-labelledby="mesa-queue-group-review">
+                    <div class="lista-header lista-header--section" id="mesa-queue-group-review">Prontos para decisão</div>
+                    <div class="mesa-queue-group-body">
+                        {% set ns = namespace(rendered=0) %}
+                        {% for laudo in laudos_pendentes %}
+                        {% if (laudo.fila_operacional | default('', true)) == 'fechamento_mesa' %}
+                        {{ render_mesa_queue_item(laudo) }}
+                        {% set ns.rendered = ns.rendered + 1 %}
+                        {% endif %}
+                        {% endfor %}
+                        {% for laudo in laudos_em_andamento %}
+                        {% if (laudo.fila_operacional | default('', true)) == 'fechamento_mesa' %}
+                        {{ render_mesa_queue_item(laudo) }}
+                        {% set ns.rendered = ns.rendered + 1 %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if ns.rendered == 0 %}
+                        <p class="mesa-queue-empty">Nenhum laudo está pronto para decisão final.</p>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="mesa-queue-group" aria-labelledby="mesa-queue-group-field">
+                    <div class="lista-header lista-header--section" id="mesa-queue-group-field">Acompanhamento de campo</div>
+                    <div class="mesa-queue-group-body">
+                        {% set ns = namespace(rendered=0) %}
+                        {% for laudo in laudos_em_andamento %}
+                        {% if (laudo.fila_operacional | default('', true)) in ['aguardando_inspetor', 'acompanhamento'] %}
+                        {{ render_mesa_queue_item(laudo) }}
+                        {% set ns.rendered = ns.rendered + 1 %}
+                        {% endif %}
+                        {% endfor %}
+                        {% for laudo in laudos_pendentes %}
+                        {% if (laudo.fila_operacional | default('', true)) in ['aguardando_inspetor', 'acompanhamento'] %}
+                        {{ render_mesa_queue_item(laudo) }}
+                        {% set ns.rendered = ns.rendered + 1 %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if ns.rendered == 0 %}
+                        <p class="mesa-queue-empty">Nenhum caso depende de acompanhamento ativo do campo.</p>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="mesa-queue-group" aria-labelledby="mesa-queue-group-history">
+                    <div class="lista-header lista-header--section" id="mesa-queue-group-history">Histórico recente</div>
+                    <div class="mesa-queue-group-body">
+                        {% if laudos_avaliados %}
+                        {% for laudo in laudos_avaliados %}
+                        {{ render_mesa_queue_item(laudo) }}
+                        {% endfor %}
+                        {% else %}
+                        <p class="mesa-queue-empty">Os casos concluídos aparecerão aqui para consulta.</p>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+        </aside>
+
+        <main class="coluna-view" aria-label="Detalhes do laudo">
+            <section id="estado-vazio" class="estado-vazio estado-vazio--dashboard" data-home-tab-inicial="overview">
+                <div class="mesa-dashboard">
+                    <section class="mesa-dashboard-hero">
+                        <div class="mesa-dashboard-hero-copy">
+                            <span class="mesa-lista-eyebrow">Fila principal</span>
+                            <h2>Selecione um caso na coluna ao lado</h2>
+                            <p>A fila da esquerda agora concentra os casos em andamento, prontos para decisão e o histórico. Ao abrir um item, a conversa, o documento e o contexto técnico ficam separados no mesmo fluxo de revisão.</p>
+                        </div>
+                        <div class="mesa-dashboard-hero-pills">
+                            <span class="mesa-dashboard-pill">{{ responder_agora_count }} pedem resposta</span>
+                            <span class="mesa-dashboard-pill">{{ aguardando_avaliacao_count }} prontos para decisão</span>
+                            <span class="mesa-dashboard-pill">{{ acompanhamento_count }} em acompanhamento</span>
+                            <span class="mesa-dashboard-pill">{{ historico_count }} no histórico</span>
+                        </div>
+                    </section>
+
+                    <section class="mesa-dashboard-grid" aria-label="Resumo operacional da fila">
+                        <article class="mesa-dashboard-card mesa-dashboard-card--critical">
+                            <span>Responder agora</span>
+                            <strong>{{ responder_agora_count }}</strong>
+                            <p>Casos com chamado novo ou aprendizado pendente, pedindo ação rápida da mesa.</p>
+                        </article>
+                        <article class="mesa-dashboard-card">
+                            <span>Prontos para decisão</span>
+                            <strong>{{ aguardando_avaliacao_count }}</strong>
+                            <p>Casos com material suficiente para decidir aprovação, devolução ou emissão.</p>
+                        </article>
+                        <article class="mesa-dashboard-card">
+                            <span>Acompanhamento</span>
+                            <strong>{{ acompanhamento_count }}</strong>
+                            <p>Casos ainda em campo, com pendências ou aguardando novo retorno do inspetor.</p>
+                        </article>
+                        <article class="mesa-dashboard-card">
+                            <span>Histórico</span>
+                            <strong>{{ historico_count }}</strong>
+                            <p>Casos fechados recentemente para consulta, comparação e reaproveitamento de contexto.</p>
+                        </article>
+                    </section>
+
+                    <div class="mesa-dashboard-columns">
+                        <section class="mesa-dashboard-panel">
+                            <h3>Como a revisão acontece agora</h3>
+                            <ul class="mesa-dashboard-list">
+                                <li>Escolha o caso na fila lateral, sem depender de uma home separada.</li>
+                                <li>No centro ficam conversa, documento e resposta para o inspetor.</li>
+                                <li>Na lateral técnica aparecem pendências, retornos, aprendizados e sinais de decisão.</li>
+                            </ul>
+                        </section>
+                        <section class="mesa-dashboard-panel">
+                            <h3>O que vale monitorar primeiro</h3>
+                            <ul class="mesa-dashboard-list">
+                                <li>Chamados novos do inspetor.</li>
+                                <li>Pendências abertas que ainda travam a conclusão.</li>
+                                <li>Casos já maduros para decisão final.</li>
+                            </ul>
+                        </section>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-content" hidden aria-live="polite">
+                <div class="view-header">
+                    <div class="view-titulo">
+                        <span class="view-eyebrow">Caso ativo</span>
+                        <h2 id="view-hash">Laudo #XYZ</h2>
+                        <span id="view-meta">Protocolo: ... | Iniciado em: ...</span>
+                    </div>
+                    <div class="view-header-acoes">
+                        <button type="button" id="btn-toggle-contexto-mesa" class="btn btn-neutro btn-contexto-mesa" aria-expanded="false">
+                            <span class="material-symbols-rounded" aria-hidden="true">right_panel_open</span>
+                            <span>Contexto da revisão</span>
+                        </button>
+                        <div class="view-acoes" id="view-acoes"></div>
+                    </div>
+                </div>
+                <div id="view-case-summary" class="view-case-summary" aria-label="Resumo executivo do caso">
+                    <div class="view-case-summary-placeholder">
+                        Abra um laudo para ver status, prioridade, próxima ação e o contexto operacional resumido.
+                    </div>
+                </div>
+
+                <div id="view-structured-document" class="view-structured-document" hidden aria-label="Leitura técnica estruturada do laudo"></div>
+
+                <div class="mesa-workspace">
+                    <section class="mesa-thread-pane" aria-label="Conversa entre a mesa e o inspetor">
+                        <div class="view-timeline" id="view-timeline" role="log" aria-live="polite" aria-relevant="additions">
+                        </div>
+
+                        <div class="view-reply" id="box-resposta">
+                            <div id="ref-ativa-resposta" class="reply-ref-ativa" hidden>
+                                <div>
+                                    <strong id="ref-ativa-titulo">Respondendo mensagem</strong>
+                                    <p id="ref-ativa-texto"></p>
+                                </div>
+                                <button type="button" id="btn-limpar-ref-ativa" class="btn-limpar-ref" aria-label="Remover referência">×</button>
+                            </div>
+
+                            <div id="preview-resposta-anexo" class="reply-attachment-preview" hidden></div>
+
+                            <div class="view-reply-main">
+                            <button type="button" id="btn-anexo-resposta" class="btn-anexo-chat" aria-label="Anexar arquivo para o inspetor">
+                                <span class="material-symbols-rounded" aria-hidden="true">attach_file</span>
+                            </button>
+                            <input
+                                type="file"
+                                id="input-anexo-resposta"
+                                accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                hidden
+                                aria-hidden="true"
+                                tabindex="-1"
+                            >
+                            <label for="input-resposta" class="sr-only">Mensagem para o inspetor</label>
+                            <textarea id="input-resposta" rows="2"
+                                placeholder="Escreva para o inspetor ou envie um anexo... (Enter envia)" aria-label="Mensagem para o inspetor"></textarea>
+                            <button class="btn-enviar-chat" id="btn-enviar-msg" type="button">
+                                <span class="material-symbols-rounded" aria-hidden="true">send</span>
+                                <span>Enviar</span>
+                            </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <aside class="mesa-context-pane" id="mesa-context-pane" aria-label="Contexto técnico da revisão">
+                        <div class="mesa-context-pane-head">
+                            <div>
+                                <span class="mesa-lista-eyebrow">Contexto técnico</span>
+                                <h3>Contexto da revisão</h3>
+                            </div>
+                            <button type="button" id="btn-fechar-contexto-mesa" class="btn btn-neutro btn-contexto-fechar">
+                                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                                <span>Ocultar</span>
+                            </button>
+                        </div>
+
+                        <div id="mesa-context-placeholder" class="mesa-context-placeholder">
+                            Pendências, retornos, aprendizados e o apoio técnico do caso aparecem aqui quando a revisão for aberta.
+                        </div>
+
+                        <section id="mesa-operacao-painel" class="mesa-operacao-painel" hidden aria-live="polite">
+                            <div id="mesa-operacao-conteudo"></div>
+                        </section>
+
+                        <section id="aprendizados-visuais-painel" class="aprendizados-visuais-painel" hidden aria-live="polite">
+                            <div id="aprendizados-visuais-conteudo"></div>
+                        </section>
+                    </aside>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-relatorio" class="modal-overlay" role="dialog" aria-modal="true"
+        aria-labelledby="titulo-modal-relatorio" aria-hidden="true">
+        <div class="modal-container" role="document">
+            <div class="modal-header">
+                <h2 id="titulo-modal-relatorio">
+                    <span class="material-symbols-rounded" aria-hidden="true">assignment</span>
+                    Relatorio Estruturado do Caso
+                </h2>
+                <button class="btn-sair btn-icon-only" id="btn-fechar-relatorio" type="button" aria-label="Fechar relatório">
+                    <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-conteudo"></div>
+        </div>
+    </div>
+
+    <div id="modal-pacote" class="modal-overlay" role="dialog" aria-modal="true"
+        aria-labelledby="titulo-modal-pacote" aria-hidden="true">
+        <div class="modal-container" role="document">
+            <div class="modal-header">
+                <h2 id="titulo-modal-pacote">
+                    <span class="material-symbols-rounded" aria-hidden="true">dataset</span>
+                    Resumo técnico da revisão
+                </h2>
+                <button class="btn-sair btn-icon-only" id="btn-fechar-pacote" type="button" aria-label="Fechar pacote">
+                    <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-pacote-conteudo"></div>
+        </div>
+    </div>
+
+    <div id="dialog-motivo" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="titulo-dialog-motivo"
+        aria-describedby="texto-dialog-motivo" aria-hidden="true">
+        <div class="dialog-motivo" role="document">
+            <h3 id="titulo-dialog-motivo" class="dialog-titulo">
+                <span class="material-symbols-rounded" aria-hidden="true">cancel</span>
+                Devolver Laudo
+            </h3>
+            <p id="texto-dialog-motivo" class="dialog-texto">
+                Informe o motivo da devolução. O inspetor verá esta mensagem no campo.
+            </p>
+
+            <label for="input-motivo" class="sr-only">Motivo da devolução</label>
+            <textarea id="input-motivo" placeholder="Ex: Foto do quadro elétrico desfocada..." aria-label="Motivo da devolução"></textarea>
+
+            <div class="dialog-acoes">
+                <button class="btn btn-neutro" id="btn-cancelar-motivo" type="button">Cancelar</button>
+                <button class="btn btn-rejeitar btn-dialog-confirmar" id="btn-confirmar-motivo" type="button">
+                    Confirmar Devolução
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="status-flutuante" class="barra-status-flutuante" aria-live="polite" aria-atomic="true"></div>
+
+    <div
+        id="revisor-front-contract"
+        hidden
+        data-websocket-url="/revisao/ws/whispers"
+        data-pacote-url-template="/revisao/api/laudo/${state.laudoAtivoId}/pacote"
+        data-pacote-pdf-url-template="/revisao/api/laudo/${state.laudoAtivoId}/pacote/exportar-pdf"
+        data-marcar-whispers-url-template="/revisao/api/laudo/${alvo}/marcar-whispers-lidos"
+        data-pendencia-url-template="/revisao/api/laudo/${laudoId}/pendencias/${msgId}"
+        data-responder-anexo-url-template="/revisao/api/laudo/${state.laudoAtivoId}/responder-anexo"
+        data-pacote-json-hook="js-btn-pacote-json"
+        data-pacote-pdf-hook="js-btn-pacote-pdf"
+        data-pendencias-key="pendencias_resolvidas_recentes"
+        data-whispers-indicator-hook="js-indicador-whispers"
+        data-pendencias-indicator-hook="js-indicador-pendencias"
+        data-anexo-link-class="anexo-mensagem-link"
+    >
+        <button type="button" data-mesa-action="responder-item" hidden tabindex="-1"></button>
+        <button type="button" data-mesa-action="alternar-pendencia" hidden tabindex="-1"></button>
+    </div>
+
+    {% if perf_mode %}
+    <script src="/static/js/shared/api-core.js?v={{ v_app }}" defer></script>
+    {% endif %}
+    <script src="/static/js/revisor/revisor_painel_core.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_documento.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_mesa.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_governanca.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_analise.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_operacao.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_pacote.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_historico.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_aprendizados.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_aprendizados_actions.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/painel_revisor_page.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_mutacoes.js?v={{ v_app }}" defer></script>
+    <script src="/static/js/revisor/revisor_painel_interacoes.js?v={{ v_app }}" defer></script>
+</body>
+
+</html>

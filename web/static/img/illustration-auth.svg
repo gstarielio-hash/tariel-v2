@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" fill="none">
+  <title>Authentication illustration</title>
+  <desc>Brand-aligned login side illustration for TARIEL.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.18"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+    <linearGradient id="panelGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <radialGradient id="authOrb" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#93C5FD" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#93C5FD" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="600" cy="420" r="280" fill="url(#authOrb)"/>
+  <g opacity="0.18">
+    <path d="M186 160h220M146 250h280M186 340h220" stroke="#DBEAFE" stroke-width="6" stroke-linecap="round"/>
+    <path d="M914 180h180M954 270h140M914 360h180" stroke="#DBEAFE" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="170" cy="430" r="6" fill="#BFDBFE"/><circle cx="1030" cy="470" r="6" fill="#BFDBFE"/>
+    <circle cx="210" cy="470" r="6" fill="#BFDBFE"/><circle cx="990" cy="510" r="6" fill="#BFDBFE"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="420" y="180" width="360" height="500" rx="36" fill="url(#panelGrad)"/>
+    <rect x="452" y="222" width="296" height="6" rx="3" fill="#334155"/>
+    <rect x="452" y="242" width="196" height="6" rx="3" fill="#1D4ED8" opacity="0.45"/>
+    <g transform="translate(480 255) scale(0.26)">
+      <g transform="translate(64.000,146.168) scale(0.825806452)">
+        <path d="M 0.00 0.00 L 128.00 201.00 L 339.00 203.00 L 339.00 654.00 L 628.00 886.00 L 1038.00 474.00 L 1038.00 227.00 L 562.00 226.00 L 562.00 571.00 L 719.00 414.00 L 846.00 416.00 L 845.00 456.00 L 634.00 665.00 L 538.00 588.00 L 538.00 200.00 L 893.00 199.00 L 1085.00 0.00 Z M 362.00 478.00 L 516.00 601.00 L 515.00 768.00 L 361.00 644.00 Z M 1015.00 247.00 L 1016.00 467.00 L 626.00 858.00 L 538.00 787.00 L 538.00 618.00 L 639.00 694.00 L 867.00 463.00 L 867.00 393.00 L 712.00 392.00 L 584.00 520.00 L 582.00 249.00 Z M 37.00 20.00 L 1038.00 23.00 L 885.00 177.00 L 517.00 177.00 L 515.00 572.00 L 361.00 450.00 L 360.00 180.00 L 140.00 180.00 Z" fill="#F8FAFC" fill-rule="evenodd" clip-rule="evenodd"/>
+      </g>
+    </g>
+    <rect x="486" y="430" width="228" height="46" rx="14" fill="#FFFFFF" opacity="0.08" stroke="#334155" stroke-width="2"/>
+    <rect x="486" y="496" width="228" height="46" rx="14" fill="#FFFFFF" opacity="0.08" stroke="#334155" stroke-width="2"/>
+    <rect x="486" y="562" width="228" height="52" rx="16" fill="url(#btnGrad)"/>
+    <rect x="514" y="446" width="120" height="8" rx="4" fill="#94A3B8"/>
+    <rect x="514" y="512" width="150" height="8" rx="4" fill="#94A3B8"/>
+    <rect x="548" y="584" width="104" height="8" rx="4" fill="#FFFFFF" opacity="0.92"/>
+    <circle cx="680" cy="381" r="10" fill="#4ADE80"/>
+    <rect x="486" y="382" width="170" height="10" rx="5" fill="#334155"/>
+  </g>
+  <g filter="url(#soft)">
+    <rect x="262" y="310" width="176" height="122" rx="24" fill="#FFFFFF" stroke="#DBEAFE" stroke-width="3"/>
+    <circle cx="308" cy="352" r="22" fill="#DBEAFE"/>
+    <path d="M300 352l8 8 14-14" stroke="#2563EB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="340" y="342" width="60" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="340" y="366" width="42" height="10" rx="5" fill="#E2E8F0"/>
+  </g>
+  <g filter="url(#soft)">
+    <rect x="778" y="266" width="164" height="110" rx="24" fill="#FFFFFF" stroke="#DBEAFE" stroke-width="3"/>
+    <rect x="814" y="302" width="86" height="12" rx="6" fill="#DBEAFE"/>
+    <path d="M806 340l26-18 26 12 26-28 26 20" stroke="#2563EB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g filter="url(#soft)">
+    <rect x="758" y="522" width="194" height="116" rx="24" fill="#FFFFFF" stroke="#DBEAFE" stroke-width="3"/>
+    <circle cx="808" cy="572" r="18" fill="#DBEAFE"/>
+    <path d="M799 572l8 8 16-16" stroke="#2563EB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="840" y="558" width="72" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="840" y="582" width="54" height="10" rx="5" fill="#E2E8F0"/>
+  </g>
+  <path d="M438 366C350 366 350 320 262 320" stroke="#93C5FD" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <path d="M780 340C842 340 842 318 930 318" stroke="#93C5FD" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <path d="M780 582C842 582 842 580 952 580" stroke="#93C5FD" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <circle cx="438" cy="366" r="6" fill="#60A5FA"/>
+  <circle cx="780" cy="340" r="6" fill="#60A5FA"/>
+  <circle cx="780" cy="582" r="6" fill="#60A5FA"/>
+</svg>

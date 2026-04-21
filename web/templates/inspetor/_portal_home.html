@@ -1,0 +1,191 @@
+{% from "inspetor/_macros.html" import render_portal_recent %}
+
+<section
+    id="tela-boas-vindas"
+    class="inspetor-portal"
+    data-inspector-region="portal-dashboard"
+    data-screen-root="portal"
+    data-active="{{ 'true' if home_forcado_inicial else 'false' }}"
+    aria-hidden="{{ 'false' if home_forcado_inicial else 'true' }}"
+    {% if not home_forcado_inicial %}hidden inert{% endif %}
+>
+    <header class="inspetor-portal__header">
+        <div class="inspetor-portal__copy">
+            <span class="inspetor-portal__eyebrow">Operação em campo</span>
+            <h1>Portal do Inspetor</h1>
+            <p>
+                Retome laudos, inicie inspecoes e acompanhe os retornos da mesa no mesmo fluxo.
+            </p>
+            <div class="inspetor-portal__signals" aria-label="Diferenciais operacionais">
+                <span class="inspetor-portal__signal">Fluxo auditável com mesa integrada</span>
+                {% for item in portal_switch_links | default([], true) %}
+                <a class="inspetor-portal__signal" href="{{ item.url | e }}">
+                    Abrir {{ item.label | e }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="inspetor-portal__header-actions portal-hero-actions" aria-label="Ações principais do portal">
+            <button
+                type="button"
+                class="technical-record-btn technical-record-btn--ghost inspetor-portal__chat-entry-btn inspetor-portal__hero-btn"
+                data-action="open-assistant-chat"
+                data-inspector-entry="portal-open-chat"
+                aria-label="Abrir novo chat livre com o assistente"
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">forum</span>
+                <span>Novo Chat</span>
+            </button>
+
+            <button
+                type="button"
+                id="btn-abrir-modal-novo"
+                class="inspetor-primary-btn inspetor-primary-btn--header inspetor-portal__hero-btn"
+                data-inspector-entry="portal-new-inspection"
+                aria-haspopup="dialog"
+                aria-controls="modal-nova-inspecao"
+                aria-expanded="false"
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                <span>Nova Inspeção</span>
+            </button>
+        </div>
+    </header>
+
+    <section class="portal-stat-grid" aria-label="Indicadores principais">
+        {% for card in cards_status %}
+        <article class="portal-stat-card portal-stat-card--{{ card.status }}">
+            <span class="portal-stat-card__icon material-symbols-rounded" aria-hidden="true">{{ card.icone }}</span>
+            <div class="portal-stat-card__copy">
+                <strong>{{ card.valor }}</strong>
+                <span>{{ card.label }}</span>
+            </div>
+        </article>
+        {% endfor %}
+        <article
+            id="portal-governance-summary"
+            class="portal-stat-card portal-stat-card--warning"
+            aria-label="Resumo de governança documental"
+            {% if not portal_governance_summary.visible %}hidden{% endif %}
+        >
+            <span class="portal-stat-card__icon material-symbols-rounded" aria-hidden="true">warning</span>
+            <div class="portal-stat-card__copy">
+                <strong id="portal-governance-summary-title">{{ portal_governance_summary.label | default('', true) }}</strong>
+                <span id="portal-governance-summary-detail">{{ portal_governance_summary.detail | default('', true) }}</span>
+            </div>
+        </article>
+    </section>
+
+    <div class="portal-divider" aria-hidden="true"></div>
+
+    <div class="portal-columns">
+        <section class="portal-column portal-column--surface" id="secao-home-recentes" aria-labelledby="titulo-home-recentes">
+            <header class="portal-section-header portal-section-header--row">
+                <div class="portal-section-header__copy">
+                    <span class="portal-section-header__eyebrow">Operação</span>
+                    <h2 id="titulo-home-recentes">Laudos Recentes</h2>
+                    <p>Retome inspecoes abertas e veja o que precisa de continuidade.</p>
+                </div>
+
+                {% if laudos_portal_cards | length > 3 %}
+                <button
+                    type="button"
+                    id="btn-home-toggle-historico-completo"
+                    class="portal-link-button"
+                    aria-expanded="false"
+                >
+                    Ver todos
+                </button>
+                {% else %}
+                <button type="button" id="btn-home-ver-historico" class="portal-link-button">
+                    Ver todos
+                </button>
+                {% endif %}
+            </header>
+
+            {% if laudos_portal_cards %}
+            <div class="portal-report-list">
+                {% for item in laudos_portal_cards[:3] %}
+                    {{ render_portal_recent(item) }}
+                {% endfor %}
+
+                {% for item in laudos_portal_cards[3:] %}
+                <div data-home-historico-extra hidden>
+                    {{ render_portal_recent(item, " portal-report-card--extra") }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="estado-vazio-historico" data-home-empty-state>
+                <span class="estado-vazio-historico__icon material-symbols-rounded" aria-hidden="true">history</span>
+                <div class="estado-vazio-historico__copy">
+                    <strong>Nenhum laudo ainda.</strong>
+                    <span>Abra uma nova inspecao ou use o chat livre para montar o contexto inicial do caso.</span>
+                </div>
+                <div class="estado-vazio-historico__actions" aria-label="Ações rápidas do portal vazio">
+                    <button
+                        type="button"
+                        class="portal-link-button"
+                        data-action="open-assistant-chat"
+                        data-inspector-entry="portal-empty-open-chat"
+                    >
+                        Novo Chat
+                    </button>
+                    <button
+                        type="button"
+                        class="inspetor-primary-btn"
+                        data-open-inspecao-modal
+                        data-inspector-entry="portal-empty-new-inspection"
+                        aria-haspopup="dialog"
+                        aria-controls="modal-nova-inspecao"
+                        aria-expanded="false"
+                    >
+                        Nova Inspeção
+                    </button>
+                </div>
+                <div class="estado-vazio-historico__tips" aria-label="Próximos passos sugeridos">
+                    <span>Defina o equipamento</span>
+                    <span>Escolha um modelo liberado</span>
+                    <span>Comece a coleta guiada</span>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="portal-column portal-column--surface" aria-labelledby="titulo-home-modelos">
+            <header class="portal-section-header">
+                <div class="portal-section-header__copy">
+                    <span class="portal-section-header__eyebrow">Biblioteca</span>
+                    <h2 id="titulo-home-modelos">Modelos Técnicos</h2>
+                    <p>Escolha uma base pronta para iniciar novas inspecoes com estrutura documental definida.</p>
+                </div>
+            </header>
+
+            <div class="portal-model-list">
+                {% for modelo in modelos_portal %}
+                <button
+                    type="button"
+                    class="portal-model-card btn-acao-rapida portal-model-card--{{ modelo.status }}"
+                    data-tipo="{{ modelo.tipo | e }}"
+                    data-runtime-tipo="{{ modelo.runtime_tipo | default(modelo.tipo, true) | e }}"
+                    data-preprompt="{{ modelo.preprompt | e }}"
+                    aria-label="{{ modelo.titulo }}"
+                >
+                    <span class="portal-model-card__icon material-symbols-rounded" aria-hidden="true">{{ modelo.icone }}</span>
+                    <div class="portal-model-card__body">
+                        <div class="portal-model-card__header">
+                            <strong>{{ modelo.titulo }}</strong>
+                            {% if modelo.badge %}
+                            <span class="inspetor-badge inspetor-badge--purple">{{ modelo.badge }}</span>
+                            {% endif %}
+                        </div>
+                        <p>{{ modelo.descricao }}</p>
+                        <span class="portal-model-card__meta">{{ modelo.meta }}</span>
+                    </div>
+                </button>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</section>

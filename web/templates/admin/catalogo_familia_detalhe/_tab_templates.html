@@ -1,0 +1,123 @@
+                <section class="catalog-tab-panel" id="catalog-panel-templates">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Documento base</p>
+                                <h2>Modelo e documento base</h2>
+                                <p class="catalog-panel__description">Aqui voce ve o modelo principal e o documento base em uma leitura curta. O detalhamento completo fica no modo avancado.</p>
+                            </div>
+                        </div>
+
+                        <div class="catalog-state-grid">
+                            <article class="catalog-card">
+                                <h3>Fluxo do documento</h3>
+                                <p>Base da família, modelo visual, documento e PDF final aparecem em etapas separadas.</p>
+                                <p>O catálogo organiza seleção e preparo. O PDF final é só a última etapa.</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Etapas disponíveis</h3>
+                                <ul class="catalog-inline-list">
+                                    <li>{{ 'Base da família carregada' if artifact_snapshot.has_family_schema else 'Base da família ausente' }}</li>
+                                    <li>{{ 'Modelo base pronto' if artifact_snapshot.has_template_seed else 'Modelo base ausente' }}</li>
+                                    <li>{{ 'Documento base pronto' if artifact_snapshot.has_laudo_output_seed else 'Documento base ausente' }}</li>
+                                    <li>{{ 'Exemplo de documento pronto' if artifact_snapshot.has_laudo_output_exemplo else 'Exemplo de documento ausente' }}</li>
+                                </ul>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Modelo principal</h3>
+                                <p>{{ offer_model_label | e }}</p>
+                                <p>{{ offer.offer_name | default('Sem oferta vinculada', true) | e }}</p>
+                            </article>
+                        </div>
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Modelo oficial de referência</h3>
+                                <p><strong>{{ template_refinement_target.label | e }}</strong></p>
+                                <div class="catalog-governance-pill-row">
+                                    <span class="catalog-status catalog-status--{{ template_refinement_target.status.tone | e }}">{{ template_refinement_target.status.label | e }}</span>
+                                </div>
+                                <p class="catalog-card__meta">{{ template_refinement_target.summary | default('Sem resumo documental registrado.', true) | e }}</p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>O que falta ajustar</h3>
+                                <ul class="catalog-inline-list">
+                                    {% for item in template_refinement_target.signals %}
+                                    <li>{{ item | e }}</li>
+                                    {% else %}
+                                    <li>Sem sinais comerciais adicionais.</li>
+                                    {% endfor %}
+                                </ul>
+                                <ul class="catalog-inline-list">
+                                    {% for item in template_refinement_target.recommended_actions %}
+                                    <li>{{ item | e }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </article>
+                        </div>
+
+                        <div class="catalog-two-column">
+                            <article class="catalog-card">
+                                <h3>Visão do documento</h3>
+                                <p><strong>{{ document_preview.title | e }}</strong></p>
+                                <p>{{ document_preview.subtitle | e }}</p>
+                                <div class="catalog-governance-pill-row">
+                                    <span class="catalog-status catalog-status--{{ document_preview.status.tone | e }}">{{ document_preview.status.label | e }}</span>
+                                    {% if document_preview.template_default_label %}
+                                    <span class="catalog-chip">{{ document_preview.template_default_label | e }}</span>
+                                    {% endif %}
+                                </div>
+                                <ul class="catalog-inline-list">
+                                    <li>{{ document_preview.minimum_evidence.fotos | int }} foto(s) mínimas</li>
+                                    <li>{{ document_preview.minimum_evidence.documentos | int }} documento(s) mínimos</li>
+                                    <li>{{ document_preview.minimum_evidence.textos | int }} texto(s) mínimos</li>
+                                    <li>{{ document_preview.required_slot_count | int }} ponto(s) obrigatório(s)</li>
+                                </ul>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Informações obrigatórias</h3>
+                                <div class="catalog-chip-row">
+                                    {% for item in document_preview.required_slots %}
+                                    <span class="catalog-chip">{{ item.label | e }}</span>
+                                    {% else %}
+                                    <span class="catalog-chip catalog-chip--muted">Sem itens estruturados</span>
+                                    {% endfor %}
+                                </div>
+                                {% if document_preview.scope_signals %}
+                                <ul class="catalog-inline-list">
+                                    {% for item in document_preview.scope_signals %}
+                                    <li>{{ item | replace('_', ' ') | e }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </article>
+                        </div>
+
+                        <div class="catalog-card-grid catalog-card-grid--compact">
+                            {% for section in document_preview.sections %}
+                            <article class="catalog-card">
+                                <div class="catalog-card__header">
+                                    <div>
+                                        <strong>{{ section.title | e }}</strong>
+                                    </div>
+                                    <span class="catalog-status catalog-status--{{ section.status.tone | e }}">{{ section.status.label | e }}</span>
+                                </div>
+                                <ul class="catalog-inline-list">
+                                    {% for item in section.bullets %}
+                                    <li>{{ item | e }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </article>
+                            {% endfor %}
+                        </div>
+
+                        <details class="catalog-advanced">
+                            <summary>Ver base completa</summary>
+                            {% if family_schema %}
+                            <pre class="catalog-code-block">{{ family_schema | tojson(indent=2) }}</pre>
+                            {% else %}
+                            <p>Nenhuma estrutura oficial localizada para esta chave.</p>
+                            {% endif %}
+                        </details>
+                    </div>
+                </section>

@@ -1,0 +1,56 @@
+<nav class="cliente-tabs" aria-label="Navegação principal do portal da empresa">
+    {% set _surface_availability = cliente_surface_availability | default({}, true) %}
+    <a
+        id="tab-admin"
+        class="cliente-tab{% if (cliente_tab_inicial | default('admin')) == 'admin' %} active{% endif %}"
+        data-tab="admin"
+        href="{{ cliente_surface_routes.admin | default('/cliente/painel') | e }}?sec={{ cliente_admin_section_inicial | default('overview') | e }}"
+        aria-selected="{{ 'true' if (cliente_tab_inicial | default('admin')) == 'admin' else 'false' }}"
+        aria-current="{{ 'page' if (cliente_tab_inicial | default('admin')) == 'admin' else 'false' }}"
+    >
+        <span class="tab-main">
+            <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+            <span class="tab-copy">
+                <span class="tab-title">Admin</span>
+                <span class="tab-desc">Empresa, plano e equipe</span>
+            </span>
+        </span>
+        <span class="tab-badge" id="tab-admin-count">0</span>
+    </a>
+    <a
+        id="tab-chat"
+        class="cliente-tab{% if (cliente_tab_inicial | default('admin')) == 'chat' %} active{% endif %}"
+        data-tab="chat"
+        href="{{ cliente_surface_routes.chat | default('/cliente/chat') | e }}?sec={{ cliente_chat_section_inicial | default('overview') | e }}"
+        aria-selected="{{ 'true' if (cliente_tab_inicial | default('admin')) == 'chat' else 'false' }}"
+        aria-current="{{ 'page' if (cliente_tab_inicial | default('admin')) == 'chat' else 'false' }}"
+        {% if not _surface_availability.get('chat', true) %}hidden{% endif %}
+    >
+        <span class="tab-main">
+            <span class="material-symbols-rounded" aria-hidden="true">forum</span>
+            <span class="tab-copy">
+                <span class="tab-title">Chat</span>
+                <span class="tab-desc">Operacao e laudos da empresa</span>
+            </span>
+        </span>
+        <span class="tab-badge" id="tab-chat-count">0</span>
+    </a>
+    <a
+        id="tab-mesa"
+        class="cliente-tab{% if (cliente_tab_inicial | default('admin')) == 'mesa' %} active{% endif %}"
+        data-tab="mesa"
+        href="{{ cliente_surface_routes.mesa | default('/cliente/mesa') | e }}?sec={{ cliente_mesa_section_inicial | default('overview') | e }}"
+        aria-selected="{{ 'true' if (cliente_tab_inicial | default('admin')) == 'mesa' else 'false' }}"
+        aria-current="{{ 'page' if (cliente_tab_inicial | default('admin')) == 'mesa' else 'false' }}"
+        {% if not _surface_availability.get('mesa', true) %}hidden{% endif %}
+    >
+        <span class="tab-main">
+            <span class="material-symbols-rounded" aria-hidden="true">rule</span>
+            <span class="tab-copy">
+                <span class="tab-title">Mesa Avaliadora</span>
+                <span class="tab-desc">Fila, pendencias e aprovacoes</span>
+            </span>
+        </span>
+        <span class="tab-badge" id="tab-mesa-count">0</span>
+    </a>
+</nav>

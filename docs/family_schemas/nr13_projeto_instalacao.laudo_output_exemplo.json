@@ -1,0 +1,124 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr13_projeto_instalacao",
+  "template_code": "nr13_projeto_instalacao",
+  "tokens": {
+    "cliente_nome": "Empresa Teste NR13",
+    "unidade_nome": "Unidade Piloto NR13",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 922024900",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "NR13_PROJETO_INSTALACAO-2026-001",
+    "empresa_nome": "Empresa Teste NR13",
+    "unidade_nome": "Unidade Piloto NR13",
+    "data_execucao": "2026-04-08",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva",
+    "wave_portfolio": 3
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Pendencias documentais secundarias foram registradas e tratadas pela Mesa.",
+    "observacoes_mesa": "Caso mantido em nr13_projeto_instalacao com rastreabilidade de escopo e evidencias."
+  },
+  "resumo_executivo": "Foi executado o servico nr13 - projeto de instalacao com registro estruturado do objeto principal, evidencias vinculadas, documentacao de apoio e conclusao tecnica consolidada para a Mesa.",
+  "identificacao": {
+    "objeto_principal": "Projeto de instalacao da casa de caldeiras da unidade piloto",
+    "localizacao": "Unidade piloto NR13",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_001",
+        "DOC_001"
+      ],
+      "referencias_texto": "IMG_001; DOC_001",
+      "descricao": "Referencia principal do objeto identificada com apoio de evidencia visual e documento associado.",
+      "observacao": "Rastreabilidade principal confirmada para o servico."
+    },
+    "codigo_interno": "NR13_PROJETO_INSTALACAO-001"
+  },
+  "escopo_servico": {
+    "tipo_entrega": "engenharia",
+    "modo_execucao": "analise_e_modelagem",
+    "ativo_tipo": "NR13",
+    "resumo_escopo": "Elaboracao e aprovacao de projeto de instalacao com consolidacao tecnica, referencias de campo e premissas de engenharia aplicaveis ao escopo contratado."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Levantamento tecnico, definicao de premissas, consolidacao de memoria descritiva e referencias do projeto de instalacao.",
+    "condicoes_observadas": "Servico executado dentro do escopo previsto, com registros suficientes para revisao da Mesa e consolidacao do documento final.",
+    "parametros_relevantes": "Projeto de instalacao com memoria descritiva e referencias anexas.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_010",
+        "DOC_010"
+      ],
+      "referencias_texto": "IMG_010; DOC_010",
+      "descricao": "Evidencia da execucao principal do servico.",
+      "observacao": "Registros principais consolidados."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_020"
+      ],
+      "referencias_texto": "IMG_020",
+      "descricao": "Evidencia principal que suporta a conclusao tecnica.",
+      "observacao": "Material principal vinculado ao caso."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_021"
+      ],
+      "referencias_texto": "IMG_021",
+      "descricao": "Evidencia complementar para contextualizacao do servico.",
+      "observacao": "Registro complementar sem impacto critico."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_001"
+      ],
+      "referencias_texto": "Projeto de instalacao com memoria descritiva e referencias anexas.",
+      "descricao": "Documento base ou ancora principal do servico.",
+      "observacao": "Documento vinculado ao pacote final."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Projeto de instalacao com memoria descritiva e referencias anexas.",
+    "documentos_emitidos": "Pacote tecnico de nr13 - projeto de instalacao consolidado para entrega.",
+    "observacoes_documentais": "Documentacao complementar registrada e vinculada ao caso."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": false,
+    "ha_pontos_de_atencao_texto": "Nao",
+    "descricao": "Nao foram identificados pontos de atencao relevantes no fechamento deste servico.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_030"
+      ],
+      "referencias_texto": "IMG_030",
+      "descricao": "Registro relacionado aos pontos de atencao ou a ausencia declarada deles.",
+      "observacao": "Evidencia vinculada ao fechamento da analise."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Consolidar o projeto aprovado como base unica para implantacao e controle de alteracoes posteriores."
+  },
+  "conclusao": {
+    "status": "conforme",
+    "conclusao_tecnica": "O servico nr13 - projeto de instalacao foi consolidado com rastreabilidade suficiente, evidencias principais vinculadas e conclusao tecnica formalizada.",
+    "justificativa": "A conclusao considera o escopo registrado, o metodo aplicado, a documentacao disponivel, a evidencia principal e os pontos de atencao ou sua ausencia declarada."
+  }
+}

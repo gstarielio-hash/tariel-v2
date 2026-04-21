@@ -1,0 +1,146 @@
+/* Structural and compatibility rules for the Inspetor shell. */
+/* Core color, spacing and radius tokens now live in tokens.generated.css. */
+
+html,
+body {
+    --font-sans: var(--font-base);
+    --font-display: var(--font-heading);
+    --surface-panel-radius: 18px;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: var(--bg-app);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+body.pagina-chat-dashboard-v2 {
+    color-scheme: light;
+    --t-fast: 140ms;
+    --t-base: 180ms;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* Compatibilidade com a base existente do portal. */
+    --bg-panel: var(--bg-subtle);
+    --bg-card: var(--bg-surface);
+    --bg-card-2: var(--bg-surface-2);
+    --border: var(--border-subtle);
+    --border-medium-legacy: var(--border-medium);
+    --accent-cyan-soft: rgba(36, 92, 147, 0.12);
+    --accent-purple: var(--accent-violet);
+    --accent-purple-soft: rgba(127, 166, 203, 0.14);
+    --success-soft: rgba(47, 185, 121, 0.14);
+    --warning-soft: rgba(110, 155, 199, 0.14);
+
+    background:
+        linear-gradient(180deg, rgba(245, 248, 252, 0.9), rgba(237, 243, 250, 0.92)),
+        url("/static/img/pattern-noise.png"),
+        url("/static/img/bg-dashboard.webp"),
+        radial-gradient(circle at top center, rgba(36, 92, 147, 0.08), transparent 24%),
+        linear-gradient(180deg, #f5f8fc 0%, #edf3fa 54%, #e6eef7 100%);
+    background-position: center, center, center, top center, center;
+    background-size: cover, 420px 420px, cover, auto, auto;
+    background-repeat: no-repeat, repeat, no-repeat, no-repeat, no-repeat;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+html[data-theme="dark"] body.pagina-chat-dashboard-v2,
+body.pagina-chat-dashboard-v2[data-theme="dark"] {
+    color-scheme: dark;
+    --accent-purple-soft: rgba(110, 155, 199, 0.14);
+    background:
+        linear-gradient(180deg, rgba(9, 16, 25, 0.86), rgba(9, 16, 25, 0.9)),
+        url("/static/img/pattern-noise.png"),
+        url("/static/img/bg-app.webp"),
+        radial-gradient(circle at top center, rgba(36, 92, 147, 0.08), transparent 24%),
+        linear-gradient(180deg, #091019 0%, #12233C 54%, #091019 100%);
+}
+
+body.pagina-chat-dashboard-v2,
+body.pagina-chat-dashboard-v2 .container-app,
+body.pagina-chat-dashboard-v2 .painel-chat,
+body.pagina-chat-dashboard-v2 .inspetor-shell-grid,
+body.pagina-chat-dashboard-v2 .inspetor-main {
+    min-height: 100%;
+}
+
+body.pagina-chat-dashboard-v2 *,
+body.pagina-chat-dashboard-v2 *::before,
+body.pagina-chat-dashboard-v2 *::after {
+    box-sizing: border-box;
+}
+
+body.pagina-chat-dashboard-v2 #root,
+body.pagina-chat-dashboard-v2 .container-app,
+body.pagina-chat-dashboard-v2 .painel-chat,
+body.pagina-chat-dashboard-v2 .inspetor-shell-grid,
+body.pagina-chat-dashboard-v2 .inspetor-main,
+body.pagina-chat-dashboard-v2 #painel-chat {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+body.pagina-chat-dashboard-v2 .container-app {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-left: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+}
+
+body.pagina-chat-dashboard-v2 .painel-chat {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    padding: 0 !important;
+    gap: 0 !important;
+    background: transparent !important;
+}
+
+body.pagina-chat-dashboard-v2 .inspetor-shell-grid,
+body.pagina-chat-dashboard-v2 .inspetor-main {
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+body.pagina-chat-dashboard-v2 .cabecalho-tariel {
+    display: none !important;
+}
+
+body.pagina-chat-dashboard-v2 .overlay-sidebar {
+    background: rgba(2, 6, 23, 0.78);
+    backdrop-filter: blur(6px);
+}
+
+body.pagina-chat-dashboard-v2 .barra-status-inspecao {
+    display: none;
+}
+
+body.pagina-chat-dashboard-v2 .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+body.pagina-chat-dashboard-v2 [hidden] {
+    display: none !important;
+}

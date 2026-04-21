@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tariel Preview - Chat Clean com Mesa</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f3f6f9;
+            --bg-strong: #eaf0f5;
+            --surface: rgba(255, 255, 255, 0.94);
+            --surface-soft: rgba(247, 250, 252, 0.92);
+            --surface-accent: rgba(240, 246, 251, 0.96);
+            --surface-mesa: rgba(250, 245, 236, 0.95);
+            --surface-user: #1f5e8e;
+            --surface-user-soft: #245f8c;
+            --line: rgba(166, 182, 198, 0.42);
+            --line-strong: rgba(31, 94, 142, 0.18);
+            --text: #12233c;
+            --muted: #64748b;
+            --accent: #1f5e8e;
+            --accent-soft: rgba(31, 94, 142, 0.1);
+            --mesa: #9a6a28;
+            --mesa-soft: rgba(160, 108, 35, 0.12);
+            --success: #2f7d5a;
+            --success-soft: rgba(47, 125, 90, 0.12);
+            --shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            background:
+                radial-gradient(circle at top left, rgba(31, 94, 142, 0.08), transparent 32%),
+                linear-gradient(180deg, #f7fafc 0%, #eef3f7 100%);
+            color: var(--text);
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        }
+
+        body {
+            padding: 20px;
+        }
+
+        .prototype-shell {
+            display: grid;
+            grid-template-columns: 288px minmax(0, 1fr);
+            gap: 18px;
+            min-height: calc(100vh - 40px);
+        }
+
+        .sidebar,
+        .main {
+            border: 1px solid var(--line);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar {
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 18px;
+            padding: 18px;
+            border-radius: 26px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+        }
+
+        .brand-copy {
+            display: grid;
+            gap: 2px;
+        }
+
+        .brand-copy strong {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .brand-copy span,
+        .section-label,
+        .conversation-meta,
+        .conversation-tag,
+        .preview-note,
+        .thread-note,
+        .composer-note {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .sidebar-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 14px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: var(--accent);
+            color: #fff;
+            font: inherit;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .sidebar-section {
+            display: grid;
+            gap: 10px;
+        }
+
+        .conversation-list {
+            display: grid;
+            gap: 6px;
+        }
+
+        .conversation-item {
+            display: grid;
+            gap: 6px;
+            padding: 12px 14px;
+            border: 1px solid transparent;
+            border-radius: 14px;
+            background: transparent;
+        }
+
+        .conversation-item.is-active {
+            border-color: rgba(31, 94, 142, 0.16);
+            background: rgba(233, 242, 248, 0.94);
+        }
+
+        .conversation-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .conversation-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 22px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.76);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .conversation-tag.mesa {
+            color: var(--mesa);
+            background: rgba(250, 241, 222, 0.92);
+        }
+
+        .sidebar-footer {
+            display: grid;
+            gap: 8px;
+        }
+
+        .sidebar-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 38px;
+            padding: 0 12px;
+            border-radius: 12px;
+            color: var(--text);
+            background: var(--surface-soft);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .main {
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 26px 14px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar-copy {
+            display: grid;
+            gap: 4px;
+        }
+
+        .topbar-copy strong {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .topbar-copy span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .profile-bubble {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: #fff;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .preview-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 26px 0;
+        }
+
+        .preview-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--surface-soft);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .stage {
+            display: grid;
+            align-content: start;
+            gap: 18px;
+            padding: 12px 26px 18px;
+            overflow: auto;
+        }
+
+        .stage-inner {
+            width: min(100%, 860px);
+            margin: 0 auto;
+            display: grid;
+            gap: 18px;
+        }
+
+        .channel-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            padding: 6px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--surface-soft);
+        }
+
+        .channel-switch button {
+            min-height: 38px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--muted);
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .channel-switch button.is-active {
+            background: #fff;
+            color: var(--text);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .thread-card {
+            display: grid;
+            gap: 16px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at top right, rgba(31, 94, 142, 0.05), transparent 28%),
+                rgba(255, 255, 255, 0.82);
+        }
+
+        .thread-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .thread-head strong {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .thread-head span {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .thread-history-chip {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 28px;
+            padding: 0 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .thread {
+            display: grid;
+            gap: 14px;
+        }
+
+        .thread[hidden] {
+            display: none;
+        }
+
+        .message {
+            display: grid;
+            gap: 8px;
+            max-width: 760px;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .message-avatar {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(31, 94, 142, 0.12);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .message-card {
+            padding: 16px 18px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+            line-height: 1.58;
+        }
+
+        .message.user {
+            justify-self: end;
+            width: min(100%, 700px);
+        }
+
+        .message.user .message-meta {
+            justify-content: flex-end;
+        }
+
+        .message.user .message-card {
+            border-color: rgba(31, 94, 142, 0.14);
+            background: linear-gradient(180deg, var(--surface-user-soft), var(--surface-user));
+            color: #fff;
+            border-bottom-right-radius: 8px;
+        }
+
+        .message.assistant .message-card {
+            background: rgba(255, 255, 255, 0.96);
+        }
+
+        .message.mesa .message-card {
+            border-color: rgba(160, 108, 35, 0.22);
+            background: var(--surface-mesa);
+        }
+
+        .message.mesa .message-avatar {
+            background: var(--mesa-soft);
+            color: var(--mesa);
+        }
+
+        .inline-pendency {
+            display: grid;
+            gap: 10px;
+            padding: 14px 16px;
+            border: 1px solid rgba(160, 108, 35, 0.2);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(250, 245, 236, 0.96));
+        }
+
+        .inline-pendency.resolved {
+            border-color: rgba(47, 125, 90, 0.2);
+            background: linear-gradient(180deg, rgba(241, 249, 245, 0.96), rgba(236, 246, 240, 0.96));
+        }
+
+        .inline-pendency-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .inline-pendency-head span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.78);
+            color: var(--mesa);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .inline-pendency.resolved .inline-pendency-head span {
+            color: var(--success);
+        }
+
+        .composer {
+            width: min(100%, 860px);
+            margin: 0 auto 22px;
+            display: grid;
+            gap: 12px;
+            padding: 0 26px;
+        }
+
+        .composer-context {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .composer-context strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+
+        .composer-context span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .composer-shell {
+            display: grid;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+        }
+
+        .composer-input {
+            min-height: 104px;
+            padding: 14px 16px;
+            border: 1px solid rgba(31, 94, 142, 0.08);
+            border-radius: 16px;
+            background: var(--surface-soft);
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .composer-actions,
+        .composer-shortcuts {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .composer-shortcuts {
+            justify-content: flex-start;
+        }
+
+        .shortcut {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--surface-soft);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .composer-send {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 108px;
+            min-height: 44px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 14px;
+            background: var(--accent);
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1080px) {
+            body {
+                padding: 14px;
+            }
+
+            .prototype-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                grid-template-rows: auto auto auto auto;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar,
+            .preview-strip,
+            .stage,
+            .composer {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .thread-card {
+                padding: 16px;
+            }
+
+            .thread-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .composer {
+                margin-bottom: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-shell">
+        <aside class="sidebar" aria-label="Historico de conversas">
+            <div class="brand">
+                <img src="/static/img/logo-mark-dark.svg" alt="Tariel">
+                <div class="brand-copy">
+                    <strong>Tariel Inspector</strong>
+                    <span>Preview visual do chat clean</span>
+                </div>
+            </div>
+
+            <button class="sidebar-button" type="button">Novo chat</button>
+
+            <section class="sidebar-section">
+                <span class="section-label">Historico</span>
+                <div class="conversation-list">
+                    <article class="conversation-item is-active">
+                        <div class="conversation-title">
+                            <span>Laudo 43028</span>
+                            <span class="conversation-tag mesa">Mesa</span>
+                        </div>
+                        <span class="conversation-meta">Ultimo envio do campo priorizado na leitura.</span>
+                    </article>
+
+                    <article class="conversation-item">
+                        <div class="conversation-title">
+                            <span>Patio Norte</span>
+                            <span class="conversation-tag">IA</span>
+                        </div>
+                        <span class="conversation-meta">Rascunho tecnico em andamento.</span>
+                    </article>
+
+                    <article class="conversation-item">
+                        <div class="conversation-title">
+                            <span>Unidade 08</span>
+                            <span class="conversation-tag">IA</span>
+                        </div>
+                        <span class="conversation-meta">Resumo pronto para consolidacao.</span>
+                    </article>
+                </div>
+            </section>
+
+            <div class="sidebar-footer">
+                <span class="section-label">Configuracoes</span>
+                <a class="sidebar-link" href="#">Perfil do usuario</a>
+                <a class="sidebar-link" href="#">Preferencias do workspace</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div class="topbar-copy">
+                    <strong>Ola, Gabriel. Por onde comecamos?</strong>
+                    <span>Mesmo shell do chat, com mesa avaliadora como canal da thread.</span>
+                </div>
+                <div class="profile-bubble" aria-label="Perfil do usuario">G</div>
+            </header>
+
+            <div class="preview-strip">
+                <span class="preview-badge">Preview visual</span>
+                <span class="preview-note">Teste de layout. Nao conectado ao backend nem ao fluxo real da mesa.</span>
+            </div>
+
+            <section class="stage">
+                <div class="stage-inner">
+                    <div class="channel-switch" role="tablist" aria-label="Canais da conversa">
+                        <button type="button" class="is-active" data-channel-trigger="ia" aria-selected="true">IA</button>
+                        <button type="button" data-channel-trigger="mesa" aria-selected="false">Mesa Avaliadora</button>
+                    </div>
+
+                    <section class="thread-card">
+                        <div class="thread-head">
+                            <div>
+                                <strong id="thread-title">Conversa com a IA</strong>
+                                <span id="thread-subtitle">A mesa entra como canal secundario da mesma experiencia, sem virar outro produto.</span>
+                            </div>
+                            <span class="thread-note">Coluna util de leitura entre 760px e 820px</span>
+                        </div>
+
+                        <span class="thread-history-chip">Historico anterior mantido acima, mas o envio atual sobe para a area util da leitura.</span>
+
+                        <div id="thread-ia" class="thread" data-channel-panel="ia">
+                            <article class="message assistant">
+                                <div class="message-meta">
+                                    <span class="message-avatar">T</span>
+                                    <span>Tariel IA</span>
+                                    <span>09:12</span>
+                                </div>
+                                <div class="message-card">
+                                    Posso estruturar o laudo enquanto voce coleta. Se quiser, eu separo observacoes, evidencias e pontos que ainda precisam de validacao.
+                                </div>
+                            </article>
+
+                            <article class="message user">
+                                <div class="message-meta">
+                                    <span>Voce</span>
+                                    <span>09:14</span>
+                                </div>
+                                <div class="message-card">
+                                    Liste o que ainda falta coletar para eu fechar esta inspecao e ja deixar pronto para eventual envio a mesa.
+                                </div>
+                            </article>
+
+                            <article class="message assistant">
+                                <div class="message-meta">
+                                    <span class="message-avatar">T</span>
+                                    <span>Tariel IA</span>
+                                    <span>09:14</span>
+                                </div>
+                                <div class="message-card">
+                                    Faltam tres pontos: foto frontal do conjunto, placa de identificacao em boa leitura e confirmacao do serial no relatorio anterior. Se voce quiser, o proximo passo pode ser abrir o canal da mesa so para validar a divergencia do serial.
+                                </div>
+                            </article>
+                        </div>
+
+                        <div id="thread-mesa" class="thread" data-channel-panel="mesa" hidden>
+                            <article class="message mesa">
+                                <div class="message-meta">
+                                    <span class="message-avatar">M</span>
+                                    <span>Mesa Avaliadora</span>
+                                    <span>09:18</span>
+                                </div>
+                                <div class="message-card">
+                                    Recebemos o contexto inicial do laudo. Antes da conclusao, precisamos validar o serial da placa e a foto frontal em angulo aberto.
+                                </div>
+                            </article>
+
+                            <article class="message user">
+                                <div class="message-meta">
+                                    <span>Voce</span>
+                                    <span>09:20</span>
+                                </div>
+                                <div class="message-card">
+                                    Segue o ponto que preciso validar com voces: no laudo anterior o serial finaliza em 42, mas na placa que encontrei em campo finaliza em 47. A foto frontal completa eu consigo anexar agora.
+                                </div>
+                            </article>
+
+                            <section class="inline-pendency">
+                                <div class="inline-pendency-head">
+                                    <strong>Pendencia aberta no meio da thread</strong>
+                                    <span>Pendente</span>
+                                </div>
+                                <div>
+                                    Confirmar se a divergencia do serial exige reclassificacao do ativo ou se basta registrar troca de componente no parecer.
+                                </div>
+                            </section>
+
+                            <article class="message mesa">
+                                <div class="message-meta">
+                                    <span class="message-avatar">M</span>
+                                    <span>Mesa Avaliadora</span>
+                                    <span>09:24</span>
+                                </div>
+                                <div class="message-card">
+                                    Para este caso, a mesa manteria o laudo na mesma thread. O ideal e anexar a foto frontal completa, registrar a divergencia no corpo tecnico e marcar que o serial atual difere do historico consolidado.
+                                </div>
+                            </article>
+
+                            <section class="inline-pendency resolved">
+                                <div class="inline-pendency-head">
+                                    <strong>Retorno consolidado na propria conversa</strong>
+                                    <span>Resolvido</span>
+                                </div>
+                                <div>
+                                    A pendencia deixa de ser card lateral e vira estado leve, inline, visivel no mesmo eixo da mensagem.
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <footer class="composer">
+                <div class="composer-context">
+                    <div>
+                        <strong id="composer-title">IA pronta para organizar a inspecao</strong>
+                        <span id="composer-status">Composer unico. O canal muda, mas a experiencia base continua a mesma.</span>
+                    </div>
+                    <span class="composer-note" id="composer-mode-note">Modo IA</span>
+                </div>
+
+                <div class="composer-shell">
+                    <div class="composer-input" id="composer-placeholder">
+                        Descreva o equipamento, cenario ou duvida tecnica.
+                    </div>
+
+                    <div class="composer-actions">
+                        <div class="composer-shortcuts" id="composer-shortcuts">
+                            <span class="shortcut">Anexar</span>
+                            <span class="shortcut">Foto</span>
+                            <span class="shortcut">/pendencias</span>
+                            <span class="shortcut">/mesa</span>
+                        </div>
+                        <button class="composer-send" type="button">Enviar</button>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            const channelConfig = {
+                ia: {
+                    title: "Conversa com a IA",
+                    subtitle: "A mesa entra como canal secundario da mesma experiencia, sem virar outro produto.",
+                    composerTitle: "IA pronta para organizar a inspecao",
+                    composerStatus: "Composer unico. O canal muda, mas a experiencia base continua a mesma.",
+                    modeNote: "Modo IA",
+                    placeholder: "Descreva o equipamento, cenario ou duvida tecnica.",
+                    shortcuts: ["Anexar", "Foto", "/pendencias", "/mesa"],
+                },
+                mesa: {
+                    title: "Canal da Mesa Avaliadora",
+                    subtitle: "Mesmo chat clean, com assinatura propria para retorno, pendencia e validacao tecnica.",
+                    composerTitle: "Mesa pronta para alinhamento tecnico",
+                    composerStatus: "O usuario continua no mesmo fluxo. So o destino da mensagem muda.",
+                    modeNote: "Modo Mesa",
+                    placeholder: "Escreva para a mesa avaliadora e anexe apenas o contexto necessario.",
+                    shortcuts: ["Anexar", "Foto", "Resumo do laudo", "Pendencias"],
+                },
+            };
+
+            const title = document.getElementById("thread-title");
+            const subtitle = document.getElementById("thread-subtitle");
+            const composerTitle = document.getElementById("composer-title");
+            const composerStatus = document.getElementById("composer-status");
+            const modeNote = document.getElementById("composer-mode-note");
+            const composerPlaceholder = document.getElementById("composer-placeholder");
+            const composerShortcuts = document.getElementById("composer-shortcuts");
+            const buttons = Array.from(document.querySelectorAll("[data-channel-trigger]"));
+            const panels = Array.from(document.querySelectorAll("[data-channel-panel]"));
+
+            function renderShortcuts(items) {
+                composerShortcuts.innerHTML = "";
+                items.forEach((item) => {
+                    const chip = document.createElement("span");
+                    chip.className = "shortcut";
+                    chip.textContent = item;
+                    composerShortcuts.appendChild(chip);
+                });
+            }
+
+            function setChannel(channel) {
+                const config = channelConfig[channel] || channelConfig.ia;
+                title.textContent = config.title;
+                subtitle.textContent = config.subtitle;
+                composerTitle.textContent = config.composerTitle;
+                composerStatus.textContent = config.composerStatus;
+                modeNote.textContent = config.modeNote;
+                composerPlaceholder.textContent = config.placeholder;
+                renderShortcuts(config.shortcuts);
+
+                buttons.forEach((button) => {
+                    const active = button.dataset.channelTrigger === channel;
+                    button.classList.toggle("is-active", active);
+                    button.setAttribute("aria-selected", active ? "true" : "false");
+                });
+
+                panels.forEach((panel) => {
+                    panel.hidden = panel.dataset.channelPanel !== channel;
+                });
+            }
+
+            buttons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    setChannel(button.dataset.channelTrigger);
+                });
+            });
+
+            setChannel("ia");
+        })();
+    </script>
+</body>
+</html>

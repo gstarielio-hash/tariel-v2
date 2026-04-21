@@ -1,0 +1,117 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr35_montagem_linha_de_vida",
+  "template_code": "nr35_montagem_linha_de_vida",
+  "tokens": {
+    "cliente_nome": "Planta Piloto NR35",
+    "unidade_nome": "Moega Leste",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 2026-00114",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "MONT-2026-011",
+    "empresa_nome": "Planta Piloto NR35",
+    "unidade_nome": "Moega Leste",
+    "data_execucao": "2026-04-14",
+    "data_emissao": "2026-04-14",
+    "status_mesa": "rascunho",
+    "wave_portfolio": 1,
+    "modalidade_laudo": "montagem_linha_de_vida"
+  },
+  "mesa_review": {
+    "status": "rascunho",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": null,
+    "observacoes_mesa": "Familia de montagem mantida com evidencias dos componentes, fixacoes e tensionamento."
+  },
+  "resumo_executivo": "A montagem da linha de vida horizontal da moega leste foi concluida com fixacoes principais executadas, tensionamento realizado e restricao apenas para inspecao final do ponto intermediario.",
+  "identificacao": {
+    "objeto_principal": "Linha de vida horizontal da moega leste",
+    "localizacao": "Cobertura da moega leste",
+    "codigo_interno": "LVH-MO-L",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": ["IMG_940"],
+      "referencias_texto": "IMG_940 - vista geral da linha montada",
+      "descricao": "Vista geral do trecho montado da linha de vida.",
+      "observacao": "Ancoragem principal do escopo executado."
+    }
+  },
+  "escopo_servico": {
+    "tipo_entrega": "montagem",
+    "modo_execucao": "in_loco",
+    "ativo_tipo": "linha_de_vida_horizontal",
+    "resumo_escopo": "Montagem e ajuste final de linha de vida horizontal para manutencao na moega leste."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Montagem dos suportes, instalacao do cabo, fixacao terminal e tensionamento final do sistema.",
+    "condicoes_observadas": "Estrutura suporte apta; ponto intermediario com necessidade de reaperto apos conferencia final.",
+    "parametros_relevantes": "Trecho de 18 m; cabo de aco inox; dois terminais, um absorvedor e tres suportes intermediarios.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": ["IMG_941", "IMG_942"],
+      "referencias_texto": "IMG_941 - suporte inicial; IMG_942 - tensionamento final",
+      "descricao": "Evidencias da montagem e do tensionamento executado em campo.",
+      "observacao": "As imagens sustentam o fechamento da execucao."
+    }
+  },
+  "execucao_montagem": {
+    "componentes_instalados": "Cabo de aco, suportes terminais, suportes intermediarios e absorvedor de energia instalados no trecho principal.",
+    "fixacoes_e_suportes": "Fixacoes principais concluidas; suporte intermediario 02 requer reaperto de conferencia.",
+    "alinhamento_ou_tensionamento": "Tensionamento final executado e alinhamento visual satisfatorio em todo o trecho.",
+    "liberacao_para_uso": "Sistema com liberacao condicionada a conferencia final do suporte intermediario 02."
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": ["IMG_942"],
+      "referencias_texto": "IMG_942 - tensionamento final",
+      "descricao": "Registro principal do fechamento da montagem com cabo tensionado.",
+      "observacao": "Sustenta a condicao final do sistema."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": ["IMG_941", "IMG_943"],
+      "referencias_texto": "IMG_941 - suporte inicial; IMG_943 - suporte intermediario 02",
+      "descricao": "Registros complementares dos pontos criticos da montagem.",
+      "observacao": "Inclui o ponto que requer reaperto final."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": ["DOC_810"],
+      "referencias_texto": "DOC_810 - lista_materiais_e_montagem.pdf",
+      "descricao": "Lista de materiais e instrucao de montagem vinculadas ao servico.",
+      "observacao": "Documento de apoio, nao obrigatorio."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Lista de materiais, instrucao de montagem e ART da instalacao.",
+    "documentos_emitidos": "Registro tecnico da montagem da linha de vida horizontal da moega leste.",
+    "observacoes_documentais": "Atualizar o checklist final apos reaperto do suporte intermediario 02."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Suporte intermediario 02 requer conferencia final de aperto antes da liberacao plena do sistema.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": ["IMG_943"],
+      "referencias_texto": "IMG_943 - suporte intermediario 02",
+      "descricao": "Registro do ponto pendente de reaperto.",
+      "observacao": "Nao impede a conclusao da montagem, mas condiciona a liberacao."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Executar reaperto final do suporte intermediario 02, registrar a conferencia e entao liberar o sistema para uso."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "A montagem da linha de vida foi concluida com rastreabilidade suficiente, restando apenas ajuste final localizado antes da liberacao plena.",
+    "justificativa": "Os componentes principais foram instalados e registrados, e a pendencia remanescente e pontual e claramente delimitada."
+  }
+}

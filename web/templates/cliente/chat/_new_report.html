@@ -1,0 +1,35 @@
+<section
+    id="chat-new"
+    class="surface-stage"
+    data-chat-panel="new"
+    role="tabpanel"
+    aria-labelledby="chat-section-tab-new"
+    {% if (cliente_chat_section_inicial | default('overview')) != 'new' %}hidden{% endif %}
+>
+    <div class="surface-stage-head">
+        <div>
+            <span class="surface-stage-kicker">Novo caso</span>
+            <h3>Abertura guiada de laudo</h3>
+            <p class="box-subtitle">Abra um novo laudo sem interromper o acompanhamento do caso em andamento.</p>
+        </div>
+    </div>
+
+    <article class="box workspace-box workspace-box--compose">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Novo laudo</h3>
+                <p class="box-subtitle">Escolha um modelo liberado para a empresa e inicie a abertura com contexto limpo.</p>
+                <div id="chat-new-policy-hint" class="toolbar-meta"></div>
+            </div>
+        </div>
+
+        <form id="form-chat-laudo" class="stack">
+            <label>
+                Modelo liberado
+                <select id="chat-tipo-template"></select>
+            </label>
+            <div id="chat-capacidade-nota"></div>
+            <button id="btn-chat-laudo-criar" class="btn primary" type="submit">Criar laudo</button>
+        </form>
+    </article>
+</section>

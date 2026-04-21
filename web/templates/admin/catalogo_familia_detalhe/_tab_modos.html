@@ -1,0 +1,90 @@
+                <section class="catalog-tab-panel" id="catalog-panel-modos">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Execucao</p>
+                                <h2>Modos de execucao</h2>
+                                <p class="catalog-panel__description">Primeiro voce ve o que ja existe. Cada modo descreve uma forma de executar a familia sem misturar isso com o pacote comercial.</p>
+                            </div>
+                            <button type="button" class="catalog-btn catalog-btn--primary" data-catalog-open-disclosure="mode-form">Novo modo</button>
+                        </div>
+
+                        <div class="catalog-state-grid">
+                            <article class="catalog-card">
+                                <h3>Estado atual</h3>
+                                <p>
+                                    {% if technical_modes %}
+                                    {{ technical_modes | length }} forma(s) de uso registrada(s) para esta família.
+                                    {% else %}
+                                    Nenhuma forma de uso separada foi criada ainda. A família segue o fluxo padrão.
+                                    {% endif %}
+                                </p>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Quando usar</h3>
+                                <p>Modo nao e pacote comercial. Ele serve para separar formas de execucao sem misturar isso com a venda.</p>
+                            </article>
+                        </div>
+
+                        <div class="catalog-card-grid catalog-card-grid--compact">
+                            {% for item in technical_modes %}
+                            <article class="catalog-card">
+                                <div class="catalog-card__header">
+                                    <div>
+                                        <strong>{{ item.display_name | e }}</strong>
+                                        <span class="catalog-card__caption">{{ item.updated_at_label | e }}</span>
+                                    </div>
+                                    <span class="catalog-chip">{{ 'Ativo' if item.active else 'Inativo' }}</span>
+                                </div>
+                                <p>{{ item.description | default('Sem descricao registrada.', true) | e }}</p>
+                                <p class="catalog-card__meta">Responsavel: {{ item.actor_label | e }} • {{ item.updated_at_label | e }}</p>
+                            </article>
+                            {% else %}
+                            <article class="catalog-empty-card">
+                                <strong>Nenhum modo registrado.</strong>
+                                <p>Abra o formulario apenas quando realmente precisar criar uma nova forma de execucao.</p>
+                            </article>
+                            {% endfor %}
+                        </div>
+
+                        <details class="catalog-disclosure" id="mode-form">
+                            <summary>Novo modo de execucao</summary>
+                            <form class="catalog-form" method="POST" action="/admin/catalogo-laudos/familias/{{ family.family_key | e }}/modos">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="return_to" value="{{ family_detail_base }}?tab=modos#modos">
+                                <div class="catalog-form__grid">
+                                    <label>
+                                        <span>Codigo do modo</span>
+                                        <input type="text" name="mode_key" maxlength="80" placeholder="periodica" required>
+                                    </label>
+                                    <label>
+                                        <span>Nome do modo</span>
+                                        <input type="text" name="nome_exibicao" maxlength="120" placeholder="Periódica" required>
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Descrição</span>
+                                        <textarea name="descricao" rows="4" placeholder="Explique quando este modo deve ser usado e o que muda na execucao."></textarea>
+                                    </label>
+                                </div>
+                                <details class="catalog-advanced">
+                                    <summary>Ver regras avancadas do modo</summary>
+                                    <div class="catalog-form__grid">
+                                        <label class="catalog-form__field catalog-form__field--wide">
+                                            <span>Regras adicionais (JSON)</span>
+                                            <textarea name="regras_adicionais_json" rows="6"></textarea>
+                                        </label>
+                                        <label class="catalog-form__field catalog-form__field--wide">
+                                            <span>Compatibilidade com modelo (JSON)</span>
+                                            <textarea name="compatibilidade_template_json" rows="6"></textarea>
+                                        </label>
+                                        <label class="catalog-form__field catalog-form__field--wide">
+                                            <span>Compatibilidade com oferta (JSON)</span>
+                                            <textarea name="compatibilidade_oferta_json" rows="6"></textarea>
+                                        </label>
+                                    </div>
+                                </details>
+                                <button type="submit" class="catalog-btn catalog-btn--primary">Salvar modo</button>
+                            </form>
+                        </details>
+                    </div>
+                </section>

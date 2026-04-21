@@ -1,0 +1,758 @@
+{
+  "family_key": "nr33_avaliacao_espaco_confinado",
+  "nome_exibicao": "NR33 - Avaliacao espaco confinado",
+  "macro_categoria": "NR33",
+  "descricao": "Execucao do servico avaliacao espaco confinado no contexto da norma seguranca e saude nos trabalhos em espacos confinados, com consolidacao de evidencias, registros de campo ou base documental e conclusao tecnica auditavel.",
+  "schema_version": 1,
+  "scope": {
+    "family_lock": true,
+    "allowed_nrs": [
+      "nr33"
+    ],
+    "allowed_contexts": [
+      "nr33_avaliacao_espaco_confinado",
+      "inspection",
+      "wave_1",
+      "nr33"
+    ],
+    "scope_signals": [
+      "servico_principal_identificado_como_nr33_avaliacao_espaco_confinado",
+      "escopo_registrado_de_forma_estruturada",
+      "evidencias_vinculadas_ao_servico",
+      "conclusao_tecnica_formalizada"
+    ],
+    "out_of_scope_examples": [
+      "troca_silenciosa_do_tipo_de_servico",
+      "mistura_de_entregaveis_sem_definicao_de_escopo",
+      "documento_sem_rastreabilidade_de_evidencias"
+    ],
+    "review_required": [
+      "quando_o_servico_principal_nao_estiver_claro",
+      "quando_houver_escopo_misto_que_induza_troca_de_familia",
+      "quando_o_caso_nao_tiver_rastreabilidade_documental_minima"
+    ]
+  },
+  "evidence_policy": {
+    "minimum_evidence": {
+      "fotos": 4,
+      "documentos": 0,
+      "textos": 1
+    },
+    "required_slots": [
+      {
+        "slot_id": "referencia_principal",
+        "label": "Referencia principal",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "identificacao.referencia_principal",
+        "purpose": "Vincular a referencia principal do objeto do servico nr33_avaliacao_espaco_confinado."
+      },
+      {
+        "slot_id": "evidencia_execucao",
+        "label": "Evidencia de execucao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "execucao_servico.evidencia_execucao",
+        "purpose": "Registrar a execucao principal do servico com evidencia rastreavel."
+      },
+      {
+        "slot_id": "evidencia_principal",
+        "label": "Evidencia principal",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.evidencia_principal",
+        "purpose": "Consolidar a evidencia principal que sustenta a conclusao do servico."
+      },
+      {
+        "slot_id": "conclusao_servico",
+        "label": "Conclusao do servico",
+        "accepted_types": [
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "conclusao.conclusao_tecnica",
+        "purpose": "Registrar a conclusao tecnica estruturada para revisao."
+      }
+    ],
+    "optional_slots": [
+      {
+        "slot_id": "evidencia_complementar",
+        "label": "Evidencia complementar",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.evidencia_complementar",
+        "purpose": "Registrar evidencias complementares que contextualizem o servico."
+      },
+      {
+        "slot_id": "documento_base",
+        "label": "Documento base",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.documento_base",
+        "purpose": "Vincular documentos de apoio quando disponiveis."
+      },
+      {
+        "slot_id": "registro_lacuna_ou_ponto",
+        "label": "Registro de lacuna ou ponto de atencao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "nao_conformidades_ou_lacunas.evidencias",
+        "purpose": "Registrar visualmente ou documentalmente os pontos de atencao do servico."
+      }
+    ],
+    "checklist_groups": [
+      {
+        "group_id": "identificacao_e_escopo",
+        "title": "Identificacao e escopo",
+        "required": true,
+        "items": [
+          {
+            "item_id": "objeto_registrado",
+            "label": "Objeto principal registrado",
+            "critical": true
+          },
+          {
+            "item_id": "localizacao_registrada",
+            "label": "Localizacao registrada",
+            "critical": true
+          },
+          {
+            "item_id": "escopo_registrado",
+            "label": "Escopo registrado",
+            "critical": true
+          }
+        ]
+      },
+      {
+        "group_id": "execucao_e_evidencias",
+        "title": "Execucao e evidencias",
+        "required": true,
+        "items": [
+          {
+            "item_id": "metodo_registrado",
+            "label": "Metodo aplicado registrado",
+            "critical": true
+          },
+          {
+            "item_id": "evidencia_principal_vinculada",
+            "label": "Evidencia principal vinculada",
+            "critical": true
+          },
+          {
+            "item_id": "documento_base_registrado_quando_existente",
+            "label": "Documento base registrado quando existente",
+            "critical": false
+          }
+        ]
+      },
+      {
+        "group_id": "conclusao_e_pontos",
+        "title": "Conclusao e pontos de atencao",
+        "required": true,
+        "items": [
+          {
+            "item_id": "conclusao_registrada",
+            "label": "Conclusao tecnica registrada",
+            "critical": true
+          },
+          {
+            "item_id": "pontos_de_atencao_registrados",
+            "label": "Pontos de atencao registrados ou ausencia declarada",
+            "critical": true
+          },
+          {
+            "item_id": "recomendacoes_registradas",
+            "label": "Recomendacoes registradas",
+            "critical": false
+          }
+        ]
+      }
+    ],
+    "review_required": [
+      "quando_as_evidencias_minimas_nao_forem_atendidas",
+      "quando_a_referencia_principal_estiver_ilegivel_sem_documento_equivalente",
+      "quando_houver_duvida_sobre_qual_documento_base_ancora_o_servico"
+    ]
+  },
+  "review_policy": {
+    "requires_family_lock": true,
+    "block_on_scope_mismatch": true,
+    "block_on_missing_required_evidence": true,
+    "block_on_critical_field_absent": true,
+    "allow_override_with_reason": true,
+    "allowed_override_cases": [
+      "documento_opcional_ausente_com_justificativa_registrada",
+      "evidencia_complementar_substituida_por_registro_textual_com_rastreabilidade",
+      "limitacao_controlada_sem_impacto_na_conclusao_critica"
+    ],
+    "blocking_conditions": [
+      "escopo_principal_divergente_da_familia",
+      "troca_silenciosa_da_familia_principal",
+      "ausencia_de_objeto_principal",
+      "ausencia_de_localizacao",
+      "ausencia_de_slot_obrigatorio",
+      "ausencia_de_conclusao_tecnica"
+    ],
+    "non_blocking_conditions": [
+      "documento_complementar_nao_disponivel",
+      "evidencia_opcional_ausente_sem_impacto_critico",
+      "lacuna_documental_secundaria_registrada"
+    ],
+    "preferred_pendencia_types": [
+      "solicitar_foto",
+      "solicitar_documento",
+      "pedir_confirmacao",
+      "apontar_inconsistencia",
+      "corrigir_familia",
+      "evidencia_insuficiente",
+      "campo_critico_ausente",
+      "revisao_conclusao",
+      "aprovacao_com_ressalva"
+    ],
+    "review_required": [
+      "qualquer_override_deve_ser_justificado_e_revisado_pela_mesa",
+      "casos_com_inconsistencia_entre_evidencia_e_registro_textual_devem_ir_para_revisao",
+      "casos_com_duvida_de_enquadramento_devem_ser_bloqueados_para_revisao"
+    ]
+  },
+  "document_blueprint": {
+    "opening_statement": "Template governado para avaliacao de espaco confinado, estruturado para cenario, perigos, controles, evidencias e conclusao auditavel.",
+    "section_order": [
+      "controle_documental_sumario",
+      "resumo_executivo",
+      "objeto_escopo_base_normativa",
+      "identificacao_tecnica_do_objeto",
+      "metodologia_instrumentos_equipe",
+      "analise_de_risco",
+      "evidencias_registros_fotograficos",
+      "nao_conformidades_criticidade",
+      "conclusao",
+      "assinaturas_responsabilidade_tecnica"
+    ],
+    "signature_roles": [
+      {
+        "role": "Responsavel tecnico",
+        "name_paths": [
+          "tokens.engenheiro_responsavel",
+          "tenant_branding.contact_name"
+        ],
+        "detail_paths": [
+          "tokens.crea_art"
+        ],
+        "date_paths": [
+          "case_context.data_emissao",
+          "document_control.issue_date"
+        ]
+      },
+      {
+        "role": "Responsavel pela operacao",
+        "name_paths": [
+          "tenant_branding.contact_name",
+          "tokens.cliente_responsavel"
+        ],
+        "detail_paths": [
+          "tenant_branding.display_name",
+          "tenant_branding.cnpj"
+        ],
+        "date_paths": [
+          "case_context.data_emissao"
+        ]
+      }
+    ],
+    "blank_row_targets": {
+      "risk": 4,
+      "evidence": 5,
+      "findings": 4
+    },
+    "section_intros": {
+      "analise_de_risco": "Matriz-base para perigo, cenario, severidade, probabilidade, controles e acoes recomendadas do espaco confinado."
+    },
+    "field_semantics": {
+      "analise_de_risco": "instance_fill",
+      "documentacao_e_registros": "instance_fill"
+    }
+  },
+  "output_schema_seed": {
+    "sections": [
+      {
+        "section_id": "identificacao",
+        "title": "Identificacao do Objeto",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "objeto_principal",
+            "label": "Objeto principal",
+            "type": "text",
+            "required": true,
+            "critical": true,
+            "binding_path": "identificacao.objeto_principal",
+            "source_hint": "Identificacao principal do servico, ativo, pacote ou turma."
+          },
+          {
+            "field_id": "localizacao",
+            "label": "Localizacao",
+            "type": "text",
+            "required": true,
+            "critical": true,
+            "binding_path": "identificacao.localizacao",
+            "source_hint": "Referencia de localizacao do servico."
+          },
+          {
+            "field_id": "referencia_principal",
+            "label": "Referencia principal",
+            "type": "document_ref",
+            "required": false,
+            "critical": false,
+            "binding_path": "identificacao.referencia_principal",
+            "source_hint": "Slot referencia_principal."
+          },
+          {
+            "field_id": "codigo_interno",
+            "label": "Codigo interno",
+            "type": "text",
+            "required": false,
+            "critical": false,
+            "binding_path": "identificacao.codigo_interno",
+            "source_hint": "Codigo interno do servico quando existir."
+          }
+        ]
+      },
+      {
+        "section_id": "escopo_servico",
+        "title": "Escopo do Servico",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "tipo_entrega",
+            "label": "Tipo de entrega",
+            "type": "text",
+            "required": true,
+            "critical": false,
+            "binding_path": "escopo_servico.tipo_entrega",
+            "source_hint": "Natureza do servico contratado."
+          },
+          {
+            "field_id": "modo_execucao",
+            "label": "Modo de execucao",
+            "type": "text",
+            "required": true,
+            "critical": false,
+            "binding_path": "escopo_servico.modo_execucao",
+            "source_hint": "Modo principal de execucao do servico."
+          },
+          {
+            "field_id": "ativo_tipo",
+            "label": "Tipo de ativo ou escopo",
+            "type": "text",
+            "required": false,
+            "critical": false,
+            "binding_path": "escopo_servico.ativo_tipo",
+            "source_hint": "Tipo principal de ativo ou escopo do servico."
+          },
+          {
+            "field_id": "resumo_escopo",
+            "label": "Resumo do escopo",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "escopo_servico.resumo_escopo",
+            "source_hint": "Sintese objetiva do escopo entregue."
+          }
+        ]
+      },
+      {
+        "section_id": "execucao_servico",
+        "title": "Execucao do Servico",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "metodo_aplicado",
+            "label": "Metodo aplicado",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "execucao_servico.metodo_aplicado",
+            "source_hint": "Como o servico foi executado."
+          },
+          {
+            "field_id": "condicoes_observadas",
+            "label": "Condicoes observadas",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "execucao_servico.condicoes_observadas",
+            "source_hint": "Condicoes observadas durante a execucao."
+          },
+          {
+            "field_id": "parametros_relevantes",
+            "label": "Parametros relevantes",
+            "type": "textarea",
+            "required": false,
+            "critical": false,
+            "binding_path": "execucao_servico.parametros_relevantes",
+            "source_hint": "Parametros, leituras ou premissas relevantes do servico."
+          },
+          {
+            "field_id": "evidencia_execucao",
+            "label": "Evidencia de execucao",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "execucao_servico.evidencia_execucao",
+            "source_hint": "Slot evidencia_execucao."
+          }
+        ]
+      },
+      {
+        "section_id": "evidencias_e_anexos",
+        "title": "Evidencias e Anexos",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "evidencia_principal",
+            "label": "Evidencia principal",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "evidencias_e_anexos.evidencia_principal",
+            "source_hint": "Slot evidencia_principal."
+          },
+          {
+            "field_id": "evidencia_complementar",
+            "label": "Evidencia complementar",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "evidencias_e_anexos.evidencia_complementar",
+            "source_hint": "Slot evidencia_complementar."
+          },
+          {
+            "field_id": "documento_base",
+            "label": "Documento base",
+            "type": "document_ref",
+            "required": false,
+            "critical": false,
+            "binding_path": "evidencias_e_anexos.documento_base",
+            "source_hint": "Slot documento_base."
+          }
+        ]
+      },
+      {
+        "section_id": "documentacao_e_registros",
+        "title": "Documentacao e Registros",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "documentos_disponiveis",
+            "label": "Documentos disponiveis",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "documentacao_e_registros.documentos_disponiveis",
+            "source_hint": "Registro textual dos documentos disponiveis."
+          },
+          {
+            "field_id": "documentos_emitidos",
+            "label": "Documentos emitidos",
+            "type": "textarea",
+            "required": false,
+            "critical": false,
+            "binding_path": "documentacao_e_registros.documentos_emitidos",
+            "source_hint": "Pacote ou entregavel emitido pelo servico."
+          },
+          {
+            "field_id": "observacoes_documentais",
+            "label": "Observacoes documentais",
+            "type": "textarea",
+            "required": false,
+            "critical": false,
+            "binding_path": "documentacao_e_registros.observacoes_documentais",
+            "source_hint": "Observacoes documentais complementares."
+          }
+        ]
+      },
+      {
+        "section_id": "nao_conformidades_ou_lacunas",
+        "title": "Nao Conformidades ou Lacunas",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "ha_pontos_de_atencao",
+            "label": "Ha pontos de atencao",
+            "type": "boolean",
+            "required": true,
+            "critical": false,
+            "binding_path": "nao_conformidades_ou_lacunas.ha_pontos_de_atencao",
+            "source_hint": "Registro do servico sobre a existencia de pontos de atencao."
+          },
+          {
+            "field_id": "descricao",
+            "label": "Descricao",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "nao_conformidades_ou_lacunas.descricao",
+            "source_hint": "Descricao das lacunas, pontos de atencao ou ausencia declarada."
+          },
+          {
+            "field_id": "evidencias",
+            "label": "Evidencias relacionadas",
+            "type": "image_slot",
+            "required": false,
+            "critical": false,
+            "binding_path": "nao_conformidades_ou_lacunas.evidencias",
+            "source_hint": "Slot registro_lacuna_ou_ponto."
+          }
+        ]
+      },
+      {
+        "section_id": "recomendacoes",
+        "title": "Recomendacoes",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "texto",
+            "label": "Recomendacoes",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "recomendacoes.texto",
+            "source_hint": "Recomendacoes e proximos passos do servico."
+          }
+        ]
+      },
+      {
+        "section_id": "conclusao",
+        "title": "Conclusao",
+        "required": true,
+        "fields": [
+          {
+            "field_id": "status",
+            "label": "Status",
+            "type": "enum",
+            "required": true,
+            "critical": false,
+            "binding_path": "conclusao.status",
+            "source_hint": "Status final do servico."
+          },
+          {
+            "field_id": "conclusao_tecnica",
+            "label": "Conclusao tecnica",
+            "type": "textarea",
+            "required": true,
+            "critical": true,
+            "binding_path": "conclusao.conclusao_tecnica",
+            "source_hint": "Conclusao tecnica do servico."
+          },
+          {
+            "field_id": "justificativa",
+            "label": "Justificativa",
+            "type": "textarea",
+            "required": true,
+            "critical": false,
+            "binding_path": "conclusao.justificativa",
+            "source_hint": "Sintese das evidencias e fundamentos da conclusao."
+          }
+        ]
+      }
+    ],
+    "conclusion_model": {
+      "required_inputs": [
+        "identificacao.objeto_principal",
+        "identificacao.localizacao",
+        "escopo_servico.resumo_escopo",
+        "execucao_servico.metodo_aplicado",
+        "execucao_servico.condicoes_observadas",
+        "conclusao.conclusao_tecnica"
+      ],
+      "status_options": [
+        "conforme",
+        "nao_conforme",
+        "ajuste",
+        "pendente"
+      ],
+      "notes": "A conclusao da familia nr33_avaliacao_espaco_confinado depende da identificacao, do escopo, do registro de execucao e da evidencia principal vinculada."
+    },
+    "review_required": [
+      "validar_os_bindings_definitivos_entre_slots_e_template",
+      "confirmar_enums_fechados_do_status_final_do_servico"
+    ]
+  },
+  "template_binding_hints": {
+    "preferred_template_codes": [
+      "nr33_avaliacao_espaco_confinado",
+      "nr33_avaliacao_espaco_confinado"
+    ],
+    "suggested_binding_paths": [
+      "identificacao.objeto_principal",
+      "identificacao.localizacao",
+      "identificacao.referencia_principal",
+      "escopo_servico.tipo_entrega",
+      "escopo_servico.modo_execucao",
+      "escopo_servico.resumo_escopo",
+      "execucao_servico.metodo_aplicado",
+      "execucao_servico.condicoes_observadas",
+      "execucao_servico.evidencia_execucao",
+      "evidencias_e_anexos.evidencia_principal",
+      "evidencias_e_anexos.documento_base",
+      "documentacao_e_registros.documentos_disponiveis",
+      "documentacao_e_registros.documentos_emitidos",
+      "nao_conformidades_ou_lacunas.descricao",
+      "recomendacoes.texto",
+      "conclusao.status",
+      "conclusao.conclusao_tecnica"
+    ],
+    "expected_image_slots": [
+      "referencia_principal",
+      "evidencia_execucao",
+      "evidencia_principal",
+      "evidencia_complementar",
+      "registro_lacuna_ou_ponto"
+    ]
+  },
+  "notes": {
+    "assumptions": [
+      "A familia foi gerada a partir do roadmap nacional de NRs do produto Tariel.",
+      "O modelo usa contrato canonico de laudo_output e template_master compativel com o renderer atual.",
+      "Detalhamento setorial e comercial pode ser refinado sem quebrar o contrato base gerado."
+    ],
+    "open_questions": [
+      "Validar em operacao real se o servico exige campo tecnico adicional alem do seed generico.",
+      "Confirmar se existe exigencia de documento ancora especifico para todos os casos desta familia."
+    ]
+  },
+  "normative_basis": {
+    "policy_version": 1,
+    "status": "official_basis_family_mapped",
+    "nr_code": "nr33",
+    "nr_title": "Seguranca e Saude nos Trabalhos em Espacos Confinados",
+    "editorial_inference_notice": "A norma oficial define os requisitos de referencia; headings, ordem, linguagem editorial e acabamento visual do template sao decisoes de produto da Tariel.",
+    "implementation_note": "Retrofit oficial aplicado para avaliacao de espaco confinado, com anchors granulares da NR-33 e do guia tecnico oficial para caracterizacao do espaco, reconhecimento de riscos, monitoramento atmosferico e controles administrativos.",
+    "sources": [
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Normas Regulamentadoras - NR",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+        "used_for": "Ponto de entrada oficial do projeto para localizar textos vigentes, anexos e atualizacoes das NRs."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Seguranca e Saude nos Trabalhos em Espacos Confinados",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-33.pdf",
+        "anchors": [
+          {
+            "item_ref": "33.1.1 / 33.2.1.b / 33.2.1.c",
+            "used_for": "Fixar o escopo da familia na identificacao dos espacos confinados e dos riscos especificos de cada ambiente avaliado."
+          },
+          {
+            "item_ref": "33.3.1 / 33.3.2.a / 33.3.2.b / 33.3.2.c / 33.3.2.f / 33.3.2.h",
+            "used_for": "Cobrir planejamento da gestao, isolamento e sinalizacao, avaliacao atmosferica inicial e monitoramento continuo do espaco."
+          },
+          {
+            "item_ref": "33.3.2.d / 33.3.2.4 / 33.3.2.5",
+            "used_for": "Amarrar medidas tecnicas de travamento, bloqueio, eliminacao de riscos de incendio, explosao, inundacao, soterramento e choque eletrico."
+          },
+          {
+            "item_ref": "33.3.3.a / 33.3.3.b / 33.3.3.c / 33.3.3.d / 33.3.3.3 / 33.3.3.4",
+            "used_for": "Vincular cadastro, procedimento de trabalho, sinalizacao permanente e revisao periodica da avaliacao com participacao das estruturas de SST."
+          }
+        ],
+        "used_for": "Texto oficial vigente da NR-33 usado como base normativa primaria desta familia."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Guia Tecnico da NR-33 (ano 2013)",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/escola/e-biblioteca/guia-tecnico-da-nr-33-ano-2013.pdf/@@download/file",
+        "anchors": [
+          {
+            "item_ref": "Comentarios 33.1.1",
+            "used_for": "Apoiar a interpretacao oficial sobre entrada, trabalho e saida segura a partir dos riscos do espaco e da atividade."
+          },
+          {
+            "item_ref": "Comentarios 33.3.2",
+            "used_for": "Detalhar a leitura oficial sobre isolamento, avaliacao de atmosfera, bloqueio, etiquetagem e medidas tecnicas de prevencao."
+          },
+          {
+            "item_ref": "Comentarios 33.3.3.3 e 33.3.3.4",
+            "used_for": "Apoiar a exigencia de procedimento documentado, analise de risco e revisao periodica da avaliacao do espaco confinado."
+          }
+        ],
+        "used_for": "Fonte oficial interpretativa de apoio para detalhar os controles de avaliacao do espaco confinado sem inovar obrigacoes."
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "space_identification_and_risk_inventory",
+        "source_refs": [
+          "NR33 33.1.1",
+          "NR33 33.2.1.b",
+          "NR33 33.2.1.c"
+        ],
+        "maps_to": [
+          "identificacao.referencia_principal",
+          "escopo_servico.resumo_escopo",
+          "checklist_componentes"
+        ],
+        "application_note": "A avaliacao precisa deixar claro qual espaco foi caracterizado, quais sao seus limites de acesso e quais riscos inerentes foram reconhecidos antes da entrada."
+      },
+      {
+        "requirement_id": "atmospheric_monitoring_and_technical_controls",
+        "source_refs": [
+          "NR33 33.3.2.f",
+          "NR33 33.3.2.h",
+          "NR33 33.3.2.4",
+          "NR33 33.3.2.5"
+        ],
+        "maps_to": [
+          "execucao_servico.metodo_aplicado",
+          "checklist_componentes.medicoes_ou_testes",
+          "evidencias_e_anexos.evidencia_principal"
+        ],
+        "application_note": "O laudo deve registrar como a atmosfera foi avaliada, quais controles tecnicos foram ativados e quais evidencias sustentam que a permanencia no espaco era segura."
+      },
+      {
+        "requirement_id": "administrative_controls_and_periodic_review",
+        "source_refs": [
+          "NR33 33.3.3.a",
+          "NR33 33.3.3.c",
+          "NR33 33.3.3.3",
+          "NR33 33.3.3.4"
+        ],
+        "maps_to": [
+          "documentacao_e_registros.documentos_disponiveis",
+          "recomendacoes.texto",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "A conclusao deve indicar se o cadastro, a sinalizacao, o procedimento e a rotina de revisao do espaco confinado estao completos e se exigem adequacao."
+      }
+    ]
+  }
+}

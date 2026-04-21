@@ -1,0 +1,23 @@
+---
+import AuthShell from "@/components/app/auth/auth-shell.astro";
+
+export const prerender = false;
+---
+
+<AuthShell
+  title="Admin-CEO | Tariel Astro"
+  description="Tela de autenticacao migrada para o portal administrativo."
+  portalLabel="Admin-CEO"
+  heroTitle="Login administrativo isolado do legado e pronto para a nova stack."
+  heroCopy="Esta fatia entrega o shell de autenticacao do admin em Astro + React, preservando a leitura executiva da interface atual e abrindo caminho para MFA, sessao e auditoria sobre a nova camada Node/TypeScript."
+  heroItems={[
+    "Estrutura pronta para encaixar CSRF, MFA e providers de identidade corporativa.",
+    "Mesmo vocabulário visual do Admin-CEO atual, sem depender do CSS antigo.",
+    "Base reutilizavel para futuras telas de configuracao e seguranca.",
+    "Facilita migrar o painel administrativo por partes, sem big bang.",
+  ]}
+  supportText="Quer um acesso? Fale com a Tariel."
+  submitLabel="Acessar"
+  previewMessage="Tela pronta. A conexao com autenticacao real do Admin-CEO entra na proxima fase do backend novo."
+  variant="admin"
+/>

@@ -1,0 +1,191 @@
+---
+import { ArrowUpRight, Boxes, KeyRound, LayoutPanelTop, Paintbrush2, Rocket, ScanSearch } from "lucide-react";
+
+import { LaunchConsole } from "@/components/marketing/launch-console";
+import { getMigrationMetrics } from "@/lib/server/dashboard-metrics";
+import StudioLayout from "@/layouts/studio-layout.astro";
+
+const metrics = await getMigrationMetrics();
+
+const bullets = [
+  {
+    icon: Rocket,
+    title: "Astro 6 SSR",
+    detail: "Configurado com adapter Node standalone para servir paginas e endpoints em runtime Node/TypeScript.",
+  },
+  {
+    icon: Paintbrush2,
+    title: "Tailwind CSS v4",
+    detail: "Configurado com o plugin oficial do Vite, sem depender da integracao legada do Astro.",
+  },
+  {
+    icon: Boxes,
+    title: "shadcn/ui + Lucide",
+    detail: "Base pronta para adicionar componentes via CLI e editar o codigo diretamente no projeto de migracao.",
+  },
+  {
+    icon: ScanSearch,
+    title: "Prisma 7 + Postgres atual",
+    detail: "Schema pode ser introspectado do banco existente e o client fica disponivel para pages, API routes e servicos server-side.",
+  },
+];
+
+const migrationRoutes = [
+  {
+    href: "/app/login",
+    icon: KeyRound,
+    title: "Portal do Inspetor",
+    detail: "Primeira autenticacao migrada com shell compartilhado e formulario em React 19.",
+  },
+  {
+    href: "/admin/login",
+    icon: KeyRound,
+    title: "Admin-CEO Login",
+    detail: "Versao nova da tela administrativa, pronta para integrar sessao e MFA.",
+  },
+  {
+    href: "/revisao/login",
+    icon: KeyRound,
+    title: "Mesa Avaliadora",
+    detail: "Mesmo shell de auth reaproveitado para o portal de revisao.",
+  },
+  {
+    href: "/admin/clientes",
+    icon: LayoutPanelTop,
+    title: "Empresas Admin",
+    detail: "Listagem administrativa com filtros, paginação e abertura do detalhe do tenant.",
+  },
+  {
+    href: "/admin/catalogo-laudos",
+    icon: LayoutPanelTop,
+    title: "Catalogo de Laudos",
+    detail: "Home e detalhe da familia ja leem o catalogo oficial, ofertas e liberacoes pelo Prisma.",
+  },
+  {
+    href: "/admin/painel",
+    icon: LayoutPanelTop,
+    title: "Admin-CEO Dashboard",
+    detail: "Painel SSR com Prisma lendo o Postgres atual para validar a migracao operacional.",
+  },
+];
+---
+
+<StudioLayout
+  title="Tariel Astro Frontend Lab"
+  description="Workspace Astro com Tailwind v4, shadcn/ui, React 19, Lucide e Vite para evolucao segura do frontend Tariel."
+>
+  <main class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.22),_transparent_35%),radial-gradient(circle_at_80%_0%,_rgba(59,130,246,0.18),_transparent_28%)]"></div>
+    <section class="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 py-20 sm:px-10">
+      <div class="grid items-center gap-14 lg:grid-cols-[1.08fr_0.92fr]">
+        <div>
+          <p class="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">
+            Tariel Frontend Lab
+            <ArrowUpRight className="size-4" />
+          </p>
+
+          <h1 class="mt-6 max-w-4xl font-display text-5xl leading-[0.96] tracking-tight text-slate-950 sm:text-6xl">
+            Um workspace Astro pronto para evoluir a interface sem tocar no portal FastAPI em producao.
+          </h1>
+
+          <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
+            Este laboratorio fica isolado em <code class="rounded bg-slate-950/8 px-2 py-1 font-mono text-sm">web/frontend-astro</code>.
+            Ele agora esta configurado como alvo de migracao: Astro no frontend e Node/TypeScript com Prisma no backend web novo, enquanto o app atual continua operando em
+            <code class="rounded bg-slate-950/8 px-2 py-1 font-mono text-sm">web/</code>.
+          </p>
+
+          <div class="mt-10 grid gap-4 sm:grid-cols-2">
+            {bullets.map(({ icon: Icon, title, detail }) => (
+              <article class="rounded-[28px] border border-slate-950/8 bg-white/80 p-5 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur">
+                <div class="flex items-center gap-3">
+                  <div class="rounded-2xl bg-slate-950 p-3 text-orange-300">
+                    <Icon className="size-5" />
+                  </div>
+                  <h2 class="font-display text-lg text-slate-950">{title}</h2>
+                </div>
+                <p class="mt-4 text-sm leading-6 text-slate-600">{detail}</p>
+              </article>
+            ))}
+          </div>
+
+          <section class="mt-8 rounded-[30px] border border-slate-950/8 bg-white/82 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-orange-700">Primeira fatia entregue</p>
+                <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">
+                  Autenticacao compartilhada, empresas e catalogo admin ja estao migrados.
+                </h2>
+              </div>
+              <p class="max-w-xl text-sm leading-6 text-slate-600">
+                A migracao segue por partes. Primeiro auth e dashboard, depois clientes e catalogo, e por ultimo os workspaces mais acoplados.
+              </p>
+            </div>
+
+            <div class="mt-6 grid gap-4 md:grid-cols-2">
+              {migrationRoutes.map(({ href, icon: Icon, title, detail }) => (
+                <a
+                  href={href}
+                  class="group rounded-[26px] border border-slate-950/8 bg-slate-50 p-5 transition hover:-translate-y-0.5 hover:border-slate-950/16 hover:bg-white"
+                >
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="rounded-2xl bg-slate-950 p-3 text-orange-300">
+                      <Icon className="size-5" />
+                    </div>
+                    <ArrowUpRight className="size-4 text-slate-400 transition group-hover:text-slate-950" />
+                  </div>
+                  <h3 class="mt-4 font-display text-xl tracking-tight text-slate-950">{title}</h3>
+                  <p class="mt-3 text-sm leading-6 text-slate-600">{detail}</p>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          <article class="mt-8 rounded-[30px] border border-slate-950/8 bg-slate-950 px-6 py-5 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)]">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-orange-200">Status Prisma</p>
+                <h2 class="mt-2 font-display text-2xl tracking-tight">
+                  {metrics.connected ? "Banco atual conectado" : "Banco ainda nao conectado"}
+                </h2>
+              </div>
+              <a
+                href="/api/db-status.json"
+                class="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-slate-100 transition hover:border-white/35 hover:bg-white/8"
+              >
+                Ver JSON de diagnostico
+                <ArrowUpRight className="size-4" />
+              </a>
+            </div>
+
+            <p class="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
+              {metrics.connected
+                ? `Leitura server-side via Prisma 7 ativa sobre o PostgreSQL atual.`
+                : `A camada Prisma ainda nao autenticou no banco. Motivo atual: ${metrics.error ?? "erro nao detalhado"}`}
+            </p>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-4">
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Empresas</p>
+                <p class="mt-3 font-display text-3xl text-white">{metrics.companies ?? "—"}</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Usuarios</p>
+                <p class="mt-3 font-display text-3xl text-white">{metrics.users ?? "—"}</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Laudos</p>
+                <p class="mt-3 font-display text-3xl text-white">{metrics.reports ?? "—"}</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Templates</p>
+                <p class="mt-3 font-display text-3xl text-white">{metrics.templates ?? "—"}</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <LaunchConsole client:load />
+      </div>
+    </section>
+  </main>
+</StudioLayout>

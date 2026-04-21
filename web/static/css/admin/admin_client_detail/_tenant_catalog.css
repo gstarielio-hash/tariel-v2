@@ -1,0 +1,207 @@
+.tenant-catalog-form {
+    display: grid;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.tenant-catalog-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.tenant-catalog-card {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid var(--tariel-border);
+    border-radius: var(--tariel-radius-md);
+    background: var(--tariel-surface-soft);
+}
+
+.tenant-catalog-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.tenant-catalog-card__header strong,
+.tenant-catalog-variant__body strong {
+    color: var(--tariel-text);
+}
+
+.tenant-catalog-card__header p,
+.tenant-catalog-card__copy {
+    margin: 4px 0 0;
+    color: var(--tariel-text-soft);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.tenant-catalog-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: var(--tariel-text-soft);
+    font-size: 12px;
+}
+
+.tenant-catalog-card__meta span {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(31, 79, 130, .08);
+    border: 1px solid rgba(31, 79, 130, .12);
+}
+
+.tenant-catalog-governance {
+    display: grid;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid rgba(191, 198, 209, .28);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .8);
+}
+
+.tenant-catalog-governance__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tenant-catalog-governance__copy {
+    display: grid;
+    gap: 4px;
+}
+
+.tenant-catalog-governance__copy small {
+    color: var(--tariel-text-soft);
+    line-height: 1.45;
+}
+
+.tenant-catalog-variants {
+    display: grid;
+    gap: 10px;
+}
+
+.tenant-catalog-variant {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(191, 198, 209, .28);
+    border-radius: 10px;
+    background: var(--tariel-surface);
+    cursor: pointer;
+}
+
+.tenant-catalog-variant input {
+    margin-top: 2px;
+}
+
+.tenant-catalog-variant__body {
+    display: grid;
+    gap: 2px;
+}
+
+.tenant-catalog-variant__body small {
+    color: var(--tariel-text-soft);
+    line-height: 1.4;
+}
+
+.tenant-catalog-variant--disabled {
+    opacity: .68;
+    cursor: not-allowed;
+}
+
+.tenant-catalog-release-disclosure {
+    border: 1px solid rgba(191, 198, 209, .28);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .8);
+}
+
+.tenant-catalog-release-disclosure summary {
+    padding: 14px 16px;
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--tariel-text);
+    list-style: none;
+}
+
+.tenant-catalog-release-disclosure summary::-webkit-details-marker {
+    display: none;
+}
+
+.tenant-catalog-release-disclosure[open] summary {
+    border-bottom: 1px solid rgba(191, 198, 209, .28);
+}
+
+.tenant-catalog-release-form {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+}
+
+.tenant-catalog-release-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.tenant-catalog-release-form__grid label {
+    display: grid;
+    gap: 8px;
+    color: var(--tariel-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.tenant-catalog-release-form__grid input,
+.tenant-catalog-release-form__grid select,
+.tenant-catalog-release-form__grid textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--tariel-border);
+    border-radius: 10px;
+    background: var(--tariel-surface);
+    color: var(--tariel-text);
+    font: inherit;
+}
+
+.tenant-catalog-release-form__grid textarea {
+    min-height: 92px;
+    resize: vertical;
+}
+
+.tenant-catalog-release-form__field--wide {
+    grid-column: 1 / -1;
+}
+
+.tenant-catalog-release-checks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.tenant-catalog-release-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-height: 46px;
+    padding: 12px;
+    border: 1px solid rgba(191, 198, 209, .28);
+    border-radius: 10px;
+    background: var(--tariel-surface);
+    color: var(--tariel-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.tenant-catalog-release-check input {
+    margin-top: 2px;
+}
+
+.tenant-catalog-release-form__submit {
+    justify-self: flex-start;
+}

@@ -1,0 +1,341 @@
+---
+import {
+  ArrowUpRight,
+  Building2,
+  FileStack,
+  ShieldCheck,
+  Sparkles,
+  Users,
+} from "lucide-react";
+
+import KpiCard from "@/components/app/admin/kpi-card.astro";
+import MiniBarChart from "@/components/app/admin/mini-bar-chart.astro";
+import StatusPill from "@/components/app/admin/status-pill.astro";
+import { getAdminDashboardData } from "@/lib/server/admin-dashboard";
+import AdminShellLayout from "@/layouts/admin-shell-layout.astro";
+
+export const prerender = false;
+
+const dashboard = await getAdminDashboardData();
+
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+function formatNumber(value: number | null) {
+  return value == null ? "—" : new Intl.NumberFormat("pt-BR").format(value);
+}
+
+function formatCurrency(value: number | null) {
+  return value == null ? "—" : currencyFormatter.format(value);
+}
+
+function startCase(value: string) {
+  return value
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function reviewTone(status: string) {
+  switch (status) {
+    case "aprovado":
+      return "success";
+    case "rejeitado":
+      return "danger";
+    default:
+      return "warning";
+  }
+}
+
+function complianceTone(status: string) {
+  if (status.includes("nao")) {
+    return "danger";
+  }
+
+  if (status.includes("conforme")) {
+    return "success";
+  }
+
+  return "info";
+}
+
+const cards = [
+  {
+    icon: Building2,
+    label: "Empresas ativas",
+    value: formatNumber(dashboard.kpis.activeCompanies),
+    detail: `${formatNumber(dashboard.kpis.totalCompanies)} empresas no total, com ${formatNumber(dashboard.kpis.blockedCompanies)} bloqueadas.`,
+    tone: "orange" as const,
+  },
+  {
+    icon: Users,
+    label: "Usuarios ativos",
+    value: formatNumber(dashboard.kpis.activeUsers),
+    detail: `${formatNumber(dashboard.kpis.adminUsers)} contas administrativas autorizadas no banco atual.`,
+    tone: "sky" as const,
+  },
+  {
+    icon: FileStack,
+    label: "Laudos em 7 dias",
+    value: formatNumber(dashboard.kpis.reportsLast7Days),
+    detail: `${formatNumber(dashboard.kpis.totalReports)} laudos acumulados desde a base atual.`,
+    tone: "slate" as const,
+  },
+  {
+    icon: Sparkles,
+    label: "Deep research",
+    value: formatNumber(dashboard.kpis.deepResearchReports),
+    detail: `${formatNumber(dashboard.kpis.templates)} templates atualmente carregados no PostgreSQL.`,
+    tone: "emerald" as const,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Receita acumulada",
+    value: formatCurrency(dashboard.kpis.totalRevenue),
+    detail: "Somatorio de custo_gerado_reais nas empresas para validar leitura administrativa via Prisma.",
+    tone: "orange" as const,
+  },
+];
+---
+
+<AdminShellLayout title="Painel Admin-CEO | Tariel Astro" activeItem="dashboard" userName="Admin-CEO">
+  <Fragment slot="header">
+    <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+      <div class="max-w-4xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Primeira tela operacional migrada</p>
+        <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950 sm:text-5xl">
+          Painel administrativo em Astro SSR com dados reais do PostgreSQL.
+        </h1>
+        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+          Esta entrega troca o dashboard inicial do `Admin-CEO` para a nova stack sem forcar uma migracao total.
+          A estrategia continua sendo: auth, shell, dashboard e depois modulos mais pesados.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="/admin/clientes"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/20 hover:bg-slate-50"
+        >
+          Ver empresas
+          <ArrowUpRight className="size-4" />
+        </a>
+        <a
+          href="/admin/catalogo-laudos"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/20 hover:bg-slate-50"
+        >
+          Ver catalogo
+          <ArrowUpRight className="size-4" />
+        </a>
+        <a
+          href="/admin/novo-cliente"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/20 hover:bg-slate-50"
+        >
+          Provisionar cliente
+          <ArrowUpRight className="size-4" />
+        </a>
+        <a
+          href="/app/login"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          Ver login inspetor
+          <ArrowUpRight className="size-4" />
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+      <StatusPill label={dashboard.connected ? "Prisma conectado" : "Sem conexao com o banco"} tone={dashboard.connected ? "success" : "danger"} />
+      <span>Atualizado em {dateTimeFormatter.format(dashboard.generatedAt)}</span>
+      <span>Astro 6 + Node SSR + Prisma 7</span>
+    </div>
+  </Fragment>
+
+  <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-5">
+    {cards.map((card) => (
+      <KpiCard label={card.label} value={card.value} detail={card.detail} icon={card.icon} tone={card.tone} />
+    ))}
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Operacao</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Ritmo de laudos nos ultimos 7 dias</h2>
+          <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            Volume lido direto do banco atual para validar a camada SSR do novo frontend.
+          </p>
+        </div>
+
+        <StatusPill label={`${formatNumber(dashboard.kpis.reportsLast7Days)} no periodo`} tone="info" />
+      </div>
+
+      <div class="mt-8">
+        <MiniBarChart series={dashboard.weeklyReports} />
+      </div>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-slate-950 p-6 text-white shadow-[0_18px_60px_rgba(15,23,42,0.16)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.24em] text-orange-200">Leitura executiva</p>
+      <h2 class="mt-3 font-display text-3xl tracking-tight">A migracao entrou na camada operacional.</h2>
+
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="rounded-[26px] border border-white/10 bg-white/5 p-4">
+          <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Admins autorizados</p>
+          <p class="mt-3 font-display text-4xl text-white">{formatNumber(dashboard.kpis.adminUsers)}</p>
+        </div>
+        <div class="rounded-[26px] border border-white/10 bg-white/5 p-4">
+          <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Empresas bloqueadas</p>
+          <p class="mt-3 font-display text-4xl text-white">{formatNumber(dashboard.kpis.blockedCompanies)}</p>
+        </div>
+      </div>
+
+      <div class="mt-6 rounded-[28px] border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300">
+        {dashboard.connected ? (
+          <p>
+            O painel ja usa Prisma 7 sobre o schema atual. Agora a nova stack cobre dashboard, carteira de empresas,
+            detalhe do tenant, onboarding inicial e catalogo administrativo sem recomecar infraestrutura.
+          </p>
+        ) : (
+          <p>
+            O layout esta pronto, mas a conexao com o banco falhou nesta execucao. Motivo atual:
+            <strong class="ml-2 text-white">{dashboard.error ?? "erro nao detalhado"}</strong>
+          </p>
+        )}
+      </div>
+    </article>
+  </section>
+
+  <section id="empresas" class="mt-8 grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Empresas</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Carteira monitorada</h2>
+          <p class="mt-3 text-sm leading-7 text-slate-600">
+            Recorte recente para validar tabela, badges e leitura de relacionamento no admin novo.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="min-w-full border-separate border-spacing-y-3">
+          <thead>
+            <tr class="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <th class="pb-1 pr-4">Empresa</th>
+              <th class="pb-1 pr-4">Plano</th>
+              <th class="pb-1 pr-4">Status</th>
+              <th class="pb-1 pr-4">Cidade</th>
+              <th class="pb-1 text-right">Custo gerado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dashboard.recentCompanies.length > 0 ? dashboard.recentCompanies.map((company) => (
+              <tr class="rounded-[20px] bg-slate-50 text-sm text-slate-700">
+                <td class="rounded-l-[20px] px-4 py-4">
+                  <div>
+                    <p class="font-semibold text-slate-950">{company.name}</p>
+                    <p class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+                      Criada em {dateTimeFormatter.format(company.createdAt)}
+                    </p>
+                  </div>
+                </td>
+                <td class="px-4 py-4">{company.plan}</td>
+                <td class="px-4 py-4">
+                  <StatusPill label={company.blocked ? "Bloqueada" : "Ativa"} tone={company.blocked ? "danger" : "success"} />
+                </td>
+                <td class="px-4 py-4">{company.city ?? "—"}</td>
+                <td class="rounded-r-[20px] px-4 py-4 text-right font-semibold text-slate-950">
+                  {formatCurrency(company.generatedCost)}
+                </td>
+              </tr>
+            )) : (
+              <tr>
+                <td colspan="5" class="rounded-[22px] bg-slate-50 px-4 py-5 text-sm text-slate-500">
+                  Nenhuma empresa encontrada na leitura atual.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article id="operacao" class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Laudos recentes</p>
+      <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Ultima atividade operacional</h2>
+      <p class="mt-3 text-sm leading-7 text-slate-600">
+        Este bloco substitui a leitura inicial do dashboard antigo com um recorte simples e util para migracao.
+      </p>
+
+      <div class="mt-6 space-y-3">
+        {dashboard.recentReports.length > 0 ? dashboard.recentReports.map((report) => (
+          <article class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="font-semibold text-slate-950">{report.companyName}</p>
+                <p class="mt-1 text-sm text-slate-600">{report.sector}</p>
+              </div>
+
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">
+                {dateTimeFormatter.format(report.createdAt)}
+              </p>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <StatusPill label={startCase(report.reviewStatus)} tone={reviewTone(report.reviewStatus)} />
+              <StatusPill label={startCase(report.complianceStatus)} tone={complianceTone(report.complianceStatus)} />
+              <StatusPill label={startCase(report.entryMode)} tone="neutral" />
+            </div>
+          </article>
+        )) : (
+          <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+            Nenhum laudo recente foi encontrado na leitura atual.
+          </div>
+        )}
+      </div>
+    </article>
+  </section>
+
+  <section id="proxima-fatia" class="mt-8 grid gap-4 lg:grid-cols-3">
+    <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-700">Proximo passo</p>
+      <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">Empresas</h3>
+      <p class="mt-3 text-sm leading-7 text-slate-600">
+        Migrar a listagem e o detalhe de cliente para reaproveitar shell, tabela e badges ja criados aqui.
+      </p>
+      <a
+        href="/admin/clientes"
+        class="mt-4 inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-50"
+      >
+        Abrir empresas
+        <ArrowUpRight className="size-4" />
+      </a>
+    </article>
+
+    <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-700">Depois</p>
+      <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">Catalogo e governanca</h3>
+      <p class="mt-3 text-sm leading-7 text-slate-600">
+        Catalogo de laudos, liberacoes e configuracoes entram como a segunda fatia admin, ainda longe do workspace pesado.
+      </p>
+    </article>
+
+    <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-700">Por ultimo</p>
+      <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">Workspace do inspetor</h3>
+      <p class="mt-3 text-sm leading-7 text-slate-600">
+        Home, historico, composer e mesa do inspetor continuam para a fase final porque concentram maior acoplamento.
+      </p>
+    </article>
+  </section>
+</AdminShellLayout>

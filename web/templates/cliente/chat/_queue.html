@@ -1,0 +1,31 @@
+<section
+    id="chat-queue"
+    class="surface-stage"
+    data-chat-panel="queue"
+    role="tabpanel"
+    aria-labelledby="chat-section-tab-queue"
+    {% if (cliente_chat_section_inicial | default('overview')) != 'queue' %}hidden{% endif %}
+>
+    <div class="surface-stage-head">
+        <div>
+            <span class="surface-stage-kicker">Fila operacional</span>
+            <h3>Laudos em andamento</h3>
+            <p class="box-subtitle">Busque e escolha o laudo certo.</p>
+        </div>
+    </div>
+
+    <article class="box workspace-box workspace-box--list">
+        <div class="toolbar">
+            <div class="toolbar-copy">
+                <h3>Fila do chat</h3>
+                <p class="box-subtitle">Filtre os laudos da empresa e entre no contexto certo.</p>
+            </div>
+            <div class="toolbar-actions">
+                <input id="chat-busca-laudos" type="search" placeholder="Buscar laudos, status ou resumo">
+            </div>
+        </div>
+
+        <div id="chat-lista-resumo" class="toolbar-meta"></div>
+        <div id="lista-chat-laudos" class="list"></div>
+    </article>
+</section>

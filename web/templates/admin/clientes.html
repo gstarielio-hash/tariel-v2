@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <title>Empresas Assinantes • Tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+
+    <link rel="icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+
+    <link rel="stylesheet" href="/static/css/admin/admin_clients.css">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app if v_app is defined else '' }}">
+</head>
+
+<body class="admin-body">
+    {% set _totais = totais_listagem or {} %}
+    {% set _filtros = filtros_listagem or {} %}
+    {% set _paginacao = pagination or {} %}
+
+    <div class="admin-layout">
+        <aside class="sidebar" aria-label="Menu administrativo">
+            <div class="logo-area logo-area--brand">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+                <span class="versao-logo">Admin-CEO</span>
+            </div>
+
+            <nav class="menu-admin" aria-label="Navegação administrativa">
+                <a href="/admin/painel" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
+                    Visão geral
+                </a>
+
+                <a href="/admin/clientes" class="item-menu ativo" aria-current="page">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    Empresas
+                </a>
+
+                <a href="/admin/catalogo-laudos" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                    Catálogo de laudos
+                </a>
+
+                <a href="/admin/auditoria" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">folder_open</span>
+                    Auditoria
+                </a>
+
+                <a href="/admin/configuracoes" class="item-menu">
+                    <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+                    Configurações
+                </a>
+
+                <form action="/admin/logout" method="POST" class="menu-admin__form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="item-menu logout-btn" aria-label="Sair do sistema">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        Sair
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="topbar">
+                <div class="titulo-pagina">
+                    <h1>Empresas assinantes</h1>
+                    <p>Operacao, acesso e saude de cada empresa em uma unica visao administrativa.</p>
+                </div>
+
+                <a href="/admin/novo-cliente" class="btn-novo-cliente" aria-label="Provisionar nova empresa assinante">
+                    <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                    Nova empresa
+                </a>
+            </header>
+
+            {% for msg in mensagens_flash %}
+            {% set _tipo_alerta = 'success' if msg.tipo == 'success' else 'error' %}
+            <div class="alert alert-{{ _tipo_alerta }}" role="alert" aria-live="assertive">
+                <span class="material-symbols-rounded" aria-hidden="true">{{ 'check_circle' if _tipo_alerta == 'success' else 'error' }}</span>
+                {{ msg.texto | e }}
+                <button type="button" class="alert-fechar" aria-label="Fechar alerta">×</button>
+            </div>
+            {% endfor %}
+
+            <section class="stats-row" aria-label="Resumo operacional da listagem">
+                <div class="stat-mini">
+                    <div class="icone icone--clientes" aria-hidden="true">
+                        <span class="material-symbols-rounded">domain</span>
+                    </div>
+                    <div>
+                        <div class="num">{{ _totais.get("clientes_total", 0) | int }}</div>
+                        <div class="label">Empresas no recorte</div>
+                    </div>
+                </div>
+
+                <div class="stat-mini">
+                    <div class="icone icone--ativos" aria-hidden="true">
+                        <span class="material-symbols-rounded">check_circle</span>
+                    </div>
+                    <div>
+                        <div class="num">{{ _totais.get("ativos", 0) | int }}</div>
+                        <div class="label">Ativas</div>
+                    </div>
+                </div>
+
+                <div class="stat-mini">
+                    <div class="icone icone--bloqueados" aria-hidden="true">
+                        <span class="material-symbols-rounded">block</span>
+                    </div>
+                    <div>
+                        <div class="num">{{ _totais.get("bloqueados", 0) | int }}</div>
+                        <div class="label">Bloqueadas</div>
+                    </div>
+                </div>
+
+                <div class="stat-mini">
+                    <div class="icone icone--clientes" aria-hidden="true">
+                        <span class="material-symbols-rounded">warning</span>
+                    </div>
+                    <div>
+                        <div class="num">{{ _totais.get("alerta", 0) | int }}</div>
+                        <div class="label">Em alerta</div>
+                    </div>
+                </div>
+
+                <div class="stat-mini">
+                    <div class="icone icone--clientes" aria-hidden="true">
+                        <span class="material-symbols-rounded">schedule</span>
+                    </div>
+                    <div>
+                        <div class="num">{{ _totais.get("sem_atividade", 0) | int }}</div>
+                        <div class="label">Sem atividade</div>
+                    </div>
+                </div>
+            </section>
+
+            <form class="filtros" method="GET" action="/admin/clientes" aria-label="Filtros de busca de empresas assinantes">
+                <div class="filtros-grid">
+                    <input type="text" name="nome" value="{{ _filtros.get('nome', filtro_nome) | e }}" maxlength="120"
+                        placeholder="Buscar por nome" aria-label="Buscar por nome da empresa">
+
+                    <input type="text" name="codigo" value="{{ _filtros.get('codigo', filtro_codigo) | e }}" maxlength="40"
+                        placeholder="Código, ID ou CNPJ" aria-label="Buscar por código, ID ou CNPJ">
+
+                    <select name="plano" aria-label="Filtrar por plano">
+                        <option value="">Todos os planos</option>
+                        <option value="Inicial" {% if (_filtros.get("plano", filtro_plano)=="Inicial" ) %}selected{% endif %}>Inicial</option>
+                        <option value="Intermediario" {% if (_filtros.get("plano", filtro_plano)=="Intermediario" ) %}selected{% endif %}>Intermediário</option>
+                        <option value="Ilimitado" {% if (_filtros.get("plano", filtro_plano)=="Ilimitado" ) %}selected{% endif %}>Ilimitado</option>
+                    </select>
+
+                    <select name="status" aria-label="Filtrar por status">
+                        <option value="">Todos os status</option>
+                        <option value="ativo" {% if (_filtros.get("status", filtro_status)=="ativo" ) %}selected{% endif %}>Ativo</option>
+                        <option value="bloqueado" {% if (_filtros.get("status", filtro_status)=="bloqueado" ) %}selected{% endif %}>Bloqueado</option>
+                        <option value="pendente" {% if (_filtros.get("status", filtro_status)=="pendente" ) %}selected{% endif %}>Pendente</option>
+                    </select>
+
+                    <select name="saude" aria-label="Filtrar por saúde operacional">
+                        <option value="">Toda saúde</option>
+                        <option value="ok" {% if (_filtros.get("saude", filtro_saude)=="ok" ) %}selected{% endif %}>OK</option>
+                        <option value="alerta" {% if (_filtros.get("saude", filtro_saude)=="alerta" ) %}selected{% endif %}>Alerta</option>
+                        <option value="critico" {% if (_filtros.get("saude", filtro_saude)=="critico" ) %}selected{% endif %}>Crítico</option>
+                    </select>
+
+                    <select name="atividade" aria-label="Filtrar por atividade recente">
+                        <option value="">Toda atividade</option>
+                        <option value="24h" {% if (_filtros.get("atividade", filtro_atividade)=="24h" ) %}selected{% endif %}>Últimas 24h</option>
+                        <option value="7d" {% if (_filtros.get("atividade", filtro_atividade)=="7d" ) %}selected{% endif %}>Últimos 7 dias</option>
+                        <option value="30d" {% if (_filtros.get("atividade", filtro_atividade)=="30d" ) %}selected{% endif %}>Últimos 30 dias</option>
+                        <option value="sem_atividade" {% if (_filtros.get("atividade", filtro_atividade)=="sem_atividade" ) %}selected{% endif %}>Sem atividade</option>
+                    </select>
+
+                    <select name="ordenar" aria-label="Ordenar por">
+                        <option value="nome" {% if (_filtros.get("ordenar", ordenar)=="nome" ) %}selected{% endif %}>Ordenar por nome</option>
+                        <option value="criacao" {% if (_filtros.get("ordenar", ordenar)=="criacao" ) %}selected{% endif %}>Ordenar por criação</option>
+                        <option value="ultimo_acesso" {% if (_filtros.get("ordenar", ordenar)=="ultimo_acesso" ) %}selected{% endif %}>Ordenar por último acesso</option>
+                        <option value="plano" {% if (_filtros.get("ordenar", ordenar)=="plano" ) %}selected{% endif %}>Ordenar por plano</option>
+                        <option value="saude" {% if (_filtros.get("ordenar", ordenar)=="saude" ) %}selected{% endif %}>Ordenar por saúde</option>
+                    </select>
+
+                    <select name="direcao" aria-label="Direção da ordenação">
+                        <option value="asc" {% if (_filtros.get("direcao", direcao)=="asc" ) %}selected{% endif %}>Ascendente</option>
+                        <option value="desc" {% if (_filtros.get("direcao", direcao)=="desc" ) %}selected{% endif %}>Descendente</option>
+                    </select>
+
+                    <select name="por_pagina" aria-label="Quantidade por página">
+                        {% for opcao in [10, 20, 50, 100] %}
+                        <option value="{{ opcao }}" {% if (_filtros.get("por_pagina", por_pagina) | int)==opcao %}selected{% endif %}>{{ opcao }} por página</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filtros-acoes">
+                    <button type="submit" class="btn-filtrar">
+                        <span class="material-symbols-rounded" aria-hidden="true">filter_alt</span>
+                        Filtrar
+                    </button>
+
+                    <a href="/admin/clientes" class="btn-limpar" aria-label="Limpar filtros">
+                        Limpar
+                    </a>
+                </div>
+            </form>
+
+            <div class="resumo-listagem" aria-live="polite">
+                <span>Página {{ _paginacao.get("page", 1) | int }} de {{ _paginacao.get("total_pages", 1) | int }}</span>
+                <span>{{ _paginacao.get("total_items", 0) | int }} empresas encontradas</span>
+            </div>
+
+            <div class="box-tabela">
+                <table class="tabela-admin clientes-tabela" aria-label="Lista de empresas assinantes">
+                    <thead>
+                        <tr>
+                            <th scope="col">Empresa</th>
+                            <th scope="col">Plano</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Saúde</th>
+                            <th scope="col">Uso resumido</th>
+                            <th scope="col" class="col-ultimo-acesso">Último acesso</th>
+                            <th scope="col">Usuários</th>
+                            <th scope="col" class="col-acoes"><span class="sr-only">Ações</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clientes %}
+                        {% set _bloqueado = c.status_value == 'bloqueado' %}
+                        <tr>
+                            <td class="empresa-cell">
+                                <strong>{{ c.nome_fantasia | e }}</strong>
+                                <div class="meta-stack">
+                                    <span class="empresa-codigo">Código {{ c.empresa_id | int }}</span>
+                                    <span>CNPJ {{ c.cnpj | e }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {% if c.plano_ativo == 'Ilimitado' %}atencao{% elif c.plano_ativo == 'Intermediario' %}info{% else %}conforme{% endif %}">
+                                    {{ c.plano_ativo | e }}
+                                </span>
+                                <div class="meta-stack">{{ c.limite_plano_label | e }} laudos/mês</div>
+                            </td>
+                            <td>
+                                <span class="badge {{ c.status_badge_class | e }}">{{ c.status_label | e }}</span>
+                                {% if c.motivo_bloqueio %}
+                                <div class="meta-stack">{{ c.motivo_bloqueio | e }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {{ c.saude_badge_class | e }}">{{ c.saude_label | e }}</span>
+                                <div class="meta-stack">{{ c.saude_razao | e }}</div>
+                            </td>
+                            <td>
+                                <div class="uso-stack">
+                                    <strong>{{ c.uso_label | e }}</strong>
+                                    <span class="meta-stack">{{ c.sessoes_ativas_total | int }} sessões ativas</span>
+                                </div>
+                            </td>
+                            <td>{{ c.ultimo_acesso_label | e }}</td>
+                            <td>
+                                <div class="uso-stack">
+                                    <strong>{{ c.usuarios_total | int }} usuários</strong>
+                                    <span class="meta-stack">{{ c.admins_total | int }} adm • {{ c.inspetores_total | int }} insp • {{ c.revisores_total | int }} rev</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="acoes-tabela">
+                                    <a href="/admin/clientes/{{ c.empresa_id | int }}" class="btn-ver"
+                                        aria-label="Ver detalhes de {{ c.nome_fantasia | e }}">
+                                        <span class="material-symbols-rounded icon-inline-sm" aria-hidden="true">open_in_new</span>
+                                        Ver detalhe
+                                    </a>
+                                    <details class="acoes-menu">
+                                        <summary class="acoes-menu__trigger">
+                                            <span class="material-symbols-rounded" aria-hidden="true">more_horiz</span>
+                                            <span>Ações</span>
+                                        </summary>
+                                        <div class="acoes-menu__content">
+                                            <form method="POST" action="/admin/clientes/{{ c.empresa_id | int }}/bloquear"
+                                                class="js-block-toggle-form"
+                                                data-empresa="{{ c.nome_fantasia | e }}"
+                                                data-blocked="{{ 'true' if _bloqueado else 'false' }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <input type="hidden" name="motivo" value="">
+                                                <input type="hidden" name="confirmar_desbloqueio" value="{{ '1' if _bloqueado else '' }}">
+                                                <button type="submit" class="acoes-menu__item {{ 'acoes-menu__item--danger' if not _bloqueado else '' }}">
+                                                    {{ 'Desbloquear empresa' if _bloqueado else 'Bloquear empresa' }}
+                                                </button>
+                                            </form>
+
+                                            {% if c.admin_cliente_reset_id %}
+                                            <form method="POST"
+                                                action="/admin/clientes/{{ c.empresa_id | int }}/resetar-senha/{{ c.admin_cliente_reset_id | int }}"
+                                                class="js-reset-form"
+                                                data-nome="{{ c.nome_fantasia | e }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <button type="submit" class="acoes-menu__item">Forçar reset</button>
+                                            </form>
+                                            {% endif %}
+
+                                            <form method="POST" action="/admin/clientes/{{ c.empresa_id | int }}/trocar-plano"
+                                                class="js-plan-form"
+                                                data-empresa="{{ c.nome_fantasia | e }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <label class="sr-only" for="plano-{{ c.empresa_id | int }}">Alterar plano</label>
+                                                <select id="plano-{{ c.empresa_id | int }}" name="plano" aria-label="Alterar plano de {{ c.nome_fantasia | e }}">
+                                                    {% for plano_nome in ['Inicial', 'Intermediario', 'Ilimitado'] %}
+                                                    {% set _preview = c.preview_planos.get(plano_nome) %}
+                                                    <option value="{{ plano_nome }}" data-preview="{{ (_preview.get('resumo_confirmacao') if _preview else '') | e }}"
+                                                        {% if plano_nome == c.plano_ativo %}selected{% endif %}>
+                                                        {{ plano_nome | e }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                                <button type="submit" class="acoes-menu__item">Aplicar plano</button>
+                                            </form>
+
+                                            <a href="/admin/clientes/{{ c.empresa_id | int }}/diagnostico" class="acoes-menu__item"
+                                                aria-label="Exportar diagnóstico de {{ c.nome_fantasia | e }}">
+                                                Exportar diagnóstico
+                                            </a>
+                                        </div>
+                                    </details>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="estado-vazio-tabela" aria-live="polite">
+                                Nenhuma empresa encontrada com os filtros atuais. Ajuste os filtros ou cadastre uma nova empresa.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <nav class="pagination" aria-label="Paginação da listagem administrativa">
+                <div class="meta-stack">
+                    Exibindo {{ clientes | length }} de {{ _paginacao.get("total_items", 0) | int }} empresas.
+                </div>
+                <div class="pagination-links">
+                    {% if _paginacao.get("has_prev") %}
+                    <a class="pagination-link"
+                        href="{{ request.url.include_query_params(pagina=_paginacao.get('page', 1) - 1, por_pagina=_paginacao.get('page_size', 20)) }}">
+                        Anterior
+                    </a>
+                    {% endif %}
+
+                    {% for pagina_item in _paginacao.get("pages", []) %}
+                    <a class="pagination-link {{ 'ativo' if pagina_item == _paginacao.get('page') else '' }}"
+                        href="{{ request.url.include_query_params(pagina=pagina_item, por_pagina=_paginacao.get('page_size', 20)) }}">
+                        {{ pagina_item }}
+                    </a>
+                    {% endfor %}
+
+                    {% if _paginacao.get("has_next") %}
+                    <a class="pagination-link"
+                        href="{{ request.url.include_query_params(pagina=_paginacao.get('page', 1) + 1, por_pagina=_paginacao.get('page_size', 20)) }}">
+                        Próxima
+                    </a>
+                    {% endif %}
+                </div>
+            </nav>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal-bloqueio-empresa-lista" role="dialog" aria-modal="true"
+        aria-labelledby="modal-bloqueio-empresa-lista-titulo">
+        <div class="modal-bloqueio">
+            <h3 id="modal-bloqueio-empresa-lista-titulo">Bloquear empresa</h3>
+            <p>Essa acao encerra sessoes da empresa nos portais Cliente, Inspetor e Mesa. O acesso do Admin-CEO nao sera afetado.</p>
+            <label for="modal-bloqueio-empresa-lista-motivo">
+                Motivo do bloqueio
+                <textarea id="modal-bloqueio-empresa-lista-motivo" placeholder="Descreva o motivo operacional do bloqueio."></textarea>
+            </label>
+            <div class="modal-bloqueio-erro" id="modal-bloqueio-empresa-lista-erro" aria-live="polite"></div>
+            <div class="modal-bloqueio-acoes">
+                <button type="button" class="btn-limpar" id="modal-bloqueio-empresa-lista-cancelar">Cancelar</button>
+                <button type="button" class="btn-block" id="modal-bloqueio-empresa-lista-confirmar">Bloquear empresa</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-dialog" id="admin-action-dialog-lista" role="dialog" aria-modal="true"
+        aria-labelledby="admin-action-dialog-lista-title">
+        <div class="admin-dialog__card">
+            <p class="admin-dialog__eyebrow">Confirmação</p>
+            <h2 class="admin-dialog__title" id="admin-action-dialog-lista-title">Confirmar ação</h2>
+            <p class="admin-dialog__body" id="admin-action-dialog-lista-body">Revise a ação antes de continuar.</p>
+            <div class="admin-dialog__payload" id="admin-action-dialog-lista-payload" hidden></div>
+            <div class="admin-dialog__actions">
+                <button type="button" class="btn-admin secundario" id="admin-action-dialog-lista-cancelar">Cancelar</button>
+                <button type="button" class="btn-admin primario" id="admin-action-dialog-lista-confirmar">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/admin/admin_clients_page.js" defer nonce="{{ csp_nonce }}"></script>
+</body>
+
+</html>

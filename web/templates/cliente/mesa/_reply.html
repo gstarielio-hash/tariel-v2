@@ -1,0 +1,76 @@
+<section
+    id="mesa-reply"
+    class="surface-stage"
+    data-mesa-panel="reply"
+    role="tabpanel"
+    aria-labelledby="mesa-section-tab-reply"
+    {% if (cliente_mesa_section_inicial | default('overview')) != 'reply' %}hidden{% endif %}
+>
+    <div class="surface-stage-head">
+        <div>
+            <span class="surface-stage-kicker">Responder</span>
+            <h3>Contexto, resumo e retorno técnico</h3>
+            <p class="box-subtitle">Contexto do laudo e decisao da mesa em primeiro plano.</p>
+        </div>
+    </div>
+
+    <div class="workspace-columns workspace-columns--mesa workspace-columns--mesa-focus">
+        <div class="workspace-context-stack">
+            <article class="box workspace-box workspace-box--context">
+                <div class="toolbar">
+                    <div class="toolbar-copy">
+                        <h3>Contexto do laudo</h3>
+                        <p class="box-subtitle">Status, pendencias e sinais do item selecionado.</p>
+                    </div>
+                </div>
+
+                <div id="mesa-contexto"></div>
+            </article>
+
+            <article class="box workspace-box workspace-box--summary">
+                <div class="toolbar">
+                    <div class="toolbar-copy">
+                        <h3>Resumo tecnico</h3>
+                        <p class="box-subtitle">Pendencias, chamados e evidencias do caso ativo.</p>
+                    </div>
+                </div>
+
+                <div id="mesa-resumo" class="summary-grid"></div>
+            </article>
+        </div>
+
+        <article class="box workspace-box workspace-box--thread">
+            <div class="toolbar">
+                <div class="toolbar-copy">
+                    <h3 id="mesa-titulo">Selecione um laudo</h3>
+                    <p class="box-subtitle">Responda, aprove ou devolva para ajuste.</p>
+                    <div id="mesa-reply-policy-hint" class="toolbar-meta"></div>
+                </div>
+                <div class="hero-actions">
+                    <button id="btn-mesa-aprovar" class="btn primary" type="button">Aprovar</button>
+                    <button id="btn-mesa-rejeitar" class="btn ghost" type="button">Devolver</button>
+                </div>
+            </div>
+            <div id="mesa-reply-policy-note" class="composer-status" hidden></div>
+
+            <div id="mesa-mensagens" class="msgs"></div>
+
+            <form id="form-mesa-msg" class="stack form-stack">
+                <div id="mesa-message-policy-note" class="composer-status" hidden></div>
+                <label>
+                    Resposta da mesa
+                    <textarea id="mesa-resposta" placeholder="Descreva o retorno tecnico ou a pendencia aberta."></textarea>
+                </label>
+                <label>
+                    Anexo opcional
+                    <input id="mesa-arquivo" type="file" accept=".pdf,.docx,.png,.jpg,.jpeg,.webp">
+                </label>
+                <label>
+                    Motivo de rejeicao
+                    <textarea id="mesa-motivo" placeholder="Use este campo quando o laudo precisar voltar para ajuste."></textarea>
+                </label>
+                <button id="btn-mesa-msg-enviar" class="btn primary" type="submit">Enviar resposta</button>
+            </form>
+        </article>
+    </div>
+</section>

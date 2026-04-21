@@ -1,0 +1,311 @@
+import {
+  carregarFeedMesaMobile,
+  carregarLaudosMobile,
+  carregarMensagensMesaMobile,
+} from "../../config/api";
+import {
+  extractMobileV2ReadRenderMetadata,
+  type MobileV2ReadRenderMetadata,
+} from "../../config/mobileV2HumanValidation";
+import type { MobilePilotRequestTraceSummary } from "../../config/mobilePilotRequestTrace";
+import { registrarEventoObservabilidade } from "../../config/observability";
+import type {
+  MobileLaudoCard,
+  MobileMesaMensagensResponse,
+  MobileMesaMessage,
+} from "../../types/mobile";
+import type { ActivityCenterAutomationSkipReason } from "../common/mobilePilotAutomationDiagnostics";
+
+export interface ActivityMonitorFlowResult {
+  requestDispatched: boolean;
+  requestedTargetIds: number[];
+  feedReadMetadata: MobileV2ReadRenderMetadata | null;
+  feedRequestTrace: MobilePilotRequestTraceSummary | null;
+  generatedNotificationsCount: number;
+  errorMessage: string | null;
+  skipReason: ActivityCenterAutomationSkipReason;
+}
+
+interface RunMonitorActivityFlowParams<TNotification> {
+  accessToken: string;
+  monitorandoAtividade: boolean;
+  conversaLaudoId: number | null;
+  conversaLaudoTitulo: string;
+  sessionUserId: number | null;
+  assinaturaStatusLaudo: (item: MobileLaudoCard) => string;
+  assinaturaMensagemMesa: (item: MobileMesaMessage) => string;
+  selecionarLaudosParaMonitoramentoMesa: (params: {
+    laudos: MobileLaudoCard[];
+    laudoAtivoId: number | null;
+  }) => number[];
+  criarNotificacaoStatusLaudo: (item: MobileLaudoCard) => TNotification;
+  criarNotificacaoMesa: (
+    kind: "mesa_nova" | "mesa_resolvida" | "mesa_reaberta",
+    item: MobileMesaMessage,
+    tituloLaudo: string,
+  ) => TNotification;
+  atualizarResumoLaudoAtual: (payload: MobileMesaMensagensResponse) => void;
+  registrarNotificacoes: (novasNotificacoes: TNotification[]) => void;
+  erroSugereModoOffline: (error: unknown) => boolean;
+  chaveCacheLaudo: (laudoId: number | null) => string;
+  statusSnapshotRef: { current: Record<number, string> };
+  mesaSnapshotRef: { current: Record<number, Record<number, string>> };
+  mesaFeedCursorRef: { current: string };
+  onSetMonitorandoAtividade: (value: boolean) => void;
+  onSetLaudosDisponiveis: (itens: MobileLaudoCard[]) => void;
+  onSetCacheLaudos: (itens: MobileLaudoCard[]) => void;
+  onSetErroLaudos: (value: string) => void;
+  onSetMensagensMesa: (itens: MobileMesaMessage[]) => void;
+  onSetLaudoMesaCarregado: (laudoId: number) => void;
+  onSetCacheMesa: (itensPorLaudo: Record<string, MobileMesaMessage[]>) => void;
+  onSetStatusApi: (value: "online" | "offline") => void;
+  onSetErroConversaIfEmpty: (value: string) => void;
+  onObserveMesaFeedReadMetadata?: (
+    metadata: MobileV2ReadRenderMetadata | null,
+  ) => void;
+  onObserveMesaFeedRequestedTargetIds?: (targetIds: number[]) => void;
+}
+
+export async function runMonitorActivityFlow<TNotification>({
+  accessToken,
+  monitorandoAtividade,
+  conversaLaudoId,
+  conversaLaudoTitulo,
+  sessionUserId,
+  assinaturaStatusLaudo,
+  assinaturaMensagemMesa,
+  selecionarLaudosParaMonitoramentoMesa,
+  criarNotificacaoStatusLaudo,
+  criarNotificacaoMesa,
+  atualizarResumoLaudoAtual,
+  registrarNotificacoes,
+  erroSugereModoOffline,
+  chaveCacheLaudo,
+  statusSnapshotRef,
+  mesaSnapshotRef,
+  mesaFeedCursorRef,
+  onSetMonitorandoAtividade,
+  onSetLaudosDisponiveis,
+  onSetCacheLaudos,
+  onSetErroLaudos,
+  onSetMensagensMesa,
+  onSetLaudoMesaCarregado,
+  onSetCacheMesa,
+  onSetStatusApi,
+  onSetErroConversaIfEmpty,
+  onObserveMesaFeedReadMetadata,
+  onObserveMesaFeedRequestedTargetIds,
+}: RunMonitorActivityFlowParams<TNotification>) {
+  const result: ActivityMonitorFlowResult = {
+    requestDispatched: false,
+    requestedTargetIds: [],
+    feedReadMetadata: null,
+    feedRequestTrace: null,
+    generatedNotificationsCount: 0,
+    errorMessage: null,
+    skipReason: null,
+  };
+  if (monitorandoAtividade) {
+    result.skipReason = "already_monitoring";
+    return result;
+  }
+
+  onSetMonitorandoAtividade(true);
+  const monitoramentoIniciadoEm = Date.now();
+
+  try {
+    const payloadLaudos = await carregarLaudosMobile(accessToken);
+    const proximosLaudos = payloadLaudos.itens || [];
+    const snapshotAnterior = statusSnapshotRef.current;
+    const snapshotNovo: Record<number, string> = {};
+    const novasNotificacoes: TNotification[] = [];
+
+    for (const item of proximosLaudos) {
+      const assinatura = assinaturaStatusLaudo(item);
+      snapshotNovo[item.id] = assinatura;
+
+      if (
+        snapshotAnterior[item.id] &&
+        snapshotAnterior[item.id] !== assinatura
+      ) {
+        novasNotificacoes.push(criarNotificacaoStatusLaudo(item));
+      }
+    }
+
+    statusSnapshotRef.current = snapshotNovo;
+    onSetLaudosDisponiveis(proximosLaudos);
+    onSetCacheLaudos(proximosLaudos);
+    onSetErroLaudos("");
+
+    const laudosMonitoradosMesa = selecionarLaudosParaMonitoramentoMesa({
+      laudos: proximosLaudos,
+      laudoAtivoId: conversaLaudoId,
+    });
+    result.requestedTargetIds = laudosMonitoradosMesa;
+    onObserveMesaFeedRequestedTargetIds?.(laudosMonitoradosMesa);
+
+    if (laudosMonitoradosMesa.length) {
+      let latestFeedRequestTrace: MobilePilotRequestTraceSummary | null = null;
+      result.requestDispatched = true;
+      const feedMesa = await carregarFeedMesaMobile(accessToken, {
+        laudoIds: laudosMonitoradosMesa,
+        cursorAtualizadoEm: mesaFeedCursorRef.current || null,
+        onRequestTrace: (trace) => {
+          latestFeedRequestTrace = trace;
+          result.feedRequestTrace = trace;
+        },
+      });
+      result.feedReadMetadata = extractMobileV2ReadRenderMetadata(feedMesa);
+      result.feedRequestTrace = latestFeedRequestTrace;
+      onObserveMesaFeedReadMetadata?.(result.feedReadMetadata);
+      if (feedMesa.cursor_atual) {
+        mesaFeedCursorRef.current = feedMesa.cursor_atual;
+      }
+      const laudosAlterados = new Set(
+        (feedMesa.itens || []).map((item) => item.laudo_id),
+      );
+      const laudosParaConsultar = laudosMonitoradosMesa.filter(
+        (laudoId) =>
+          laudosAlterados.has(laudoId) ||
+          !mesaSnapshotRef.current[laudoId] ||
+          !Object.keys(mesaSnapshotRef.current[laudoId] || {}).length,
+      );
+
+      if (!laudosParaConsultar.length) {
+        result.generatedNotificationsCount = novasNotificacoes.length;
+        registrarNotificacoes(novasNotificacoes);
+        onSetStatusApi("online");
+        void registrarEventoObservabilidade({
+          kind: "activity_monitor",
+          name: "activity_cycle",
+          ok: true,
+          durationMs: Date.now() - monitoramentoIniciadoEm,
+          count: 0,
+          detail: `feed_${laudosMonitoradosMesa.length}`,
+        });
+        return result;
+      }
+
+      const resultadosMesa = await Promise.allSettled(
+        laudosParaConsultar.map(async (laudoId) => ({
+          laudoId,
+          payload: await carregarMensagensMesaMobile(accessToken, laudoId),
+        })),
+      );
+      const cacheMesaAtualizado: Record<string, MobileMesaMessage[]> = {};
+      const titulosLaudos = new Map(
+        proximosLaudos.map((item) => [item.id, item.titulo]),
+      );
+
+      for (const resultado of resultadosMesa) {
+        if (resultado.status !== "fulfilled") {
+          continue;
+        }
+
+        const { laudoId, payload } = resultado.value;
+        const itensMesa = payload.itens || [];
+        const snapshotMesaAnterior = mesaSnapshotRef.current[laudoId] || {};
+        const snapshotMesaNovo: Record<number, string> = {};
+        const tituloLaudo =
+          titulosLaudos.get(laudoId) ||
+          (conversaLaudoId === laudoId ? conversaLaudoTitulo || "" : "") ||
+          `Laudo #${laudoId}`;
+        const mesaPossuiaSnapshot =
+          Object.keys(snapshotMesaAnterior).length > 0;
+
+        for (const item of itensMesa) {
+          const assinatura = assinaturaMensagemMesa(item);
+          snapshotMesaNovo[item.id] = assinatura;
+          const assinaturaAntiga = snapshotMesaAnterior[item.id];
+
+          if (!mesaPossuiaSnapshot) {
+            continue;
+          }
+
+          if (!assinaturaAntiga) {
+            const veioDaMesa = item.remetente_id !== sessionUserId;
+            if (veioDaMesa) {
+              novasNotificacoes.push(
+                criarNotificacaoMesa("mesa_nova", item, tituloLaudo),
+              );
+            }
+            continue;
+          }
+
+          const estadoAnterior =
+            assinaturaAntiga.split("|")[2] || "not_applicable";
+          const estadoAtual = assinatura.split("|")[2] || "not_applicable";
+          if (estadoAnterior !== "resolved" && estadoAtual === "resolved") {
+            novasNotificacoes.push(
+              criarNotificacaoMesa("mesa_resolvida", item, tituloLaudo),
+            );
+          } else if (estadoAnterior === "resolved" && estadoAtual === "open") {
+            novasNotificacoes.push(
+              criarNotificacaoMesa("mesa_reaberta", item, tituloLaudo),
+            );
+          }
+        }
+
+        mesaSnapshotRef.current[laudoId] = snapshotMesaNovo;
+        cacheMesaAtualizado[chaveCacheLaudo(laudoId)] = itensMesa;
+
+        if (conversaLaudoId === laudoId) {
+          onSetMensagensMesa(itensMesa);
+          onSetLaudoMesaCarregado(laudoId);
+          atualizarResumoLaudoAtual(payload);
+        }
+      }
+
+      if (Object.keys(cacheMesaAtualizado).length) {
+        onSetCacheMesa(cacheMesaAtualizado);
+      }
+    } else {
+      result.skipReason = "no_target";
+      onObserveMesaFeedReadMetadata?.(null);
+    }
+
+    result.generatedNotificationsCount = novasNotificacoes.length;
+    registrarNotificacoes(novasNotificacoes);
+    onSetStatusApi("online");
+    void registrarEventoObservabilidade({
+      kind: "activity_monitor",
+      name: "activity_cycle",
+      ok: true,
+      durationMs: Date.now() - monitoramentoIniciadoEm,
+      count: novasNotificacoes.length,
+      detail: `laudos_${proximosLaudos.length}`,
+    });
+    return result;
+  } catch (error) {
+    onObserveMesaFeedReadMetadata?.(null);
+    onObserveMesaFeedRequestedTargetIds?.([]);
+    if (erroSugereModoOffline(error)) {
+      onSetStatusApi("offline");
+      void registrarEventoObservabilidade({
+        kind: "activity_monitor",
+        name: "activity_cycle",
+        ok: false,
+        durationMs: Date.now() - monitoramentoIniciadoEm,
+        detail: "offline",
+      });
+      return result;
+    }
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Não foi possível monitorar a atividade do inspetor.";
+    result.errorMessage = message;
+    onSetErroConversaIfEmpty(message);
+    void registrarEventoObservabilidade({
+      kind: "activity_monitor",
+      name: "activity_cycle",
+      ok: false,
+      durationMs: Date.now() - monitoramentoIniciadoEm,
+      detail: message,
+    });
+    return result;
+  } finally {
+    onSetMonitorandoAtividade(false);
+  }
+}

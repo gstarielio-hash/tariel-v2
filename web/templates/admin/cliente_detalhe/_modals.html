@@ -1,0 +1,72 @@
+    <div class="modal-overlay" id="modal-bloqueio-empresa" role="dialog" aria-modal="true"
+        aria-labelledby="modal-bloqueio-empresa-titulo">
+        <div class="modal-plano">
+            <button type="button" class="modal-fechar-x" id="fechar-modal-bloqueio-empresa" aria-label="Fechar modal">×</button>
+            <h3 id="modal-bloqueio-empresa-titulo">Bloquear empresa</h3>
+            <p class="modal-helper-text">Essa acao encerra as sessoes da empresa no painel principal, na area de campo e na area de analise. O acesso do Admin-CEO nao sera afetado.</p>
+            <label for="motivo-bloqueio-empresa">Motivo do bloqueio</label>
+            <textarea id="motivo-bloqueio-empresa" placeholder="Descreva o motivo operacional do bloqueio."></textarea>
+            <div class="modal-error-text" id="erro-modal-bloqueio-empresa" aria-live="polite"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancelar" id="cancelar-modal-bloqueio-empresa">Cancelar</button>
+                <button type="button" class="btn-modal-confirmar" id="confirmar-modal-bloqueio-empresa">Bloquear empresa</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-dialog" id="admin-action-dialog-detail" role="dialog" aria-modal="true"
+        aria-labelledby="admin-action-dialog-detail-title">
+        <div class="admin-dialog__card">
+            <p class="admin-dialog__eyebrow">Confirmação administrativa</p>
+            <h2 class="admin-dialog__title" id="admin-action-dialog-detail-title">Confirmar ação</h2>
+            <p class="admin-dialog__body" id="admin-action-dialog-detail-body">Revise a ação antes de prosseguir.</p>
+            <div class="admin-dialog__payload" id="admin-action-dialog-detail-payload" hidden></div>
+            <div class="admin-dialog__actions">
+                <button type="button" class="btn-admin secundario" id="admin-action-dialog-detail-cancelar">Cancelar</button>
+                <button type="button" class="btn-admin primario" id="admin-action-dialog-detail-confirmar">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-plano" role="dialog" aria-modal="true" aria-labelledby="modal-plano-titulo">
+        <div class="modal-plano">
+            <button type="button" class="modal-fechar-x" id="fechar-modal-plano" aria-label="Fechar modal">×</button>
+            <h3 id="modal-plano-titulo">Alterar plano</h3>
+            <form method="POST" action="/admin/clientes/{{ empresa.id | int }}/trocar-plano" id="form-modal-plano">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <label for="select-plano">Novo plano</label>
+                <select id="select-plano" name="plano">
+                    {% for plano_nome in ['Inicial', 'Intermediario', 'Ilimitado'] %}
+                    {% set _preview = _plano_preview.get(plano_nome, {}) %}
+                    <option value="{{ plano_nome }}"
+                        data-resumo="{{ _preview.get('resumo_confirmacao', '') | e }}"
+                        data-alertas="{{ (_preview.get('alertas', []) | join(' | ')) | e }}"
+                        data-impacto-usuarios="{{ (_preview.get('impacto', {}) or {}).get('usuarios_max', 'Sem alteração') | e }}"
+                        data-impacto-laudos="{{ (_preview.get('impacto', {}) or {}).get('laudos_mes', 'Sem alteração') | e }}"
+                        data-impacto-integracoes="{{ (_preview.get('impacto', {}) or {}).get('integracoes_max', 'Sem alteração') | e }}"
+                        data-impacto-retencao="{{ (_preview.get('impacto', {}) or {}).get('retencao_dias', 'Sem alteração') | e }}"
+                        {% if plano_nome == empresa.plano_ativo %}selected{% endif %}>
+                        {{ plano_nome | e }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <div class="preview-plano" id="preview-plano" aria-live="polite">
+                    <strong id="preview-plano-resumo">Selecione um plano para ver o impacto.</strong>
+                    <ul>
+                        <li id="preview-usuarios">Usuários: —</li>
+                        <li id="preview-laudos">Laudos/mês: —</li>
+                        <li id="preview-integracoes">Integrações: —</li>
+                        <li id="preview-retencao">Retenção: —</li>
+                        <li id="preview-alertas">Alertas: sem alertas.</li>
+                    </ul>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancelar" id="cancelar-modal-plano">Cancelar</button>
+                    <button type="submit" class="btn-modal-confirmar">Confirmar troca</button>
+                </div>
+            </form>
+        </div>
+    </div>

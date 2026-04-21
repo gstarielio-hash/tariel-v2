@@ -1,0 +1,185 @@
+{
+  "schema_type": "tariel_filled_reference_bundle",
+  "schema_version": 1,
+  "family_key": "nr13_inspecao_vaso_pressao",
+  "template_code": "nr13_vaso_pressao",
+  "reference_id": "nr13_inspecao_vaso_pressao.synthetic.v1",
+  "source_kind": "synthetic_repo_baseline",
+  "reference_summary": {
+    "title": "Baseline sintético - inspeção visual de vaso de pressão vertical",
+    "document_code": "REL-NR13-VP204-2026-031",
+    "status_final": "ajuste",
+    "pdf_file": "pdf/nr13_inspecao_vaso_pressao_referencia_sintetica.pdf",
+    "asset_files": [
+      "assets/IMG_001_placa_identificacao.png",
+      "assets/IMG_002_vista_geral_equipamento.png",
+      "assets/IMG_003_area_instalacao.png",
+      "assets/IMG_004_ponto_corrosao.png",
+      "assets/IMG_005_valvula_seguranca.png",
+      "assets/IMG_006_manometro.png",
+      "assets/IMG_007_suportes_base.png"
+    ],
+    "resumo": "Caso sintético de vaso de pressão vertical VP-204 com placa parcialmente legível, prontuário disponível, certificado não apresentado e corrosão superficial localizada no suporte inferior, concluído com status ajuste."
+  },
+  "required_slots_snapshot": {
+    "tipo_equipamento": "vaso_de_pressao_vertical",
+    "codigo_ativo": "VP-204",
+    "tag_patrimonial": "TAG-VP-204",
+    "local_instalacao": "Casa de utilidades, linha de ar comprimido, Bloco B",
+    "placa_identificacao": "parcialmente_legivel",
+    "confirmacao_por_prontuario": true,
+    "condicao_geral": "sem_deformacoes_aparentes",
+    "integridade_aparente": "preservada",
+    "area_instalacao": "limpa_e_acessivel",
+    "restricao_lateral": "tubulacao_secundaria",
+    "corrosao_localizada": "suporte_inferior",
+    "vazamento_aparente": false,
+    "isolamento_termico_externo": false,
+    "valvula_seguranca_presente": true,
+    "manometro_presente_legivel": true,
+    "suportes_fixacao_visualmente_adequados": true,
+    "prontuario_disponivel": true,
+    "certificado_apresentado": false,
+    "relatorio_anterior_disponivel": true,
+    "status_final": "ajuste"
+  },
+  "documental_sections_snapshot": [
+    "capa / folha de rosto",
+    "controle documental / ficha da inspeção",
+    "objeto, escopo, base normativa e limitações",
+    "metodologia, condições operacionais e equipe",
+    "identificação técnica do vaso",
+    "inspeção visual e integridade aparente",
+    "dispositivos de segurança e acessórios",
+    "documentação, registros e evidências",
+    "não conformidades, criticidade e recomendações",
+    "conclusão, parecer e próxima ação",
+    "governança da Mesa",
+    "assinaturas e responsabilidade técnica",
+    "anexos e referências"
+  ],
+  "notes": [
+    "Conteúdo integralmente sintético, produzido para baseline de referência visual e documental.",
+    "Sem uso de marcas reais, sem reprodução de laudos existentes e com identificação discreta de REFERÊNCIA SINTÉTICA.",
+    "Conclusão amarrada às figuras 1, 4, 5, 6 e 7, ao prontuário e ao relatório anterior."
+  ],
+  "laudo_output_snapshot": {
+    "tokens": {
+      "document_code": "REL-NR13-VP204-2026-031",
+      "laudo_id": "LT-NR13-BB-VP204-2026-031",
+      "art": "ART-SP2026/1184079",
+      "crea": "CREA-SP 5234187615-D",
+      "status_final": "ajuste",
+      "cliente": "Empresa Técnica Alfa Utilidades Ltda.",
+      "unidade": "Unidade de Utilidades - Bloco B"
+    },
+    "case_context": {
+      "local": "Casa de utilidades, linha de ar comprimido, Bloco B",
+      "ativo": "VP-204",
+      "tag": "TAG-VP-204",
+      "tipo": "Vaso de pressão vertical",
+      "fluido": "Ar comprimido",
+      "data_inspecao": "26/03/2026",
+      "data_emissao": "02/04/2026"
+    },
+    "mesa_review": {
+      "mesa": "Mesa Tariel de Integridade de Equipamentos Pressurizados",
+      "criterio_deliberacao": "coerência entre achados visuais, rastreabilidade mínima e materialidade do risco observado",
+      "deliberacao": "baseline sintético aprovado com status ajuste e acompanhamento corretivo localizado"
+    },
+    "resumo_executivo": {
+      "sintese": "Vaso de pressão vertical VP-204 em condição geral visualmente íntegra, com placa parcialmente legível e confirmação complementar em prontuário.",
+      "status": "ajuste",
+      "fundamentos": [
+        "corrosão superficial localizada próxima ao suporte inferior",
+        "certificado não apresentado na vistoria",
+        "demais dispositivos visíveis presentes e legíveis"
+      ]
+    },
+    "identificacao": {
+      "cliente": "Empresa Técnica Alfa Utilidades Ltda.",
+      "unidade": "Unidade de Utilidades - Bloco B",
+      "local": "Casa de utilidades, linha de ar comprimido, Bloco B",
+      "documento": "REL-NR13-VP204-2026-031",
+      "revisao": "00",
+      "responsavel_tecnico": "Eng. Rafael Vinícius Moreira"
+    },
+    "caracterizacao_do_equipamento": {
+      "tipo": "Vaso de pressão vertical",
+      "codigo_ativo": "VP-204",
+      "tag": "TAG-VP-204",
+      "sem_isolamento_termico_externo": true,
+      "base_metalica": true,
+      "placa_identificacao": {
+        "condicao": "parcialmente legível",
+        "confirmacao_complementar": "prontuário"
+      }
+    },
+    "inspecao_visual": {
+      "condicao_geral": "sem deformações aparentes",
+      "integridade_aparente": "preservada",
+      "area_instalacao": "limpa e acessível",
+      "restricao_lateral": "parcial por tubulação secundária",
+      "corrosao_superficial_localizada": "próxima ao suporte inferior",
+      "sem_vazamento_aparente": true,
+      "evidencias_fotograficas": [
+        "Figura 2",
+        "Figura 3",
+        "Figura 4",
+        "Figura 7"
+      ]
+    },
+    "dispositivos_e_acessorios": {
+      "valvula_seguranca": "presente",
+      "manometro": "presente e legível",
+      "suportes_fixacao": "visualmente adequados",
+      "tubulacoes": "conectadas e sem vazamento aparente na vistoria",
+      "evidencias_fotograficas": [
+        "Figura 5",
+        "Figura 6",
+        "Figura 7"
+      ]
+    },
+    "documentacao_e_registros": {
+      "prontuario": "PRT-VP204-2020-012",
+      "prontuario_disponivel": true,
+      "certificado": "Não apresentado na vistoria",
+      "relatorio_anterior": "RIV-VP204-2025-044",
+      "relatorio_anterior_disponivel": true
+    },
+    "nao_conformidades": [
+      {
+        "codigo": "NC-01",
+        "tipo": "ajuste localizado",
+        "descricao": "corrosão superficial localizada próxima ao suporte inferior",
+        "evidencia": "Figura 4"
+      },
+      {
+        "codigo": "NC-02",
+        "tipo": "lacuna documental",
+        "descricao": "certificado não apresentado na vistoria",
+        "evidencia": "registro documental"
+      }
+    ],
+    "recomendacoes": [
+      "executar tratamento corretivo localizado no suporte afetado",
+      "recompor proteção superficial após o tratamento",
+      "reapresentar certificado ao dossiê do equipamento",
+      "realizar reinspeção de fechamento do ajuste"
+    ],
+    "conclusao": {
+      "status_final": "ajuste",
+      "parecer": "continuidade operacional condicionada a ajuste",
+      "amarracao_evidencias": [
+        "Figura 1",
+        "Figura 4",
+        "Figura 5",
+        "Figura 6",
+        "Figura 7",
+        "PRT-VP204-2020-012",
+        "RIV-VP204-2025-044"
+      ],
+      "proxima_acao": "acompanhamento corretivo localizado e regularização documental"
+    }
+  }
+}

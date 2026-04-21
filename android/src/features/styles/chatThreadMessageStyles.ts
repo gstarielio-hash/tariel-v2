@@ -1,0 +1,332 @@
+import { colors, radii, spacing } from "../../theme/tokens";
+
+export const chatThreadMessageStyles = {
+  messageRow: {
+    width: "100%",
+  },
+  messageRowIncoming: {
+    alignItems: "flex-start",
+  },
+  messageRowOutgoing: {
+    alignItems: "flex-end",
+  },
+  messageIncomingCluster: {
+    maxWidth: "94%",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  messageIncomingClusterAssistant: {
+    maxWidth: "96%",
+  },
+  messageAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    marginTop: 4,
+  },
+  messageAvatarTariel: {
+    backgroundColor: "#EEF5FB",
+    borderColor: "#D9E6F2",
+  },
+  messageAvatarBrand: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  messageAvatarEngineering: {
+    backgroundColor: "#FFF4E8",
+    borderColor: "#EEC8A7",
+  },
+  messageAvatarMesa: {
+    backgroundColor: "#FFF4E8",
+    borderColor: "#EEC8A7",
+  },
+  messageBubble: {
+    maxWidth: "84%",
+    borderRadius: 22,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  messageBubbleIncomingShell: {
+    flexShrink: 1,
+    maxWidth: "100%",
+  },
+  messageBubbleIncomingAssistant: {
+    maxWidth: "92%",
+  },
+  messageBubbleIncoming: {
+    backgroundColor: colors.surfaceCanvas,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+    borderTopLeftRadius: 18,
+    borderBottomLeftRadius: 14,
+  },
+  messageBubbleOutgoing: {
+    backgroundColor: colors.ink800,
+    borderWidth: 1,
+    borderColor: colors.ink800,
+    borderTopRightRadius: 18,
+    borderBottomRightRadius: 14,
+  },
+  messageBubbleEngineering: {
+    backgroundColor: colors.accentWash,
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    borderTopLeftRadius: 18,
+    borderBottomLeftRadius: 14,
+  },
+  messageBubbleReferenced: {
+    borderColor: colors.accentMuted,
+    borderWidth: 1,
+  },
+  messageAuthor: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  messageAuthorOutgoing: {
+    color: colors.accentSoft,
+  },
+  messageHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.sm,
+  },
+  messageStatusBadge: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+  },
+  messageStatusBadgeAccent: {
+    backgroundColor: "#FFF1E4",
+    borderColor: "#FFD6B2",
+  },
+  messageStatusBadgeSuccess: {
+    backgroundColor: "#EEF9F3",
+    borderColor: "#BCE8D0",
+  },
+  messageStatusBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  messageStatusBadgeTextAccent: {
+    color: colors.accent,
+  },
+  messageStatusBadgeTextSuccess: {
+    color: colors.success,
+  },
+  messageText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  messageTextOutgoing: {
+    color: colors.white,
+  },
+  messageOperationalCard: {
+    gap: 6,
+    borderRadius: 18,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    backgroundColor: "rgba(255,255,255,0.46)",
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+  },
+  messageOperationalEyebrow: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  messageOperationalTitle: {
+    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: "800",
+    lineHeight: 18,
+  },
+  messageOperationalText: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  messageOperationalMeta: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  messageMeta: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  messageMetaOutgoing: {
+    color: "rgba(255,255,255,0.74)",
+    alignSelf: "flex-end",
+  },
+  messageReferenceCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+    backgroundColor: colors.surfacePanelRaised,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 9,
+  },
+  messageReferenceCardOutgoing: {
+    borderColor: "rgba(255,255,255,0.24)",
+    backgroundColor: "rgba(255,255,255,0.08)",
+  },
+  messageReferenceIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: radii.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.accentWash,
+  },
+  messageReferenceIconOutgoing: {
+    backgroundColor: "rgba(255,255,255,0.16)",
+  },
+  messageReferenceCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  messageReferenceTitle: {
+    color: colors.accent,
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  messageReferenceTitleOutgoing: {
+    color: "rgba(255,255,255,0.86)",
+  },
+  messageReferenceText: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  messageReferenceTextOutgoing: {
+    color: "rgba(255,255,255,0.8)",
+  },
+  messageActionRow: {
+    paddingTop: 2,
+  },
+  messageActionButton: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+    backgroundColor: colors.surfacePanelRaised,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 7,
+  },
+  messageActionText: {
+    color: colors.accent,
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  messageAttachments: {
+    gap: spacing.xs,
+  },
+  messageAttachmentCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.surfacePanelRaised,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+    padding: 10,
+  },
+  messageAttachmentCardImage: {
+    alignItems: "flex-start",
+  },
+  messageAttachmentCardDisabled: {
+    opacity: 0.7,
+  },
+  messageAttachmentIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: radii.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.accentWash,
+  },
+  messageAttachmentImageFrame: {
+    width: 76,
+    height: 68,
+    borderRadius: radii.md,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surfacePanelRaised,
+    borderWidth: 1,
+    borderColor: colors.surfaceStrokeStrong,
+  },
+  messageAttachmentImagePreview: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#E8EDF2",
+  },
+  messageAttachmentBody: {
+    flex: 1,
+    gap: 4,
+    minHeight: 68,
+    justifyContent: "center",
+  },
+  messageAttachmentTitle: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "600",
+  },
+  messageAttachmentCaption: {
+    color: colors.textSecondary,
+    fontSize: 10,
+    lineHeight: 14,
+  },
+  messageAttachmentAction: {
+    width: 30,
+    alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  typingRow: {
+    alignItems: "flex-start",
+  },
+  typingBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    backgroundColor: colors.surfaceSoft,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: colors.surfaceStroke,
+  },
+  typingText: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+} as const;

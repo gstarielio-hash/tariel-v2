@@ -1,0 +1,192 @@
+appId: com.tarielia.inspetor
+tags:
+  - smoke
+  - attachments
+env:
+  LOGIN_EMAIL: ${MAESTRO_LOGIN_EMAIL}
+  LOGIN_PASSWORD: ${MAESTRO_LOGIN_PASSWORD}
+  TARGET_LAUDO_ID: ${MAESTRO_TARGET_LAUDO_ID}
+  ATTACHMENT_DOCUMENT_FILENAME: ${MAESTRO_ATTACHMENT_DOCUMENT_FILENAME}
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: login-email-input
+    timeout: 30000
+
+- tapOn:
+    id: login-email-input
+
+- inputText: ${LOGIN_EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-password-input
+
+- inputText: ${LOGIN_PASSWORD}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-submit-button
+
+- extendedWaitUntil:
+    visible:
+      id: free-chat-start-button
+    timeout: 20000
+
+- tapOn:
+    id: free-chat-start-button
+
+- extendedWaitUntil:
+    visible:
+      id: chat-attach-button
+    timeout: 15000
+
+- tapOn:
+    id: chat-attach-button
+
+- extendedWaitUntil:
+    visible:
+      id: attachment-picker-option-galeria
+    timeout: 10000
+
+- tapOn:
+    id: attachment-picker-option-galeria
+
+- extendedWaitUntil:
+    visible: "Fotos"
+    timeout: 20000
+
+- runFlow:
+    when:
+      visible: "Dispensar"
+    commands:
+      - tapOn: "Dispensar"
+
+- tapOn:
+    point: "16%,76%"
+
+- runFlow:
+    when:
+      visible: "Concluir"
+    commands:
+      - tapOn: "Concluir"
+
+- extendedWaitUntil:
+    visible:
+      id: chat-attachment-draft-card
+    timeout: 20000
+
+- assertVisible:
+    id: chat-attachment-draft-kind-image
+
+- tapOn:
+    id: chat-attachment-draft-remove
+
+- tapOn:
+    id: chat-composer-input
+
+- inputText: Abrindo caso para smoke de anexos.
+
+- tapOn:
+    id: chat-send-button
+    retryTapIfNoChange: true
+    waitToSettleTimeoutMs: 1800
+
+- extendedWaitUntil:
+    visible: Abrindo caso para smoke de anexos.
+    timeout: 20000
+
+- extendedWaitUntil:
+    visible: Caso criado
+    timeout: 30000
+
+- extendedWaitUntil:
+    visible:
+      id: chat-attach-button
+    timeout: 10000
+
+- tapOn:
+    id: chat-attach-button
+
+- extendedWaitUntil:
+    visible:
+      id: attachment-picker-option-documento
+    timeout: 10000
+
+- tapOn:
+    id: attachment-picker-option-documento
+
+- extendedWaitUntil:
+    visible:
+      text: ${ATTACHMENT_DOCUMENT_FILENAME}
+    timeout: 20000
+
+- tapOn:
+    text: ${ATTACHMENT_DOCUMENT_FILENAME}
+
+- extendedWaitUntil:
+    visible:
+      id: chat-attachment-draft-card
+    timeout: 30000
+
+- assertVisible:
+    id: chat-attachment-draft-kind-document
+
+- tapOn:
+    id: chat-attachment-draft-remove
+
+- tapOn:
+    id: chat-attach-button
+
+- extendedWaitUntil:
+    visible:
+      id: attachment-picker-option-camera
+    timeout: 10000
+
+- tapOn:
+    id: attachment-picker-option-camera
+
+- runFlow:
+    when:
+      visible:
+        id: "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
+    commands:
+      - tapOn:
+          id: "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
+
+- runFlow:
+    when:
+      visible:
+        id: "com.android.permissioncontroller:id/permission_allow_button"
+    commands:
+      - tapOn:
+          id: "com.android.permissioncontroller:id/permission_allow_button"
+
+- runFlow:
+    when:
+      visible:
+        id: "com.android.packageinstaller:id/permission_allow_button"
+    commands:
+      - tapOn:
+          id: "com.android.packageinstaller:id/permission_allow_button"
+
+- runFlow:
+    when:
+      visible:
+        id: "com.android.camera2:id/confirm_button"
+    commands:
+      - tapOn:
+          id: "com.android.camera2:id/confirm_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "com.android.camera2:id/shutter_button|com.sec.android.app.camera:id/normal_center_button|com.sec.android.app.camera:id/shutter_area"
+    timeout: 20000
+
+- assertVisible:
+    id: "com.android.camera2:id/shutter_button|com.sec.android.app.camera:id/normal_center_button|com.sec.android.app.camera:id/shutter_area"

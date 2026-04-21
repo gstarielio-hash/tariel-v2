@@ -1,0 +1,966 @@
+---
+import {
+  ArrowLeft,
+  Binary,
+  Boxes,
+  Clock3,
+  FileStack,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import KpiCard from "@/components/app/admin/kpi-card.astro";
+import StatusPill from "@/components/app/admin/status-pill.astro";
+import {
+  getAdminCatalogFamilyDetail,
+  normalizeCatalogTab,
+} from "@/lib/server/admin-catalog";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+import AdminShellLayout from "@/layouts/admin-shell-layout.astro";
+
+export const prerender = false;
+
+const familyKey = String(Astro.params.familyKey ?? "");
+const detail = await getAdminCatalogFamilyDetail(familyKey);
+const notice = consumeAdminNotice(Astro.cookies);
+const activeTab = normalizeCatalogTab(Astro.url.searchParams.get("tab"));
+
+if (!detail) {
+  Astro.response.status = 404;
+}
+
+const familyBasePath = detail
+  ? `/admin/catalogo-laudos/familias/${detail.family.familyKey}`
+  : "/admin/catalogo-laudos";
+const releaseTemplateOptions = detail
+  ? Array.from(
+      detail.offer?.variants.reduce((map, variant) => {
+        if (!variant.runtimeTemplateCode) {
+          return map;
+        }
+
+        if (!map.has(variant.runtimeTemplateCode)) {
+          map.set(variant.runtimeTemplateCode, {
+            code: variant.runtimeTemplateCode,
+            label: variant.runtimeTemplateLabel,
+          });
+        }
+
+        return map;
+      }, new Map<string, { code: string; label: string }>()) ?? new Map<string, { code: string; label: string }>(),
+    ).map(([, option]) => option)
+  : [];
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("pt-BR").format(value);
+}
+
+function releaseTemplateChecked(
+  release: { allowedTemplates: string[] },
+  templateCode: string,
+) {
+  return release.allowedTemplates.length > 0
+    ? release.allowedTemplates.includes(templateCode)
+    : false;
+}
+
+function releaseVariantChecked(
+  release: { allowedVariants: string[] },
+  variant: { selectionToken: string | null },
+) {
+  return variant.selectionToken
+    ? release.allowedVariants.includes(variant.selectionToken)
+    : false;
+}
+
+const cards = detail
+  ? [
+      {
+        icon: Boxes,
+        label: "Modos tecnicos",
+        value: formatNumber(detail.summary.modeCount),
+        detail: `${detail.summary.variantCount} variantes ligadas ao pacote comercial.`,
+        tone: "orange" as const,
+      },
+      {
+        icon: ShieldCheck,
+        label: "Liberacoes ativas",
+        value: formatNumber(detail.summary.activeReleaseCount),
+        detail: `${detail.summary.releaseCount} tenants com governanca registrada.`,
+        tone: "emerald" as const,
+      },
+      {
+        icon: FileStack,
+        label: "Laudos emitidos",
+        value: formatNumber(detail.summary.reportCount),
+        detail: detail.summary.lastReportLabel,
+        tone: "sky" as const,
+      },
+      {
+        icon: Clock3,
+        label: "Ultima atividade",
+        value: detail.summary.lastUpdatedLabel,
+        detail: `${detail.base.outputFieldCount} campos estruturados no schema atual.`,
+        tone: "slate" as const,
+      },
+    ]
+  : [];
+
+const tabs = detail
+  ? [
+      { key: "visao-geral", label: "Visao geral", meta: "executivo" },
+      { key: "base", label: "Base", meta: `${detail.base.outputSections.length} secoes` },
+      { key: "oferta", label: "Oferta", meta: detail.offer ? detail.offer.lifecycle.label : "sem pacote" },
+      { key: "calibracao", label: "Calibracao", meta: detail.calibration.status.label },
+      { key: "liberacao", label: "Liberacao", meta: `${detail.releases.length} tenants` },
+      { key: "relatorios", label: "Laudos", meta: `${detail.recentReports.length} recentes` },
+    ]
+  : [];
+---
+
+{detail ? (
+  <AdminShellLayout
+    title={`${detail.family.displayName} | Catalogo Tariel Astro`}
+    activeItem="catalog"
+    userName="Admin-CEO"
+  >
+    <Fragment slot="header">
+      <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+        <div class="max-w-4xl">
+          <a
+            href="/admin/catalogo-laudos"
+            class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+          >
+            <ArrowLeft className="size-4" />
+            Voltar para o catalogo
+          </a>
+
+          <p class="mt-4 text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Detalhe da familia</p>
+          <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950 sm:text-5xl">
+            {detail.family.displayName}
+          </h1>
+          <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+            {detail.family.familyKey} • {detail.family.macroCategory} • Schema v{detail.family.schemaVersion} •
+            Atualizado em {detail.family.updatedLabel}
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <StatusPill label={detail.family.technicalStatus.label} tone={detail.family.technicalStatus.tone} />
+          {detail.offer ? <StatusPill label={detail.offer.lifecycle.label} tone={detail.offer.lifecycle.tone} /> : null}
+          <StatusPill label={detail.calibration.status.label} tone={detail.calibration.status.tone} />
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+        <span>{detail.family.classificationLabel}</span>
+        <span>Status catalogo: {detail.family.catalogStatus}</span>
+        <span>Ultimo ator conhecido: {detail.family.actorLabel}</span>
+      </div>
+    </Fragment>
+
+    <AdminNotice notice={notice} />
+
+    <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+      {cards.map((card) => (
+        <KpiCard label={card.label} value={card.value} detail={card.detail} icon={card.icon} tone={card.tone} />
+      ))}
+    </section>
+
+    <section class="mt-8 grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Resumo executivo</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Leitura administrativa da familia</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          {detail.family.description ??
+            "A familia ja esta catalogada na nova stack, com leitura de oferta, calibracao, liberacoes e laudos emitidos."}
+        </p>
+
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
+          <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Base governada</p>
+            <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">
+              {detail.base.outputSections.length} secoes estruturadas
+            </h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              {detail.base.requiredSlots.length} slots obrigatorios e {detail.base.reviewRules.length} regras de revisao.
+            </p>
+          </div>
+
+          <div class="rounded-[26px] border border-slate-950/8 bg-slate-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Pacote comercial</p>
+            <h3 class="mt-3 font-display text-2xl tracking-tight text-slate-950">
+              {detail.offer?.name ?? "Sem pacote publicado"}
+            </h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              {detail.offer
+                ? `${detail.offer.variants.length} variantes com template ${detail.offer.templateDefaultCode ?? "em definicao"}.`
+                : "A familia ainda nao recebeu pacote comercial no recorte atual."}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
+          <div class="rounded-[26px] border border-slate-950/8 bg-white p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Controles da familia</p>
+            <dl class="mt-4 space-y-3 text-sm text-slate-700">
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Macro categoria</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.family.macroCategory}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">NR principal</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.family.nrKey ?? "Nao informada"}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Criada em</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.family.createdLabel}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Ultima mudanca</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.summary.lastUpdatedLabel}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="rounded-[26px] border border-slate-950/8 bg-white p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Prontidao</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <StatusPill label={detail.family.technicalStatus.label} tone={detail.family.technicalStatus.tone} />
+              {detail.offer ? <StatusPill label={detail.offer.lifecycle.label} tone={detail.offer.lifecycle.tone} /> : null}
+              <StatusPill label={detail.calibration.status.label} tone={detail.calibration.status.tone} />
+            </div>
+            <dl class="mt-4 space-y-3 text-sm text-slate-700">
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Modos tecnicos</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.summary.modeCount}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Tenants liberados</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.summary.activeReleaseCount}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-slate-500">Laudos gerados</dt>
+                <dd class="text-right font-medium text-slate-950">{detail.summary.reportCount}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-slate-950 p-6 text-white shadow-[0_18px_60px_rgba(15,23,42,0.16)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-orange-200">Snapshot operacional</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight">A familia ja vive no catalogo governado.</h2>
+
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div class="rounded-[26px] border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Campos estruturados</p>
+            <p class="mt-3 font-display text-4xl text-white">{detail.base.outputFieldCount}</p>
+          </div>
+          <div class="rounded-[26px] border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Slots obrigatorios</p>
+            <p class="mt-3 font-display text-4xl text-white">{detail.base.requiredSlots.length}</p>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-[28px] border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300">
+          <p>
+            {detail.offer
+              ? `${detail.offer.variants.length} variantes comerciais ligadas ao pacote ${detail.offer.packageName ?? detail.offer.name}.`
+              : "Nenhum pacote comercial foi encontrado para esta familia no banco atual."}
+          </p>
+          <p class="mt-3">
+            {detail.releases.length > 0
+              ? `${detail.releases.length} tenants possuem liberacao cadastrada para esta familia.`
+              : "A familia ainda nao foi liberada para nenhum tenant."}
+          </p>
+        </div>
+
+        <div class="mt-6 grid gap-3 text-sm leading-6 text-slate-300">
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            Ultimo laudo: <strong class="text-white">{detail.summary.lastReportLabel}</strong>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            Ultima mudanca: <strong class="text-white">{detail.summary.lastUpdatedLabel}</strong>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            Ultimo responsavel conhecido: <strong class="text-white">{detail.history[0]?.actorLabel ?? detail.family.actorLabel}</strong>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div class="flex flex-wrap gap-3" role="tablist" aria-label="Secoes da familia">
+        {tabs.map((tab) => (
+          <a
+            href={`${familyBasePath}?tab=${tab.key}`}
+            class:list={[
+              "rounded-full border px-4 py-2 text-sm font-medium transition",
+              activeTab === tab.key
+                ? "border-slate-950 bg-slate-950 text-white"
+                : "border-slate-950/10 bg-slate-50 text-slate-700 hover:border-slate-950/18 hover:bg-white",
+            ]}
+            aria-current={activeTab === tab.key ? "page" : undefined}
+          >
+            <span>{tab.label}</span>
+            <small class="ml-2 text-xs uppercase tracking-[0.18em] opacity-70">{tab.meta}</small>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    {activeTab === "visao-geral" ? (
+      <section class="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Visao geral</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Base, oferta e calibracao</h2>
+
+          <div class="mt-6 grid gap-4 md:grid-cols-2">
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Base</p>
+              <p class="mt-2 font-semibold text-slate-950">{detail.base.outputSections.length} secoes</p>
+              <p class="mt-2 text-sm text-slate-600">
+                {detail.base.requiredSlots.length} slots obrigatorios e {detail.base.blockingConditions.length} bloqueios definidos.
+              </p>
+            </article>
+
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Oferta</p>
+              <p class="mt-2 font-semibold text-slate-950">{detail.offer?.name ?? "Sem pacote"}</p>
+              <p class="mt-2 text-sm text-slate-600">
+                {detail.offer ? `${detail.offer.variants.length} variantes e template ${detail.offer.templateDefaultCode ?? "em definicao"}.` : "Nenhum pacote publicado."}
+              </p>
+            </article>
+
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Calibracao</p>
+              <p class="mt-2 font-semibold text-slate-950">{detail.calibration.status.label}</p>
+              <p class="mt-2 text-sm text-slate-600">
+                {detail.calibration.referenceSource ?? "Sem fonte de referencia registrada."}
+              </p>
+            </article>
+
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Liberacao</p>
+              <p class="mt-2 font-semibold text-slate-950">{detail.summary.activeReleaseCount} tenants ativos</p>
+              <p class="mt-2 text-sm text-slate-600">
+                {detail.summary.reportCount} laudos emitidos a partir desta familia.
+              </p>
+            </article>
+          </div>
+        </article>
+
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Historico recente</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Ultimos movimentos</h2>
+
+          <div class="mt-6 space-y-3">
+            {detail.history.length > 0 ? detail.history.slice(0, 6).map((event) => (
+              <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-semibold text-slate-950">{event.title}</p>
+                    <p class="mt-1 text-sm text-slate-600">{event.detail}</p>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <StatusPill label={event.typeLabel} tone="neutral" />
+                    <StatusPill label={event.whenLabel} tone="info" />
+                  </div>
+                </div>
+              </article>
+            )) : (
+              <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+                Nenhum evento foi encontrado para esta familia.
+              </div>
+            )}
+          </div>
+        </article>
+      </section>
+    ) : null}
+
+    {activeTab === "base" ? (
+      <section class="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Base governada</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Schema, slots e revisao</h2>
+
+          <div class="mt-6 grid gap-4">
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Secoes do documento</p>
+              <div class="mt-4 grid gap-3">
+                {detail.base.outputSections.length > 0 ? detail.base.outputSections.map((section) => (
+                  <div class="rounded-2xl border border-slate-950/8 bg-white px-4 py-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                      <p class="font-medium text-slate-950">{section.title}</p>
+                      <div class="flex flex-wrap gap-2">
+                        <StatusPill label={`${section.fieldCount} campos`} tone="info" />
+                        <StatusPill label={section.required ? "Obrigatoria" : "Opcional"} tone={section.required ? "warning" : "neutral"} />
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <p class="text-sm text-slate-500">Sem secoes estruturadas no payload atual.</p>
+                )}
+              </div>
+            </article>
+
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Slots e regras</p>
+              <div class="mt-4 grid gap-4 md:grid-cols-2">
+                <div>
+                  <p class="text-sm font-semibold text-slate-950">Slots obrigatorios</p>
+                  <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                    {detail.base.requiredSlots.length > 0 ? detail.base.requiredSlots.map((slot) => (
+                      <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">{slot}</li>
+                    )) : (
+                      <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">Nenhum slot obrigatorio registrado.</li>
+                    )}
+                  </ul>
+                </div>
+
+                <div>
+                  <p class="text-sm font-semibold text-slate-950">Regras de revisao</p>
+                  <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                    {detail.base.reviewRules.length > 0 ? detail.base.reviewRules.map((rule) => (
+                      <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">{rule}</li>
+                    )) : (
+                      <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">Nenhuma regra registrada.</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </article>
+          </div>
+        </article>
+
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Payloads</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">JSON bruto da familia</h2>
+
+          <div class="mt-6 space-y-4">
+            {detail.base.reviewPolicyPreview ? (
+              <details class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-950">Review policy JSON</summary>
+                <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{detail.base.reviewPolicyPreview}</pre>
+              </details>
+            ) : null}
+
+            {detail.base.evidencePolicyPreview ? (
+              <details class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-950">Evidence policy JSON</summary>
+                <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{detail.base.evidencePolicyPreview}</pre>
+              </details>
+            ) : null}
+
+            {detail.base.outputSchemaPreview ? (
+              <details class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4" open>
+                <summary class="cursor-pointer text-sm font-semibold text-slate-950">Output schema seed JSON</summary>
+                <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{detail.base.outputSchemaPreview}</pre>
+              </details>
+            ) : null}
+
+            {detail.base.governancePreview ? (
+              <details class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-950">Governance metadata JSON</summary>
+                <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{detail.base.governancePreview}</pre>
+              </details>
+            ) : null}
+          </div>
+        </article>
+      </section>
+    ) : null}
+
+    {activeTab === "oferta" ? (
+      <section class="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
+        {detail.offer ? (
+          <>
+            <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Oferta comercial</p>
+              <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">{detail.offer.name}</h2>
+              <p class="mt-3 text-sm leading-7 text-slate-600">
+                {detail.offer.description ?? "Pacote comercial registrado sem descricao adicional."}
+              </p>
+
+              <div class="mt-6 flex flex-wrap gap-2">
+                <StatusPill label={detail.offer.lifecycle.label} tone={detail.offer.lifecycle.tone} />
+                <StatusPill label={detail.offer.materialLevel.label} tone={detail.offer.materialLevel.tone} />
+                <StatusPill label={detail.offer.showcaseEnabled ? "Showcase ligado" : "Showcase desligado"} tone={detail.offer.showcaseEnabled ? "info" : "neutral"} />
+              </div>
+
+              <dl class="mt-6 space-y-3 text-sm text-slate-700">
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="text-slate-500">Pacote</dt>
+                  <dd class="text-right font-medium text-slate-950">{detail.offer.packageName ?? "Nao informado"}</dd>
+                </div>
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="text-slate-500">Template default</dt>
+                  <dd class="text-right font-medium text-slate-950">{detail.offer.templateDefaultCode ?? "Nao definido"}</dd>
+                </div>
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="text-slate-500">Prazo padrao</dt>
+                  <dd class="text-right font-medium text-slate-950">{detail.offer.prazoPadraoDias == null ? "Nao informado" : `${detail.offer.prazoPadraoDias} dias`}</dd>
+                </div>
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="text-slate-500">Versao</dt>
+                  <dd class="text-right font-medium text-slate-950">v{detail.offer.version}</dd>
+                </div>
+              </dl>
+            </article>
+
+            <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Variantes e escopo</p>
+              <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Biblioteca comercial</h2>
+
+              <div class="mt-6 grid gap-4">
+                <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                  <p class="text-sm font-semibold text-slate-950">Variantes</p>
+                  <div class="mt-4 grid gap-3">
+                    {detail.offer.variants.length > 0 ? detail.offer.variants.map((variant) => (
+                      <div class="rounded-2xl border border-slate-950/8 bg-white px-4 py-3">
+                        <p class="font-medium text-slate-950">{variant.label}</p>
+                        {variant.description ? <p class="mt-1 text-sm text-slate-600">{variant.description}</p> : null}
+                        <p class="mt-2 text-xs uppercase tracking-[0.16em] text-slate-500">{variant.key}</p>
+                      </div>
+                    )) : (
+                      <p class="text-sm text-slate-500">Nenhuma variante estruturada foi encontrada.</p>
+                    )}
+                  </div>
+                </article>
+
+                <div class="grid gap-4 md:grid-cols-3">
+                  <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                    <p class="text-sm font-semibold text-slate-950">Escopo</p>
+                    <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                      {detail.offer.scopeItems.length > 0 ? detail.offer.scopeItems.map((item) => (
+                        <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">{item}</li>
+                      )) : (
+                        <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">Sem itens cadastrados.</li>
+                      )}
+                    </ul>
+                  </article>
+
+                  <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                    <p class="text-sm font-semibold text-slate-950">Exclusoes</p>
+                    <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                      {detail.offer.exclusionItems.length > 0 ? detail.offer.exclusionItems.map((item) => (
+                        <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">{item}</li>
+                      )) : (
+                        <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">Sem exclusoes registradas.</li>
+                      )}
+                    </ul>
+                  </article>
+
+                  <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                    <p class="text-sm font-semibold text-slate-950">Insumos minimos</p>
+                    <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                      {detail.offer.minimumInputs.length > 0 ? detail.offer.minimumInputs.map((item) => (
+                        <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">{item}</li>
+                      )) : (
+                        <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">Sem insumos minimos registrados.</li>
+                      )}
+                    </ul>
+                  </article>
+                </div>
+
+                {detail.offer.flagsPreview ? (
+                  <details class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                    <summary class="cursor-pointer text-sm font-semibold text-slate-950">Flags comerciais JSON</summary>
+                    <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{detail.offer.flagsPreview}</pre>
+                  </details>
+                ) : null}
+              </div>
+            </article>
+          </>
+        ) : (
+          <article class="rounded-[32px] border border-slate-950/8 bg-white p-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] xl:col-span-2">
+            <h2 class="font-display text-3xl tracking-tight text-slate-950">Sem pacote comercial nesta familia</h2>
+            <p class="mt-4 text-sm leading-7 text-slate-600">
+              A leitura do catalogo novo ja funciona, mas esta familia ainda nao possui oferta comercial no banco atual.
+            </p>
+          </article>
+        )}
+      </section>
+    ) : null}
+
+    {activeTab === "calibracao" ? (
+      <section class="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Calibracao</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">{detail.calibration.status.label}</h2>
+
+          <dl class="mt-6 space-y-3 text-sm text-slate-700">
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-500">Ultima calibracao</dt>
+              <dd class="text-right font-medium text-slate-950">{detail.calibration.lastCalibratedLabel}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-500">Fonte de referencia</dt>
+              <dd class="text-right font-medium text-slate-950">{detail.calibration.referenceSource ?? "Nao informada"}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-500">Responsavel</dt>
+              <dd class="text-right font-medium text-slate-950">{detail.calibration.actorLabel}</dd>
+            </div>
+          </dl>
+
+          {detail.calibration.summary ? (
+            <div class="mt-6 rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
+              {detail.calibration.summary}
+            </div>
+          ) : null}
+        </article>
+
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Ajustes registrados</p>
+          <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Campos e anexos</h2>
+
+          <div class="mt-6 grid gap-4">
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-sm font-semibold text-slate-950">Campos alterados</p>
+              <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                {detail.calibration.changedFields.length > 0 ? detail.calibration.changedFields.map((item) => (
+                  <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">{item}</li>
+                )) : (
+                  <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">Sem campos alterados registrados.</li>
+                )}
+              </ul>
+            </article>
+
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <p class="text-sm font-semibold text-slate-950">Anexos</p>
+              <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+                {detail.calibration.attachments.length > 0 ? detail.calibration.attachments.map((item) => (
+                  <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">{item}</li>
+                )) : (
+                  <li class="rounded-xl border border-slate-950/8 bg-white px-3 py-2">Sem anexos de calibracao.</li>
+                )}
+              </ul>
+            </article>
+
+            {detail.calibration.changedLanguageNotes ? (
+              <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
+                {detail.calibration.changedLanguageNotes}
+              </article>
+            ) : null}
+
+            {detail.calibration.rawPreview ? (
+              <details class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-950">Payload bruto da calibracao</summary>
+                <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{detail.calibration.rawPreview}</pre>
+              </details>
+            ) : null}
+          </div>
+        </article>
+      </section>
+    ) : null}
+
+    {activeTab === "liberacao" ? (
+      <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tenants</p>
+            <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Liberacao por empresa</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              A nova stack ja le o rollout comercial por tenant, inclusive template default e escopo efetivo.
+            </p>
+          </div>
+          <StatusPill label={`${formatNumber(detail.releases.length)} tenants`} tone="info" />
+        </div>
+
+        <div class="mt-6 space-y-3">
+          {detail.releases.length > 0 ? detail.releases.map((release) => (
+            <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-slate-950">{release.tenantName}</p>
+                  <p class="mt-1 text-sm text-slate-600">
+                    Tenant #{release.tenantId} • {release.cityState ?? "cidade n/d"} • {release.plan}
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <StatusPill label={release.releaseStatus.label} tone={release.releaseStatus.tone} />
+                  <StatusPill label={release.updatedLabel} tone="info" />
+                </div>
+              </div>
+
+              <div class="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Template default</p>
+                  <p class="mt-1 font-medium text-slate-950">{release.defaultTemplateCode ?? "Herdado da familia"}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Escopo liberado</p>
+                  <p class="mt-1 font-medium text-slate-950">
+                    {release.modeCount} modos • {release.templateCount} templates • {release.variantCount} variantes
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Janela</p>
+                  <p class="mt-1 font-medium text-slate-950">{release.startLabel} ate {release.endLabel}</p>
+                </div>
+              </div>
+
+              {release.observations ? (
+                <div class="mt-4 rounded-2xl border border-slate-950/8 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
+                  {release.observations}
+                </div>
+              ) : null}
+
+              <details class="mt-4 rounded-2xl border border-slate-950/8 bg-white px-4 py-3">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-950">Editar esta liberação</summary>
+
+                <form
+                  method="POST"
+                  action={`${familyBasePath}/liberacao-tenant`}
+                  class="mt-4 space-y-4"
+                >
+                  <input type="hidden" name="tenant_id" value={release.tenantId} />
+                  <input type="hidden" name="returnTo" value={`${familyBasePath}?tab=liberacao`} />
+
+                  <div class="grid gap-4 md:grid-cols-2">
+                    <label class="block space-y-2">
+                      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Status</span>
+                      <select
+                        name="release_status"
+                        class="w-full rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+                      >
+                        <option value="draft" selected={release.releaseStatus.key === "draft"}>Em preparo</option>
+                        <option value="active" selected={release.releaseStatus.key === "active"}>Ativa</option>
+                        <option value="paused" selected={release.releaseStatus.key === "paused"}>Pausada</option>
+                        <option value="expired" selected={release.releaseStatus.key === "expired"}>Encerrada</option>
+                      </select>
+                    </label>
+
+                    <label class="block space-y-2">
+                      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Template default</span>
+                      <select
+                        name="default_template_code"
+                        class="w-full rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+                      >
+                        <option value="">Herdar da família</option>
+                        {releaseTemplateOptions.map((template) => (
+                          <option value={template.code} selected={release.defaultTemplateCode === template.code}>
+                            {template.label} ({template.code})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  {releaseTemplateOptions.length > 0 ? (
+                    <div class="space-y-2">
+                      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Templates liberados</p>
+                      <div class="grid gap-2 md:grid-cols-2">
+                        {releaseTemplateOptions.map((template) => (
+                          <label class="flex items-start gap-3 rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                            <input
+                              type="checkbox"
+                              name="allowed_templates"
+                              value={template.code}
+                              checked={releaseTemplateChecked(release, template.code)}
+                              class="mt-1 size-4 rounded border-slate-300 text-slate-950 focus:ring-slate-950"
+                            />
+                            <span>
+                              <strong class="text-slate-950">{template.label}</strong>
+                              <small class="mt-1 block uppercase tracking-[0.16em] text-slate-500">{template.code}</small>
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div class="space-y-2">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Variantes liberadas</p>
+                    <div class="grid gap-2">
+                      {detail.offer?.variants.length ? detail.offer.variants.map((variant) => (
+                        <label
+                          class:list={[
+                            "flex items-start gap-3 rounded-[20px] border px-4 py-3 text-sm",
+                            variant.runtimeTemplateCode
+                              ? "border-slate-200 bg-slate-50 text-slate-700"
+                              : "border-slate-200 bg-slate-100 text-slate-500 opacity-80",
+                          ]}
+                        >
+                          <input
+                            type="checkbox"
+                            name="allowed_variants"
+                            value={variant.selectionToken ?? ""}
+                            checked={releaseVariantChecked(release, variant)}
+                            disabled={!variant.selectionToken || !variant.runtimeTemplateCode}
+                            class="mt-1 size-4 rounded border-slate-300 text-slate-950 focus:ring-slate-950"
+                          />
+                          <span>
+                            <strong class="text-slate-950">{variant.label}</strong>
+                            <small class="mt-1 block text-slate-500">
+                              {variant.runtimeTemplateCode
+                                ? `Runtime ${variant.runtimeTemplateLabel}`
+                                : "Modelo ainda sem runtime operacional"}
+                            </small>
+                          </span>
+                        </label>
+                      )) : (
+                        <div class="rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                          Nenhuma variante estruturada foi encontrada para esta família.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <label class="block space-y-2">
+                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Observações</span>
+                    <textarea
+                      name="observacoes"
+                      rows="3"
+                      placeholder="Descreva janela, restrição ou contexto desta liberação."
+                      class="w-full rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+                    >{release.observations ?? ""}</textarea>
+                  </label>
+
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <a
+                      href={`/admin/clientes/${release.tenantId}`}
+                      class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-100"
+                    >
+                      Abrir empresa
+                    </a>
+
+                    <button
+                      type="submit"
+                      class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                    >
+                      Salvar liberação
+                    </button>
+                  </div>
+                </form>
+              </details>
+
+              {release.governancePreview ? (
+                <details class="mt-4 rounded-2xl border border-slate-950/8 bg-white px-4 py-3">
+                  <summary class="cursor-pointer text-sm font-semibold text-slate-950">Governanca da liberacao</summary>
+                  <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{release.governancePreview}</pre>
+                </details>
+              ) : null}
+            </article>
+          )) : (
+            <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+              Nenhuma liberacao por tenant foi encontrada para esta familia. Novas empresas continuam sendo liberadas pelo detalhe do cliente.
+            </div>
+          )}
+        </div>
+      </section>
+    ) : null}
+
+    {activeTab === "relatorios" ? (
+      <section class="mt-8 grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Laudos recentes</p>
+              <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Uso em producao</h2>
+            </div>
+            <StatusPill label={`${formatNumber(detail.recentReports.length)} itens`} tone="neutral" />
+          </div>
+
+          <div class="mt-6 space-y-3">
+            {detail.recentReports.length > 0 ? detail.recentReports.map((report) => (
+              <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-semibold text-slate-950">{report.companyName}</p>
+                    <p class="mt-1 text-sm text-slate-600">{report.sector}</p>
+                  </div>
+                  <StatusPill label={report.createdLabel} tone="info" />
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <StatusPill label={report.reviewStatus} tone="neutral" />
+                  <StatusPill label={report.complianceStatus} tone="neutral" />
+                  <StatusPill label={report.entryMode} tone="info" />
+                  {report.variantLabel ? <StatusPill label={report.variantLabel} tone="warning" /> : null}
+                </div>
+              </article>
+            )) : (
+              <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+                Nenhum laudo catalogado foi encontrado para esta familia.
+              </div>
+            )}
+          </div>
+        </article>
+
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Historico</p>
+              <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Linha do tempo da familia</h2>
+            </div>
+            <StatusPill label={`${formatNumber(detail.history.length)} eventos`} tone="info" />
+          </div>
+
+          <div class="mt-6 space-y-3">
+            {detail.history.length > 0 ? detail.history.map((event) => (
+              <article class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="rounded-2xl bg-slate-950 p-3 text-orange-300">
+                      <Binary className="size-4" />
+                    </div>
+                    <div>
+                      <p class="font-semibold text-slate-950">{event.title}</p>
+                      <p class="mt-1 text-sm text-slate-600">{event.detail}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2">
+                    <StatusPill label={event.typeLabel} tone="neutral" />
+                    <StatusPill label={event.whenLabel} tone="info" />
+                  </div>
+                </div>
+              </article>
+            )) : (
+              <div class="rounded-[24px] border border-slate-950/8 bg-slate-50 p-4 text-sm text-slate-500">
+                Nenhum evento foi encontrado.
+              </div>
+            )}
+          </div>
+        </article>
+      </section>
+    ) : null}
+  </AdminShellLayout>
+) : (
+  <AdminShellLayout title="Familia nao encontrada | Catalogo Tariel Astro" activeItem="catalog" userName="Admin-CEO">
+    <Fragment slot="header">
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Detalhe indisponivel</p>
+        <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950">Familia nao encontrada</h1>
+        <p class="mt-4 text-sm leading-7 text-slate-600">
+          A family key informada nao existe no catalogo atual ou ainda nao foi trazida para a nova stack.
+        </p>
+      </div>
+    </Fragment>
+
+    <AdminNotice notice={notice} />
+
+    <section class="rounded-[32px] border border-slate-950/8 bg-white p-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div class="max-w-2xl">
+        <div class="w-fit rounded-2xl bg-slate-950 p-3 text-orange-300">
+          <Sparkles className="size-5" />
+        </div>
+        <h2 class="mt-6 font-display text-3xl tracking-tight text-slate-950">Voltar para o catalogo</h2>
+        <p class="mt-4 text-sm leading-7 text-slate-600">
+          Reabra a home do catalogo e selecione outra familia para continuar a migracao por superficies.
+        </p>
+        <a
+          href="/admin/catalogo-laudos"
+          class="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          <ArrowLeft className="size-4" />
+          Ir para catalogo
+        </a>
+      </div>
+    </section>
+  </AdminShellLayout>
+)}

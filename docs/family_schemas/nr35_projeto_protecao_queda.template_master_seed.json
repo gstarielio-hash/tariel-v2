@@ -1,0 +1,28 @@
+{
+  "family_key": "nr35_projeto_protecao_queda",
+  "template_code": "nr35_projeto_protecao_queda",
+  "nome_template": "NR35 - Projeto de protecao contra queda - Template Governado",
+  "versao": 1,
+  "modo_editor": "editor_rico",
+  "observacoes": "Template governado para projeto de protecao contra queda com premissas, calculo e layout.",
+  "documento_editor_json": {
+    "version": 1,
+    "doc": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "NR35 - Projeto de protecao contra queda"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

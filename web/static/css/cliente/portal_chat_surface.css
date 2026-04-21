@@ -1,0 +1,49 @@
+.workspace-shell--chat .workspace-radar-grid--chat {
+    grid-template-columns: minmax(0, 0.9fr) repeat(2, minmax(0, 1fr));
+}
+
+.panel--chat .workspace-box--radar {
+    background:
+        linear-gradient(135deg, rgba(97, 153, 255, 0.11), transparent 38%),
+        linear-gradient(180deg, rgba(18, 27, 39, 0.98), rgba(11, 18, 28, 0.98));
+}
+
+.panel--chat .workspace-box--thread {
+    background:
+        linear-gradient(180deg, rgba(17, 25, 36, 0.99), rgba(10, 17, 26, 0.99));
+}
+
+.panel--chat .workspace-box--context,
+.panel--chat .workspace-box--compose,
+.panel--chat .workspace-box--list {
+    background:
+        linear-gradient(180deg, rgba(15, 23, 34, 0.98), rgba(10, 17, 26, 0.98));
+}
+
+.panel--chat #chat-alertas-operacionais,
+.panel--chat #chat-triagem,
+.panel--chat #chat-movimentos {
+    margin-top: 0;
+}
+
+.panel--chat #chat-contexto .empty-state,
+.panel--chat #chat-mensagens .empty-state {
+    min-height: 180px;
+}
+
+.panel--chat #lista-chat-laudos .item.active {
+    border-color: rgba(97, 153, 255, 0.34);
+    background:
+        linear-gradient(180deg, rgba(97, 153, 255, 0.16), rgba(255, 255, 255, 0.03)),
+        rgba(9, 14, 20, 0.58);
+}
+
+.panel--chat .workspace-box--thread .composer-toolbar {
+    padding-bottom: 2px;
+}
+
+@media (max-width: 1320px) {
+    .workspace-shell--chat .workspace-radar-grid--chat {
+        grid-template-columns: 1fr;
+    }
+}

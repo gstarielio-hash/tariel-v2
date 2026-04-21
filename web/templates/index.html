@@ -1,0 +1,65 @@
+{% extends "inspetor/base.html" %}
+
+{% block title %}Tariel.ia • Portal do Inspetor{% endblock %}
+{% block body_class %}pagina-chat pagina-chat-dashboard-v2 pagina-chat-redesign{% endblock %}
+
+{% set laudos_portal = laudos_recentes | default([], true) %}
+{% set usuario_nome = usuario.nome_completo if usuario else "João Silva" %}
+{% set usuario_email = usuario.email if usuario else "" %}
+{% set usuario_telefone = usuario.telefone if usuario and usuario.telefone else "" %}
+{% set usuario_foto_url = usuario.foto_perfil_url if usuario and usuario.foto_perfil_url else "" %}
+{% set empresa_nome = usuario.empresa.nome_fantasia if usuario and usuario.empresa else "Empresa Demo" %}
+{% set status_relatorio_atual = estado_relatorio.estado if estado_relatorio and estado_relatorio.estado else "sem_relatorio" %}
+{% set laudo_selecionado_id = estado_relatorio.laudo_id if estado_relatorio and estado_relatorio.laudo_id else none %}
+{% set laudos_sidebar = laudos_sidebar | default([], true) %}
+{% set laudos_portal_cards = laudos_portal_cards | default([], true) %}
+{% set modelos_portal = modelos_portal | default([], true) %}
+{% set cards_status = cards_status | default([], true) %}
+
+{% block header %}{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+{% include "inspetor/_portal_main.html" %}
+{% endblock %}
+
+{% block overlay_host %}
+{% include "inspetor/modals/_nova_inspecao.html" %}
+{% include "inspetor/modals/_gate_qualidade.html" %}
+{% include "inspetor/modals/_perfil.html" %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/shared/api-core.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/shared/chat-render.js?v={{ v_app }}&ui_rev=20260406_focused_chat_cleanup" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/shared/chat-network-utils.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/shared/case-lifecycle.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/shared/chat-network.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/shared/api.js?v={{ v_app }}&ui_rev=20260406_focused_chat_cleanup" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/shared/ui.js?v={{ v_app }}&ui_rev=20260406_mesa_channels_real" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/shared/hardware.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/modals.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/observers.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/pendencias.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/mesa_widget.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/notifications_sse.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/entry_mode.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/bootstrap.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/system_events.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/ui_bindings.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/governance.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/workspace_overview.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/workspace_history.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/workspace_context.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/workspace_navigation.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/workspace_report_flow.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/inspetor/workspace_derivatives.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_index_page.js?v={{ v_app }}&ui_rev=20260406_mesa_channels_attachment_fix" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_perfil_usuario.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_painel_core.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_painel_laudos.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_painel_historico_acoes.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_painel_mesa.js?v={{ v_app }}&ui_rev=20260406_mesa_channels_real" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_painel_relatorio.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+<script src="/static/js/chat/chat_painel_index.js?v={{ v_app }}" defer nonce="{{ csp_nonce }}"></script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{
+  "family_key": "nr13_calculo_espessura_minima_vaso_pressao",
+  "status": "stub_sintetico",
+  "description": "Stub local para orientar a futura consolidacao do pacote de filled_reference.",
+  "required_files": [
+    "manifest.json",
+    "tariel_filled_reference_bundle.json"
+  ],
+  "source_of_truth": "material real consolidado em coleta_entrada/"
+}

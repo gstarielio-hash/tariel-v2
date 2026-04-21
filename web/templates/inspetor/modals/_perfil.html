@@ -1,0 +1,103 @@
+<div
+    id="modal-perfil-chat"
+    class="modal-overlay modal-overlay-perfil"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="perfil-chat-titulo"
+    aria-describedby="perfil-chat-descricao"
+    aria-hidden="true"
+    hidden
+>
+    <div class="modal-container modal-container-perfil" role="document">
+        <div class="modal-header">
+            <div>
+                <h2 id="perfil-chat-titulo">
+                    <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+                    Perfil do Usuário
+                </h2>
+                <p id="perfil-chat-descricao">Atualize os dados do seu perfil de inspeção.</p>
+            </div>
+
+            <button
+                type="button"
+                id="btn-fechar-modal-perfil"
+                class="btn-fechar-modal"
+                aria-label="Fechar perfil"
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            </button>
+        </div>
+
+        <div class="modal-body modal-body-perfil">
+            <div class="perfil-avatar-editor">
+                <div id="perfil-avatar-preview" class="perfil-avatar-preview" aria-hidden="true">
+                    <span id="perfil-avatar-iniciais">US</span>
+                </div>
+
+                <div class="perfil-avatar-acoes">
+                    <button type="button" id="btn-trocar-foto-perfil" class="technical-record-btn technical-record-btn--outline">
+                        Trocar foto
+                    </button>
+
+                    <input
+                        type="file"
+                        id="input-foto-perfil"
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                        hidden
+                        aria-hidden="true"
+                        tabindex="-1"
+                    >
+                </div>
+            </div>
+
+            <div class="modal-campo">
+                <label for="input-perfil-nome" class="modal-label">Nome</label>
+                <input
+                    id="input-perfil-nome"
+                    class="modal-input"
+                    type="text"
+                    maxlength="150"
+                    placeholder="Seu nome completo"
+                    autocomplete="name"
+                >
+            </div>
+
+            <div class="modal-campo">
+                <label for="input-perfil-email" class="modal-label">E-mail</label>
+                <input
+                    id="input-perfil-email"
+                    class="modal-input"
+                    type="email"
+                    maxlength="254"
+                    placeholder="voce@empresa.com"
+                    autocomplete="email"
+                    autocapitalize="off"
+                    spellcheck="false"
+                >
+            </div>
+
+            <div class="modal-campo">
+                <label for="input-perfil-telefone" class="modal-label">Telefone</label>
+                <input
+                    id="input-perfil-telefone"
+                    class="modal-input"
+                    type="tel"
+                    maxlength="30"
+                    placeholder="(11) 99999-9999"
+                    autocomplete="tel"
+                >
+            </div>
+
+            <p id="perfil-chat-feedback" class="perfil-chat-feedback" aria-live="polite"></p>
+
+            <div class="perfil-chat-acoes">
+                <button type="button" id="btn-cancelar-modal-perfil" class="technical-record-btn technical-record-btn--ghost">
+                    Cancelar
+                </button>
+                <button type="button" id="btn-salvar-perfil-chat" class="technical-record-btn technical-record-btn--primary">
+                    Salvar perfil
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

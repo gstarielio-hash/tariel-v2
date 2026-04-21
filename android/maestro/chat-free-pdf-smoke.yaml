@@ -1,0 +1,129 @@
+appId: com.tarielia.inspetor
+tags:
+  - smoke
+  - chat
+  - pdf
+env:
+  LOGIN_EMAIL: ${MAESTRO_LOGIN_EMAIL}
+  LOGIN_PASSWORD: ${MAESTRO_LOGIN_PASSWORD}
+  TARGET_LAUDO_ID: ${MAESTRO_TARGET_LAUDO_ID}
+  CHAT_EVIDENCE_TEXT: ${MAESTRO_CHAT_EVIDENCE_TEXT}
+  CHAT_PDF_REQUEST: ${MAESTRO_CHAT_PDF_REQUEST}
+  CHAT_PDF_SUCCESS_TEXT: ${MAESTRO_CHAT_PDF_SUCCESS_TEXT}
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: login-email-input
+    timeout: 30000
+
+- tapOn:
+    id: login-email-input
+
+- inputText: ${LOGIN_EMAIL}
+
+- tapOn:
+    id: login-password-input
+
+- inputText: ${LOGIN_PASSWORD}
+
+- tapOn:
+    id: login-submit-button
+
+- extendedWaitUntil:
+    visible:
+      id: free-chat-start-button
+    timeout: 20000
+
+- tapOn:
+    id: free-chat-start-button
+
+- extendedWaitUntil:
+    visible:
+      id: chat-attach-button
+    timeout: 15000
+
+- tapOn:
+    id: chat-tab-button
+
+- tapOn:
+    id: chat-attach-button
+
+- extendedWaitUntil:
+    visible:
+      id: attachment-picker-option-galeria
+    timeout: 10000
+
+- tapOn:
+    id: attachment-picker-option-galeria
+
+- extendedWaitUntil:
+    visible: "Fotos"
+    timeout: 20000
+
+- runFlow:
+    when:
+      visible: "Dispensar"
+    commands:
+      - tapOn: "Dispensar"
+
+- tapOn:
+    point: "16%,76%"
+
+- runFlow:
+    when:
+      visible: "Concluir"
+    commands:
+      - tapOn: "Concluir"
+
+- extendedWaitUntil:
+    visible:
+      id: chat-attachment-draft-card
+    timeout: 20000
+
+- tapOn:
+    id: chat-composer-input
+
+- inputText: ${CHAT_EVIDENCE_TEXT}
+
+- tapOn:
+    id: chat-send-button
+    retryTapIfNoChange: true
+    waitToSettleTimeoutMs: 1800
+
+- extendedWaitUntil:
+    visible: ${CHAT_EVIDENCE_TEXT}
+    timeout: 20000
+
+- tapOn:
+    id: chat-composer-input
+
+- inputText: ${CHAT_PDF_REQUEST}
+
+- hideKeyboard
+
+- extendedWaitUntil:
+    visible:
+      id: chat-send-button
+    timeout: 10000
+
+- tapOn:
+    id: chat-send-button
+    retryTapIfNoChange: true
+    waitToSettleTimeoutMs: 1800
+
+- scrollUntilVisible:
+    element:
+      id: chat-last-assistant-document-attachment
+    direction: DOWN
+    timeout: 90000
+
+- assertVisible:
+    id: chat-last-assistant-document-attachment
+
+- takeScreenshot: chat-free-pdf-result
+
+- tapOn:
+    id: chat-last-assistant-document-attachment

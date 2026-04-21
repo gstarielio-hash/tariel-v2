@@ -1,0 +1,123 @@
+import type { ComponentProps } from "react";
+
+import {
+  APP_BUILD_CHANNEL,
+  APP_VERSION_LABEL,
+} from "../InspectorMobileApp.constants";
+import { SettingsDrawerPanel } from "./SettingsDrawerPanel";
+import type { SettingsDrawerPanelBuilderInput } from "./settingsDrawerBuilderTypes";
+
+type SettingsDrawerPanelComponentProps = ComponentProps<
+  typeof SettingsDrawerPanel
+>;
+
+export function buildSettingsDrawerPanelProps(
+  input: SettingsDrawerPanelBuilderInput,
+): SettingsDrawerPanelComponentProps {
+  const {
+    accountSectionContentProps,
+    advancedResourcesSectionProps,
+    appBuildChannel,
+    appVersionLabel,
+    artigosAjudaCount,
+    configuracoesDrawerX,
+    emailRetorno,
+    experienceAiSectionProps,
+    experienceAppearanceSectionProps,
+    experienceNotificationsSectionProps,
+    filaSuporteCount,
+    mostrarGrupoContaAcesso,
+    mostrarGrupoExperiencia,
+    mostrarGrupoSeguranca,
+    mostrarGrupoSistema,
+    onAbrirFilaOffline,
+    overviewContentProps,
+    priorityActionsContentProps,
+    sectionMenuContentProps,
+    securityActivitySectionProps,
+    securityConnectedAccountsSectionProps,
+    securityDataConversationsSectionProps,
+    securityDeleteAccountSectionProps,
+    securityDeviceProtectionSectionProps,
+    securityFileUploadSectionProps,
+    securityIdentityVerificationSectionProps,
+    securityNotificationPrivacySectionProps,
+    securityPermissionsSectionProps,
+    securitySessionsSectionProps,
+    securityTwoFactorSectionProps,
+    settingsDrawerInOverview,
+    settingsDrawerMatchesPage,
+    settingsDrawerMatchesSection,
+    settingsDrawerPage,
+    settingsDrawerPageSections,
+    settingsDrawerPanHandlers,
+    settingsDrawerSectionMenuAtiva,
+    settingsDrawerSubtitle,
+    settingsDrawerTitle,
+    settingsPrintDarkMode,
+    supportSectionProps,
+    systemSectionProps,
+    totalSecoesConfiguracaoVisiveis,
+    fecharConfiguracoes,
+    handleVoltarResumoConfiguracoes,
+  } = input;
+
+  return {
+    accountSectionContentProps,
+    advancedResourcesSectionProps,
+    configuracoesDrawerX,
+    experienceAiSectionProps,
+    experienceAppearanceSectionProps,
+    experienceNotificationsSectionProps,
+    mostrarGrupoContaAcesso,
+    mostrarGrupoExperiencia,
+    mostrarGrupoSeguranca,
+    mostrarGrupoSistema,
+    onCloseOrBackPress: settingsDrawerInOverview
+      ? () => fecharConfiguracoes()
+      : handleVoltarResumoConfiguracoes,
+    overviewContentProps,
+    priorityActionsContentProps,
+    sectionMenuContentProps,
+    securityActivitySectionProps,
+    securityConnectedAccountsSectionProps,
+    securityDataConversationsSectionProps,
+    securityDeleteAccountSectionProps,
+    securityDeviceProtectionSectionProps,
+    securityFileUploadSectionProps,
+    securityIdentityVerificationSectionProps,
+    securityNotificationPrivacySectionProps,
+    securityPermissionsSectionProps,
+    securitySessionsSectionProps,
+    securityTwoFactorSectionProps,
+    settingsDrawerInOverview,
+    settingsDrawerMatchesPage,
+    settingsDrawerMatchesSection,
+    settingsDrawerPage,
+    settingsDrawerPageSections,
+    settingsDrawerPanHandlers,
+    settingsDrawerSectionMenuAtiva,
+    settingsDrawerSubtitle,
+    settingsDrawerTitle,
+    settingsPrintDarkMode,
+    supportSectionProps: {
+      ...supportSectionProps,
+      artigosAjudaCount,
+      emailRetorno,
+      filaSuporteCount,
+    },
+    systemSectionProps: {
+      ...systemSectionProps,
+      appBuildChannel:
+        systemSectionProps?.appBuildChannel ||
+        appBuildChannel ||
+        APP_BUILD_CHANNEL,
+      appVersionLabel:
+        systemSectionProps?.appVersionLabel ||
+        appVersionLabel ||
+        APP_VERSION_LABEL,
+      onAbrirFilaOffline,
+    },
+    totalSecoesConfiguracaoVisiveis,
+  };
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo_pagina | default("Troca de Senha") | e }}</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_auth_shell.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/cliente_auth.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app }}">
+</head>
+<body class="auth-shell auth-shell--cliente">
+    <main class="auth-layout auth-layout--split auth-layout--password-reset">
+        <section class="auth-hero auth-hero--password-reset">
+            <div class="auth-brand" aria-hidden="true">
+                <img src="/static/img/logo-horizontal-dark.png" alt="tariel.ia">
+            </div>
+            <span class="auth-eyebrow">Primeiro acesso da empresa</span>
+            <h1 class="auth-title">Ative o portal com uma senha definitiva.</h1>
+            <p class="auth-description">Use a senha temporaria recebida para concluir o primeiro acesso. Depois disso, o login da empresa continua normalmente com a nova senha.</p>
+
+            <div class="auth-signal-stack">
+                <div class="auth-signal-grid">
+                    <article class="auth-signal-card auth-signal-card--primary">
+                        <span class="auth-signal-label">Passo 1</span>
+                        <strong>Confirme a senha temporaria</strong>
+                        <p>Ela valida que este primeiro acesso pertence a empresa certa.</p>
+                    </article>
+                    <article class="auth-signal-card auth-signal-card--accent">
+                        <span class="auth-signal-label">Passo 2</span>
+                        <strong>Crie a nova senha</strong>
+                        <p>Essa sera a senha usada nos proximos acessos ao portal.</p>
+                    </article>
+                </div>
+
+                <div class="auth-access-policy">
+                    <strong>O que muda depois da confirmacao</strong>
+                    <ul>
+                        <li>O acesso temporario e encerrado.</li>
+                        <li>O portal passa a aceitar a nova senha no login normal.</li>
+                        <li>O restante do cadastro continua dentro do proprio portal da empresa.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-card auth-card--password-reset">
+            <div class="auth-card-shell auth-card-shell--reset">
+                <div class="auth-card-header">
+                    <span class="auth-eyebrow">Atualizacao obrigatoria</span>
+                    <h2 class="auth-card-title">{{ titulo_pagina | default("Troca de Senha") | e }}</h2>
+                    <p class="auth-card-subtitle">{{ subtitulo_pagina | default("Defina agora a senha que vai liberar o portal da empresa.") | e }}</p>
+                </div>
+
+                <div class="auth-inline-banner is-visible">Preencha os tres campos para liberar o acesso da empresa.</div>
+
+                <div class="auth-chip-row">
+                    <span class="auth-chip">Senha temporaria</span>
+                    <span class="auth-chip">Nova senha definitiva</span>
+                    <span class="auth-chip">Acesso liberado apos confirmacao</span>
+                </div>
+
+                {% if erro %}
+                <div class="auth-error" role="alert" aria-live="assertive">{{ erro | e }}</div>
+                {% endif %}
+
+                <form class="auth-form auth-form--reset" method="post" action="{{ acao_form | e }}" data-auth-form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token | e }}">
+
+                    <label for="senha_atual">
+                        Senha temporaria
+                        <div class="auth-field auth-field--password">
+                            <input id="senha_atual" name="senha_atual" type="password" autocomplete="current-password" required>
+                            <button class="auth-toggle" type="button" data-password-toggle data-password-target="senha_atual" aria-label="Mostrar senha temporaria" aria-pressed="false">
+                                <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                            </button>
+                        </div>
+                    </label>
+
+                    <label for="nova_senha">
+                        Nova senha
+                        <div class="auth-field auth-field--password">
+                            <input id="nova_senha" name="nova_senha" type="password" autocomplete="new-password" required>
+                            <button class="auth-toggle" type="button" data-password-toggle data-password-target="nova_senha" aria-label="Mostrar nova senha" aria-pressed="false">
+                                <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                            </button>
+                        </div>
+                    </label>
+
+                    <label for="confirmar_senha">
+                        Confirmar nova senha
+                        <div class="auth-field auth-field--password">
+                            <input id="confirmar_senha" name="confirmar_senha" type="password" autocomplete="new-password" required>
+                            <button class="auth-toggle" type="button" data-password-toggle data-password-target="confirmar_senha" aria-label="Mostrar confirmacao da senha" aria-pressed="false">
+                                <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                            </button>
+                        </div>
+                    </label>
+
+                    <div class="auth-actions">
+                        <button class="auth-button" type="submit" data-submit-label="Atualizar senha">Salvar e entrar no portal</button>
+                        <a href="{{ rota_login | e }}">Voltar para login</a>
+                    </div>
+                </form>
+
+                <small class="auth-note">Depois da confirmacao, a empresa passa a acessar o portal com a nova senha.</small>
+            </div>
+        </section>
+    </main>
+
+    <script nonce="{{ csp_nonce }}">
+        (() => {
+            "use strict";
+
+            document.querySelectorAll("[data-password-toggle]").forEach((botao) => {
+                const targetId = botao.getAttribute("data-password-target");
+                const input = targetId ? document.getElementById(targetId) : null;
+                if (!input) return;
+
+                botao.addEventListener("click", () => {
+                    const visivel = input.type === "text";
+                    input.type = visivel ? "password" : "text";
+                    botao.setAttribute("aria-pressed", String(!visivel));
+                    const icone = botao.querySelector(".material-symbols-rounded");
+                    if (icone) icone.textContent = visivel ? "visibility" : "visibility_off";
+                    input.focus();
+                });
+            });
+
+            document.querySelectorAll("[data-auth-form]").forEach((form) => {
+                form.addEventListener("submit", () => {
+                    const botao = form.querySelector(".auth-button");
+                    if (!botao) return;
+                    botao.disabled = true;
+                    botao.innerHTML = "<span>Atualizando...</span>";
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

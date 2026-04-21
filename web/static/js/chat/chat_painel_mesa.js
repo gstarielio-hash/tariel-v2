@@ -1,0 +1,469 @@
+// ==========================================
+// TARIEL CONTROL TOWER — CHAT_PAINEL_MESA.JS
+// Papel: integração com mesa avaliadora (@insp).
+// Responsável por:
+// - normalizar prefixos da mesa avaliadora
+// - ativar o modo de envio para engenharia/revisão
+// - focar o campo de mensagem
+// - bind do botão do composer e atalhos globais
+//
+// Dependência:
+// - window.TarielChatPainel (core)
+// ==========================================
+
+(function () {
+    "use strict";
+
+    const TP = window.TarielChatPainel;
+    if (!TP || TP.__mesaWired__) return;
+    TP.__mesaWired__ = true;
+    const PERF = window.TarielPerf || window.TarielCore?.TarielPerf || TP.perf || null;
+
+    PERF?.noteModule?.("chat/chat_painel_mesa.js", {
+        readyState: document.readyState,
+    });
+
+    // =========================================================
+    // CONFIGURAÇÃO
+    // =========================================================
+
+    // Prefixo oficial usado pelo backend para encaminhar a mensagem
+    // ao fluxo da mesa avaliadora / engenharia.
+    const PREFIXO_BASE = String(TP.config?.ATALHO_MESA_AVALIADORA || "@insp").trim() || "@insp";
+    const PREFIXO_MESA = `${PREFIXO_BASE} `;
+    const MENSAGEM_MESA_EXIGE_INSPECAO =
+        "A conversa com a mesa avaliadora só é permitida após iniciar uma nova inspeção.";
+
+    // Todos os aliases aceitos no início da mensagem.
+    // Exemplo:
+    // - eng texto
+    // - @eng texto
+    // - @mesa texto
+    // - revisor texto
+    const REGEX_ALIAS_MESA_INICIAL = /^@?(insp|inspetor|eng|engenharia|revisor|mesa|avaliador|avaliacao)\b\s*[:\-]?\s*/i;
+
+    // =========================================================
+    // HELPERS
+    // =========================================================
+
+    function ouvirEventoTariel(nome, handler) {
+        if (typeof window.TarielInspectorEvents?.on === "function") {
+            return window.TarielInspectorEvents.on(nome, handler, {
+                target: document,
+            });
+        }
+
+        document.addEventListener(nome, handler);
+        return () => {
+            document.removeEventListener(nome, handler);
+        };
+    }
+
+    function obterCampoMensagem() {
+        return TP.obterCampoMensagem?.() || document.getElementById("campo-mensagem");
+    }
+
+    function obterBotaoComposerMesa() {
+        return document.getElementById("btn-toggle-humano");
+    }
+
+    function mesaWidgetDedicadoPermitidoNoContextoAtual() {
+        const body = document.body;
+        const permitidoDataset = String(body?.dataset?.mesaWidgetVisible || "").trim();
+        if (permitidoDataset === "true") return true;
+        if (permitidoDataset === "false") return false;
+
+        const baseScreen = String(
+            body?.dataset?.inspectorBaseScreen ||
+            body?.dataset?.inspectorScreen ||
+            ""
+        ).trim();
+        const overlayOwner = String(
+            body?.dataset?.inspectorOverlayOwner ||
+            body?.dataset?.overlayOwner ||
+            ""
+        ).trim();
+
+        return !overlayOwner && (
+            baseScreen === "inspection_record" ||
+            baseScreen === "inspection_conversation" ||
+            baseScreen === "inspection_mesa"
+        );
+    }
+
+    function possuiWidgetMesaDedicado() {
+        return Boolean(
+            mesaWidgetDedicadoPermitidoNoContextoAtual() &&
+            document.getElementById("painel-mesa-widget") &&
+            document.getElementById("mesa-widget-input")
+        );
+    }
+
+    function obterLaudoAtivo() {
+        const laudoId = Number(window.TarielAPI?.obterLaudoAtualId?.() || 0);
+        return Number.isFinite(laudoId) && laudoId > 0 ? laudoId : null;
+    }
+
+    function abrirWidgetMesaDedicado(texto = "") {
+        if (!possuiWidgetMesaDedicado()) return null;
+
+        if (!obterLaudoAtivo()) {
+            TP.toast?.(MENSAGEM_MESA_EXIGE_INSPECAO, "aviso", 3200);
+            return false;
+        }
+
+        const painel = document.getElementById("painel-mesa-widget");
+        const botaoToggle = document.getElementById("btn-mesa-widget-toggle");
+        const input = document.getElementById("mesa-widget-input");
+
+        const aberto =
+            botaoToggle?.getAttribute("aria-expanded") === "true" ||
+            painel?.classList.contains("aberto") ||
+            (painel ? !painel.hidden : false);
+
+        if (!aberto && botaoToggle) {
+            botaoToggle.click();
+        }
+
+        const sugestao = String(texto || "")
+            .replace(REGEX_ALIAS_MESA_INICIAL, "")
+            .trim();
+
+        if (input) {
+            const somenteLeitura = !!input.disabled || input.getAttribute("aria-disabled") === "true";
+
+            if (!somenteLeitura && sugestao && !String(input.value || "").trim()) {
+                input.value = sugestao;
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+
+            if (!somenteLeitura) {
+                try {
+                    input.focus({ preventScroll: true });
+                } catch (_) {
+                    input.focus();
+                }
+
+                try {
+                    const fim = input.value.length;
+                    input.setSelectionRange(fim, fim);
+                } catch (_) { }
+            }
+        }
+
+        fecharSidebarMobile();
+        return true;
+    }
+
+    function fecharSidebarMobile() {
+        if (window.innerWidth >= 768) return;
+
+        // Primeiro tenta usar a infraestrutura global, se existir.
+        window.TarielUI?.fecharSidebar?.();
+
+        // Fallback defensivo.
+        const sidebar = document.getElementById("barra-historico");
+        const overlay = document.getElementById("overlay-sidebar");
+
+        sidebar?.classList.remove("aberta", "aberto");
+        overlay?.classList.remove("ativo");
+        document.body.classList.remove("sidebar-aberta");
+    }
+
+    function posicionarCursorNoFinal(campo) {
+        if (!campo) return;
+
+        try {
+            const fim = campo.value.length;
+            campo.setSelectionRange(fim, fim);
+        } catch (_) { }
+    }
+
+    function focarCampoMensagem(campo) {
+        if (!campo) return;
+
+        try {
+            campo.focus({ preventScroll: true });
+        } catch (_) {
+            campo.focus();
+        }
+
+        posicionarCursorNoFinal(campo);
+    }
+
+    function sincronizarUIComposer(campo, houveMudanca) {
+        if (!campo) return;
+
+        if (houveMudanca) {
+            campo.dispatchEvent(new Event("input", { bubbles: true }));
+            campo.dispatchEvent(new Event("change", { bubbles: true }));
+            return;
+        }
+
+        TP.atualizarEstadoBotao?.();
+        TP.atualizarContadorChars?.();
+    }
+
+    function textoJaEstaNoModoMesa(texto) {
+        return /^@insp\b/i.test(String(texto || "").trimStart());
+    }
+
+    // Normaliza qualquer alias de entrada para o prefixo oficial @insp.
+    // Exemplos:
+    // "eng preciso de ajuda"      -> "@insp preciso de ajuda"
+    // "@engenharia revisar isso"  -> "@insp revisar isso"
+    // "@mesa: analisar laudo"     -> "@insp analisar laudo"
+    // "texto comum"               -> "@insp texto comum"
+    // ""                          -> "@insp "
+    function normalizarTextoMesa(texto) {
+        const bruto = String(texto || "");
+        const semEspacosIniciais = bruto.replace(/^\s+/, "");
+
+        if (!semEspacosIniciais.trim()) {
+            return PREFIXO_MESA;
+        }
+
+        if (textoJaEstaNoModoMesa(semEspacosIniciais)) {
+            const semPrefixoDuplicado = semEspacosIniciais.replace(/^@insp\b\s*[:\-]?\s*/i, "");
+            return semPrefixoDuplicado
+                ? `${PREFIXO_MESA}${semPrefixoDuplicado}`.trimEnd()
+                : PREFIXO_MESA;
+        }
+
+        if (REGEX_ALIAS_MESA_INICIAL.test(semEspacosIniciais)) {
+            const semAlias = semEspacosIniciais.replace(REGEX_ALIAS_MESA_INICIAL, "");
+            return semAlias
+                ? `${PREFIXO_MESA}${semAlias}`.trimEnd()
+                : PREFIXO_MESA;
+        }
+
+        return `${PREFIXO_MESA}${semEspacosIniciais}`.trimEnd();
+    }
+
+    // =========================================================
+    // API DE MESA AVALIADORA
+    // =========================================================
+
+    // Apenas ativa/preenche o composer com o prefixo @insp.
+    // Não dispara envio automático.
+    function ativarMesaAvaliadora(texto = "") {
+        const resultadoWidget = abrirWidgetMesaDedicado(texto);
+        if (resultadoWidget === true) {
+            return true;
+        }
+        if (resultadoWidget === false) return false;
+
+        const campo = obterCampoMensagem();
+        if (!campo) return false;
+
+        const valorAtual = String(campo.value || "");
+        const base = texto || valorAtual;
+        const valorNormalizado = normalizarTextoMesa(base);
+
+        const houveMudanca = valorAtual !== valorNormalizado;
+        campo.value = valorNormalizado;
+
+        sincronizarUIComposer(campo, houveMudanca);
+        focarCampoMensagem(campo);
+        fecharSidebarMobile();
+
+        TP.emitir?.("tariel:mesa-avaliadora-ativada", {
+            atalho: "@insp",
+            valor: campo.value,
+            alterado: houveMudanca,
+        });
+
+        return true;
+    }
+
+    // Atalho de conveniência para UI.
+    function enviarParaMesaAvaliadora(texto = "") {
+        const ok = ativarMesaAvaliadora(texto);
+
+        if (!ok) {
+            if (possuiWidgetMesaDedicado()) {
+                return false;
+            }
+            TP.toast?.("Campo de mensagem não encontrado.", "erro", 3000);
+            return false;
+        }
+
+        if (possuiWidgetMesaDedicado()) {
+            const inputMesa = document.getElementById("mesa-widget-input");
+            if (inputMesa?.disabled || inputMesa?.getAttribute("aria-disabled") === "true") {
+                TP.toast?.(
+                    "Canal da mesa aberto em modo consulta. Reabra a inspeção para responder.",
+                    "info",
+                    2600
+                );
+                return true;
+            }
+            TP.toast?.("Chat da mesa avaliadora aberto.", "info", 1800);
+            return true;
+        }
+
+        TP.toast?.("Atalho @insp ativado para a mesa avaliadora.", "info", 1800);
+        return true;
+    }
+
+    // =========================================================
+    // ATALHOS E GATILHOS
+    // =========================================================
+
+    function deveIgnorarAtalhoTeclado(evento) {
+        if (!evento) return true;
+        if (evento.defaultPrevented) return true;
+        if (evento.isComposing) return true;
+        if (evento.repeat) return true;
+
+        const alvo = evento.target;
+        if (!alvo) return false;
+
+        // Permite uso dentro do textarea/input,
+        // mas bloqueia em selects e áreas explicitamente marcadas.
+        const tag = String(alvo.tagName || "").toLowerCase();
+
+        if (tag === "select" || tag === "option") {
+            return true;
+        }
+
+        if (alvo.closest?.('[data-bloquear-atalho-mesa="true"]')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function onClickBotaoMesa() {
+        enviarParaMesaAvaliadora();
+    }
+
+    function onClickGatilhoDelegado(evento) {
+        const gatilho = evento.target.closest(
+            "[data-atalho-mesa='insp'], [data-abrir-mesa-avaliadora='true']"
+        );
+        if (!gatilho) return;
+
+        evento.preventDefault();
+
+        enviarParaMesaAvaliadora(
+            gatilho.dataset?.textoMesa ||
+            gatilho.getAttribute("data-texto-mesa") ||
+            ""
+        );
+    }
+
+    function onKeydownAtalhoMesa(evento) {
+        if (deveIgnorarAtalhoTeclado(evento)) return;
+
+        const tecla = String(evento.key || "").toLowerCase();
+        const atalhoPressionado =
+            (evento.ctrlKey || evento.metaKey) &&
+            evento.altKey &&
+            tecla === "i";
+
+        if (!atalhoPressionado) return;
+
+        evento.preventDefault();
+        enviarParaMesaAvaliadora();
+    }
+
+    function onEventoProgramaticoMesa(evento) {
+        const texto =
+            evento?.detail?.texto ||
+            evento?.detail?.mensagem ||
+            "";
+
+        ativarMesaAvaliadora(texto);
+    }
+
+    // =========================================================
+    // BIND
+    // =========================================================
+
+    function wireBotaoComposerMesa() {
+        if (possuiWidgetMesaDedicado()) return;
+
+        const botao = obterBotaoComposerMesa();
+        if (!botao || botao.dataset.boundMesa === "true") return;
+
+        botao.dataset.boundMesa = "true";
+        botao.addEventListener("click", onClickBotaoMesa);
+    }
+
+    function wireMesaAvaliadoraHooks() {
+        if (TP.state?.flags?.mesaHooksBound) return;
+        TP.state.flags.mesaHooksBound = true;
+
+        wireBotaoComposerMesa();
+
+        document.addEventListener("click", onClickGatilhoDelegado);
+        document.addEventListener("keydown", onKeydownAtalhoMesa);
+
+        // Gatilho programático para outros módulos.
+        ouvirEventoTariel("tariel:ativar-mesa-avaliadora", onEventoProgramaticoMesa);
+    }
+
+    if (PERF?.enabled) {
+        const ativarMesaAvaliadoraOriginal = ativarMesaAvaliadora;
+        ativarMesaAvaliadora = function ativarMesaAvaliadoraComPerf(...args) {
+            return PERF.measureSync(
+                "chat_painel_mesa.ativarMesaAvaliadora",
+                () => ativarMesaAvaliadoraOriginal.apply(this, args),
+                {
+                    category: "function",
+                    detail: {
+                        textoTamanho: String(args[0] || "").length,
+                    },
+                }
+            );
+        };
+
+        const enviarParaMesaAvaliadoraOriginal = enviarParaMesaAvaliadora;
+        enviarParaMesaAvaliadora = function enviarParaMesaAvaliadoraComPerf(...args) {
+            return PERF.measureSync(
+                "chat_painel_mesa.enviarParaMesaAvaliadora",
+                () => enviarParaMesaAvaliadoraOriginal.apply(this, args),
+                {
+                    category: "function",
+                    detail: {
+                        textoTamanho: String(args[0] || "").length,
+                    },
+                }
+            );
+        };
+
+        const wireMesaAvaliadoraHooksOriginal = wireMesaAvaliadoraHooks;
+        wireMesaAvaliadoraHooks = function wireMesaAvaliadoraHooksComPerf(...args) {
+            return PERF.measureSync(
+                "chat_painel_mesa.wireMesaAvaliadoraHooks",
+                () => wireMesaAvaliadoraHooksOriginal.apply(this, args),
+                {
+                    category: "boot",
+                    detail: {
+                        hooksBound: !!TP.state?.flags?.mesaHooksBound,
+                    },
+                }
+            );
+        };
+    }
+
+    // =========================================================
+    // BOOT
+    // =========================================================
+
+    TP.registrarBootTask("chat_painel_mesa", () => {
+        wireMesaAvaliadoraHooks();
+    });
+
+    // =========================================================
+    // EXPORTS
+    // =========================================================
+
+    Object.assign(TP, {
+        normalizarTextoMesa,
+        ativarMesaAvaliadora,
+        enviarParaMesaAvaliadora,
+        wireMesaAvaliadoraHooks,
+    });
+})();

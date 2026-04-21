@@ -1,0 +1,237 @@
+                <section class="catalog-tab-panel" id="catalog-panel-schema-tecnico">
+                    <div class="catalog-panel catalog-panel--detail">
+                        <div class="catalog-panel__header">
+                            <div>
+                                <p class="catalog-section__eyebrow">Base da família</p>
+                                <h2>Base da família</h2>
+                                <p class="catalog-panel__description">Aqui fica separado o que você pode ajustar, o que já vem pronto e o que fica recolhido para não poluir a leitura.</p>
+                            </div>
+                            <button type="button" class="catalog-btn catalog-btn--primary" data-catalog-open-disclosure="schema-form">Editar base</button>
+                        </div>
+
+                        <div class="catalog-state-grid">
+                            <article class="catalog-card">
+                                <h3>Você pode editar</h3>
+                                <ul class="catalog-inline-list">
+                                    <li>Nome: {{ family.display_name | e }}</li>
+                                    <li>Norma: {{ ((family.nr_key | upper) if family.nr_key else family.macro_category) | e }}</li>
+                                    <li>Área: {{ family.macro_category | e }}</li>
+                                    <li>Etapa: {{ family.technical_status.label | e }}</li>
+                                    <li>Versão: {{ family_entity.schema_version | int }}</li>
+                                </ul>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Permanece estável</h3>
+                                <ul class="catalog-inline-list">
+                                    <li>{{ 'Base da família pronta' if artifact_snapshot.has_family_schema else 'Base da família ausente' }}</li>
+                                    <li>{{ 'Modelo base pronto' if artifact_snapshot.has_template_seed else 'Modelo base ausente' }}</li>
+                                    <li>{{ 'Documento base pronto' if artifact_snapshot.has_laudo_output_seed else 'Documento base ausente' }}</li>
+                                    <li>O fluxo principal do documento fica preservado.</li>
+                                </ul>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Fluxo de revisão</h3>
+                                <div class="catalog-governance-pill-row">
+                                    {{ catalogo.status_badge(review_governance.default_review_mode) }}
+                                    {{ catalogo.status_badge(review_governance.max_review_mode) }}
+                                </div>
+                                <ul class="catalog-inline-list">
+                                    <li>{{ review_governance.red_flags_count | int }} alerta(s) automático(s)</li>
+                                    <li>{{ review_governance.tenant_entitlements.mobile_review_allowed_plans | length }} plano(s) com revisão no app</li>
+                                    <li>{{ review_governance.tenant_entitlements.mobile_autonomous_allowed_plans | length }} plano(s) com autonomia</li>
+                                    <li>{{ 'Acesso ativo da empresa obrigatório' if review_governance.tenant_entitlements.requires_release_active else 'Acesso da empresa opcional por regra' }}</li>
+                                </ul>
+                            </article>
+                            <article class="catalog-card">
+                                <h3>Detalhes avançados</h3>
+                                <p>Os dados brutos e a base completa ficam recolhidos por padrão. A leitura principal mostra só o que importa para a operação.</p>
+                            </article>
+                        </div>
+
+                        <details class="catalog-disclosure" id="schema-form">
+                            <summary>Editar base da família</summary>
+                            <form class="catalog-form" method="POST" action="/admin/catalogo-laudos/familias">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="return_to" value="{{ family_detail_base }}?tab=schema-tecnico#schema-tecnico">
+                                <input type="hidden" name="family_key" value="{{ family.family_key | e }}">
+                                <div class="catalog-form__grid">
+                                    <label>
+                                        <span>Nome da família</span>
+                                        <input type="text" name="nome_exibicao" maxlength="180" value="{{ family.display_name | e }}" required>
+                                    </label>
+                                    <label>
+                                        <span>Categoria</span>
+                                        <input type="text" name="macro_categoria" maxlength="80" value="{{ family.macro_category | e }}">
+                                    </label>
+                                    <label>
+                                        <span>Chave da norma</span>
+                                        <input type="text" name="nr_key" maxlength="40" value="{{ family.nr_key | default('', true) | e }}">
+                                    </label>
+                                    <label>
+                                        <span>Etapa</span>
+                                        <select name="technical_status">
+                                            <option value="draft" {% if family.technical_status.key == 'draft' %}selected{% endif %}>Em preparo</option>
+                                            <option value="review" {% if family.technical_status.key == 'review' %}selected{% endif %}>Em ajuste</option>
+                                            <option value="ready" {% if family.technical_status.key == 'ready' %}selected{% endif %}>Pronta</option>
+                                            <option value="deprecated" {% if family.technical_status.key == 'deprecated' %}selected{% endif %}>Arquivado</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Tipo</span>
+                                        <select name="catalog_classification">
+                                            <option value="family" {% if family.catalog_classification == 'family' %}selected{% endif %}>Família</option>
+                                            <option value="inspection_method" {% if family.catalog_classification == 'inspection_method' %}selected{% endif %}>Método de inspeção</option>
+                                            <option value="evidence_method" {% if family.catalog_classification == 'evidence_method' %}selected{% endif %}>Método de evidência</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Status antigo</span>
+                                        <select name="status_catalogo">
+                                            <option value="rascunho" {% if family_entity.status_catalogo == 'rascunho' %}selected{% endif %}>Rascunho</option>
+                                            <option value="publicado" {% if family_entity.status_catalogo == 'publicado' %}selected{% endif %}>Publicado</option>
+                                            <option value="arquivado" {% if family_entity.status_catalogo == 'arquivado' %}selected{% endif %}>Arquivado</option>
+                                        </select>
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Descricao</span>
+                                        <textarea name="descricao" rows="5">{{ family_entity.descricao | default('', true) | e }}</textarea>
+                                    </label>
+                                    <label>
+                                        <span>Versão</span>
+                                        <input type="number" name="schema_version" min="1" step="1" value="{{ family_entity.schema_version | int }}">
+                                    </label>
+                                </div>
+
+                                <details class="catalog-advanced">
+                                    <summary>Ver dados avançados da base</summary>
+                                    <div class="catalog-form__grid">
+                                        <label class="catalog-form__field catalog-form__field--wide">
+                                            <span>Regras de evidência</span>
+                                            <textarea name="evidence_policy_json" rows="8">{{ family_entity.evidence_policy_json | tojson if family_entity.evidence_policy_json is not none else '' }}</textarea>
+                                        </label>
+                                        <label class="catalog-form__field catalog-form__field--wide">
+                                            <span>Regras de revisão</span>
+                                            <textarea name="review_policy_json" rows="8">{{ family_entity.review_policy_json | tojson if family_entity.review_policy_json is not none else '' }}</textarea>
+                                        </label>
+                                        <label class="catalog-form__field catalog-form__field--wide">
+                                            <span>Base do documento</span>
+                                            <textarea name="output_schema_seed_json" rows="8">{{ family_entity.output_schema_seed_json | tojson if family_entity.output_schema_seed_json is not none else '' }}</textarea>
+                                        </label>
+                                        <label class="catalog-form__field catalog-form__field--wide">
+                                            <span>Dados extras</span>
+                                            <textarea name="governance_metadata_json" rows="6">{{ family_entity.governance_metadata_json | tojson if family_entity.governance_metadata_json is not none else '' }}</textarea>
+                                        </label>
+                                    </div>
+                                </details>
+                                <button type="submit" class="catalog-btn catalog-btn--primary">Salvar base</button>
+                            </form>
+                        </details>
+
+                        <details class="catalog-disclosure" id="review-governance-form">
+                            <summary>Editar fluxo de revisão</summary>
+                            <form class="catalog-form" method="POST" action="/admin/catalogo-laudos/familias/{{ family.family_key | e }}/governanca-review">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="return_to" value="{{ family_detail_base }}?tab=schema-tecnico#schema-tecnico">
+                                <div class="catalog-form__grid">
+                                    <label>
+                                        <span>Fluxo padrão</span>
+                                        <select name="default_review_mode">
+                                            <option value="">Seguir regra atual</option>
+                                            <option value="mesa_required" {% if review_governance.default_review_mode.key == 'mesa_required' %}selected{% endif %}>Revisão da mesa</option>
+                                            <option value="mobile_review_allowed" {% if review_governance.default_review_mode.key == 'mobile_review_allowed' %}selected{% endif %}>App com apoio da mesa</option>
+                                            <option value="mobile_autonomous" {% if review_governance.default_review_mode.key == 'mobile_autonomous' %}selected{% endif %}>App com autonomia</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>Limite de autonomia</span>
+                                        <select name="max_review_mode">
+                                            <option value="">Sem limite extra</option>
+                                            <option value="mesa_required" {% if review_governance.max_review_mode.key == 'mesa_required' %}selected{% endif %}>Revisão da mesa</option>
+                                            <option value="mobile_review_allowed" {% if review_governance.max_review_mode.key == 'mobile_review_allowed' %}selected{% endif %}>App com apoio da mesa</option>
+                                            <option value="mobile_autonomous" {% if review_governance.max_review_mode.key == 'mobile_autonomous' %}selected{% endif %}>App com autonomia</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="catalog-checkbox-grid">
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="requires_family_lock" value="on" {% if review_governance.requires_family_lock %}checked{% endif %}>
+                                        <span>Exigir confirmação da base antes de concluir</span>
+                                    </label>
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="block_on_scope_mismatch" value="on" {% if review_governance.block_on_scope_mismatch %}checked{% endif %}>
+                                        <span>Bloquear quando o escopo do caso não combinar</span>
+                                    </label>
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="block_on_missing_required_evidence" value="on" {% if review_governance.block_on_missing_required_evidence %}checked{% endif %}>
+                                        <span>Bloquear falta de evidência obrigatória</span>
+                                    </label>
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="block_on_critical_field_absent" value="on" {% if review_governance.block_on_critical_field_absent %}checked{% endif %}>
+                                        <span>Bloquear falta de informação crítica</span>
+                                    </label>
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="requires_release_active" value="on" {% if review_governance.tenant_entitlements.requires_release_active %}checked{% endif %}>
+                                        <span>Exigir acesso ativo da empresa</span>
+                                    </label>
+                                    <label class="catalog-check">
+                                        <input type="checkbox" name="requires_upload_doc_for_mobile_autonomous" value="on" {% if review_governance.tenant_entitlements.requires_upload_doc_for_mobile_autonomous %}checked{% endif %}>
+                                        <span>Exigir envio de documento para liberar autonomia no app</span>
+                                    </label>
+                                </div>
+
+                                <div class="catalog-form__grid">
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Condições que bloqueiam</span>
+                                        {{ catalogo.string_list_editor('blocking_conditions', review_governance.blocking_conditions, 'Condição que bloqueia', 'Adicionar condição') }}
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Condições de alerta</span>
+                                        {{ catalogo.string_list_editor('non_blocking_conditions', review_governance.non_blocking_conditions, 'Condição de alerta', 'Adicionar condição') }}
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Planos com revisão no app</span>
+                                        {{ catalogo.string_list_editor('mobile_review_allowed_plans', review_governance.tenant_entitlements.mobile_review_allowed_plans, 'Inicial / Intermediário / Ilimitado', 'Adicionar plano') }}
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Planos com autonomia no app</span>
+                                        {{ catalogo.string_list_editor('mobile_autonomous_allowed_plans', review_governance.tenant_entitlements.mobile_autonomous_allowed_plans, 'Inicial / Intermediário / Ilimitado', 'Adicionar plano') }}
+                                    </label>
+                                    <label class="catalog-form__field catalog-form__field--wide">
+                                        <span>Alertas automáticos</span>
+                                        {{ catalogo.red_flag_editor('red_flags_json', review_governance.red_flags) }}
+                                    </label>
+                                </div>
+                                <button type="submit" class="catalog-btn catalog-btn--primary">Salvar fluxo de revisão</button>
+                            </form>
+                        </details>
+
+                        {% if review_governance.red_flags %}
+                        <div class="catalog-governance-list">
+                            {% for item in review_governance.red_flags %}
+                            <article class="catalog-governance-list__item">
+                                <div class="catalog-governance-pill-row">
+                                    {{ catalogo.status_badge(item.severity_meta) }}
+                                    {% if item.blocking %}
+                                    <span class="catalog-chip">Bloqueante</span>
+                                    {% endif %}
+                                    {% if item.when_missing_required_evidence %}
+                                    <span class="catalog-chip">Só quando faltar evidência</span>
+                                    {% endif %}
+                                </div>
+                                <strong>{{ item.title | e }}</strong>
+                                <p>{{ item.message | e }}</p>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <details class="catalog-advanced">
+                            <summary>Ver base completa da família</summary>
+                            {% if family_schema %}
+                            <pre class="catalog-code-block">{{ family_schema | tojson(indent=2) }}</pre>
+                            {% else %}
+                            <p>Nenhuma estrutura oficial localizada para esta chave.</p>
+                            {% endif %}
+                        </details>
+                    </div>
+                </section>

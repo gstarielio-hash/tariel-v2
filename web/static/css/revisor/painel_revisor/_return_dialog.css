@@ -1,0 +1,51 @@
+        /* Dialog devolução */
+        .dialog-motivo {
+            max-width: 500px;
+            padding: 24px;
+            background: var(--cor-primaria);
+        }
+
+        .dialog-titulo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 8px;
+            color: var(--cor-rejeitado-soft);
+            font-size: 20px;
+        }
+
+        .dialog-texto {
+            margin: 0;
+            color: var(--texto-mutado);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .dialog-motivo textarea {
+            width: 100%;
+            min-height: 110px;
+            margin: 16px 0 14px;
+            padding: 12px;
+            border: 1px solid var(--borda);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.28);
+            color: #fff;
+            resize: vertical;
+        }
+
+        .dialog-motivo textarea.erro {
+            border-color: var(--cor-rejeitado-soft);
+            box-shadow: 0 0 0 3px rgba(255, 138, 128, 0.1);
+        }
+
+        .dialog-acoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-neutro {
+            background: transparent;
+            color: var(--texto-mutado);
+            border: 1px solid var(--borda);
+        }

@@ -1,0 +1,87 @@
+appId: com.tarielia.inspetor
+tags:
+  - smoke
+  - login
+env:
+  LOGIN_EMAIL: ${MAESTRO_LOGIN_EMAIL}
+  LOGIN_PASSWORD: ${MAESTRO_LOGIN_PASSWORD}
+  TEST_MESSAGE: Teste Maestro
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: login-email-input
+    timeout: 30000
+
+- tapOn:
+    id: login-email-input
+
+- inputText: ${LOGIN_EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: login-password-input
+
+- inputText: ${LOGIN_PASSWORD}
+
+- takeScreenshot: login-keyboard-layout
+
+- hideKeyboard
+
+- tapOn:
+    id: login-submit-button
+
+- extendedWaitUntil:
+    visible:
+      id: open-history-button
+    timeout: 20000
+
+- assertVisible:
+    id: open-history-button
+
+- assertVisible:
+    id: open-settings-button
+
+- assertVisible:
+    id: free-chat-start-button
+
+- tapOn:
+    id: open-history-button
+
+- assertVisible:
+    id: history-drawer
+
+- tapOn:
+    id: close-history-drawer-button
+
+- tapOn:
+    id: open-settings-button
+
+- assertVisible:
+    id: settings-drawer
+
+- tapOn:
+    id: close-settings-drawer-button
+
+- tapOn:
+    id: free-chat-start-button
+
+- extendedWaitUntil:
+    visible:
+      id: chat-composer-input
+    timeout: 20000
+
+- tapOn:
+    id: chat-composer-input
+
+- inputText: ${TEST_MESSAGE}
+
+- tapOn:
+    id: chat-send-button
+
+- extendedWaitUntil:
+    visible: ${TEST_MESSAGE}
+    timeout: 10000

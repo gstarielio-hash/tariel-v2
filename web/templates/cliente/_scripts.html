@@ -1,0 +1,20 @@
+{% if perf_mode %}
+<script src="/static/js/shared/api-core.js?v={{ v_app }}" defer></script>
+{% endif %}
+<script src="/static/js/cliente/portal_admin_surface.js?v={{ v_app }}" defer></script>
+<script src="/static/js/cliente/portal_chat_surface.js?v={{ v_app }}" defer></script>
+<script src="/static/js/cliente/portal_mesa_surface.js?v={{ v_app }}" defer></script>
+<script src="/static/js/cliente/painel_page.js?v={{ v_app }}" defer></script>
+<script src="/static/js/cliente/chat_page.js?v={{ v_app }}" defer></script>
+<script src="/static/js/cliente/mesa_page.js?v={{ v_app }}" defer></script>
+<!-- Contrato canonico de entrypoint do portal cliente. Nao reordenar sem atualizar portal.js, smoke e docs 34/35. -->
+<!-- Ordem obrigatoria: runtime -> priorities -> admin -> chat -> mesa -> sharedHelpers -> shell -> bindings -> portal -->
+<script src="/static/js/cliente/portal_runtime.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="runtime"></script>
+<script src="/static/js/cliente/portal_priorities.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="priorities"></script>
+<script src="/static/js/cliente/portal_admin.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="admin"></script>
+<script src="/static/js/cliente/portal_chat.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="chat"></script>
+<script src="/static/js/cliente/portal_mesa.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="mesa"></script>
+<script src="/static/js/cliente/portal_shared_helpers.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="sharedHelpers"></script>
+<script src="/static/js/cliente/portal_shell.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="shell"></script>
+<script src="/static/js/cliente/portal_bindings.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="bindings"></script>
+<script src="/static/js/cliente/portal.js?v={{ v_app }}" defer data-portal-contract="cliente" data-portal-module="portal"></script>

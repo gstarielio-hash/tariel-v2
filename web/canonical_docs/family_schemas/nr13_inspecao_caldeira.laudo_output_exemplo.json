@@ -1,0 +1,188 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr13_inspecao_caldeira",
+  "template_code": "nr13_caldeira",
+  "tokens": {
+    "cliente_nome": "Empresa Teste NR13",
+    "unidade_nome": "Casa de Caldeiras - Unidade Norte",
+    "engenheiro_responsavel": "Gabriel Santos",
+    "crea_art": "CREA 123456/D | ART 922024002",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "NR13-CAL-2026-001",
+    "empresa_nome": "Empresa Teste NR13",
+    "unidade_nome": "Casa de Caldeiras - Unidade Norte",
+    "data_inspecao": "2026-04-08",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva"
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Ausencia de certificado adicional registrada sem bloqueio e leitura parcial da placa compensada pelo prontuario vinculado.",
+    "observacoes_mesa": "Caso mantido em NR13 | caldeira, sem troca de familia e com evidencias minimas atendidas."
+  },
+  "resumo_executivo": "Foi realizada inspecao visual em caldeira horizontal instalada em casa de caldeiras dedicada. A identificacao minima do equipamento foi validada com apoio de placa e prontuario, o painel e os dispositivos de seguranca foram registrados e a emissao do laudo foi aprovada com ressalva para tratamento de desgaste localizado em isolamento termico e marcas leves de fuligem em trecho aparente de exaustao.",
+  "identificacao": {
+    "identificacao_da_caldeira": "Caldeira horizontal CAL-01",
+    "localizacao": "Casa de caldeiras, unidade norte, setor de utilidades",
+    "placa_identificacao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_101",
+        "DOC_021"
+      ],
+      "referencias_texto": "IMG_101; DOC_021",
+      "descricao": "Placa parcialmente legivel com confirmacao complementar no prontuario da caldeira.",
+      "observacao": "Numero de identificacao e dados principais confirmados por documentacao vinculada."
+    },
+    "tag_patrimonial": "TAG-CAL-01"
+  },
+  "caracterizacao_do_equipamento": {
+    "vista_geral_caldeira": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_102",
+        "IMG_103"
+      ],
+      "referencias_texto": "IMG_102; IMG_103",
+      "descricao": "Vista frontal e lateral da caldeira instalada em base fixa com acesso operacional frontal."
+    },
+    "descricao_sumaria": "Equipamento horizontal de medio porte em area coberta, com frente operacional acessivel, instrumentacao local aparente e duto de exaustao visivel no ambiente.",
+    "condicao_de_operacao_no_momento": "em_operacao"
+  },
+  "inspecao_visual": {
+    "condicao_geral": "Estrutura geral sem deformacoes aparentes, com conservacao visual adequada e desgaste localizado no revestimento externo do isolamento termico.",
+    "integridade_aparente": "Integridade aparente preservada nas superficies visiveis observadas durante a coleta, sem sinais de dano estrutural evidente no corpo da caldeira.",
+    "area_instalacao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_104"
+      ],
+      "referencias_texto": "IMG_104",
+      "descricao": "Area de instalacao organizada, com espaco frontal para operacao e inspecao visual."
+    },
+    "acessibilidade_para_inspecao": "Acesso frontal adequado e lateral parcialmente condicionada por tubulacao de utilidades.",
+    "pontos_de_vazamento_ou_fuligem": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_110"
+      ],
+      "referencias_texto": "IMG_110",
+      "descricao": "Marca leve de fuligem em trecho aparente do duto de exaustao, sem vazamento visivel no corpo principal da caldeira."
+    },
+    "isolamento_termico": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_111"
+      ],
+      "referencias_texto": "IMG_111",
+      "descricao": "Desgaste localizado do revestimento externo do isolamento termico em painel lateral."
+    },
+    "chamine_ou_exaustao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_112"
+      ],
+      "referencias_texto": "IMG_112",
+      "descricao": "Trecho aparente da exaustao registrado sem desalinhamento visual relevante."
+    }
+  },
+  "dispositivos_e_controles": {
+    "dispositivos_de_seguranca": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_105",
+        "IMG_106"
+      ],
+      "referencias_texto": "IMG_105; IMG_106",
+      "descricao": "Registro visual de valvula de seguranca e instrumentacao associada."
+    },
+    "leitura_dos_dispositivos_de_seguranca": "Dispositivos aparentes registrados, com acessibilidade visual e sem evidencia imediata de intervencao improvisada.",
+    "painel_e_comandos": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_107"
+      ],
+      "referencias_texto": "IMG_107",
+      "descricao": "Painel frontal e comandos principais registrados durante a inspecao."
+    },
+    "leitura_dos_comandos_e_indicadores": "Painel com identificacao visual suficiente para revisao, com comandos principais acessiveis e indicadores aparentes em condicao operacional.",
+    "manometro": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_108"
+      ],
+      "referencias_texto": "IMG_108",
+      "descricao": "Manometro com visor legivel no momento da inspecao."
+    },
+    "indicador_nivel": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_109"
+      ],
+      "referencias_texto": "IMG_109",
+      "descricao": "Indicador de nivel registrado visualmente na frente operacional."
+    },
+    "queimador_ou_sistema_termico": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_113"
+      ],
+      "referencias_texto": "IMG_113",
+      "descricao": "Frente do sistema termico registrada sem improvisacao aparente."
+    }
+  },
+  "documentacao_e_registros": {
+    "registros_disponiveis_no_local": "Prontuario e relatorio anterior estavam disponiveis digitalmente no momento da revisao. Nao houve certificado adicional apresentado em campo.",
+    "prontuario": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_021"
+      ],
+      "referencias_texto": "DOC_021 - prontuario_caldeira_cal01.pdf",
+      "observacao": "Usado para complementar a identificacao da placa."
+    },
+    "certificado": {
+      "disponivel": false,
+      "referencias": [],
+      "referencias_texto": "Nao apresentado",
+      "observacao": "Ausencia registrada sem bloqueio adicional."
+    },
+    "relatorio_anterior": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_022"
+      ],
+      "referencias_texto": "DOC_022 - relatorio_anterior_caldeira_2025.pdf",
+      "observacao": "Usado como referencia historica, sem prevalecer sobre a inspecao atual."
+    }
+  },
+  "nao_conformidades": {
+    "ha_nao_conformidades": true,
+    "ha_nao_conformidades_texto": "Sim",
+    "descricao": "Foram observados desgaste localizado no revestimento externo do isolamento termico e marcas leves de fuligem em trecho aparente da exaustao, sem evidencia visual de dano estrutural no corpo principal da caldeira.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_110",
+        "IMG_111"
+      ],
+      "referencias_texto": "IMG_110; IMG_111",
+      "descricao": "Registro fotografico das nao conformidades aparentes observadas."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Programar recomposicao do revestimento externo do isolamento termico e revisar o trecho da exaustao com marcas de fuligem, registrando nova verificacao fotografica na proxima rodada de inspecao."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "A caldeira apresenta identificacao minima validada, evidencias obrigatorias suficientes, painel e dispositivos principais registrados, com necessidade de ajuste corretivo localizado associado ao isolamento termico e ao acompanhamento do trecho aparente da exaustao.",
+    "justificativa": "A conclusao considera a evidencia visual coletada, a leitura dos dispositivos de seguranca e dos comandos, a ausencia de dano estrutural aparente no corpo principal e o registro de nao conformidades localizadas sem impedimento imediato para emissao."
+  }
+}

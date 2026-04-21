@@ -1,0 +1,23 @@
+---
+import AuthShell from "@/components/app/auth/auth-shell.astro";
+
+export const prerender = false;
+---
+
+<AuthShell
+  title="Mesa Avaliadora | Tariel Astro"
+  description="Tela de autenticacao migrada para a mesa avaliadora."
+  portalLabel="Mesa Avaliadora"
+  heroTitle="Entrada da mesa revisora pronta para a migracao por etapas."
+  heroCopy="A tela de autenticacao da mesa agora usa a mesma base moderna dos outros portais. Isso reduz retrabalho antes de atacar a parte mais complexa: fila, historico e resposta operacional."
+  heroItems={[
+    "Shared auth shell para manter consistencia entre portais internos.",
+    "Componentes prontos para evoluir com regras de sessao e permissao.",
+    "Abre espaco para migrar a mesa revisora sem reescrever tudo de uma vez.",
+    "Mantem a interface atual reconhecivel enquanto a arquitetura muda por baixo.",
+  ]}
+  supportText="Quer um acesso? Fale com o administrador."
+  submitLabel="Acessar"
+  previewMessage="Layout pronto. A parte de autenticacao real da mesa avaliadora entra na proxima etapa de integracao."
+  variant="mesa"
+/>

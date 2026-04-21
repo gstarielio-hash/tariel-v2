@@ -1,0 +1,59 @@
+            <section class="secao admin-tab-panel" data-admin-tab-panel="seguranca" hidden>
+                <div class="secao-header">
+                    <div class="secao-header__copy">
+                        <h3>
+                            <span class="material-symbols-rounded" aria-hidden="true">security</span>
+                            Segurança
+                        </h3>
+                        <p>Sessoes ativas, trocas de senha pendentes e o nivel de exposicao operacional da empresa.</p>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="info-card">
+                        <div class="label">Sessões ativas</div>
+                        <div class="valor">{{ _seguranca.get("total_sessoes_ativas", 0) | int }}</div>
+                        <div class="valor-auxiliar">{{ _seguranca.get("usuarios_com_sessao_ativa", 0) | int }} usuários com sessão</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Troca de senha pendente</div>
+                        <div class="valor">{{ _seguranca.get("usuarios_troca_senha_pendente", 0) | int }}</div>
+                        <div class="valor-auxiliar">Reset seguro e onboarding</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Usuários bloqueados</div>
+                        <div class="valor">{{ _seguranca.get("usuarios_bloqueados", 0) | int }}</div>
+                        <div class="valor-auxiliar">Bloqueios administrativos nesta empresa</div>
+                    </div>
+                </div>
+
+                <div class="box-tabela">
+                    <table class="tabela-admin" aria-label="Sessoes ativas da empresa">
+                        <thead>
+                            <tr>
+                                <th scope="col">Usuário</th>
+                                <th scope="col">Perfil</th>
+                                <th scope="col">Última atividade</th>
+                                <th scope="col">Expira em</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sessao in _seguranca.get("sessoes_ativas", []) %}
+                            <tr>
+                                <td>
+                                    <strong>{{ sessao.usuario_nome | e }}</strong>
+                                    <div class="texto-suave">{{ sessao.usuario_email | e }}</div>
+                                </td>
+                                <td>{{ sessao.role_label | e }}</td>
+                                <td>{{ sessao.ultima_atividade_label | e }}</td>
+                                <td>{{ sessao.expira_em_label | e }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="estado-vazio-tabela">Nenhuma sessão ativa registrada para esta empresa.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>

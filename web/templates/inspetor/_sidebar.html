@@ -1,0 +1,119 @@
+{% from "inspetor/_macros.html" import render_sidebar_recent %}
+{% set laudos_pinados = laudos_sidebar | selectattr("pinado") | list %}
+{% set laudos_recentes = laudos_sidebar | rejectattr("pinado") | list %}
+
+<aside
+    id="barra-historico"
+    class="inspetor-sidebar inspetor-sidebar--clean"
+    aria-label="Portal do inspetor"
+    data-estado-relatorio="{{ status_relatorio_atual }}"
+    data-laudo-ativo-id="{{ laudo_selecionado_id if laudo_selecionado_id else '' }}"
+    data-sidebar-laudos-view="recentes"
+>
+    <div class="inspetor-sidebar__top">
+        <div class="inspetor-sidebar__masthead inspetor-sidebar__masthead--chat">
+            <div class="inspetor-brand">
+                <span class="inspetor-brand__mark" aria-hidden="true">T</span>
+                <div class="inspetor-brand__copy">
+                    <strong data-action="go-home">Tariel IA</strong>
+                    <span>Chat do Inspetor</span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                id="btn-sidebar-open-assistant-chat"
+                class="inspetor-primary-btn inspetor-primary-btn--sidebar"
+                data-action="open-assistant-chat"
+                data-inspector-entry="sidebar-open-chat"
+                aria-label="Novo chat com o assistente"
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                <span>Novo chat</span>
+            </button>
+
+            <label class="inspetor-search-field" for="busca-historico-input">
+                <span class="material-symbols-rounded" aria-hidden="true">search</span>
+                <input
+                    type="search"
+                    id="busca-historico-input"
+                    placeholder="Buscar conversas..."
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+            </label>
+        </div>
+
+        <section class="inspetor-sidebar-recentes" aria-labelledby="inspetor-sidebar-recentes-titulo">
+            <header class="inspetor-sidebar-recentes__header">
+                <div class="inspetor-sidebar-section-heading inspetor-sidebar-section-heading--tight">
+                    <strong id="inspetor-sidebar-recentes-titulo">Conversas</strong>
+                </div>
+            </header>
+
+            <div
+                id="lista-historico"
+                class="inspetor-sidebar-recentes__lista"
+                aria-label="Laudos recentes"
+                {% if not laudos_sidebar %}hidden{% endif %}
+            >
+                <section
+                    id="secao-laudos-pinados"
+                    class="inspetor-sidebar-group"
+                    {% if not laudos_pinados %}hidden{% endif %}
+                >
+                    <span class="inspetor-sidebar-group__label">Fixadas</span>
+                    {% for item in laudos_pinados %}
+                        {{ render_sidebar_recent(item) }}
+                    {% endfor %}
+                </section>
+
+                <section
+                    id="secao-laudos-historico"
+                    class="inspetor-sidebar-group"
+                    {% if not laudos_recentes %}hidden{% endif %}
+                >
+                    {% for item in laudos_recentes %}
+                        {{ render_sidebar_recent(item) }}
+                    {% endfor %}
+                </section>
+            </div>
+
+            <p id="estado-vazio-historico" class="inspetor-sidebar-empty" {% if laudos_sidebar %}hidden{% endif %}>
+                Nenhuma conversa ainda. Inicie um novo chat para começar.
+            </p>
+        </section>
+    </div>
+
+    <div class="inspetor-sidebar__footer">
+        <div class="inspetor-sidebar-section-heading inspetor-sidebar-section-heading--footer">
+            <strong>Configurações</strong>
+        </div>
+
+        <button
+            type="button"
+            id="btn-abrir-perfil-chat"
+            class="inspetor-user-card inspetor-user-card--settings"
+            data-nome="{{ usuario_nome | e }}"
+            data-email="{{ usuario_email | e }}"
+            data-telefone="{{ usuario_telefone | e }}"
+            data-foto-url="{{ usuario_foto_url | e }}"
+            aria-label="Abrir perfil do usuário"
+        >
+            <span class="inspetor-user-card__avatar" aria-hidden="true">{{ usuario_nome[:1] | upper }}</span>
+            <span class="inspetor-user-card__copy">
+                <strong>{{ usuario_nome }}</strong>
+                <span>Perfil e personalização</span>
+            </span>
+            <span class="material-symbols-rounded inspetor-user-card__chevron" aria-hidden="true">tune</span>
+        </button>
+
+        <form action="/app/logout" method="POST" class="inspetor-logout-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="inspetor-logout-btn inspetor-logout-btn--wide" aria-label="Sair">
+                <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                <span>Sair</span>
+            </button>
+        </form>
+    </div>
+</aside>

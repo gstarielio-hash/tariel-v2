@@ -1,0 +1,236 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr12_inspecao_maquina_equipamento",
+  "template_code": "nr12_inspecao_maquina_equipamento",
+  "tokens": {
+    "cliente_nome": "CARAMURU ALIMENTOS S.A",
+    "unidade_nome": "Itumbiara - GO",
+    "engenheiro_responsavel": "Marcos Antonio Dias",
+    "crea_art": "CREA/SP 060.104.6000 | ART 1020230041192",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "ITM0722WF_CRM-FT-RC-02",
+    "empresa_nome": "CARAMURU ALIMENTOS S.A",
+    "unidade_nome": "Itumbiara - GO",
+    "local_documento": "Recebimento",
+    "tipo_inspecao": "Inicial",
+    "data_execucao": "2022-07-19",
+    "data_emissao": "2022-07-13",
+    "status_mesa": "aprovado_com_ressalva",
+    "wave_portfolio": 1,
+    "modalidade_laudo": "inspecao_tecnica"
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios de familia; emissao condicionada ao registro completo das adequacoes recomendadas.",
+    "pendencias_resolvidas_texto": "A Mesa consolidou referencias documentais, nomenclatura da maquina e fechamento tecnico do pacote NR12.",
+    "observacoes_mesa": "Caso mantido em nr12_inspecao_maquina_equipamento com foco em transportador continuo e protecoes mecanicas."
+  },
+  "resumo_executivo": "Inspecao inicial NR12 do conjunto motor da fita transportadora FT RC 02, com nao conformidades relevantes em protecoes mecanicas, sinalizacao e instalacoes eletricas, exigindo adequacoes antes do fechamento definitivo.",
+  "identificacao": {
+    "objeto_principal": "Conj. Motor da Fita Transportadora FT RC 02",
+    "localizacao": "Recebimento | Itumbiara - GO",
+    "unidade_operacional": "Itumbiara - GO",
+    "local_documento": "Recebimento",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_501",
+        "DOC_201"
+      ],
+      "referencias_texto": "IMG_501 - vista_geral_ft_rc_02.png; DOC_201 - relatorio_wf.crm.202207.itm.00018_rcb.pdf",
+      "descricao": "Vista geral do conjunto motriz e documento principal de referencia do parecer tecnico NR12.",
+      "observacao": "A referencia principal ancora a identificacao da maquina, do relatorio e do local inspecionado."
+    },
+    "codigo_interno": "FT RC 02",
+    "relatorio_codigo": "wf.crm.202207.itm.00018 rcb",
+    "numero_laudo": "ITM0722WF_CRM",
+    "data_laudo": "2022-07-13",
+    "mes_inspecao": "Julho 2022",
+    "tipo_inspecao": "Inicial",
+    "contratante": "CARAMURU ALIMENTOS S.A",
+    "executante": "WF SOLUCOES INDUSTRIAIS E INSPECOES LTDA",
+    "responsavel_tecnico": "Marcos Antonio Dias",
+    "inspetor": "Marcel Renato Silva",
+    "funcao_equipamento": "Transporte de graneis",
+    "fabricante": "WEG",
+    "numero_serie": "N/I",
+    "modelo": "N/I",
+    "tag": "FT RC 02",
+    "voltagem": "380",
+    "comando": "Automatico",
+    "operadores_por_turno": "1",
+    "art_numero": "1020230041192"
+  },
+  "objetivo_e_base_normativa": {
+    "objetivo": "Elaborar analise preliminar de risco para verificar protecoes de seguranca em equipamentos e instalacoes, apontando solucoes tecnicas e aferindo conformidade com a NR12 e normas tecnicas aplicaveis.",
+    "normas_aplicaveis": "NR-12; NR-10; NBR 12100; NBR 14153; NBR 14154; NBR 5410; NBR 7195; ISO 13850; ISO 14119",
+    "generalidades": "Levantamento executado em planta em funcionamento, com observacao de operacao, entrevistas e consolidacao de evidencias fotograficas para parecer tecnico."
+  },
+  "objeto_inspecao": {
+    "descricao_escopo": "Inspecao inicial do conjunto motor da fita transportadora FT RC 02, incluindo identificacao da maquina, checklist NR12 por grupos, comentarios tecnicos, recomendacoes e analise de risco.",
+    "categoria_maquina": "Transportador continuo de materiais",
+    "processo_associado": "Recebimento e transporte interno de graos"
+  },
+  "escopo_servico": {
+    "tipo_entrega": "inspecao_tecnica",
+    "modo_execucao": "in_loco",
+    "ativo_tipo": "esteira_transportadora",
+    "resumo_escopo": "Parecer tecnico de inspecao de seguranca em maquina e equipamento, com foco em arranjos fisicos, instalacoes eletricas, sistemas de seguranca, ergonomia, sinalizacao e documentacao operacional."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Inspecao visual e funcional com checklist NR12, observacao da maquina em operacao, entrevistas com operadores e consolidacao de evidencias fotograficas por grupo de risco.",
+    "condicoes_observadas": "Equipamento em operacao na planta de Itumbiara, com base segura e circulacao aceitavel, mas com exposicao de partes moveis, ausencia de protecoes mecanicas em pontos de tracao e falta de sinalizacao dedicada.",
+    "parametros_relevantes": "Protecoes: ausencia de protecoes mecanicas no decorrer da fita, rolo e corrente de tracao; Parada de emergencia: dispositivo acionador presente, com reavaliacao recomendada; Instalacoes eletricas: fiacao aparente e necessidade de SealTubo; Sinalizacao: ausente; LOTO: exigido em manutencao e limpeza.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_502",
+        "IMG_503",
+        "DOC_202"
+      ],
+      "referencias_texto": "IMG_502 - rolo_tracao_exposto.png; IMG_503 - painel_controle_fiacao.png; DOC_202 - checklist_nr12_ft_rc_02.pdf",
+      "descricao": "Evidencias da execucao com foco em protecoes mecanicas, cabeamento e pontos criticos do transportador.",
+      "observacao": "As imagens sustentam os comentarios por grupo e a recomendacao de adequacao."
+    }
+  },
+  "metodologia_e_criterios": {
+    "metodologia": "Analise preliminar de risco in loco com a maquina em funcionamento, verificacao de requisitos minimos por grupo NR12 e avaliacao complementar por HRN.",
+    "checklist_referencia": "Checklist NR12 estruturado nos grupos 5.1 a 5.6 do parecer tecnico.",
+    "criterios_risco": "Grafico de Risco NBR 14153 e classificacao HRN por grupo de verificacao."
+  },
+  "checklist_grupos": {
+    "arranjos_fisicos_instalacoes": {
+      "status": "atencao",
+      "comentarios": "Equipamento instalado em base segura e com deslocamento aceitavel, mantendo necessidade de disciplina administrativa de acesso.",
+      "risco_nivel": "Atencao"
+    },
+    "instalacoes_eletricas_partida_parada": {
+      "status": "nao_conforme",
+      "comentarios": "Ha fiacao aparente no local e necessidade de adequacao de condutores e conectores segundo o item 12.3.6 da NR12.",
+      "risco_nivel": "Atencao"
+    },
+    "sistemas_seguranca_transportadores": {
+      "status": "nao_conforme",
+      "comentarios": "Necessario instalar protecao mecanica no decorrer da fita, no rolo de tracao, na corrente de tracao e na correia de acoplamento.",
+      "risco_nivel": "Alto"
+    },
+    "aspectos_ergonomicos": {
+      "status": "conforme",
+      "comentarios": "Local com ventilacao e iluminacao adequadas e equipamento instalado em area coberta.",
+      "risco_nivel": "Baixo"
+    },
+    "riscos_adicionais_manutencao_sinalizacao": {
+      "status": "ajuste",
+      "comentarios": "Ausencia de sinalizacao no equipamento, embora haja registro de manutencao no ativo.",
+      "risco_nivel": "Significativo"
+    },
+    "manuais_procedimentos_capacitacao": {
+      "status": "conforme_com_ressalvas",
+      "comentarios": "Ha lista de presenca em treinamento e manual operacional em lingua portuguesa, com necessidade de revisar POPs apos apreciacao de risco.",
+      "risco_nivel": "Controlado"
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_502"
+      ],
+      "referencias_texto": "IMG_502 - rolo_tracao_exposto.png",
+      "descricao": "Ponto critico com ausencia de protecao mecanica em elemento de tracao acessivel.",
+      "observacao": "A evidencia principal sustenta o maior risco identificado na inspeao."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_503",
+        "IMG_504"
+      ],
+      "referencias_texto": "IMG_503 - painel_controle_fiacao.png; IMG_504 - area_sem_sinalizacao.png",
+      "descricao": "Registros complementares de fiacao aparente, painel de comando e ausencia de sinalizacao no local de instalacao.",
+      "observacao": "As evidencias complementares contextualizam os desvios secundarios do pacote."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_201",
+        "DOC_202",
+        "DOC_203"
+      ],
+      "referencias_texto": "DOC_201 - relatorio_wf.crm.202207.itm.00018_rcb.pdf; DOC_202 - checklist_nr12_ft_rc_02.pdf; DOC_203 - manual_operacional_ft_rc_02.pdf",
+      "descricao": "Relatorio base, checklist NR12 e manual operacional considerados no fechamento do parecer tecnico.",
+      "observacao": "O documento base ancora a linguagem, os grupos do checklist e o roteiro de recomendacoes."
+    }
+  },
+  "checklist_componentes": {
+    "protecao_fixa_e_movel": {
+      "condicao": "NC",
+      "observacao": "Ausencia de protecoes mecanicas no decorrer da fita, no rolo de tracao e na corrente de tracao."
+    },
+    "comandos_e_intertravamentos": {
+      "condicao": "NC",
+      "observacao": "Cabeamento aparente e necessidade de adequacao do sistema de partida e comando."
+    },
+    "parada_de_emergencia": {
+      "condicao": "C",
+      "observacao": "Dispositivos acionadores presentes, com reavaliacao complementar recomendada no pacote final."
+    },
+    "sinalizacao_e_identificacao": {
+      "condicao": "NC",
+      "observacao": "Ausencia de sinalizacao de seguranca no equipamento e no entorno imediato."
+    },
+    "zona_de_risco_e_acesso": {
+      "condicao": "NC",
+      "observacao": "Pontos de esmagamento e aprisionamento acessiveis durante a operacao normal."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Manual: DOC_203 - manual_operacional_ft_rc_02.pdf; Inventario: DOC_204 - inventario_nr12_recebimento.pdf; Checklist NR12: DOC_202 - checklist_nr12_ft_rc_02.pdf; Apreciacao de risco: DOC_205 - apr_ft_rc_02.pdf; Procedimento LOTO: DOC_206 - loto_transportadores.pdf",
+    "documentos_emitidos": "Parecer tecnico NR12 com checklist por grupos, recomendacoes formais e rastreabilidade de risco para o conjunto FT RC 02.",
+    "manual_maquina": "DOC_203 - manual_operacional_ft_rc_02.pdf",
+    "inventario_nr12": "DOC_204 - inventario_nr12_recebimento.pdf",
+    "checklist_nr12": "DOC_202 - checklist_nr12_ft_rc_02.pdf",
+    "apreciacao_risco": "DOC_205 - apr_ft_rc_02.pdf",
+    "procedimento_loto": "DOC_206 - loto_transportadores.pdf",
+    "observacoes_documentais": "O pacote documental cobre manual, inventario, checklist NR12, apreciacao de risco e procedimento de bloqueio para manutencao e limpeza."
+  },
+  "analise_risco": {
+    "grafico_risco_categoria": "Categoria 2 | S2 F1 P1",
+    "grau_risco_antes": "Atencao no grupo eletrico; Alto em sistemas de seguranca e transportadores; Significativo em sinalizacao e manutencao; Baixo em ergonomia.",
+    "grau_risco_apos": "Pendente de reavaliacao apos instalacao das protecoes mecanicas, adequacao eletrica e implantacao da sinalizacao de seguranca.",
+    "resumo_risco": "O pico de risco esta concentrado nos elementos moveis acessiveis do transportador, com impacto complementar em instalacoes eletricas e sinalizacao."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Ausencia de protecoes mecanicas em pontos de tracao, fiacao aparente, falta de sinalizacao e necessidade de revisar procedimentos de seguranca antes do fechamento definitivo.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_502",
+        "IMG_503",
+        "IMG_504"
+      ],
+      "referencias_texto": "IMG_502 - rolo_tracao_exposto.png; IMG_503 - painel_controle_fiacao.png; IMG_504 - area_sem_sinalizacao.png",
+      "descricao": "Conjunto de evidencias associado aos principais desvios de seguranca observados durante a inspecao.",
+      "observacao": "As evidencias suportam as recomendacoes e a classificacao de adequacao requerida."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Providenciar protecoes mecanicas no decorrer da fita transportadora, no rolo de tracao, na corrente de tracao e na correia de acoplamento. Adequar condutores, conectores e organizacao do cabeamento. Implantar sinalizacao de seguranca eficaz conforme NR-26 e NBR 7195. Manter cronograma de manutencoes, treinamentos e uso de LOTO em manutencao e limpeza. Revisar POPs apos a apreciacao de risco."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "status_operacional": "adequacao_requerida",
+    "parecer_final": "Necessita adequacao NR12 antes do fechamento definitivo.",
+    "conclusao_tecnica": "O conjunto motor da fita transportadora FT RC 02 apresenta rastreabilidade suficiente para emissao do parecer tecnico, mas requer adequacoes mecanicas, eletricas e de sinalizacao para atendimento consistente aos requisitos de seguranca da NR12.",
+    "justificativa": "A conclusao considera os grupos do checklist com risco Alto e Significativo, a ausencia de protecoes mecanicas em pontos acessiveis, a necessidade de adequacao eletrica e a obrigatoriedade de revisar os procedimentos de bloqueio e sinalizacao.",
+    "proxima_acao": "Executar as adequacoes recomendadas, atualizar POPs e reinspecionar o equipamento apos a implementacao das correcoes."
+  }
+}

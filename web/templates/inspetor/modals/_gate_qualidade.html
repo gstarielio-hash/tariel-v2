@@ -1,0 +1,97 @@
+<div
+    id="modal-gate-qualidade"
+    class="modal-overlay modal-overlay-gate"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="gate-qualidade-titulo"
+    aria-describedby="gate-qualidade-descricao"
+    aria-hidden="true"
+    hidden
+>
+    <div class="modal-container modal-container-gate" role="document">
+        <div class="modal-header modal-header-gate">
+            <h2 id="gate-qualidade-titulo">
+                <span class="material-symbols-rounded" aria-hidden="true">fact_check</span>
+                Checklist obrigatório antes do envio
+            </h2>
+
+            <button
+                type="button"
+                id="btn-fechar-modal-gate-qualidade"
+                class="btn-fechar-modal"
+                aria-label="Fechar checklist de qualidade"
+            >
+                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            </button>
+        </div>
+
+        <div class="modal-body modal-body-gate">
+            <p id="gate-qualidade-descricao">
+                A sessão não foi enviada para a mesa avaliadora porque ainda faltam evidências obrigatórias.
+            </p>
+
+            <div class="gate-template-pill">
+                <span class="material-symbols-rounded" aria-hidden="true">assignment</span>
+                <span id="titulo-gate-template">Inspeção Geral</span>
+            </div>
+
+            <p id="texto-gate-qualidade-resumo" class="gate-resumo"></p>
+
+            <section
+                id="bloco-gate-roteiro-template"
+                class="bloco-gate-qualidade"
+                aria-labelledby="titulo-gate-roteiro-template"
+                hidden
+            >
+                <h3 id="titulo-gate-roteiro-template">Roteiro obrigatorio do modelo</h3>
+                <p id="texto-gate-roteiro-template" class="gate-roteiro-resumo"></p>
+                <ul id="lista-gate-roteiro-template" class="lista-gate-qualidade"></ul>
+            </section>
+
+            <section class="bloco-gate-qualidade" aria-labelledby="titulo-gate-faltantes">
+                <h3 id="titulo-gate-faltantes">Itens pendentes</h3>
+                <ul id="lista-gate-faltantes" class="lista-gate-qualidade"></ul>
+            </section>
+
+            <details class="bloco-gate-qualidade gate-checklist-completo">
+                <summary>Ver checklist completo</summary>
+                <ul id="lista-gate-checklist" class="lista-gate-qualidade"></ul>
+            </details>
+
+            <section
+                id="bloco-gate-override-humano"
+                class="bloco-gate-qualidade"
+                aria-labelledby="titulo-gate-override-humano"
+                hidden
+            >
+                <h3 id="titulo-gate-override-humano">Exceção governada com justificativa</h3>
+                <p id="texto-gate-override-humano" class="gate-roteiro-resumo"></p>
+                <ul id="lista-gate-override-casos" class="lista-gate-qualidade"></ul>
+                <label for="textarea-gate-override-justificativa">Justificativa interna obrigatória</label>
+                <textarea
+                    id="textarea-gate-override-justificativa"
+                    rows="4"
+                    maxlength="2000"
+                    placeholder="Explique por que o humano decidiu seguir mesmo com o alerta automático."
+                ></textarea>
+                <p id="texto-gate-override-responsabilidade" class="gate-resumo"></p>
+                <button
+                    type="button"
+                    id="btn-gate-override-continuar"
+                    class="technical-record-btn technical-record-btn--primary"
+                >
+                    Registrar justificativa e continuar
+                </button>
+            </section>
+
+            <div class="gate-acoes">
+                <button type="button" id="btn-entendi-gate-qualidade" class="technical-record-btn technical-record-btn--primary">
+                    Entendi, voltar para coleta
+                </button>
+                <button type="button" id="btn-gate-preencher-no-chat" class="technical-record-btn technical-record-btn--outline">
+                    Inserir /pendencias no chat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,125 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr04_diagnostico_sesmt",
+  "template_code": "nr04_diagnostico_sesmt",
+  "tokens": {
+    "cliente_nome": "Empresa Demo (DEV)",
+    "unidade_nome": "Unidade Piloto Nacional",
+    "engenheiro_responsavel": "Engenheiro Revisor (Dev)",
+    "crea_art": "CREA 123456/D | ART 2026-0001",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "NR04_DIAGNOSTICO_SESMT-2026-001",
+    "empresa_nome": "Empresa Demo (DEV)",
+    "unidade_nome": "Unidade Piloto Nacional",
+    "data_execucao": "2026-04-08",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva",
+    "wave_portfolio": 3,
+    "modalidade_laudo": "pacote_documental"
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Pendencias documentais secundarias foram registradas e tratadas pela Mesa.",
+    "observacoes_mesa": "Caso mantido em nr04_diagnostico_sesmt com rastreabilidade de escopo e evidencias."
+  },
+  "resumo_executivo": "Foi executado o servico nr4 - diagnostico sesmt com registro estruturado do objeto principal, evidencias vinculadas, documentacao de apoio e conclusao tecnica consolidada para a Mesa.",
+  "identificacao": {
+    "objeto_principal": "Objeto principal do servico diagnostico sesmt",
+    "localizacao": "Setor tecnico associado a nr4",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_001",
+        "DOC_001"
+      ],
+      "referencias_texto": "IMG_001; DOC_001",
+      "descricao": "Referencia principal do objeto identificada com apoio de evidencia visual e documento associado.",
+      "observacao": "Rastreabilidade principal confirmada para o servico."
+    },
+    "codigo_interno": "NR04_DIAGNOSTICO_SESMT-001"
+  },
+  "escopo_servico": {
+    "tipo_entrega": "pacote_documental",
+    "modo_execucao": "analise_documental",
+    "ativo_tipo": "NR4",
+    "resumo_escopo": "Execucao do servico diagnostico sesmt no contexto da norma servicos especializados em seguranca e em medicina do trabalho, com consolidacao de evidencias, registros de campo ou base documental e conclusao tecnica auditavel."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Metodo padrao Tariel para diagnostico sesmt, com registro estruturado do escopo, dados de execucao, anexos principais e pontos de atencao.",
+    "condicoes_observadas": "Servico executado dentro do escopo previsto, com registros suficientes para revisao da Mesa e consolidacao do documento final.",
+    "parametros_relevantes": "Pacote tecnico de referencia para diagnostico sesmt.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_010",
+        "DOC_010"
+      ],
+      "referencias_texto": "IMG_010; DOC_010",
+      "descricao": "Evidencia da execucao principal do servico.",
+      "observacao": "Registros principais consolidados."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_020"
+      ],
+      "referencias_texto": "IMG_020",
+      "descricao": "Evidencia principal que suporta a conclusao tecnica.",
+      "observacao": "Material principal vinculado ao caso."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_021"
+      ],
+      "referencias_texto": "IMG_021",
+      "descricao": "Evidencia complementar para contextualizacao do servico.",
+      "observacao": "Registro complementar sem impacto critico."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_001"
+      ],
+      "referencias_texto": "Pacote tecnico de referencia para diagnostico sesmt.",
+      "descricao": "Documento base ou ancora principal do servico.",
+      "observacao": "Documento vinculado ao pacote final."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Pacote tecnico de referencia para diagnostico sesmt.",
+    "documentos_emitidos": "Pacote tecnico de nr4 - diagnostico sesmt consolidado para entrega.",
+    "observacoes_documentais": "Documento vinculado ao contexto de servicos especializados em seguranca e em medicina do trabalho."
+  },
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Ponto de atencao controlado no servico diagnostico sesmt, exigindo rastreabilidade documental complementar antes do fechamento definitivo.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_030"
+      ],
+      "referencias_texto": "IMG_030",
+      "descricao": "Registro relacionado aos pontos de atencao ou a ausencia declarada deles.",
+      "observacao": "Evidencia vinculada ao fechamento da analise."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Manter rastreabilidade do servico diagnostico sesmt e registrar formalmente qualquer ajuste, complemento documental ou revalidacao futura."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "O servico nr4 - diagnostico sesmt foi consolidado com rastreabilidade suficiente, evidencias principais vinculadas e conclusao tecnica formalizada.",
+    "justificativa": "A conclusao considera o escopo registrado, o metodo aplicado, a documentacao disponivel, a evidencia principal e os pontos de atencao ou sua ausencia declarada."
+  }
+}

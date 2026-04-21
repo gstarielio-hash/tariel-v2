@@ -1,0 +1,389 @@
+{
+  "family_key": "nr10_implantacao_loto",
+  "nome_exibicao": "NR10 - Implantacao e gerenciamento de LOTO",
+  "macro_categoria": "NR10",
+  "descricao": "Implantacao, revisao ou gerenciamento de bloqueio e sinalizacao de energias perigosas com rastreabilidade tecnica, evidencias de campo e conclusao auditavel.",
+  "schema_version": 1,
+  "scope": {
+    "family_lock": true,
+    "allowed_nrs": [
+      "nr10"
+    ],
+    "allowed_contexts": [
+      "nr10_implantacao_loto",
+      "loto",
+      "management",
+      "wave_1",
+      "nr10"
+    ],
+    "scope_signals": [
+      "fontes_de_energia_identificadas",
+      "pontos_de_bloqueio_registrados",
+      "energia_zero_confirmada",
+      "procedimento_documentado"
+    ],
+    "out_of_scope_examples": [
+      "inspecao_generica_sem_mapeamento_de_energias",
+      "troca_silenciosa_para_rti_ou_pie",
+      "ausencia_de_rastreabilidade_do_bloqueio"
+    ],
+    "review_required": [
+      "quando_o_ponto_de_bloqueio_nao_estiver_claro",
+      "quando_nao_houver_verificacao_da_condicao_segura",
+      "quando_a_documentacao_base_estiver_ausente_sem_justificativa"
+    ]
+  },
+  "evidence_policy": {
+    "minimum_evidence": {
+      "fotos": 3,
+      "documentos": 1,
+      "textos": 1
+    },
+    "required_slots": [
+      {
+        "slot_id": "referencia_principal",
+        "label": "Referencia principal",
+        "accepted_types": [
+          "foto",
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "identificacao.referencia_principal",
+        "purpose": "Identificar o ativo, painel, maquina ou frente com procedimento LOTO aplicado."
+      },
+      {
+        "slot_id": "evidencia_execucao",
+        "label": "Evidencia de execucao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "execucao_servico.evidencia_execucao",
+        "purpose": "Registrar a aplicacao do bloqueio, etiquetagem e verificacao da condicao segura."
+      },
+      {
+        "slot_id": "evidencia_principal",
+        "label": "Evidencia principal",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.evidencia_principal",
+        "purpose": "Consolidar o principal registro visual ou documental que sustenta a implantacao LOTO."
+      },
+      {
+        "slot_id": "documento_base",
+        "label": "Procedimento ou documento base",
+        "accepted_types": [
+          "documento"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "evidencias_e_anexos.documento_base",
+        "purpose": "Vincular procedimento, APR, matriz de energias ou instrucao de bloqueio."
+      },
+      {
+        "slot_id": "conclusao_servico",
+        "label": "Conclusao do servico",
+        "accepted_types": [
+          "texto"
+        ],
+        "required": true,
+        "min_items": 1,
+        "binding_path": "conclusao.conclusao_tecnica",
+        "purpose": "Registrar o status tecnico da implantacao e as pendencias de gerenciamento."
+      }
+    ],
+    "optional_slots": [
+      {
+        "slot_id": "evidencia_complementar",
+        "label": "Evidencia complementar",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "evidencias_e_anexos.evidencia_complementar",
+        "purpose": "Complementar o caso com sinais, cadeados, etiquetas ou croquis adicionais."
+      },
+      {
+        "slot_id": "registro_lacuna_ou_ponto",
+        "label": "Registro de lacuna ou ponto de atencao",
+        "accepted_types": [
+          "foto",
+          "documento",
+          "texto"
+        ],
+        "required": false,
+        "min_items": 0,
+        "binding_path": "nao_conformidades_ou_lacunas.evidencias",
+        "purpose": "Registrar lacunas de padronizacao, ausencia de pontos ou falhas de gerenciamento."
+      }
+    ],
+    "checklist_groups": [
+      {
+        "group_id": "identificacao_e_escopo",
+        "title": "Identificacao e escopo",
+        "required": true,
+        "items": [
+          {
+            "item_id": "objeto_registrado",
+            "label": "Objeto principal registrado",
+            "critical": true
+          },
+          {
+            "item_id": "localizacao_registrada",
+            "label": "Localizacao registrada",
+            "critical": true
+          },
+          {
+            "item_id": "escopo_registrado",
+            "label": "Escopo LOTO registrado",
+            "critical": true
+          }
+        ]
+      },
+      {
+        "group_id": "controle_energias",
+        "title": "Controle de energias",
+        "required": true,
+        "items": [
+          {
+            "item_id": "fontes_identificadas",
+            "label": "Fontes de energia identificadas",
+            "critical": true
+          },
+          {
+            "item_id": "pontos_bloqueio_registrados",
+            "label": "Pontos de bloqueio registrados",
+            "critical": true
+          },
+          {
+            "item_id": "energia_zero_verificada",
+            "label": "Condicao segura ou energia zero verificada",
+            "critical": true
+          }
+        ]
+      },
+      {
+        "group_id": "fechamento_documental",
+        "title": "Fechamento documental",
+        "required": true,
+        "items": [
+          {
+            "item_id": "documento_base_vinculado",
+            "label": "Procedimento ou documento base vinculado",
+            "critical": true
+          },
+          {
+            "item_id": "conclusao_registrada",
+            "label": "Conclusao tecnica registrada",
+            "critical": true
+          }
+        ]
+      }
+    ],
+    "review_required": [
+      "quando_o_documento_base_nao_estiver_vinculado",
+      "quando_nao_houver_evidencia_da_condicao_segura",
+      "quando_houver_lacuna_de_ponto_critico_sem_tratativa"
+    ]
+  },
+  "review_policy": {
+    "requires_family_lock": true,
+    "block_on_scope_mismatch": true,
+    "block_on_missing_required_evidence": true,
+    "block_on_critical_field_absent": true,
+    "allow_override_with_reason": true,
+    "allowed_override_cases": [
+      "documento_opcional_ausente_com_justificativa_registrada",
+      "evidencia_complementar_substituida_por_registro_textual_com_rastreabilidade",
+      "limitacao_controlada_sem_impacto_na_conclusao_critica"
+    ],
+    "blocking_conditions": [
+      "ausencia_de_ponto_de_bloqueio_identificado",
+      "ausencia_de_documento_base_do_procedimento",
+      "ausencia_de_conclusao_tecnica"
+    ]
+  },
+  "document_blueprint": {
+    "opening_statement": "Template governado para implantacao LOTO baseada na sequencia de desenergizacao, impedimento de reenergizacao e verificacao de condicao segura prevista na NR10.",
+    "section_order": [
+      "controle_documental_sumario",
+      "resumo_executivo",
+      "objeto_escopo_base_normativa",
+      "identificacao_tecnica_do_objeto",
+      "metodologia_instrumentos_equipe",
+      "checklist_tecnico",
+      "evidencias_registros_fotograficos",
+      "nao_conformidades_criticidade",
+      "conclusao",
+      "assinaturas_responsabilidade_tecnica"
+    ],
+    "signature_roles": [
+      {
+        "role": "Responsavel tecnico",
+        "name_paths": [
+          "tokens.engenheiro_responsavel",
+          "tenant_branding.contact_name"
+        ],
+        "detail_paths": [
+          "tokens.crea_art"
+        ],
+        "date_paths": [
+          "case_context.data_emissao",
+          "document_control.issue_date"
+        ]
+      },
+      {
+        "role": "Representante da empresa",
+        "name_paths": [
+          "tenant_branding.contact_name",
+          "tokens.cliente_responsavel"
+        ],
+        "detail_paths": [
+          "tenant_branding.display_name",
+          "tenant_branding.cnpj"
+        ],
+        "date_paths": [
+          "case_context.data_emissao"
+        ]
+      }
+    ],
+    "section_intros": {
+      "identificacao_e_escopo": "Identifique o ativo, o contexto operacional e o escopo LOTO aplicado.",
+      "procedimentos_de_bloqueio": "Consolide fontes de energia, pontos de bloqueio, sinalizacao e confirmacao da condicao segura.",
+      "evidencias_e_documentos": "Amarre evidencias visuais, procedimento base e registros emitidos.",
+      "conclusao_e_assinaturas": "Feche pendencias, recomendacao e responsabilidade tecnica.",
+      "checklist_tecnico": "Leitura guiada da sequencia de bloqueio: fontes de energia, pontos de bloqueio, sinalizacao, energia zero e reenergizacao controlada."
+    },
+    "blank_row_targets": {
+      "checklist": 5,
+      "evidence": 5,
+      "findings": 4
+    },
+    "field_semantics": {
+      "checklist_componentes": "instance_fill",
+      "documentacao_e_registros": "instance_fill"
+    }
+  },
+  "compatible_runtime_templates": [
+    "loto"
+  ],
+  "compatible_template_codes": [
+    "nr10_implantacao_loto",
+    "loto"
+  ],
+  "normative_basis": {
+    "policy_version": 1,
+    "status": "official_basis_family_mapped",
+    "nr_code": "nr10",
+    "nr_title": "Seguranca em Instalacoes e Servicos em Eletricidade",
+    "editorial_inference_notice": "A NR10 nao dita um template de LOTO; a Tariel transforma a sequencia obrigatoria de desenergizacao e impedimento de reenergizacao em checklist e evidencia auditavel.",
+    "implementation_note": "Retrofit oficial aplicado para implantacao de LOTO, com anchors granulares da NR-10 e do manual oficial para desenergizacao, travamento, sinalizacao, controle documental e liberacao segura do circuito.",
+    "sources": [
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Normas Regulamentadoras - NR",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs",
+        "used_for": "Ponto de entrada oficial do projeto para localizar textos vigentes, anexos e atualizacoes das NRs."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "NR 10 - Seguranca em Instalacoes e Servicos em Eletricidade",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-10.pdf",
+        "anchors": [
+          {
+            "item_ref": "10.2.8.2 / 10.2.8.2.1",
+            "used_for": "Fixar a primazia da desenergizacao e, quando ela nao bastar por si so, o uso de barreiras, sinalizacao, bloqueios e demais medidas coletivas complementares."
+          },
+          {
+            "item_ref": "10.5.1 / 10.5.2 / 10.5.3",
+            "used_for": "Estruturar a sequencia formal de seccionamento, impedimento de reenergizacao, ausencia de tensao, aterramento temporario, sinalizacao e reenergizacao controlada."
+          },
+          {
+            "item_ref": "10.8.8 / 10.8.8.2",
+            "used_for": "Relacionar a familia a trabalhadores autorizados, treinamento especifico e reciclagem quando houver mudanca de metodo ou de instalacao."
+          },
+          {
+            "item_ref": "10.11.2 / 10.11.3",
+            "used_for": "Vincular a implantacao do bloqueio a ordens de servico e procedimentos padronizados com base tecnica e medidas de controle documentadas."
+          }
+        ],
+        "used_for": "Texto oficial vigente da NR-10 usado como base normativa primaria desta familia."
+      },
+      {
+        "authority": "Ministerio do Trabalho e Emprego",
+        "title": "Manual de Auxilio na Interpretacao e Aplicacao da NR10",
+        "url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/manuais-e-publicacoes/manual_de_auxilio_na_interpretacao_e_aplicacao_da_nr_10.pdf",
+        "anchors": [
+          {
+            "item_ref": "Comentarios 10.2.8.2 e 10.2.8.2.1",
+            "used_for": "Apoiar a interpretacao oficial sobre seletividade das medidas coletivas, uso de sinalizacao, barreiras e bloqueio do religamento."
+          },
+          {
+            "item_ref": "Comentarios 10.5.1 e 10.5.2",
+            "used_for": "Detalhar a diferenca entre desligado e desenergizado, a logica do travamento, das etiquetas e da manutencao do estado seguro ate a reenergizacao."
+          },
+          {
+            "item_ref": "Comentarios 10.11.2 e 10.11.3",
+            "used_for": "Consolidar a leitura oficial sobre ordem de servico, responsabilizacao e conteudo minimo dos procedimentos de trabalho."
+          }
+        ],
+        "used_for": "Fonte oficial interpretativa de apoio para detalhar a implantacao do bloqueio e etiquetagem sem inovar obrigacoes."
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "deenergization_lockout_sequence",
+        "source_refs": [
+          "NR10 10.2.8.2",
+          "NR10 10.5.1",
+          "NR10 10.5.2"
+        ],
+        "maps_to": [
+          "checklist_componentes",
+          "execucao_servico.metodo_aplicado",
+          "evidencias_e_anexos.evidencia_principal"
+        ],
+        "application_note": "O laudo de LOTO precisa mostrar a sequencia adotada para seccionamento, travamento, ausencia de tensao, aterramento temporario quando aplicavel e a manutencao do estado seguro ate a liberacao."
+      },
+      {
+        "requirement_id": "documented_service_order_and_procedure",
+        "source_refs": [
+          "NR10 10.11.2",
+          "NR10 10.11.3"
+        ],
+        "maps_to": [
+          "documentacao_e_registros.documentos_disponiveis",
+          "document_blueprint",
+          "execucao_servico.condicoes_observadas"
+        ],
+        "application_note": "A familia deve evidenciar ordem de servico, procedimento aplicavel e a base tecnica usada para a implantacao do bloqueio e etiquetagem."
+      },
+      {
+        "requirement_id": "authorized_team_and_justified_deviations",
+        "source_refs": [
+          "NR10 10.5.3",
+          "NR10 10.8.8",
+          "NR10 10.8.8.2"
+        ],
+        "maps_to": [
+          "nao_conformidades_ou_lacunas.descricao",
+          "recomendacoes.texto",
+          "conclusao.conclusao_tecnica"
+        ],
+        "application_note": "Desvios da sequencia padrao, mudancas de metodo ou lacunas de treinamento devem aparecer como risco residual, justificativa tecnica e recomendacao formal."
+      }
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta name="tariel-perf-mode" content="{{ '1' if perf_mode | default(false) else '0' }}">
+    <title>{{ empresa.nome_fantasia | e }} • Portal da empresa • tariel.ia</title>
+    <script src="/static/js/shared/theme_bootstrap.js"></script>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="preload" as="image" href="/static/img/logo-horizontal-dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin/admin_icons.css">
+    <link rel="stylesheet" href="/static/css/cliente/portal_foundation.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/portal_components.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/portal.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/portal_workspace.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/portal_admin_surface.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/portal_chat_surface.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/portal_mesa_surface.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/cliente/portal_admin_theme.css?v={{ v_app }}">
+    <link rel="stylesheet" href="/static/css/shared/official_visual_system.css?v={{ v_app }}">
+</head>
+<body
+    data-cliente-tab-inicial="{{ cliente_tab_inicial | default('admin') | e }}"
+    data-cliente-admin-section-inicial="{{ cliente_admin_section_inicial | default('overview') | e }}"
+    data-cliente-chat-section-inicial="{{ cliente_chat_section_inicial | default('overview') | e }}"
+    data-cliente-mesa-section-inicial="{{ cliente_mesa_section_inicial | default('overview') | e }}"
+    data-cliente-route-admin="{{ cliente_surface_routes.admin | default('/cliente/painel') | e }}"
+    data-cliente-route-chat="{{ cliente_surface_routes.chat | default('/cliente/chat') | e }}"
+    data-cliente-route-mesa="{{ cliente_surface_routes.mesa | default('/cliente/mesa') | e }}"
+>
+    <div class="cliente-app">
+        <div class="cliente-tabs-shell">
+            {% include "cliente/_primary_tabs.html" %}
+        </div>
+
+        <div class="cliente-shell">
+            <main class="cliente-main">
+                {% include "cliente/painel/_content.html" %}
+                {% include "cliente/chat/_content.html" %}
+                {% include "cliente/mesa/_content.html" %}
+            </main>
+        </div>
+    </div>
+
+    <div id="feedback" class="feedback" data-visible="false" role="status" aria-live="polite"></div>
+
+    {% include "cliente/_scripts.html" %}
+</body>
+</html>

@@ -1,0 +1,137 @@
+{
+  "schema_type": "laudo_output",
+  "schema_version": 1,
+  "family_key": "nr12_apreciacao_risco_maquina",
+  "template_code": "nr12_apreciacao_risco_maquina",
+  "tokens": {
+    "cliente_nome": "Empresa Demo (DEV)",
+    "unidade_nome": "Unidade Piloto Nacional",
+    "engenheiro_responsavel": "Engenheiro Revisor (Dev)",
+    "crea_art": "CREA 123456/D | ART 2026-0001",
+    "revisao_template": "v1"
+  },
+  "case_context": {
+    "laudo_id": "NR12_APR_RISCO_PH07-2026-001",
+    "empresa_nome": "Empresa Demo (DEV)",
+    "unidade_nome": "Unidade Piloto Nacional",
+    "data_execucao": "2026-04-08",
+    "data_emissao": "2026-04-08",
+    "status_mesa": "aprovado_com_ressalva",
+    "wave_portfolio": 1,
+    "modalidade_laudo": "engenharia"
+  },
+  "mesa_review": {
+    "status": "aprovado_com_ressalva",
+    "family_lock": true,
+    "scope_mismatch": false,
+    "bloqueios": [],
+    "bloqueios_texto": "Sem bloqueios pendentes para emissao.",
+    "pendencias_resolvidas_texto": "Matriz de risco, checklist NR12 e memoria tecnica foram conciliados pela Mesa antes da emissao.",
+    "observacoes_mesa": "Caso mantido em nr12_apreciacao_risco_maquina com foco na prensa PH-07 e no risco de aprisionamento durante setup."
+  },
+  "resumo_executivo": "Foi executada a apreciacao de risco da prensa hidraulica PH-07 com consolidacao da matriz de risco, documentacao NR12 vinculada e recomendacao formal de intertravamento frontal antes da revalidacao operacional.",
+  "identificacao": {
+    "objeto_principal": "Prensa hidraulica PH-07",
+    "localizacao": "Linha de estampagem | Celula 02",
+    "referencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_451",
+        "DOC_061"
+      ],
+      "referencias_texto": "IMG_451 - vista geral da PH-07; DOC_061 - matriz_risco_ph07.pdf",
+      "descricao": "Referencia principal consolidada com foto geral da prensa e memoria tecnica da apreciacao de risco.",
+      "observacao": "Rastreabilidade principal confirmada para o equipamento e para a zona frontal de alimentacao."
+    },
+    "codigo_interno": "PH-07"
+  },
+  "escopo_servico": {
+    "tipo_entrega": "engenharia",
+    "modo_execucao": "analise_e_modelagem",
+    "ativo_tipo": "prensa_hidraulica",
+    "resumo_escopo": "Apreciacao de risco da prensa hidraulica PH-07 com foco no setup, na limpeza e no acesso frontal ao ferramental, utilizando memoria tecnica, checklist NR12 e matriz HRN."
+  },
+  "execucao_servico": {
+    "metodo_aplicado": "Apreciacao de risco com matriz HRN, checklist NR12 estruturado por grupos e memoria tecnica da maquina.",
+    "condicoes_observadas": "Durante o setup e a limpeza foi identificado acesso perigoso ao ferramental na zona frontal de alimentacao, sem bloqueio intertravado no ponto de maior exposicao.",
+    "parametros_relevantes": "Perigo: Aprisionamento na zona de alimentacao durante setup e limpeza. | Categoria: Alto. | Severidade: Grave. | Probabilidade: Provavel. | Controles existentes: Protecoes laterais fixas e parada de emergencia frontal.",
+    "evidencia_execucao": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_061",
+        "DOC_062"
+      ],
+      "referencias_texto": "DOC_061 - matriz_risco_ph07.pdf; DOC_062 - checklist_nr12_ph07.pdf",
+      "descricao": "Base da execucao consolidada com matriz de risco e checklist NR12 aplicados na PH-07.",
+      "observacao": "Registros principais consolidados e conciliados com a Mesa."
+    }
+  },
+  "evidencias_e_anexos": {
+    "evidencia_principal": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_061"
+      ],
+      "referencias_texto": "DOC_061 - matriz_risco_ph07.pdf",
+      "descricao": "Memoria principal da apreciacao de risco que suporta a conclusao tecnica.",
+      "observacao": "Documento principal vinculado ao caso."
+    },
+    "evidencia_complementar": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_452"
+      ],
+      "referencias_texto": "IMG_452 - zona de alimentacao frontal",
+      "descricao": "Registro complementar da zona de alimentacao e do acesso frontal ao ferramental.",
+      "observacao": "Foto complementar usada para contextualizar o cenario critico."
+    },
+    "documento_base": {
+      "disponivel": true,
+      "referencias": [
+        "DOC_061"
+      ],
+      "referencias_texto": "DOC_061 - matriz_risco_ph07.pdf",
+      "descricao": "Documento base principal considerado para a apreciacao de risco NR12.",
+      "observacao": "Documento ancora vinculado ao pacote final."
+    }
+  },
+  "documentacao_e_registros": {
+    "documentos_disponiveis": "Apreciacao de risco: DOC_061 - matriz_risco_ph07.pdf | Checklist NR12: DOC_062 - checklist_nr12_ph07.pdf | Manual: DOC_063 - manual_prensa_ph07.pdf",
+    "documentos_emitidos": "Pacote tecnico de apreciacao de risco NR12 consolidado para emissao da PH-07.",
+    "observacoes_documentais": "A matriz de risco, o checklist e o manual da prensa foram conciliados como base documental do caso."
+  },
+  "analise_de_risco": [
+    {
+      "perigo": "Aprisionamento na zona de alimentacao durante setup e limpeza.",
+      "cenario": "Zona frontal de alimentacao com acesso perigoso ao ferramental durante intervencao manual.",
+      "categoria": "Alto",
+      "severidade": "Grave",
+      "probabilidade": "Provavel",
+      "controle": "Protecoes laterais fixas e parada de emergencia frontal.",
+      "medida_existente": "Protecoes laterais fixas e parada de emergencia frontal.",
+      "acao_recomendada": "Intertravar o acesso frontal e revisar o procedimento de setup seguro antes da liberacao final."
+    }
+  ],
+  "nao_conformidades_ou_lacunas": {
+    "ha_pontos_de_atencao": true,
+    "ha_pontos_de_atencao_texto": "Sim",
+    "descricao": "Risco alto de aprisionamento na zona de alimentacao durante setup, exigindo intertravamento frontal e revalidacao da matriz apos ajuste.",
+    "evidencias": {
+      "disponivel": true,
+      "referencias": [
+        "IMG_452"
+      ],
+      "referencias_texto": "IMG_452 - zona de alimentacao frontal",
+      "descricao": "Registro visual associado ao principal ponto de atencao da apreciacao.",
+      "observacao": "Evidencia vinculada ao fechamento da analise."
+    }
+  },
+  "recomendacoes": {
+    "texto": "Intertravar o acesso frontal, revisar o procedimento de setup seguro e revalidar a matriz de risco apos a adequacao."
+  },
+  "conclusao": {
+    "status": "ajuste",
+    "conclusao_tecnica": "A apreciacao de risco da prensa PH-07 foi consolidada com rastreabilidade suficiente, mas demanda adequacao frontal antes da liberacao definitiva da maquina.",
+    "justificativa": "A conclusao considera o perigo de aprisionamento identificado, a classificacao de risco alto, os controles existentes ainda insuficientes e a necessidade de intertravamento frontal com revalidacao posterior."
+  }
+}

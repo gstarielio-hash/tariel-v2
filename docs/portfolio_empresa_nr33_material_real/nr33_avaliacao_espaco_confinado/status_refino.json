@@ -1,0 +1,35 @@
+{
+  "family_key": "nr33_avaliacao_espaco_confinado",
+  "status_refino": "baseline_sintetica_externa_validada",
+  "material_recebido": [
+    "pacote_referencia/manifest.json",
+    "pacote_referencia/tariel_filled_reference_bundle.json",
+    "pacote_referencia/assets/",
+    "pacote_referencia/pdf/",
+    "coleta_entrada/referencia_sintetica_externa/nr33_avaliacao_espaco_confinado.zip",
+    "coleta_entrada/referencia_sintetica_externa/nr33_avaliacao_espaco_confinado_referencia_sintetica.pdf"
+  ],
+  "lacunas_abertas": [
+    "Aguardando modelo atual vazio da empresa.",
+    "Aguardando documentos finais reais para consolidar linguagem e estrutura recorrente."
+  ],
+  "proximo_passo": "Usar a baseline sintetica externa validada para calibrar o overlay visual/documental e depois complementar com material real da empresa.",
+  "base_sintetica_disponivel": true,
+  "workspace_pronta_para_importacao_externa": true,
+  "pacote_referencia_sintetico_disponivel": true,
+  "baseline_sintetica_externa_validada": true,
+  "artefatos_externos_validados": [
+    {
+      "fonte": "coleta_entrada/referencia_sintetica_externa/nr33_avaliacao_espaco_confinado.zip",
+      "validacao_em": "2026-04-10",
+      "resultado": "ok",
+      "observacoes": [
+        "ZIP autocontido com assets, manifest, bundle e PDF.",
+        "manifest.json aderente ao contrato filled_reference_package_manifest.",
+        "tariel_filled_reference_bundle.json aderente ao contrato tariel_filled_reference_bundle.",
+        "Status final consolidado no bundle: conforme.",
+        "Arquivos promovidos para pacote_referencia/assets/, pacote_referencia/pdf/."
+      ]
+    }
+  ]
+}
