@@ -4344,3 +4344,42 @@ Proximo passo imediato:
 - com `finalizar` e `reabrir` ja dentro da mesa Astro, o `Inspetor` reduz mais um bloco funcional do shell legado no ponto mais sensivel do fluxo;
 - os proximos cortes restantes tendem a ser residuais de shell, navegacao antiga ou refinamentos de paridade, nao mais a operacao principal do laudo;
 - seguir apenas em fatias que reduzam dependencias reais do workspace antigo e nao reintroduzam dupla manutencao entre Astro e legado.
+
+## Ciclo 104 — consolidacao operacional da home Astro do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a home Astro do `Inspetor` ainda se apresentava como leitura inicial e empurrava o operador para a mesa dedicada mesmo quando as acoes principais ja existiam no V2;
+- isso mantinha a home com papel parcialmente demonstrativo, enquanto o legado ainda seguia sendo lembrado como porta de entrada operacional em alguns trechos do fluxo;
+- o corte seguro era transformar a home em um ponto real de triagem e despacho, mas sem duplicar backend nem criar mutacoes paralelas.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a consumir `inspectorStatus` e o catalogo governado de templates para abrir nova inspecao direto pela home;
+- a home agora exibe acoes rapidas do laudo em foco, incluindo `Abrir mesa`, `Preview PDF`, `Finalizar` e `Reabrir`, reaproveitando as rotas Astro ja validadas da mesa;
+- o texto e o enquadramento da tela deixaram de tratar a home como leitura provisoria e passaram a posiciona-la como entrada operacional consolidada do portal;
+- o ownership permaneceu limpo: a home apenas orquestra navegacao e submit para endpoints/rotas oficiais que continuam governados pelo backend Python e pela mesa Astro.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+
+Proximo passo imediato:
+
+- com a home Astro deixando de ser apenas leitura e passando a despachar as acoes principais do caso, o `Inspetor` reduz mais um motivo de retorno mental ao shell legado;
+- os proximos cortes restantes devem mirar paridade residual de navegacao, contexto ou atalhos antigos ligados ao workspace pesado;
+- seguir apenas em fatias que retirem trafego real do legado, nao em reorganizacoes cosmeticas da home.

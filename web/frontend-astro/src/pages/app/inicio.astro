@@ -10,6 +10,7 @@ import {
   MessageSquareCode,
   Paperclip,
   ScanSearch,
+  Search,
   ShieldCheck,
   Workflow,
 } from "lucide-react";
@@ -35,8 +36,16 @@ if (!workspace) {
   throw new Error("Perfil do portal do inspetor nao encontrado.");
 }
 
-const { overview, selectedMessages, selectedReport, selectedSummary, threadPreview, messageIndex, referencedMessage } =
-  workspace;
+const {
+  overview,
+  inspectorStatus,
+  selectedMessages,
+  selectedReport,
+  selectedSummary,
+  threadPreview,
+  messageIndex,
+  referencedMessage,
+} = workspace;
 const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
 const notice = consumeAppNotice(Astro.cookies);
 const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -59,6 +68,31 @@ function formatBytes(value: number | undefined) {
 
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+const templateOptions = (inspectorStatus?.tipo_template_options ?? []).filter((option) =>
+  String(option?.value ?? "").trim() && String(option?.label ?? "").trim(),
+);
+const templateOptionsByGroup = Array.from(
+  templateOptions.reduce((map, option) => {
+    const groupLabel = String(option.group_label ?? "Catalogo oficial").trim() || "Catalogo oficial";
+    const items = map.get(groupLabel) ?? [];
+    items.push(option);
+    map.set(groupLabel, items);
+    return map;
+  }, new Map<string, typeof templateOptions>()),
+);
+const canCreateInspection = templateOptions.length > 0;
+const actionKeySet = new Set((selectedSummary?.allowed_surface_actions ?? []).map((action) => String(action).trim().toLowerCase()));
+const canFinalizeInspection = Boolean(
+  selectedReport
+  && selectedSummary
+  && (selectedSummary.permite_edicao || actionKeySet.has("chat_send_to_review") || actionKeySet.has("chat_finalize")),
+);
+const canReopenInspection = Boolean(
+  selectedReport
+  && selectedSummary
+  && (selectedSummary.permite_reabrir || actionKeySet.has("chat_reopen")),
+);
 
 const cards = [
   {
@@ -109,16 +143,16 @@ const cards = [
           {overview.profile.name}
         </h1>
         <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          Sessao oficial do inspetor ativa no Astro SSR. Esta home agora mostra contexto real do operador, seus laudos
-          recentes e trilha de auditoria sem puxar ainda a workspace operacional pesada.
+          Sessao oficial do inspetor ativa no Astro SSR. Esta home agora concentra fila, resumo do caso em foco,
+          atalhos operacionais e a entrada para a mesa dedicada sem depender do workspace legado para abrir o fluxo.
         </p>
       </div>
 
       <div class="rounded-[28px] border border-sky-500/16 bg-sky-500/6 px-5 py-4">
         <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Status da migracao</p>
-        <p class="mt-2 text-lg font-semibold text-slate-950">Overview operacional inicial entregue</p>
+        <p class="mt-2 text-lg font-semibold text-slate-950">Home operacional do inspetor em consolidacao</p>
         <p class="mt-1 text-sm leading-6 text-slate-600">
-          Entrada, sessao e primeira leitura real do portal ja sairam do legado.
+          Entrada, sessao, resumo do caso e atalhos principais ja sairam do legado.
         </p>
       </div>
     </div>
@@ -243,6 +277,60 @@ const cards = [
       <div class="mt-6 grid gap-3">
         {selectedReport && selectedSummary ? (
           <>
+            <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-sm font-semibold text-slate-950">Acoes rapidas do caso</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    A home ja consegue encaminhar o caso em foco sem voltar ao shell antigo.
+                  </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <a
+                    href={`/app/mesa?laudo=${selectedReport.id}`}
+                    class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-800 transition hover:border-slate-300"
+                  >
+                    <Search className="size-3.5" />
+                    Abrir mesa
+                  </a>
+                  <a
+                    href={`/app/mesa/${selectedReport.id}/preview`}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="inline-flex items-center gap-2 rounded-full border border-sky-500/24 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800 transition hover:border-sky-500/40"
+                  >
+                    <FileStack className="size-3.5" />
+                    Preview PDF
+                  </a>
+                  {canFinalizeInspection ? (
+                    <form method="POST" action={`/app/mesa/${selectedReport.id}/finalizar`}>
+                      <input type="hidden" name="returnTo" value={`/app/inicio?laudo=${selectedReport.id}`} />
+                      <button
+                        type="submit"
+                        class="inline-flex items-center gap-2 rounded-full border border-emerald-500/24 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800 transition hover:border-emerald-500/40"
+                      >
+                        <CheckCircle2 className="size-3.5" />
+                        Finalizar
+                      </button>
+                    </form>
+                  ) : null}
+                  {canReopenInspection ? (
+                    <form method="POST" action={`/app/mesa/${selectedReport.id}/reabrir`}>
+                      <input type="hidden" name="returnTo" value={`/app/inicio?laudo=${selectedReport.id}`} />
+                      <input type="hidden" name="issuedDocumentPolicy" value="keep_visible" />
+                      <button
+                        type="submit"
+                        class="inline-flex items-center gap-2 rounded-full border border-amber-500/24 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-800 transition hover:border-amber-500/40"
+                      >
+                        <Clock3 className="size-3.5" />
+                        Reabrir
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
             <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
               <p class="text-sm font-semibold text-slate-950">
                 {selectedSummary.laudo_card?.titulo || selectedReport.sector}
@@ -339,10 +427,88 @@ const cards = [
         </div>
 
         <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
-          <p class="text-sm font-semibold text-slate-950">O que ja migrou</p>
-          <p class="mt-2 text-sm leading-6 text-slate-600">
-            Login por senha, cookie httpOnly, primeiro acesso, logout e overview autenticado do inspetor ja rodam no Astro.
-          </p>
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-slate-950">Nova inspecao pelo Astro</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                A home tambem pode abrir um novo caso usando o catalogo governado do backend oficial.
+              </p>
+            </div>
+            <span class="rounded-full border border-sky-500/20 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">
+              {inspectorStatus?.estado || "sem_relatorio"}
+            </span>
+          </div>
+
+          <form method="POST" action="/app/mesa/iniciar" class="mt-4 space-y-4">
+            <input type="hidden" name="returnTo" value={selectedReport ? `/app/inicio?laudo=${selectedReport.id}` : "/app/inicio"} />
+
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Modelo tecnico</span>
+              <select
+                name="tipoTemplate"
+                required
+                disabled={!canCreateInspection}
+                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500 disabled:cursor-not-allowed disabled:bg-slate-100"
+              >
+                <option value="">Selecione um modelo...</option>
+                {templateOptionsByGroup.map(([groupLabel, options]) => (
+                  <optgroup label={groupLabel}>
+                    {options.map((option) => (
+                      <option value={option.value}>{option.label}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="block space-y-2">
+                <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Cliente</span>
+                <input
+                  type="text"
+                  name="cliente"
+                  maxlength="120"
+                  placeholder="Ex: Petrobras"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                />
+              </label>
+
+              <label class="block space-y-2">
+                <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Unidade</span>
+                <input
+                  type="text"
+                  name="unidade"
+                  maxlength="120"
+                  placeholder="Ex: REPLAN - Paulinia"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                />
+              </label>
+            </div>
+
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Equipamento</span>
+              <input
+                type="text"
+                name="localInspecao"
+                maxlength="160"
+                placeholder="Ex: Caldeira B-202"
+                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+              />
+            </label>
+
+            {canCreateInspection ? (
+              <button
+                type="submit"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
+              >
+                Criar nova inspecao
+              </button>
+            ) : (
+              <div class="rounded-[20px] border border-dashed border-slate-300 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                O catalogo governado ainda nao expôs modelos de inspeção para este tenant.
+              </div>
+            )}
+          </form>
         </div>
 
         <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
@@ -353,7 +519,7 @@ const cards = [
             <div>
               <p class="text-sm font-semibold text-slate-950">O que continua no Python</p>
               <p class="mt-2 text-sm leading-6 text-slate-600">
-                O chat, a mesa do laudo, pendencias, feed, stream e mutacoes de operacao continuam no backend Python.
+                Regras de dominio, auditoria, feed, preview, PDF e mutacoes de operacao continuam no backend Python.
               </p>
             </div>
           </div>
