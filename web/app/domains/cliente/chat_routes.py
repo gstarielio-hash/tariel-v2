@@ -18,6 +18,9 @@ from app.domains.cliente.dashboard import (
     listar_laudos_chat_usuario as _listar_laudos_chat_usuario,
     listar_laudos_mesa_empresa as _listar_laudos_mesa_empresa,
 )
+from app.domains.cliente.mesa_snapshot import (
+    build_cliente_mesa_snapshot_projection,
+)
 from app.domains.cliente.portal_bridge import (
     DadosChat,
     DadosPendenciaMesa,
@@ -314,6 +317,21 @@ async def api_mesa_laudos_cliente(
     banco: Session = Depends(obter_banco),
 ):
     return JSONResponse({"itens": _listar_laudos_mesa_empresa(banco, usuario)})
+
+
+@roteador_cliente_chat.get("/api/mesa/snapshot")
+async def api_mesa_snapshot_cliente(
+    request: Request,
+    usuario: Usuario = Depends(exigir_admin_cliente_com_visibilidade_casos),
+    banco: Session = Depends(obter_banco),
+):
+    projection = build_cliente_mesa_snapshot_projection(
+        request=request,
+        usuario=usuario,
+        banco=banco,
+    )
+    request.state.v2_client_mesa_projection_result = projection.model_dump(mode="python")
+    return JSONResponse(projection.model_dump(mode="json"))
 
 
 @roteador_cliente_chat.get("/api/mesa/laudos/{laudo_id}/mensagens", responses=RESPOSTAS_MESA_CLIENTE)

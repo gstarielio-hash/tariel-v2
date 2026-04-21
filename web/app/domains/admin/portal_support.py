@@ -199,7 +199,7 @@ def _adicionar_flash(
     fila = request.session.get(_CHAVE_FLASH, [])
     if not isinstance(fila, list):
         fila = []
-    item = {
+    item: dict[str, Any] = {
         "tipo": _normalizar_tipo_flash(tipo),
         "texto": mensagem,
     }

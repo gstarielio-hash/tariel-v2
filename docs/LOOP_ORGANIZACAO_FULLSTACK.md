@@ -3057,3 +3057,58 @@ Proximo passo imediato:
 - abrir a superficie `/cliente/mesa` com leitura e acoes reais sobre a fila do tenant, usando a mesma sessao oficial do portal cliente;
 - depois avancar o portal `Mesa Avaliadora` em Astro sobre o mesmo padrao de auth/session ja live em `admin` e `cliente`;
 - manter `Inspetor` e a remocao do legado na fila seguinte, sem reabrir o caminho oficial do Python para as superficies ja migradas.
+
+## Ciclo 76 — `/cliente/mesa` com snapshot governado pelo backend Python
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a primeira versao de `/cliente/mesa` no Astro ja expunha a superficie do tenant, mas ainda montava o resumo principal lendo e inferindo estado direto do banco dentro do frontend;
+- isso mantinha a fronteira errada para a vertical: o portal cliente ficava com conhecimento demais sobre fila, reviewer roster e resumo operacional da mesa;
+- para fechar a issue `#14` no caminho correto, era preciso mover a inteligencia de leitura para um contrato explicito do backend Python e deixar o Astro apenas como consumidor SSR autenticado.
+
+Corte executado:
+
+- foi criado o contrato `ClientMesaDashboardProjectionV1` em `web/app/v2/contracts/client_mesa.py`, com envelope, `tenant_summary`, `reviewer_summary`, `review_status_totals`, `reviewers`, `recent_audit` e o `review_queue_projection` embutido;
+- entrou o builder `build_cliente_mesa_snapshot_projection()` em `web/app/domains/cliente/mesa_snapshot.py`, agregando `empresa`, roster da mesa, auditoria `scope=mesa` e o projection canonico da fila vindo de `web/app/domains/revisor/panel_state.py` e `web/app/v2/contracts/review_queue.py`;
+- `web/app/domains/cliente/chat_routes.py` ganhou o endpoint autenticado `GET /cliente/api/mesa/snapshot`, reutilizando a sessao oficial de `sessoes_ativas` via bearer token;
+- o Astro ganhou a bridge server-side `web/frontend-astro/src/lib/server/client-mesa-bridge.ts`, que repassa o token da sessao do portal cliente para o backend Python sem expor a chamada no navegador;
+- `web/frontend-astro/src/lib/server/client-portal.ts` deixou de montar o resumo da mesa por leitura local e passou a consumir e adaptar o snapshot do backend;
+- `web/frontend-astro/src/pages/cliente/mesa.astro` foi atualizado para renderizar explicitamente o novo slice, marcando a tela como `Snapshot governado da analise no V2` e exibindo fila, reviewers e auditoria a partir do contrato Python;
+- entrou o teste `web/tests/test_v2_client_mesa_projection.py` para cobrir a montagem do novo projection.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/app/domains/cliente/chat_routes.py`
+- `web/app/domains/cliente/mesa_snapshot.py`
+- `web/app/v2/contracts/client_mesa.py`
+- `web/frontend-astro/src/lib/server/client-mesa-bridge.ts`
+- `web/frontend-astro/src/lib/server/client-portal.ts`
+- `web/frontend-astro/src/pages/cliente/mesa.astro`
+- `web/tests/test_v2_client_mesa_projection.py`
+
+Validacao local executada:
+
+- `python3 -m py_compile web/app/v2/contracts/client_mesa.py web/app/domains/cliente/mesa_snapshot.py web/app/domains/cliente/chat_routes.py`
+- `source ~/.nvm/nvm.sh && nvm use 22.22.2 >/dev/null && cd web/frontend-astro && DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run check`
+- `source ~/.nvm/nvm.sh && nvm use 22.22.2 >/dev/null && cd web/frontend-astro && DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `cd web && AMBIENTE=dev DATABASE_URL=postgresql:///tariel_dev REDIS_URL=redis://127.0.0.1:6379/0 python3 -m pytest tests/test_v2_client_mesa_projection.py -q`
+- smoke manual com `curl` no Astro:
+  - login do `admin_cliente` em primeiro acesso
+  - troca obrigatoria de senha
+  - `GET /cliente/mesa` retornando `200`
+  - render com os marcadores `Snapshot governado da analise no V2`, `Python owner` e `Casos mais recentes do snapshot`
+- smoke direto no backend:
+  - `GET /cliente/api/mesa/snapshot` com bearer token da sessao do portal retornando `200`
+  - `projection_type=client_mesa_dashboard_projection`
+
+Proximo passo imediato:
+
+- atacar o proximo slice da issue `#14` removendo o restante da inferencia local que ainda sobrou no portal cliente e consolidando as mutacoes relevantes da mesa como contratos do backend Python;
+- em seguida, reutilizar esse mesmo contrato para abrir a vertical `Mesa Avaliadora` no Astro sem duplicar regra no frontend;
+- manter `Inspetor` fora da frente ativa ate `cliente/mesa` e `revisao` estarem fechados com ownership claro.

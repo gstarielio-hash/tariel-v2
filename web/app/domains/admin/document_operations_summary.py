@@ -197,9 +197,10 @@ def build_document_operations_operational_summary(db: Session) -> dict[str, Any]
         "top_render_ops": [],
         "operations": [],
     }
-    operations = (
-        perf_report.get("operations", [])
-        if isinstance(perf_report.get("operations", []), list)
+    operations_raw = perf_report.get("operations", [])
+    operations: list[dict[str, Any]] = (
+        [item for item in operations_raw if isinstance(item, dict)]
+        if isinstance(operations_raw, list)
         else []
     )
 

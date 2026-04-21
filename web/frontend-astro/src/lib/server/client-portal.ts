@@ -6,6 +6,8 @@ import {
   getAdminClientDetail,
   type AdminClientDetailData,
 } from "@/lib/server/admin-clients";
+import { fetchClientMesaBackendProjection } from "@/lib/server/client-mesa-bridge";
+import type { AuthenticatedClientRequest } from "@/lib/server/client-auth";
 import {
   generateStrongPassword,
   hashPassword,
@@ -81,11 +83,76 @@ export interface ClientPortalSupportData {
   planCards: ClientPortalSupportPlanCard[];
 }
 
+export interface ClientPortalMesaReviewer {
+  id: number;
+  name: string;
+  email: string;
+  portalLabel: string;
+  active: boolean;
+  blocked: boolean;
+  temporaryPasswordActive: boolean;
+  lastLoginAt: Date | null;
+  lastLoginLabel: string;
+  lastActivityAt: Date | null;
+  lastActivityLabel: string;
+  sessionCount: number;
+}
+
+export interface ClientPortalMesaQueueItem {
+  id: number;
+  queueSection: "em_andamento" | "aguardando_avaliacao" | "historico";
+  hashShort: string;
+  title: string;
+  sector: string;
+  reviewStatus: string;
+  statusVisualLabel: string;
+  operationLabel: string;
+  priorityLabel: string;
+  nextAction: string;
+  inspectorName: string;
+  whispersPending: number;
+  openPendencies: number;
+  pendingLearning: number;
+  updatedAt: Date | null;
+  updatedAtLabel: string;
+}
+
+export interface ClientPortalMesaAuditEntry {
+  id: number;
+  portal: string;
+  action: string;
+  category: string;
+  scope: string;
+  summary: string;
+  detail: string | null;
+  actorName: string;
+  targetName: string;
+  createdAt: Date | null;
+  createdAtLabel: string;
+}
+
 export interface ClientPortalMesaData {
-  detail: AdminClientDetailData;
-  reviewers: ClientPortalTeamMember[];
-  recentCases: AdminClientDetailData["recentReports"];
-  recentAudit: AdminClientDetailData["recentAudit"];
+  detail: {
+    companyId: number;
+    companyName: string;
+    activePlan: string;
+    blocked: boolean;
+    healthLabel: string;
+    healthTone: string;
+    healthText: string;
+    totalReports: number;
+  };
+  reviewers: ClientPortalMesaReviewer[];
+  recentCases: ClientPortalMesaQueueItem[];
+  recentAudit: ClientPortalMesaAuditEntry[];
+  queue: {
+    inField: ClientPortalMesaQueueItem[];
+    awaitingReview: ClientPortalMesaQueueItem[];
+    history: ClientPortalMesaQueueItem[];
+    pendingWhispers: number;
+    openPendencies: number;
+    pendingLearning: number;
+  };
   summary: {
     reviewers: number;
     reviewerSessions: number;
@@ -282,72 +349,84 @@ export async function getClientPortalSupportData(companyId: number): Promise<Cli
   };
 }
 
-export async function getClientPortalMesaData(companyId: number): Promise<ClientPortalMesaData | null> {
-  const [detail, team, reviewBuckets] = await Promise.all([
-    getAdminClientDetail(companyId),
-    getClientPortalTeamData(companyId),
-    prisma.laudos.groupBy({
-      by: ["status_revisao"],
-      where: {
-        empresa_id: companyId,
-      },
-      _count: {
-        _all: true,
-      },
-    }),
-  ]);
+export async function getClientPortalMesaData(
+  clientSession: AuthenticatedClientRequest,
+): Promise<ClientPortalMesaData | null> {
+  const projection = await fetchClientMesaBackendProjection(clientSession);
+  const payload = projection.payload;
+  const queuePayload = payload.review_queue_projection.payload;
 
-  if (!detail || !team) {
-    return null;
-  }
+  const reviewers = payload.reviewers.map((reviewer) => ({
+    id: reviewer.id,
+    name: reviewer.name,
+    email: reviewer.email,
+    portalLabel: reviewer.portal_label,
+    active: reviewer.active,
+    blocked: reviewer.blocked,
+    temporaryPasswordActive: reviewer.temporary_password_active,
+    lastLoginAt: parseDateOrNull(reviewer.last_login_at),
+    lastLoginLabel: reviewer.last_login_label,
+    lastActivityAt: parseDateOrNull(reviewer.last_activity_at),
+    lastActivityLabel: reviewer.last_activity_label,
+    sessionCount: reviewer.session_count,
+  })) satisfies ClientPortalMesaReviewer[];
 
-  const reviewers = team.members.filter((member) => member.role === "revisor");
-  const mesaAudit = detail.recentAudit.filter((entry) => isMesaAuditEntry(entry));
-  const reviewCounts = {
-    drafts: 0,
-    waitingReview: 0,
-    approved: 0,
-    rejected: 0,
-    otherStatuses: 0,
-  };
-
-  for (const bucket of reviewBuckets) {
-    const count = Number(bucket._count?._all ?? 0);
-
-    switch (normalizeMesaReviewBucket(bucket.status_revisao)) {
-      case "draft":
-        reviewCounts.drafts += count;
-        break;
-      case "waiting":
-        reviewCounts.waitingReview += count;
-        break;
-      case "approved":
-        reviewCounts.approved += count;
-        break;
-      case "rejected":
-        reviewCounts.rejected += count;
-        break;
-      default:
-        reviewCounts.otherStatuses += count;
-        break;
-    }
-  }
+  const inField = queuePayload.queue_sections.em_andamento.map(mapClientMesaQueueItem);
+  const awaitingReview = queuePayload.queue_sections.aguardando_avaliacao.map(mapClientMesaQueueItem);
+  const history = queuePayload.queue_sections.historico.map(mapClientMesaQueueItem);
+  const recentCases = [...awaitingReview, ...inField, ...history]
+    .sort((left, right) => {
+      const leftTime = left.updatedAt?.getTime() ?? 0;
+      const rightTime = right.updatedAt?.getTime() ?? 0;
+      return rightTime - leftTime;
+    })
+    .slice(0, 6);
+  const recentAudit = payload.recent_audit.map((entry) => ({
+    id: entry.id,
+    portal: entry.portal,
+    action: entry.action,
+    category: entry.category,
+    scope: entry.scope,
+    summary: entry.summary,
+    detail: entry.detail || null,
+    actorName: entry.actor_name,
+    targetName: entry.target_name,
+    createdAt: parseDateOrNull(entry.created_at),
+    createdAtLabel: entry.created_at_label,
+  })) satisfies ClientPortalMesaAuditEntry[];
 
   return {
-    detail,
+    detail: {
+      companyId: payload.tenant_summary.company_id,
+      companyName: payload.tenant_summary.company_name,
+      activePlan: payload.tenant_summary.active_plan,
+      blocked: payload.tenant_summary.blocked,
+      healthLabel: payload.tenant_summary.health_label,
+      healthTone: payload.tenant_summary.health_tone,
+      healthText: payload.tenant_summary.health_text,
+      totalReports: payload.tenant_summary.total_reports,
+    },
     reviewers,
-    recentCases: detail.recentReports,
-    recentAudit: mesaAudit,
+    recentCases,
+    recentAudit,
+    queue: {
+      inField,
+      awaitingReview,
+      history,
+      pendingWhispers: queuePayload.queue_summary.total_pending_whispers,
+      openPendencies: queuePayload.queue_summary.total_open_pendencies,
+      pendingLearning: queuePayload.queue_summary.total_pending_learning,
+    },
     summary: {
-      reviewers: reviewers.length,
-      reviewerSessions: reviewers.filter((member) => member.sessionCount > 0).length,
-      reviewerFirstAccessPending: reviewers.filter((member) => member.temporaryPasswordActive).length,
-      waitingReview: reviewCounts.waitingReview,
-      approved: reviewCounts.approved,
-      rejected: reviewCounts.rejected,
-      drafts: reviewCounts.drafts,
-      otherStatuses: reviewCounts.otherStatuses,
-      mesaAuditEvents: mesaAudit.length,
+      reviewers: payload.reviewer_summary.total,
+      reviewerSessions: payload.reviewer_summary.with_recent_sessions,
+      reviewerFirstAccessPending: payload.reviewer_summary.first_access_pending,
+      waitingReview: payload.review_status_totals.waiting_review,
+      approved: payload.review_status_totals.approved,
+      rejected: payload.review_status_totals.rejected,
+      drafts: payload.review_status_totals.drafts,
+      otherStatuses: payload.review_status_totals.other_statuses,
+      mesaAuditEvents: Number(payload.audit_summary.total ?? payload.recent_audit.length),
     },
   };
 }
@@ -756,44 +835,6 @@ function normalizeSupportOrigin(value: string | null | undefined): ClientSupport
   return "admin";
 }
 
-function normalizeMesaReviewBucket(value: string | null | undefined) {
-  const normalized = String(value ?? "").trim().toLowerCase();
-
-  if (!normalized || normalized === "rascunho") {
-    return "draft";
-  }
-
-  if (normalized.includes("aguard")) {
-    return "waiting";
-  }
-
-  if (normalized.includes("aprov")) {
-    return "approved";
-  }
-
-  if (normalized.includes("rejeit")) {
-    return "rejected";
-  }
-
-  return "other";
-}
-
-function isMesaAuditEntry(entry: AdminClientDetailData["recentAudit"][number]) {
-  const portal = String(entry.portal ?? "").trim().toLowerCase();
-  const action = String(entry.acao ?? "").trim().toLowerCase();
-  const summary = String(entry.resumo ?? "").trim().toLowerCase();
-
-  return (
-    portal === "mesa" ||
-    portal === "revisor" ||
-    action.includes("mesa") ||
-    action.includes("revisor") ||
-    summary.includes("mesa") ||
-    summary.includes("revisor") ||
-    summary.includes("analise")
-  );
-}
-
 function roleFromAccessLevel(value: number): ClientTeamRole {
   return Number(value) === ACCESS_LEVELS.reviewer ? "revisor" : "inspetor";
 }
@@ -849,6 +890,54 @@ function planRank(value: string) {
     default:
       return 0;
   }
+}
+
+function parseDateOrNull(value: string | null | undefined) {
+  const normalized = String(value ?? "").trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function mapClientMesaQueueItem(item: {
+  id: number;
+  queue_section: "em_andamento" | "aguardando_avaliacao" | "historico";
+  hash_curto: string;
+  primeira_mensagem: string;
+  setor_industrial: string;
+  status_revisao: string;
+  atualizado_em: string | null;
+  inspetor_nome: string;
+  whispers_nao_lidos: number;
+  pendencias_abertas: number;
+  aprendizados_pendentes: number;
+  fila_operacional_label: string;
+  prioridade_operacional_label: string;
+  proxima_acao: string;
+  status_visual_label: string;
+}) {
+  return {
+    id: item.id,
+    queueSection: item.queue_section,
+    hashShort: item.hash_curto,
+    title: item.primeira_mensagem,
+    sector: item.setor_industrial,
+    reviewStatus: item.status_revisao,
+    statusVisualLabel: item.status_visual_label,
+    operationLabel: item.fila_operacional_label,
+    priorityLabel: item.prioridade_operacional_label,
+    nextAction: item.proxima_acao,
+    inspectorName: item.inspetor_nome,
+    whispersPending: item.whispers_nao_lidos,
+    openPendencies: item.pendencias_abertas,
+    pendingLearning: item.aprendizados_pendentes,
+    updatedAt: parseDateOrNull(item.atualizado_em),
+    updatedAtLabel: formatDateTime(parseDateOrNull(item.atualizado_em), "Sem atualização"),
+  } satisfies ClientPortalMesaQueueItem;
 }
 
 function formatDateTime(value: Date | null | undefined, fallback: string) {
