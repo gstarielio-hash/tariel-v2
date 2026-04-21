@@ -3,6 +3,7 @@ import {
   Clock3,
   FileStack,
   Fingerprint,
+  MessageCircle,
   MessageCircleWarning,
   MessageSquareCode,
   ScanSearch,
@@ -11,7 +12,7 @@ import {
 } from "lucide-react";
 
 import AppShellLayout from "@/layouts/app-shell-layout.astro";
-import { fetchAppMesaSummary } from "@/lib/server/app-mesa-bridge";
+import { fetchAppMesaMessages, fetchAppMesaSummary } from "@/lib/server/app-mesa-bridge";
 import { getAppPortalOverview } from "@/lib/server/app-portal";
 
 export const prerender = false;
@@ -37,6 +38,10 @@ const selectedReport = overview.recentReports.find((report) => report.id === sel
 const selectedSummary = selectedReport
   ? await fetchAppMesaSummary(appSession, selectedReport.id).catch(() => null)
   : null;
+const selectedMessages = selectedReport
+  ? await fetchAppMesaMessages(appSession, selectedReport.id).catch(() => null)
+  : null;
+const threadPreview = selectedMessages?.itens.slice(-6).reverse() ?? [];
 const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
   timeStyle: "short",
@@ -339,25 +344,66 @@ const cards = [
     <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
       <div class="flex items-center justify-between gap-4">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Proxima entrega</p>
-          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Passo seguinte natural</h2>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Thread recente</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Primeira leitura da conversa da mesa</h2>
         </div>
 
         <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          `/app/api/*`
+          {selectedMessages?.tem_mais ? "Com historico" : "Leitura atual"}
         </div>
       </div>
 
-      <div class="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-        <div class="flex items-start gap-3">
-          <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
-            <ScanSearch className="size-5" />
+      <div class="mt-6 space-y-3">
+        {threadPreview.length > 0 ? threadPreview.map((message) => (
+          <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div class="flex flex-wrap gap-2">
+                  <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    {message.message_kind}
+                  </span>
+                  <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    {message.pendency_state}
+                  </span>
+                  {message.lida === false ? (
+                    <span class="rounded-full bg-amber-500/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-800">
+                      Nao lida
+                    </span>
+                  ) : null}
+                </div>
+
+                <p class="mt-3 text-sm leading-6 text-slate-700">{message.texto}</p>
+
+                <div class="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                  <span>{message.data}</span>
+                  {message.resolvida_em_label ? <span>Resolvida em {message.resolvida_em_label}</span> : null}
+                  {message.resolvida_por_nome ? <span>Por {message.resolvida_por_nome}</span> : null}
+                  {message.anexos && message.anexos.length > 0 ? <span>{message.anexos.length} anexos</span> : null}
+                </div>
+              </div>
+
+              <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+                <MessageCircle className="size-5" />
+              </div>
+            </div>
           </div>
-          <div>
-            <p class="text-sm font-semibold text-slate-950">Primeira tela operacional do workspace</p>
-            <p class="mt-2 text-sm leading-6 text-slate-600">
-              O proximo corte mais util e portar a primeira leitura operacional do `/app` sobre os contratos canonicos ja expostos em `/app/api/*`, sem reabrir sessao nem primeiro acesso.
-            </p>
+        )) : (
+          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+            Ainda nao ha mensagens disponiveis para o laudo selecionado nesta leitura.
+          </div>
+        )}
+
+        <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+          <div class="flex items-start gap-3">
+            <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+              <ScanSearch className="size-5" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-950">Proxima fatia natural</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                Com resumo e thread em leitura no Astro, o proximo corte mais util e liberar a primeira acao de pendencia ou reply sobre o laudo selecionado.
+              </p>
+            </div>
           </div>
         </div>
       </div>

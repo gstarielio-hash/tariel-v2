@@ -3569,3 +3569,50 @@ Proximo passo imediato:
 - a proxima fatia natural e expandir esse resumo para a primeira leitura de thread ou de pendencias do laudo selecionado;
 - o melhor caminho continua sendo reaproveitar os contratos canonicos do backend em vez de reimplementar regra no Astro;
 - vale manter o mesmo criterio incremental: primeiro leitura, depois acao, depois anexos, e so no fim a workspace completa.
+
+## Ciclo 86 — thread recente em leitura no `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- o portal do inspetor ja conseguia selecionar um laudo e ler seu resumo operacional, mas ainda faltava a primeira leitura da conversa da mesa no Astro;
+- isso mantinha uma quebra entre o resumo do caso e o historico real da interacao, justamente no ponto em que o operador precisa entender contexto e pendencias;
+- o corte seguro era trazer a thread recente em modo leitura, sem reply, anexos ou mutacoes.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a consumir tambem `/app/api/laudo/{laudo_id}/mesa/mensagens`, preservando o mesmo bearer token da sessao Astro do inspetor;
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a carregar a thread recente do laudo selecionado e mostrar uma amostra dos itens mais recentes na propria home;
+- a UI nova exibe:
+  - tipo da mensagem;
+  - estado de pendencia;
+  - marcador de nao lida;
+  - texto visivel da mensagem;
+  - metadados de resolucao e anexos quando existirem;
+- o portal agora fecha uma trilha inicial coerente: lista de casos, resumo do caso e leitura da conversa, tudo sem reabrir ownership do backend.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com resumo e thread em leitura no Astro, o proximo corte natural e liberar a primeira acao sobre o laudo selecionado;
+- a candidata mais segura e uma acao de pendencia ou um reply simples, porque reutiliza contratos ja expostos e nao exige portar a workspace inteira;
+- seguir mantendo o corte estreito: leitura primeiro, acao unica depois, uploads e fluxo completo so nas rodadas seguintes.

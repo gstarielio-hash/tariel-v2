@@ -55,6 +55,48 @@ export interface AppMesaSummaryPayload {
   };
 }
 
+export interface AppMesaAttachmentPayload {
+  id: number;
+  nome: string;
+  mime_type: string;
+  categoria: string;
+  tamanho_bytes?: number;
+  eh_imagem?: boolean;
+}
+
+export interface AppMesaMessagePayload {
+  id: number;
+  laudo_id?: number;
+  tipo: string;
+  item_kind: string;
+  message_kind: string;
+  pendency_state: string;
+  texto: string;
+  remetente_id: number | null;
+  data: string;
+  criado_em_iso?: string;
+  lida?: boolean;
+  resolvida_em?: string;
+  resolvida_em_label?: string;
+  resolvida_por_nome?: string | null;
+  referencia_mensagem_id?: number;
+  anexos?: AppMesaAttachmentPayload[];
+  operational_context?: Record<string, unknown> | null;
+}
+
+export interface AppMesaMessagesPayload {
+  laudo_id: number;
+  itens: AppMesaMessagePayload[];
+  cursor_proximo: number | null;
+  cursor_ultimo_id?: number | null;
+  tem_mais: boolean;
+  estado?: string;
+  permite_edicao?: boolean;
+  permite_reabrir?: boolean;
+  laudo_card?: Record<string, unknown> | null;
+  resumo?: Record<string, unknown> | null;
+}
+
 const DEFAULT_PYTHON_BACKEND_URL = "http://127.0.0.1:8000";
 
 function resolvePythonBackendBaseUrl() {
@@ -105,4 +147,28 @@ export async function fetchAppMesaSummary(
   }
 
   return (await response.json()) as AppMesaSummaryPayload;
+}
+
+export async function fetchAppMesaMessages(
+  appSession: AuthenticatedAppRequest,
+  laudoId: number,
+): Promise<AppMesaMessagesPayload> {
+  const response = await fetch(buildBackendUrl(`/app/api/laudo/${laudoId}/mesa/mensagens`), {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${appSession.session.token}`,
+      "X-Client-Request-Id": randomUUID(),
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python inspector mesa messages failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return (await response.json()) as AppMesaMessagesPayload;
 }
