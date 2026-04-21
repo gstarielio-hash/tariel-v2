@@ -159,6 +159,8 @@ def _mensagem_portal_correto(usuario: Usuario) -> str:
             destinos.append("/revisao/login")
         elif portal == PORTAL_INSPETOR:
             destinos.append("/app/login")
+        elif portal == PORTAL_CLIENTE:
+            destinos.append(URL_LOGIN)
 
     if not destinos:
         nivel = int(usuario.nivel_acesso or 0)

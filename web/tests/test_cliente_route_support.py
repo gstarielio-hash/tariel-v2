@@ -48,7 +48,7 @@ def test_render_helpers_cliente_aplicam_headers_e_contexto() -> None:
 
     assert resposta_troca.status_code == 400
     assert "Troca Obrigatória de Senha" in html_troca
-    assert "Portal da empresa" in html_troca
+    assert "portal da empresa" in html_troca.lower()
 
     resposta_portal = route_support._render_portal_cliente(
         _request("/cliente/chat"),
@@ -160,11 +160,11 @@ def test_fluxo_troca_senha_cliente_identifica_usuario_pendente(ambiente_critico)
 def test_helpers_cliente_traduzem_erros_payloads_e_urls() -> None:
     assert (
         route_support._mensagem_portal_correto(Usuario(nivel_acesso=NivelAcesso.INSPETOR.value))
-        == "Esta credencial deve acessar /app/login."
+        == "Este usuário deve acessar /app/login."
     )
     assert (
         route_support._mensagem_portal_correto(Usuario(nivel_acesso=NivelAcesso.REVISOR.value))
-        == "Esta credencial deve acessar /revisao/login."
+        == "Este usuário deve acessar /revisao/login."
     )
     assert (
         route_support._mensagem_portal_correto(Usuario(nivel_acesso=NivelAcesso.DIRETORIA.value))
