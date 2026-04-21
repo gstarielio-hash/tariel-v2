@@ -10,8 +10,9 @@ Status:
 
 - `tariel-v2` must become the official system.
 - `tariel-web` and the legacy Python/Jinja stack must be treated as backup, reference, or temporary bridge only.
-- The main product surface should converge to `Astro + React + TypeScript + Prisma`.
-- Python should remain only where it still acts as specialized runtime or where rewrite is not yet justified.
+- `Astro + TypeScript` owns the new portals and the new web experience.
+- `Python + FastAPI` owns domain rules, policy, auditability, AI/OCR, `dados_formulario`, preview, and PDF generation.
+- `Bridge/BFF` layers may exist only when migration strictly requires them and must never become the final ownership destination.
 
 ## Migration Scope
 
@@ -47,20 +48,27 @@ Every migration cycle must read this file before choosing the next slice.
   - conflicting user edits that cannot be merged safely
 - If one slice is blocked, move to another safe slice instead of idling.
 
+## Issue and PR Gate
+
+- Relevant work must start from the architectural issue template.
+- Each issue must declare architectural classification, ownership decision, source of truth, scope, and non-scope.
+- Each pull request must declare what stayed in `Astro`, what stayed in `Python`, and what remained as temporary `bridge`.
+- Review should treat missing ownership declaration as a process failure, not as an optional documentation gap.
+
 ## Priority Order
 
 1. Finish the slice already in progress.
-2. Close the `Admin-CEO` portal end-to-end in v2.
-3. Migrate the `Admin-cliente` portal end-to-end in v2.
+2. Close the `Admin-cliente` vertical with `/cliente/mesa` in v2.
+3. Finish the `Admin-cliente` portal end-to-end in v2.
 4. Migrate the `Mesa Avaliadora` / review portal end-to-end in v2.
-5. Migrate the `Inspetor` workspace and remove heavy legacy JS/CSS dependence.
+5. Only then open the heavy `Inspetor` workspace migration in earnest.
 6. Remove legacy route and template traffic after validation across the whole product.
 
 ## Current Architectural Stance
 
-- TypeScript is the primary language for the official application surface.
-- Python is transitional for specialized engines and mature legacy subsystems.
-- New web work should default to v2 unless a bridge is strictly necessary.
+- TypeScript is the primary language for portal UI, SSR, routing, and the new web interaction layer.
+- Python remains the primary language for domain logic, policy, audit, AI, document pipelines, and mature backend subsystems.
+- New portal work should default to v2, new domain/document rules should default to the Python backend, and bridges are temporary by definition.
 
 ## Delivery Contract
 
