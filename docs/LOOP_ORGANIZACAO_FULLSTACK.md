@@ -3665,3 +3665,46 @@ Proximo passo imediato:
 - com a primeira acao de reply textual liberada, o proximo corte natural e uma acao de pendencia ou reply com referencia de mensagem;
 - depois disso, a proxima extensao logica e reply com anexo, ainda sem portar a workspace inteira;
 - manter o mesmo ownership: Astro como shell e action route, Python como dono de validacao, auditoria e persistencia da thread.
+
+## Ciclo 88 — toggle de pendencia no `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- o portal do inspetor ja conseguia ler a thread recente e enviar um reply textual, mas ainda faltava uma acao simples sobre os itens de pendencia exibidos na propria conversa;
+- isso deixava a home do laudo selecionado sem capacidade de fechar o ciclo mais comum da mesa, mesmo com o backend ja expondo `PATCH /app/api/laudo/{laudo_id}/pendencias/{mensagem_id}`;
+- o corte seguro era liberar apenas o toggle de resolver/reabrir pendencia direto nos cards da thread recente.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a expor `updateAppMesaPendency`, consumindo o endpoint canonico de pendencias do inspetor com bearer token;
+- entrou a action route `web/frontend-astro/src/pages/app/inicio/[laudoId]/pendencias/[messageId].ts`, seguindo o mesmo contrato de `cliente` e `revisao`;
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a renderizar o CTA de resolver ou reabrir apenas quando a mensagem da thread e do tipo `mesa_pendency`;
+- o retorno continua no mesmo `/app/inicio?laudo=...`, com notice de sucesso ou erro, sem abrir nova tela nem reimplementar regra no Astro.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+- `web/frontend-astro/src/pages/app/inicio/[laudoId]/pendencias/[messageId].ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com reply textual e pendencia resolvida/reaberta no Astro, o proximo corte natural e reply com referencia de mensagem;
+- em seguida, a extensao mais util e o envio com anexo, ainda sem portar a workspace completa;
+- manter o criterio incremental: uma acao operacional por vez, sempre reaproveitando os contratos canonicos do backend.

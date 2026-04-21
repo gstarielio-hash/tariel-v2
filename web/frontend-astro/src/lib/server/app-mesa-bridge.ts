@@ -109,6 +109,16 @@ export interface AppMesaReplyPayload {
   idempotent_replay?: boolean;
 }
 
+export interface AppMesaPendencyPayload {
+  ok: boolean;
+  laudo_id: number;
+  mensagem_id: number;
+  lida: boolean;
+  resolvida_por_id: number | null;
+  resolvida_por_nome: string | null;
+  resolvida_em: string;
+}
+
 const DEFAULT_PYTHON_BACKEND_URL = "http://127.0.0.1:8000";
 
 function resolvePythonBackendBaseUrl() {
@@ -222,4 +232,39 @@ export async function replyToAppMesa(
   }
 
   return (await response.json()) as AppMesaReplyPayload;
+}
+
+export async function updateAppMesaPendency(
+  appSession: AuthenticatedAppRequest,
+  input: {
+    laudoId: number;
+    mensagemId: number;
+    lida: boolean;
+  },
+): Promise<AppMesaPendencyPayload> {
+  const response = await fetch(
+    buildBackendUrl(`/app/api/laudo/${input.laudoId}/pendencias/${input.mensagemId}`),
+    {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${appSession.session.token}`,
+        "Content-Type": "application/json",
+        "X-Client-Request-Id": randomUUID(),
+      },
+      body: JSON.stringify({
+        lida: input.lida,
+      }),
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python inspector mesa pendency failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return (await response.json()) as AppMesaPendencyPayload;
 }

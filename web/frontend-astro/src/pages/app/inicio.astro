@@ -412,6 +412,28 @@ const cards = [
                   {message.resolvida_por_nome ? <span>Por {message.resolvida_por_nome}</span> : null}
                   {message.anexos && message.anexos.length > 0 ? <span>{message.anexos.length} anexos</span> : null}
                 </div>
+
+                {message.message_kind === "mesa_pendency" && selectedReport ? (
+                  <form
+                    method="POST"
+                    action={`/app/inicio/${selectedReport.id}/pendencias/${message.id}`}
+                    class="mt-4 flex flex-wrap gap-3"
+                  >
+                    <input type="hidden" name="returnTo" value={`/app/inicio?laudo=${selectedReport.id}`} />
+                    <input type="hidden" name="lida" value={message.pendency_state === "resolved" ? "false" : "true"} />
+                    <button
+                      type="submit"
+                      class:list={[
+                        "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition",
+                        message.pendency_state === "resolved"
+                          ? "border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                          : "bg-slate-950 text-white hover:bg-slate-800",
+                      ]}
+                    >
+                      {message.pendency_state === "resolved" ? "Reabrir pendencia" : "Marcar resolvida"}
+                    </button>
+                  </form>
+                ) : null}
               </div>
 
               <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
