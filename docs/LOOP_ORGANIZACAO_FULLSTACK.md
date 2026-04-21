@@ -4174,3 +4174,44 @@ Proximo passo imediato:
 - com a trilha operacional ja visivel no contexto da mesa, o proximo ganho util do `Inspetor` e aproximar ainda mais a leitura de decisao do caso, reduzindo a distancia para a workspace legada;
 - isso pode vir de estados operacionais derivados da thread ou de mais organizacao da leitura da conversa, sem abrir mutacoes novas cedo demais;
 - seguir em slices pequenos que movam a operacao oficial para o Astro e deixem o legado como referencia residual.
+
+## Ciclo 100 — historico dirigido na mesa do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a `view=historico` ja aceitava filtro por `hist=`, mas ainda renderizava a pre-visualizacao curta da thread em vez do recorte historico filtrado;
+- isso fazia a navegacao prometer uma leitura que a tela ainda nao entregava por inteiro e mantinha a analise historica menos util do que no workspace legado;
+- o corte seguro era corrigir a fonte da listagem e adicionar uma camada pequena de orientacao visual, sem contrato novo nem fetch adicional.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/mesa.astro` passou a derivar `historySummary` e `historyAnchors` a partir do historico filtrado do laudo;
+- a `view=historico` agora mostra cards-resumo do recorte atual e atalhos por ancora para os eventos mais recentes do filtro;
+- a listagem principal do historico foi corrigida para renderizar `filteredHistoryItems`, em vez da `threadPreview` curta usada na view de conversa;
+- o ownership permanece o mesmo: Astro organiza a leitura filtrada do historico e o backend Python segue dono da thread canonica e do estado do caso.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com o historico agora lendo de fato o recorte filtrado, o proximo ganho util do `Inspetor` e fechar os fluxos residuais que ainda prendem a operacao ao workspace legado;
+- o melhor alvo passa a ser a abertura operacional de novo caso e demais estados que ainda dependem do shell antigo;
+- seguir em fatias pequenas, coerentes e publicadas para empurrar a superficie web do `Inspetor` para uma migracao integral.

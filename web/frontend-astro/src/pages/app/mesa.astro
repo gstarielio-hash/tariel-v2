@@ -203,6 +203,13 @@ const latestReferenceSignal =
     .slice()
     .reverse()
     .find((message) => Boolean(message.referencia_mensagem_id)) ?? null;
+const historySummary = {
+  total: filteredHistoryItems.length,
+  pendencias: filteredHistoryItems.filter((message) => message.message_kind === "mesa_pendency").length,
+  referencias: filteredHistoryItems.filter((message) => Boolean(message.referencia_mensagem_id)).length,
+  anexos: filteredHistoryItems.filter((message) => Boolean(message.anexos && message.anexos.length > 0)).length,
+};
+const historyAnchors = filteredHistoryItems.slice().reverse().slice(0, 4);
 const historyFilterOptions = [
   { key: "todos", label: "Todos", count: canonicalHistoryItems.length },
   {
@@ -867,7 +874,58 @@ function formatBytes(value: number | undefined) {
         </div>
 
         <div class="mt-6 space-y-3">
-          {threadPreview.length > 0 ? threadPreview.map((message) => (
+          <div class="grid gap-3 sm:grid-cols-4">
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Itens no recorte</p>
+              <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{historySummary.total}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Leitura ativa com o filtro atual do historico.</p>
+            </div>
+
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Pendencias</p>
+              <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{historySummary.pendencias}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Eventos marcados como `mesa_pendency` neste recorte.</p>
+            </div>
+
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Referencias</p>
+              <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{historySummary.referencias}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Replies que apontam para outra mensagem da thread.</p>
+            </div>
+
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Anexos</p>
+              <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{historySummary.anexos}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Mensagens do recorte que carregam evidencias anexadas.</p>
+            </div>
+          </div>
+
+          <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Atalhos do historico</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  Os eventos mais recentes deste filtro ficam acessiveis direto por ancora.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {historyAnchors.length > 0 ? historyAnchors.map((message) => (
+                  <a
+                    href={`#mensagem-${message.id}`}
+                    class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    #{message.id}
+                  </a>
+                )) : (
+                  <span class="rounded-full border border-dashed border-slate-300 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    Sem atalhos neste recorte
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {filteredHistoryItems.length > 0 ? filteredHistoryItems.slice().reverse().map((message) => (
             <div
               id={`mensagem-${message.id}`}
               class:list={[
@@ -999,7 +1057,7 @@ function formatBytes(value: number | undefined) {
             </div>
           )) : (
             <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
-              Ainda nao ha mensagens disponiveis para o laudo selecionado nesta leitura.
+              Ainda nao ha mensagens disponiveis para o filtro atual do historico.
             </div>
           )}
 
