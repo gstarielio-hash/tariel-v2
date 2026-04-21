@@ -48,7 +48,8 @@ const selectedMessages = selectedReport
   ? await fetchAppMesaMessages(appSession, selectedReport.id).catch(() => null)
   : null;
 const threadPreview = selectedMessages?.itens.slice(-6).reverse() ?? [];
-const referencedMessage = threadPreview.find((message) => message.id === selectedReferenceMessageId) ?? null;
+const messageIndex = new Map((selectedMessages?.itens ?? []).map((message) => [message.id, message]));
+const referencedMessage = messageIndex.get(selectedReferenceMessageId) ?? null;
 const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
   timeStyle: "short",
@@ -406,10 +407,23 @@ const cards = [
 
       <div class="mt-6 space-y-3">
         {threadPreview.length > 0 ? threadPreview.map((message) => (
-          <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+          <div
+            id={`mensagem-${message.id}`}
+            class:list={[
+              "rounded-[24px] border px-4 py-4",
+              referencedMessage?.id === message.id
+                ? "border-sky-500/30 bg-sky-500/8 shadow-[0_18px_40px_rgba(14,165,233,0.08)]"
+                : "border-slate-200 bg-slate-50",
+            ]}
+          >
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <div class="flex flex-wrap gap-2">
+                  {referencedMessage?.id === message.id ? (
+                    <span class="rounded-full bg-sky-600 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white">
+                      Mensagem selecionada
+                    </span>
+                  ) : null}
                   <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     {message.message_kind}
                   </span>
@@ -424,6 +438,35 @@ const cards = [
                 </div>
 
                 <p class="mt-3 text-sm leading-6 text-slate-700">{message.texto}</p>
+
+                {message.referencia_mensagem_id ? (
+                  <div class="mt-4 rounded-[20px] border border-slate-200 bg-white px-4 py-4">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                          Em resposta a #{message.referencia_mensagem_id}
+                        </p>
+                        <p class="mt-2 text-sm leading-6 text-slate-700">
+                          {messageIndex.get(message.referencia_mensagem_id)?.texto || "A mensagem referenciada nao apareceu nesta leitura recente."}
+                        </p>
+                        {messageIndex.get(message.referencia_mensagem_id) ? (
+                          <p class="mt-2 text-xs text-slate-500">
+                            {messageIndex.get(message.referencia_mensagem_id)?.data} • {messageIndex.get(message.referencia_mensagem_id)?.message_kind}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      {messageIndex.get(message.referencia_mensagem_id) ? (
+                        <a
+                          href={`/app/inicio?laudo=${selectedReport?.id}&ref=${message.referencia_mensagem_id}#mensagem-${message.referencia_mensagem_id}`}
+                          class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700 transition hover:border-slate-300 hover:bg-white"
+                        >
+                          Ver referencia
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
 
                 <div class="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
                   <span>{message.data}</span>

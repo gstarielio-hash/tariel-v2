@@ -3835,3 +3835,44 @@ Proximo passo imediato:
 - com a thread do inspetor agora lendo e baixando anexos, o proximo corte util e melhorar a navegacao da home para destacar melhor contexto, referencia e anexos da mensagem selecionada;
 - depois disso, a migracao pode abrir uma superficie de mesa mais dedicada no Astro, separando melhor fila, thread e composer;
 - manter o backend Python como dono dos contratos e usar o Astro apenas como shell autenticado e proxy de portal.
+
+## Ciclo 92 — contexto de referencia na thread do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a home do inspetor ja permitia selecionar uma mensagem para responder, mas a thread ainda mostrava cada item de forma isolada;
+- isso enfraquecia a leitura operacional quando uma resposta vinha encadeada em outra mensagem, porque o operador precisava inferir o contexto sem ver a referencia inline;
+- o corte seguro era enriquecer apenas a renderizacao da thread recente, sem alterar os contratos do backend nem abrir uma mesa dedicada.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a indexar as mensagens recebidas para resolver referencias por `id`;
+- a mensagem selecionada para resposta agora recebe destaque visual direto na thread, evitando perda de contexto quando o operador clica em `Responder a esta mensagem`;
+- mensagens com `referencia_mensagem_id` agora exibem um bloco inline com resumo da mensagem referenciada e CTA `Ver referencia` quando o item ainda esta presente na leitura atual;
+- o fluxo continua inteiro sobre os mesmos payloads canonicos do backend Python, sem duplicar regra de negocio no Astro.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com o contexto de referencia ja visivel na home, o proximo ganho util no `Inspetor` e aproximar resumo, thread e composer numa leitura mais focada do laudo selecionado;
+- isso pode incluir um painel de contexto do item ativo ou uma separacao mais clara entre fila de laudos e conversa operacional;
+- manter o backend Python como dono do estado e usar o Astro apenas para melhorar leitura, navegacao e mutacoes autenticadas.
