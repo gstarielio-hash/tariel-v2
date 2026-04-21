@@ -1,0 +1,279 @@
+---
+import { Download, LifeBuoy, LineChart, ShieldCheck } from "lucide-react";
+
+import ClientNotice from "@/components/app/client/client-notice.astro";
+import ClientShellLayout from "@/layouts/client-shell-layout.astro";
+import { consumeClientNotice } from "@/lib/server/client-notice";
+import { getClientPortalSupportData } from "@/lib/server/client-portal";
+
+export const prerender = false;
+
+const clientSession = Astro.locals.clientSession;
+
+if (!clientSession) {
+  return Astro.redirect("/cliente/login", 303);
+}
+
+const workspace = await getClientPortalSupportData(clientSession.user.companyId);
+
+if (!workspace) {
+  throw new Error("Empresa do portal cliente nao encontrada.");
+}
+
+const notice = consumeClientNotice(Astro.cookies);
+const returnTo = "/cliente/suporte";
+const auditFormatter = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
+---
+
+<ClientShellLayout
+  title={`Suporte | ${workspace.detail.company.nomeFantasia} | Tariel Astro`}
+  description="Suporte, diagnostico e historico do portal cliente em Astro SSR."
+  userName={clientSession.user.name}
+  companyName={workspace.detail.company.nomeFantasia}
+  activeItem="support"
+>
+  <Fragment slot="header">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">Suporte e governanca</p>
+        <h1 class="mt-3 font-display text-3xl tracking-tight text-slate-950 sm:text-4xl">
+          Diagnostico e trilha operacional
+        </h1>
+        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          O portal cliente agora registra interesse comercial, protocolo de suporte e exportacao de snapshot
+          operacional diretamente no V2.
+        </p>
+      </div>
+
+      <div class="rounded-[28px] border border-sky-500/16 bg-sky-500/6 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Saude do tenant</p>
+        <p class="mt-2 text-lg font-semibold text-slate-950">{workspace.detail.health.label}</p>
+        <p class="mt-1 text-sm leading-6 text-slate-600">{workspace.detail.health.reason}</p>
+      </div>
+    </div>
+  </Fragment>
+
+  <ClientNotice notice={notice} />
+
+  <section class="grid gap-4 xl:grid-cols-3">
+    <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Diagnostico</p>
+        <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+          <Download className="size-5" />
+        </div>
+      </div>
+      <p class="mt-5 font-display text-3xl tracking-tight text-slate-950">JSON</p>
+      <p class="mt-3 text-sm leading-6 text-slate-600">
+        Exporte o retrato do tenant com resumo, equipe, portfolio e auditoria recente.
+      </p>
+    </article>
+
+    <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Plano atual</p>
+        <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+          <LineChart className="size-5" />
+        </div>
+      </div>
+      <p class="mt-5 font-display text-3xl tracking-tight text-slate-950">{workspace.detail.company.planoAtivo}</p>
+      <p class="mt-3 text-sm leading-6 text-slate-600">{workspace.detail.summary.usoLabel}</p>
+    </article>
+
+    <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Auditoria recente</p>
+        <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+          <ShieldCheck className="size-5" />
+        </div>
+      </div>
+      <p class="mt-5 font-display text-3xl tracking-tight text-slate-950">{workspace.recentAudit.length}</p>
+      <p class="mt-3 text-sm leading-6 text-slate-600">
+        Eventos recentes disponiveis para leitura imediata no portal cliente.
+      </p>
+    </article>
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Snapshot operacional</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Exportacao segura do tenant</h2>
+        </div>
+
+        <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+          <Download className="size-5" />
+        </div>
+      </div>
+
+      <p class="mt-4 text-sm leading-7 text-slate-600">
+        O arquivo inclui o estado administrativo visivel da empresa no V2. Ele foi desenhado para ser compartilhado
+        com suporte interno sem depender do template legado.
+      </p>
+
+      <a
+        href="/cliente/suporte/diagnostico"
+        class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:border-slate-400 hover:bg-slate-100"
+      >
+        <Download className="size-4" />
+        Exportar diagnostico em JSON
+      </a>
+
+      <div class="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+        Inclui resumo de uso, saude do tenant, equipe operacional, portfolio do catalogo e a cauda mais recente da
+        auditoria.
+      </div>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Interesse comercial</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Sinalizar movimento de plano</h2>
+        </div>
+
+        <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+          <LineChart className="size-5" />
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-3">
+        {workspace.planCards.map((card) => (
+          <form method="POST" action="/cliente/suporte/plano-interesse" class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+            <input type="hidden" name="returnTo" value={returnTo} />
+            <input type="hidden" name="plano" value={card.plan} />
+            <input type="hidden" name="origem" value="admin" />
+
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-sm font-semibold text-slate-950">{card.plan}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">{card.summary}</p>
+              </div>
+              {card.current ? (
+                <span class="rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-800">
+                  Atual
+                </span>
+              ) : (
+                <button
+                  type="submit"
+                  class="inline-flex shrink-0 items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:border-slate-400 hover:bg-slate-100"
+                >
+                  Registrar interesse
+                </button>
+              )}
+            </div>
+          </form>
+        ))}
+      </div>
+    </article>
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Contato com suporte</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Registrar protocolo rastreavel</h2>
+        </div>
+
+        <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+          <LifeBuoy className="size-5" />
+        </div>
+      </div>
+
+      <form method="POST" action="/cliente/suporte/registrar" class="mt-6 space-y-4">
+        <input type="hidden" name="returnTo" value={returnTo} />
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Tipo</span>
+          <select
+            name="tipo"
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+          >
+            <option value="feedback">Feedback operacional</option>
+            <option value="bug">Bug</option>
+          </select>
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Titulo</span>
+          <input
+            type="text"
+            name="titulo"
+            maxlength="120"
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+            placeholder="Resumo rapido do caso"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">E-mail de retorno</span>
+          <input
+            type="email"
+            name="email"
+            maxlength="254"
+            value={clientSession.user.email}
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Mensagem</span>
+          <textarea
+            name="mensagem"
+            rows="5"
+            maxlength="4000"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+            placeholder="Descreva o contexto, impacto e o que ja foi tentado."
+          />
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Registrar protocolo
+        </button>
+      </form>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Auditoria operacional</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Ultimos eventos do tenant</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          {workspace.recentAudit.length} eventos
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        {workspace.recentAudit.length > 0 ? workspace.recentAudit.map((entry) => (
+          <article class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p class="font-semibold text-slate-950">{entry.summary}</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {entry.portal} • {auditFormatter.format(entry.createdAt)}
+              </p>
+            </div>
+
+            <p class="mt-2 text-sm leading-6 text-slate-600">
+              {entry.detail ?? entry.action}
+            </p>
+          </article>
+        )) : (
+          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+            Nenhum evento recente foi encontrado para este tenant.
+          </div>
+        )}
+      </div>
+    </article>
+  </section>
+</ClientShellLayout>

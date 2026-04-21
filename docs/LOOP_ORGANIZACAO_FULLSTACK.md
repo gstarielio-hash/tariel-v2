@@ -2997,3 +2997,63 @@ Proximo passo imediato:
 - fechar a leitura e as acoes do `Admin-cliente` para equipe, suporte e mesa sem voltar ao template legado;
 - depois abrir a vertical do `Mesa Avaliadora` sobre a mesma base de autenticacao real ja presente em `/revisao/login`;
 - manter o `Inspetor` como fatia seguinte, aproveitando o mesmo padrao de sessao e rollout progressivo do V2.
+
+## Ciclo 75 — Admin-cliente com equipe e suporte reais no Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- o `Admin-cliente` ja tinha `login`, `trocar-senha`, `logout` e um `painel` inicial no Astro, mas ainda faltavam as superficies de operacao diaria que tiram o tenant do legado;
+- a gestao da equipe operacional e o contato com suporte ainda dependiam do portal Python, o que mantinha a trilha oficial incompleta mesmo com sessao real ja ativa no V2;
+- era preciso portar leitura e escrita de `equipe` e `suporte` sem fingir que a `mesa` ja estava fechada.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/client-portal.ts` foi expandido para servir como backend real do portal cliente no V2, com leitura de `equipe` e `suporte`, provisionamento de usuarios operacionais, reset de senha, bloqueio/desbloqueio, registro de interesse comercial e protocolo de suporte;
+- entrou um sistema proprio de flash para o portal cliente com `web/frontend-astro/src/lib/server/client-notice.ts`, `web/frontend-astro/src/lib/server/client-action-route.ts` e o componente `web/frontend-astro/src/components/app/client/client-notice.astro`;
+- foram criadas as paginas `web/frontend-astro/src/pages/cliente/equipe.astro` e `web/frontend-astro/src/pages/cliente/suporte.astro`, ambas SSR, protegidas pela sessao real do cliente e usando apenas handlers do Astro para leitura e escrita;
+- a equipe operacional ganhou handlers para criar conta, bloquear/desbloquear e regenerar senha temporaria em `web/frontend-astro/src/pages/cliente/equipe/*`;
+- o suporte ganhou handlers para registrar protocolo auditavel, sinalizar interesse de plano e exportar diagnostico em JSON em `web/frontend-astro/src/pages/cliente/suporte/*`;
+- `web/frontend-astro/src/layouts/client-shell-layout.astro` e `web/frontend-astro/src/pages/cliente/painel.astro` foram atualizados para refletir que `equipe` e `suporte` ja rodam no V2, deixando `mesa` como proxima vertical honesta.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/components/app/client/client-notice.astro`
+- `web/frontend-astro/src/layouts/client-shell-layout.astro`
+- `web/frontend-astro/src/lib/server/client-action-route.ts`
+- `web/frontend-astro/src/lib/server/client-notice.ts`
+- `web/frontend-astro/src/lib/server/client-portal.ts`
+- `web/frontend-astro/src/pages/cliente/equipe.astro`
+- `web/frontend-astro/src/pages/cliente/equipe/[userId]/bloquear.ts`
+- `web/frontend-astro/src/pages/cliente/equipe/[userId]/resetar-senha.ts`
+- `web/frontend-astro/src/pages/cliente/equipe/criar.ts`
+- `web/frontend-astro/src/pages/cliente/painel.astro`
+- `web/frontend-astro/src/pages/cliente/suporte.astro`
+- `web/frontend-astro/src/pages/cliente/suporte/diagnostico.ts`
+- `web/frontend-astro/src/pages/cliente/suporte/plano-interesse.ts`
+- `web/frontend-astro/src/pages/cliente/suporte/registrar.ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 exec --yes --package tsx -- tsx -e '...getClientPortalTeamData(1)...'`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 exec --yes --package tsx -- tsx -e '...createClientOperationalUser/resetClientOperationalUserPassword/toggleClientOperationalUserStatus/createClientSupportReport/registerClientPlanInterest...'`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - smoke leitura equipe: `ok=true`, `members=2`, `plan=Ilimitado`
+  - smoke mutacoes cliente: `create=true`, `reset=true`, `block=true`, `reactivate=true`, `support=CLI-3B363FED`, `interest=Intermediario`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- abrir a superficie `/cliente/mesa` com leitura e acoes reais sobre a fila do tenant, usando a mesma sessao oficial do portal cliente;
+- depois avancar o portal `Mesa Avaliadora` em Astro sobre o mesmo padrao de auth/session ja live em `admin` e `cliente`;
+- manter `Inspetor` e a remocao do legado na fila seguinte, sem reabrir o caminho oficial do Python para as superficies ja migradas.

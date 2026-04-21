@@ -1,0 +1,319 @@
+---
+import { LockKeyhole, RefreshCcw, ShieldCheck, UserPlus, Users } from "lucide-react";
+
+import ClientNotice from "@/components/app/client/client-notice.astro";
+import ClientShellLayout from "@/layouts/client-shell-layout.astro";
+import { consumeClientNotice } from "@/lib/server/client-notice";
+import { getClientPortalTeamData } from "@/lib/server/client-portal";
+
+export const prerender = false;
+
+const clientSession = Astro.locals.clientSession;
+
+if (!clientSession) {
+  return Astro.redirect("/cliente/login", 303);
+}
+
+const workspace = await getClientPortalTeamData(clientSession.user.companyId);
+
+if (!workspace) {
+  throw new Error("Empresa do portal cliente nao encontrada.");
+}
+
+const notice = consumeClientNotice(Astro.cookies);
+const members = workspace.members;
+const returnTo = "/cliente/equipe";
+const summaryCards = [
+  {
+    label: "Equipe operacional",
+    value: workspace.summary.total,
+    detail: workspace.summary.capacityLabel,
+    icon: Users,
+  },
+  {
+    label: "Sessoes recentes",
+    value: workspace.summary.withSessions,
+    detail: "Pessoas com atividade viva no tenant neste momento.",
+    icon: ShieldCheck,
+  },
+  {
+    label: "Primeiro acesso",
+    value: workspace.summary.temporaryPasswords,
+    detail: "Contas que ainda precisam trocar a senha temporaria.",
+    icon: LockKeyhole,
+  },
+];
+---
+
+<ClientShellLayout
+  title={`Equipe | ${workspace.detail.company.nomeFantasia} | Tariel Astro`}
+  description="Gestao da equipe operacional do portal cliente em Astro SSR."
+  userName={clientSession.user.name}
+  companyName={workspace.detail.company.nomeFantasia}
+  activeItem="team"
+>
+  <Fragment slot="header">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">Equipe operacional</p>
+        <h1 class="mt-3 font-display text-3xl tracking-tight text-slate-950 sm:text-4xl">
+          Gestao do time em Astro SSR
+        </h1>
+        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          Este slice migra a criacao e o controle do time operacional do tenant para o V2, incluindo senha
+          temporaria, bloqueio e auditoria do proprio portal cliente.
+        </p>
+      </div>
+
+      <div class="rounded-[28px] border border-sky-500/16 bg-sky-500/6 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Plano atual</p>
+        <p class="mt-2 text-lg font-semibold text-slate-950">{workspace.detail.company.planoAtivo}</p>
+        <p class="mt-1 text-sm leading-6 text-slate-600">{workspace.summary.capacityLabel}</p>
+      </div>
+    </div>
+  </Fragment>
+
+  <ClientNotice notice={notice} />
+
+  <section class="grid gap-4 xl:grid-cols-3">
+    {summaryCards.map(({ label, value, detail, icon: Icon }) => (
+      <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</p>
+          <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+            <Icon className="size-5" />
+          </div>
+        </div>
+        <p class="mt-5 font-display text-3xl tracking-tight text-slate-950">{value}</p>
+        <p class="mt-3 text-sm leading-6 text-slate-600">{detail}</p>
+      </article>
+    ))}
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[0.94fr_1.06fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Novo usuario</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Provisionar acesso operacional</h2>
+        </div>
+
+        <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+          <UserPlus className="size-5" />
+        </div>
+      </div>
+
+      <p class="mt-4 text-sm leading-7 text-slate-600">
+        O V2 cria a conta diretamente no banco oficial, emite senha temporaria e registra a trilha auditavel do
+        admin-cliente.
+      </p>
+
+      <form method="POST" action="/cliente/equipe/criar" class="mt-6 space-y-4">
+        <input type="hidden" name="returnTo" value={returnTo} />
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Nome</span>
+          <input
+            type="text"
+            name="nome"
+            required
+            maxlength="150"
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+            placeholder="Nome completo da pessoa"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">E-mail</span>
+          <input
+            type="email"
+            name="email"
+            required
+            maxlength="254"
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+            placeholder="nome@empresa.com"
+          />
+        </label>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="block space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Papel</span>
+            <select
+              name="papel"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+            >
+              <option value="inspetor">Equipe de campo</option>
+              <option value="revisor">Mesa Avaliadora</option>
+            </select>
+          </label>
+
+          <label class="block space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Telefone</span>
+            <input
+              type="text"
+              name="telefone"
+              maxlength="30"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+              placeholder="Opcional"
+            />
+          </label>
+        </div>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">CREA</span>
+          <input
+            type="text"
+            name="crea"
+            maxlength="40"
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+            placeholder="Opcional"
+          />
+        </label>
+
+        <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+          O acesso liberado acompanha o papel escolhido: equipe de campo entra por <strong>/app/login</strong> e mesa
+          avaliadora por <strong>/revisao/login</strong>. Cross-portal detalhado continua na fatia seguinte.
+        </div>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Criar usuario operacional
+        </button>
+      </form>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Cobertura atual</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">O que este slice ja governa</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          Sem legado
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-3">
+        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+          <p class="text-sm font-semibold text-slate-950">Criacao e senha temporaria</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            O usuario nasce com acesso inicial controlado e instrucoes de login do portal correto.
+          </p>
+        </div>
+
+        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+          <p class="text-sm font-semibold text-slate-950">Bloqueio e reset no V2</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            O admin-cliente consegue revogar sessoes, bloquear contas e renovar a senha temporaria sem sair do Astro.
+          </p>
+        </div>
+
+        <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+          <p class="text-sm font-semibold text-slate-950">Proxima etapa</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            A leitura e as mutacoes da mesa entram na proxima vertical usando a mesma sessao real do portal cliente.
+          </p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Equipe atual</p>
+        <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Pessoas provisionadas para o tenant</h2>
+        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          Contas operacionais criadas no V2 aparecem aqui com estado de login, sessoes recentes e acoes de manutencao.
+        </p>
+      </div>
+
+      <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+        {workspace.summary.inspectors} campo • {workspace.summary.reviewers} mesa
+      </div>
+    </div>
+
+    <div class="mt-6 space-y-4">
+      {members.length > 0 ? members.map((member) => (
+        <article class="rounded-[28px] border border-slate-200 bg-slate-50 px-5 py-5">
+          <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="font-semibold text-slate-950">{member.name}</h3>
+                <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  {member.roleLabel}
+                </span>
+                {member.temporaryPasswordActive ? (
+                  <span class="rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-800">
+                    Primeiro acesso pendente
+                  </span>
+                ) : null}
+                {member.blocked ? (
+                  <span class="rounded-full border border-red-200 bg-red-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-800">
+                    Bloqueado
+                  </span>
+                ) : (
+                  <span class="rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
+                    Ativo
+                  </span>
+                )}
+              </div>
+
+              <div class="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2 xl:grid-cols-3">
+                <p>{member.email}</p>
+                <p>{member.portalLabel}</p>
+                <p>Ultimo login: {member.lastLoginLabel}</p>
+                <p>Ultima atividade: {member.lastActivityLabel}</p>
+                <p>Telefone: {member.phone ?? "Nao informado"}</p>
+                <p>CREA: {member.crea ?? "Nao informado"}</p>
+              </div>
+            </div>
+
+            <div class="grid gap-3 sm:grid-cols-2 xl:w-[360px]">
+              <form method="POST" action={`/cliente/equipe/${member.id}/resetar-senha`}>
+                <input type="hidden" name="returnTo" value={returnTo} />
+                <button
+                  type="submit"
+                  class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-950 transition hover:border-slate-400 hover:bg-slate-100"
+                >
+                  <RefreshCcw className="size-4" />
+                  Resetar senha
+                </button>
+              </form>
+
+              <form method="POST" action={`/cliente/equipe/${member.id}/bloquear`}>
+                <input type="hidden" name="returnTo" value={returnTo} />
+                <button
+                  type="submit"
+                  class:list={[
+                    "inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition",
+                    member.blocked
+                      ? "border border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100"
+                      : "border border-red-300 bg-red-50 text-red-900 hover:bg-red-100",
+                  ]}
+                >
+                  <LockKeyhole className="size-4" />
+                  {member.blocked ? "Reativar conta" : "Bloquear conta"}
+                </button>
+              </form>
+
+              <a
+                href={member.loginUrl}
+                class="inline-flex w-full items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-950 transition hover:border-slate-400 hover:bg-slate-100 sm:col-span-2"
+              >
+                Abrir portal de acesso
+              </a>
+            </div>
+          </div>
+        </article>
+      )) : (
+        <div class="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-sm leading-6 text-slate-600">
+          Nenhum usuario operacional foi provisionado no tenant. Use o formulario acima para abrir o primeiro acesso.
+        </div>
+      )}
+    </div>
+  </section>
+</ClientShellLayout>
