@@ -4091,3 +4091,45 @@ Proximo passo imediato:
 - com a leitura tecnica do contexto ja aberta no Astro, o proximo ganho util do inspetor e migrar mais sinais da operacao ativa para dentro da mesa, reduzindo ainda mais a necessidade do workspace legado;
 - a melhor sequencia e aprofundar estados do caso e a trilha operacional ainda dependentes da interface antiga, sem abrir contrato novo antes da hora;
 - seguir em fatias pequenas, reversiveis e validadas para aproximar o `Inspetor` de uma migracao integral.
+
+## Ciclo 98 — trilho de lifecycle na mesa do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a `view=contexto` ja tinha leitura tecnica basica, mas ainda escondia parte importante do contrato operacional do caso;
+- o backend da mesa ja expunha lifecycle atual, proximos estados, transicoes permitidas e exigencia de validacao humana, mas o Astro ainda nao transformava isso em leitura util para o operador;
+- isso mantinha a consulta do fluxo tecnico mais dependente do workspace legado do que o necessario.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/mesa.astro` passou a humanizar o lifecycle atual, o owner ativo, as actions expostas e as transicoes permitidas do caso;
+- a `view=contexto` agora inclui um bloco de trilho do caso com estado atual, workflow, proximos estados e flag de validacao humana;
+- entrou tambem uma faixa dedicada de transicoes operacionais, reaproveitando `allowed_lifecycle_transitions` sem introduzir mutacao nova no frontend;
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` foi alinhado com o contrato existente da mesa para declarar `human_validation_required` no payload tipado do Astro.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com o contrato de lifecycle ja visivel dentro da mesa Astro, o proximo corte util do `Inspetor` e aproximar a trilha operacional do caso com sinais de decisao e retorno ainda mais proximos do workspace legado;
+- isso pode ser feito com leitura de eventos e estados ja disponiveis no payload, antes de abrir qualquer mutacao nova na interface;
+- seguir reduzindo a dependencia do workspace antigo em camadas pequenas, auditaveis e reversiveis.

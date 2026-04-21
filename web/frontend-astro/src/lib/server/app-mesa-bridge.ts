@@ -14,6 +14,7 @@ export interface AppMesaSummaryPayload {
   allowed_next_lifecycle_statuses: string[];
   allowed_lifecycle_transitions: Array<Record<string, unknown>>;
   allowed_surface_actions: string[];
+  human_validation_required?: boolean;
   laudo_card: {
     id: number;
     titulo: string;

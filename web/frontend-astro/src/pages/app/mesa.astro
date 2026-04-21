@@ -85,6 +85,43 @@ const filteredHistoryItems = canonicalHistoryItems.filter((message) => {
   return true;
 });
 const currentView = ["conversa", "historico", "contexto"].includes(requestedView) ? requestedView : "conversa";
+const lifecycleStatusLabels: Record<string, string> = {
+  analise_livre: "Analise livre",
+  pre_laudo: "Pre-laudo",
+  laudo_em_coleta: "Laudo guiado",
+  aguardando_mesa: "Aguardando mesa",
+  em_revisao_mesa: "Em revisao na mesa",
+  devolvido_para_correcao: "Devolvido para correcao",
+  aprovado: "Aprovado",
+  emitido: "Emitido",
+};
+const ownerRoleLabels: Record<string, string> = {
+  inspetor: "Responsavel: campo",
+  mesa: "Responsavel: mesa",
+  none: "Responsavel: conclusao",
+};
+const preferredSurfaceLabels: Record<string, string> = {
+  chat: "Surface: chat",
+  review_panel: "Surface: painel de revisao",
+  workspace: "Surface: workspace",
+  system: "Surface: sistema",
+};
+interface LifecycleTransitionCard {
+  targetStatus: string;
+  targetStatusLabel: string;
+  transitionKind: string;
+  label: string;
+  ownerRoleLabel: string;
+  preferredSurfaceLabel: string;
+}
+const surfaceActionLabels: Record<string, string> = {
+  chat_send_to_review: "Enviar para revisao",
+  chat_finalize: "Finalizar pelo chat",
+  chat_reopen: "Reabrir caso",
+  mesa_approve: "Aprovar na mesa",
+  mesa_return: "Devolver para correcao",
+  system_issue: "Emitir PDF final",
+};
 const contextHighlights = [
   {
     label: "Template",
@@ -102,6 +139,45 @@ const contextHighlights = [
     detail: selectedSummary?.resumo.ultima_mensagem_preview || "Nenhum preview operacional disponivel.",
   },
 ] as const;
+const lifecycleStatusLabel =
+  lifecycleStatusLabels[String(selectedSummary?.case_lifecycle_status ?? "").trim().toLowerCase()] ||
+  selectedSummary?.case_lifecycle_status ||
+  "Fluxo nao definido";
+const ownerRoleLabel =
+  ownerRoleLabels[String(selectedSummary?.active_owner_role ?? "").trim().toLowerCase()] ||
+  selectedSummary?.active_owner_role ||
+  "Responsavel nao definido";
+const allowedNextStatuses = (selectedSummary?.allowed_next_lifecycle_statuses ?? []).map((status) => ({
+  key: status,
+  label: lifecycleStatusLabels[String(status).trim().toLowerCase()] || status,
+}));
+const allowedSurfaceActions = (selectedSummary?.allowed_surface_actions ?? []).map((action) => ({
+  key: action,
+  label: surfaceActionLabels[String(action).trim().toLowerCase()] || action,
+}));
+const lifecycleTransitions = (selectedSummary?.allowed_lifecycle_transitions ?? [])
+  .map((item) => {
+    const targetStatus = String(item.target_status ?? "").trim();
+    const transitionKind = String(item.transition_kind ?? "").trim();
+    const label = String(item.label ?? "").trim();
+    const ownerRole = String(item.owner_role ?? "").trim();
+    const preferredSurface = String(item.preferred_surface ?? "").trim();
+
+    if (!targetStatus || !label) {
+      return null;
+    }
+
+    return {
+      targetStatus,
+      targetStatusLabel: lifecycleStatusLabels[targetStatus.toLowerCase()] || targetStatus,
+      transitionKind: transitionKind || "advance",
+      label,
+      ownerRoleLabel: ownerRoleLabels[ownerRole.toLowerCase()] || ownerRole || "Responsavel nao definido",
+      preferredSurfaceLabel:
+        preferredSurfaceLabels[preferredSurface.toLowerCase()] || preferredSurface || "Surface nao definida",
+    };
+  })
+  .filter((item): item is LifecycleTransitionCard => item !== null);
 const historyFilterOptions = [
   { key: "todos", label: "Todos", count: canonicalHistoryItems.length },
   {
@@ -437,8 +513,8 @@ function formatBytes(value: number | undefined) {
               <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
                 <p class="text-sm font-semibold text-slate-950">Acoes de superficie liberadas</p>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
-                  {selectedSummary.allowed_surface_actions.length > 0
-                    ? selectedSummary.allowed_surface_actions.join(", ")
+                  {allowedSurfaceActions.length > 0
+                    ? allowedSurfaceActions.map((item) => item.label).join(", ")
                     : "Nenhuma acao de superficie exposta para este estado."}
                 </p>
               </div>
@@ -462,6 +538,64 @@ function formatBytes(value: number | undefined) {
                       ? `Bloqueio: ${overview.company.blockedReason || "motivo nao informado."}`
                       : "Tenant operacional sem bloqueio ativo."}
                   </p>
+                </div>
+              </div>
+
+              <div class="grid gap-3 xl:grid-cols-[0.92fr_1.08fr]">
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Trilho do caso</p>
+                  <p class="mt-3 text-sm font-semibold text-slate-950">{lifecycleStatusLabel}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    {ownerRoleLabel} • {selectedSummary.case_workflow_mode || "workflow nao informado"}
+                  </p>
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    {allowedNextStatuses.length > 0 ? allowedNextStatuses.map((status) => (
+                      <span class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
+                        {status.label}
+                      </span>
+                    )) : (
+                      <span class="rounded-full border border-dashed border-slate-300 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        Sem proximo estado exposto
+                      </span>
+                    )}
+                  </div>
+                  <p class="mt-4 text-sm leading-6 text-slate-600">
+                    {selectedSummary.human_validation_required
+                      ? "Este estado ainda exige validacao humana antes da conclusao do caso."
+                      : "Nao ha exigencia adicional de validacao humana sinalizada neste snapshot."}
+                  </p>
+                </div>
+
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Transicoes permitidas</p>
+                    <span class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      {lifecycleTransitions.length} opcoes
+                    </span>
+                  </div>
+
+                  <div class="mt-4 space-y-3">
+                    {lifecycleTransitions.length > 0 ? lifecycleTransitions.map((transition) => (
+                      <div class="rounded-[20px] border border-slate-200 bg-white px-4 py-4">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span class="rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">
+                            {transition.transitionKind}
+                          </span>
+                          <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            {transition.targetStatusLabel}
+                          </span>
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-slate-950">{transition.label}</p>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">
+                          {transition.ownerRoleLabel} • {transition.preferredSurfaceLabel}
+                        </p>
+                      </div>
+                    )) : (
+                      <div class="rounded-[20px] border border-dashed border-slate-300 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                        O backend ainda nao expôs transicoes operacionais para este estado do caso.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </>
