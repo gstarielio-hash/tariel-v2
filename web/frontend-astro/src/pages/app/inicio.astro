@@ -3,6 +3,7 @@ import {
   Clock3,
   FileStack,
   Fingerprint,
+  MessageCircleWarning,
   MessageSquareCode,
   ScanSearch,
   ShieldCheck,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 
 import AppShellLayout from "@/layouts/app-shell-layout.astro";
+import { fetchAppMesaSummary } from "@/lib/server/app-mesa-bridge";
 import { getAppPortalOverview } from "@/lib/server/app-portal";
 
 export const prerender = false;
@@ -30,6 +32,11 @@ if (!overview) {
 }
 
 const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const selectedLaudoId = Number(Astro.url.searchParams.get("laudo") ?? 0) || overview.recentReports[0]?.id || 0;
+const selectedReport = overview.recentReports.find((report) => report.id === selectedLaudoId) ?? overview.recentReports[0] ?? null;
+const selectedSummary = selectedReport
+  ? await fetchAppMesaSummary(appSession, selectedReport.id).catch(() => null)
+  : null;
 const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
   timeStyle: "short",
@@ -120,7 +127,7 @@ const cards = [
     ))}
   </section>
 
-  <section class="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+  <section class="mt-8 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
     <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
       <div class="flex items-center justify-between gap-4">
         <div>
@@ -135,7 +142,15 @@ const cards = [
 
       <div class="mt-6 space-y-3">
         {overview.recentReports.length > 0 ? overview.recentReports.map((report) => (
-          <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+          <a
+            href={`/app/inicio?laudo=${report.id}`}
+            class:list={[
+              "block rounded-[24px] border px-4 py-4 transition",
+              report.id === selectedReport?.id
+                ? "border-sky-500/25 bg-sky-500/8 shadow-[0_18px_40px_rgba(14,165,233,0.08)]"
+                : "border-slate-200 bg-slate-50 hover:border-sky-500/18 hover:bg-white",
+            ]}
+          >
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p class="font-semibold text-slate-950">
@@ -153,7 +168,7 @@ const cards = [
 
               <p class="text-sm text-slate-500">{report.updatedAtLabel}</p>
             </div>
-          </div>
+          </a>
         )) : (
           <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
             Nenhum laudo recente foi encontrado para este inspetor.
@@ -165,16 +180,85 @@ const cards = [
     <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
       <div class="flex items-center justify-between gap-4">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Perfil e governanca</p>
-          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Contexto atual do operador</h2>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Resumo operacional</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Primeira leitura do laudo selecionado</h2>
         </div>
 
         <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Nivel {overview.profile.accessLevel}
+          {selectedReport ? `Laudo ${selectedReport.id}` : `Nivel ${overview.profile.accessLevel}`}
         </div>
       </div>
 
       <div class="mt-6 grid gap-3">
+        {selectedReport && selectedSummary ? (
+          <>
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-sm font-semibold text-slate-950">
+                {selectedSummary.laudo_card?.titulo || selectedReport.sector}
+              </p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                {selectedSummary.laudo_card?.preview || selectedSummary.resumo.ultima_mensagem_preview || "Sem preview disponível."}
+              </p>
+              <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <span class="rounded-full border border-slate-200 px-3 py-2">
+                  {selectedSummary.status_visual_label}
+                </span>
+                <span class="rounded-full border border-slate-200 px-3 py-2">
+                  {selectedSummary.laudo_card?.status_card_label || selectedReport.reviewStatus}
+                </span>
+                <span class="rounded-full border border-slate-200 px-3 py-2">
+                  {selectedReport.template}
+                </span>
+              </div>
+            </div>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Mensagens</p>
+                <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">
+                  {selectedSummary.resumo.total_mensagens}
+                </p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  {selectedSummary.resumo.mensagens_nao_lidas} nao lidas • ultima atividade em {selectedSummary.resumo.atualizado_em || "agora"}.
+                </p>
+              </div>
+
+              <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Pendencias</p>
+                <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">
+                  {selectedSummary.resumo.pendencias_abertas}
+                </p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  {selectedSummary.resumo.pendencias_resolvidas} resolvidas • dono atual {selectedSummary.active_owner_role}.
+                </p>
+              </div>
+            </div>
+
+            <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+              <p class="text-sm font-semibold text-slate-950">Acoes de superficie liberadas</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                {selectedSummary.allowed_surface_actions.length > 0
+                  ? selectedSummary.allowed_surface_actions.join(", ")
+                  : "Nenhuma acao de superficie exposta para este estado."}
+              </p>
+            </div>
+          </>
+        ) : selectedReport ? (
+          <div class="rounded-[24px] border border-amber-500/18 bg-amber-500/8 p-4 text-amber-950">
+            <div class="flex items-start gap-3">
+              <div class="rounded-2xl bg-white/80 p-3 text-slate-950">
+                <MessageCircleWarning className="size-5" />
+              </div>
+              <div>
+                <p class="text-sm font-semibold">Resumo operacional indisponivel neste momento</p>
+                <p class="mt-2 text-sm leading-6">
+                  O laudo foi selecionado, mas o backend nao retornou o resumo da mesa nesta leitura.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
           <p class="text-sm font-semibold text-slate-950">{overview.profile.email}</p>
           <p class="mt-2 text-sm leading-6 text-slate-600">

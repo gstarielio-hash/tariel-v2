@@ -3522,3 +3522,50 @@ Proximo passo imediato:
 - com a entrada do inspetor agora autenticada e lendo dados reais, o proximo corte natural e migrar a primeira superficie operacional ligada a `/app/api/*`;
 - a melhor candidata e uma leitura inicial de workspace ou resumo do laudo selecionado, porque reaproveita contratos existentes sem reabrir a sessao;
 - seguir evitando portar o chat inteiro de uma vez, privilegiando uma primeira tela de valor com baixo acoplamento ao legado.
+
+## Ciclo 85 — primeiro resumo operacional do laudo em `/app`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a home do inspetor ja tinha overview real do operador, mas ainda faltava a primeira leitura operacional conectada aos contratos canonicos de `/app/api/*`;
+- isso deixava o portal sem uma ponte clara entre a entrada autenticada e a workspace do laudo, mesmo com o backend ja expondo `/app/api/laudo/{laudo_id}/mesa/resumo`;
+- o corte seguro era plugar um resumo SSR do laudo selecionado, sem abrir ainda mensagens, reply, anexos ou mutacoes do chat.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`, consumindo `/app/api/laudo/{laudo_id}/mesa/resumo` via bearer token da sessao Astro do inspetor;
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a aceitar selecao de laudo por `?laudo=` e a usar o primeiro laudo recente como fallback quando nenhum id e informado;
+- a lista de laudos recentes do operador agora funciona como entrada para uma primeira leitura operacional do caso, mantendo o mesmo shell SSR;
+- a area principal do resumo passou a mostrar:
+  - preview do laudo selecionado;
+  - status visual e estado do card;
+  - contagem de mensagens e pendencias;
+  - acoes de superficie liberadas no estado atual;
+- o corte continua estreito: ainda sem thread completa, reply, upload ou mutacoes, preservando Python como dono da workspace e Astro como shell/read model.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- a proxima fatia natural e expandir esse resumo para a primeira leitura de thread ou de pendencias do laudo selecionado;
+- o melhor caminho continua sendo reaproveitar os contratos canonicos do backend em vez de reimplementar regra no Astro;
+- vale manter o mesmo criterio incremental: primeiro leitura, depois acao, depois anexos, e so no fim a workspace completa.
