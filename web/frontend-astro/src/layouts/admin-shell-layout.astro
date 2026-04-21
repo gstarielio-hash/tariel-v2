@@ -16,7 +16,7 @@ interface Props {
   title?: string;
   description?: string;
   userName?: string;
-  activeItem?: "dashboard" | "clients" | "catalog";
+  activeItem?: "dashboard" | "clients" | "catalog" | "audit";
 }
 
 const {
@@ -46,9 +46,10 @@ const menuItems = [
     current: activeItem === "catalog",
   },
   {
-    href: "#operacao",
-    label: "Operacao",
+    href: "/admin/auditoria",
+    label: "Auditoria",
     icon: FileSearch,
+    current: activeItem === "audit",
   },
   {
     href: "#proxima-fatia",

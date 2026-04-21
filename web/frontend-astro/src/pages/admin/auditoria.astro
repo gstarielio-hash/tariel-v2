@@ -1,0 +1,205 @@
+---
+import {
+  Building2,
+  FileSearch,
+  ShieldCheck,
+  UserRoundCog,
+} from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import KpiCard from "@/components/app/admin/kpi-card.astro";
+import StatusPill from "@/components/app/admin/status-pill.astro";
+import { getAdminAuditData } from "@/lib/server/admin-audit";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+import AdminShellLayout from "@/layouts/admin-shell-layout.astro";
+
+export const prerender = false;
+
+const data = await getAdminAuditData({
+  empresaId: Astro.url.searchParams.get("empresa_id"),
+  limite: Astro.url.searchParams.get("limite"),
+});
+const notice = consumeAdminNotice(Astro.cookies);
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("pt-BR").format(value);
+}
+
+const cards = [
+  {
+    icon: FileSearch,
+    label: "Eventos carregados",
+    value: formatNumber(data.summary.total),
+    detail: "Últimos registros administrativos do recorte atual.",
+    tone: "orange" as const,
+  },
+  {
+    icon: Building2,
+    label: "Filtro de empresa",
+    value: data.filters.empresaId ? `#${data.filters.empresaId}` : "Todas",
+    detail: "Use o ID da empresa para investigar um caso específico.",
+    tone: "sky" as const,
+  },
+  {
+    icon: UserRoundCog,
+    label: "Equipe e acesso",
+    value: formatNumber(data.summary.categories.team + data.summary.categories.access),
+    detail: "Trocas de senha, bloqueios, reativações e gestão de usuários.",
+    tone: "slate" as const,
+  },
+  {
+    icon: ShieldCheck,
+    label: "Comercial e catálogo",
+    value: formatNumber(data.summary.categories.commercial),
+    detail: "Trocas de plano, onboarding e governança do catálogo por tenant.",
+    tone: "emerald" as const,
+  },
+];
+---
+
+<AdminShellLayout title="Auditoria | Tariel Astro" activeItem="audit" userName="Admin-CEO">
+  <Fragment slot="header">
+    <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+      <div class="max-w-4xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Auditoria migrada</p>
+        <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950 sm:text-5xl">
+          Trilha administrativa
+        </h1>
+        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+          Registro das ações críticas do Admin-CEO na nova stack, com recorte por empresa e leitura do payload auditável.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <StatusPill label={`${formatNumber(data.summary.scopes.admin)} eventos de painel`} tone="info" />
+        <StatusPill label={`limite ${data.filters.limite}`} tone="neutral" />
+      </div>
+    </div>
+  </Fragment>
+
+  <AdminNotice notice={notice} />
+
+  <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+    {cards.map((card) => (
+      <KpiCard label={card.label} value={card.value} detail={card.detail} icon={card.icon} tone={card.tone} />
+    ))}
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Consulta</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Filtrar recorte</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          O filtro atual carrega eventos do portal admin e ajuda a investigar bloqueios, mudanças comerciais e trilha operacional recente.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <StatusPill label={`${formatNumber(data.summary.categories.access)} acesso`} tone="warning" />
+        <StatusPill label={`${formatNumber(data.summary.categories.team)} equipe`} tone="info" />
+        <StatusPill label={`${formatNumber(data.summary.categories.commercial)} comercial`} tone="success" />
+      </div>
+    </div>
+
+    <form method="GET" action="/admin/auditoria" class="mt-6 grid gap-4 md:grid-cols-[1fr_1fr_auto]">
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Empresa</span>
+        <input
+          type="number"
+          min="1"
+          name="empresa_id"
+          value={data.filters.empresaId ?? ""}
+          placeholder="ID da empresa"
+          class="w-full rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        />
+      </label>
+
+      <label class="block space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Limite</span>
+        <input
+          type="number"
+          min="1"
+          max="100"
+          name="limite"
+          value={data.filters.limite}
+          class="w-full rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-950/20 focus:bg-white"
+        />
+      </label>
+
+      <div class="flex items-end">
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
+          Atualizar recorte
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="mt-8 space-y-4">
+    {data.items.length > 0 ? data.items.map((item) => (
+      <article class="rounded-[28px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div class="max-w-4xl">
+            <div class="flex flex-wrap gap-2">
+              <StatusPill label={item.companyName} tone="neutral" />
+              <StatusPill label={item.action} tone="info" />
+              <StatusPill label={item.categoryLabel} tone="warning" />
+              <StatusPill label={item.createdLabel} tone="success" />
+            </div>
+
+            <h2 class="mt-4 font-display text-2xl tracking-tight text-slate-950">{item.summary}</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-600">
+              {item.detail ?? "Sem detalhe adicional para este registro."}
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <StatusPill label={item.scopeLabel} tone="info" />
+            <a
+              href={`/admin/clientes/${item.companyId}`}
+              class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-50"
+            >
+              Abrir empresa
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-[22px] border border-slate-950/8 bg-slate-50 px-4 py-3">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Empresa</p>
+            <p class="mt-1 font-medium text-slate-950">#{item.companyId}</p>
+          </div>
+          <div class="rounded-[22px] border border-slate-950/8 bg-slate-50 px-4 py-3">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Ator</p>
+            <p class="mt-1 font-medium text-slate-950">{item.actorName}</p>
+          </div>
+          <div class="rounded-[22px] border border-slate-950/8 bg-slate-50 px-4 py-3">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Alvo</p>
+            <p class="mt-1 font-medium text-slate-950">{item.targetName ?? "Sem alvo direto"}</p>
+          </div>
+          <div class="rounded-[22px] border border-slate-950/8 bg-slate-50 px-4 py-3">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Portal</p>
+            <p class="mt-1 font-medium text-slate-950">{item.portal}</p>
+          </div>
+        </div>
+
+        {item.payloadPreview ? (
+          <details class="mt-4 rounded-[24px] border border-slate-950/8 bg-slate-50 p-4">
+            <summary class="cursor-pointer text-sm font-semibold text-slate-950">Detalhes do registro</summary>
+            <pre class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-slate-100">{item.payloadPreview}</pre>
+          </details>
+        ) : null}
+      </article>
+    )) : (
+      <article class="rounded-[28px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
+        <h2 class="font-display text-2xl tracking-tight text-slate-950">Nenhuma ação encontrada</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          A trilha administrativa aparece aqui assim que o portal executa bloqueios, trocas de plano, resets de senha e ações de catálogo.
+        </p>
+      </article>
+    )}
+  </section>
+</AdminShellLayout>
