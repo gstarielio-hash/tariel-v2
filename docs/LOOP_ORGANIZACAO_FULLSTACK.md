@@ -2913,3 +2913,87 @@ Próximo passo imediato:
 - migrar o restante sensível da trilha de segurança admin no `tariel-v2`, começando por MFA TOTP, troca obrigatória de senha e `reauth/step-up` para eliminar o `step-up pendente` das ações críticas;
 - depois retomar `support` e `rollout` em `/admin/configuracoes`, agora já com sessão e `ator_usuario_id` reais;
 - manter os providers corporativos (`google` e `microsoft`) como fatia seguinte da identidade admin, sem reabrir bridge desnecessária para o legado.
+
+## Ciclo 74 — Seguranca admin completa no Astro e primeira vertical real do Admin-cliente
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- o `Admin-CEO` ja tinha login e sessao no Astro, mas ainda faltavam as transicoes honestas para senha temporaria, MFA TOTP e `reauth/step-up` nas acoes criticas;
+- ao mesmo tempo, o escopo total da migracao precisava sair do afunilamento exclusivo no `Admin-CEO` e abrir a primeira vertical real do `Admin-cliente` no V2;
+- isso mantinha o portal da empresa sem rota oficial em Astro, apesar de o onboarding novo ja provisionar `admins-cliente` e apontar para `/cliente/login`.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/admin-auth.ts` passou a tratar sessao admin como trilha de transicoes, com senha temporaria, setup/challenge TOTP, cookie de retorno e janela de `step-up` para mutacoes sensiveis;
+- foi criado `web/frontend-astro/src/lib/server/admin-totp.ts` e entraram as paginas `admin/trocar-senha`, `admin/mfa/setup`, `admin/mfa/challenge` e `admin/reauth`, todas ligadas a handlers reais no Astro SSR;
+- `web/frontend-astro/src/lib/server/admin-action-route.ts` e os handlers criticos do `Admin-CEO` passaram a exigir `reauth` antes de provisionamento, bloqueio, reset de senha, troca de plano, catalogo e ajustes sensiveis;
+- `web/frontend-astro/src/middleware.ts` foi ampliado para orquestrar as transicoes obrigatorias do `Admin-CEO` e, no mesmo pacote, proteger o novo namespace `/cliente/*`;
+- foi criado `web/frontend-astro/src/lib/server/client-auth.ts` com login por senha, sessao propia em `sessoes_ativas`, troca obrigatoria de senha e logout do `Admin-cliente`;
+- foi criada a primeira shell oficial do portal da empresa em `web/frontend-astro/src/layouts/client-shell-layout.astro` e entrou a vertical inicial `web/frontend-astro/src/pages/cliente/*` com `login`, `trocar-senha`, `painel`, `logout` e redirect raiz;
+- `web/frontend-astro/src/lib/server/client-portal.ts` reutiliza a leitura consolidada do tenant para entregar um `/cliente/painel` SSR inicial sem depender do portal legado.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/env.d.ts`
+- `web/frontend-astro/src/lib/server/admin-action-route.ts`
+- `web/frontend-astro/src/lib/server/admin-auth.ts`
+- `web/frontend-astro/src/lib/server/admin-totp.ts`
+- `web/frontend-astro/src/lib/server/client-auth.ts`
+- `web/frontend-astro/src/lib/server/client-portal.ts`
+- `web/frontend-astro/src/layouts/client-shell-layout.astro`
+- `web/frontend-astro/src/middleware.ts`
+- `web/frontend-astro/src/pages/admin/login.astro`
+- `web/frontend-astro/src/pages/admin/login/entrar.ts`
+- `web/frontend-astro/src/pages/admin/trocar-senha.astro`
+- `web/frontend-astro/src/pages/admin/trocar-senha/confirmar.ts`
+- `web/frontend-astro/src/pages/admin/mfa/setup.astro`
+- `web/frontend-astro/src/pages/admin/mfa/setup/confirmar.ts`
+- `web/frontend-astro/src/pages/admin/mfa/challenge.astro`
+- `web/frontend-astro/src/pages/admin/mfa/challenge/confirmar.ts`
+- `web/frontend-astro/src/pages/admin/reauth.astro`
+- `web/frontend-astro/src/pages/admin/reauth/confirmar.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/adicionar-admin-cliente.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/bloquear.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/catalogo-laudos.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/resetar-senha/[usuarioId].ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/trocar-plano.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/usuarios/[usuarioId]/bloquear.ts`
+- `web/frontend-astro/src/pages/admin/catalogo-laudos/familias/[familyKey]/liberacao-tenant.ts`
+- `web/frontend-astro/src/pages/admin/configuracoes.astro`
+- `web/frontend-astro/src/pages/admin/configuracoes/acesso.ts`
+- `web/frontend-astro/src/pages/admin/configuracoes/defaults.ts`
+- `web/frontend-astro/src/pages/admin/novo-cliente/criar.ts`
+- `web/frontend-astro/src/pages/cliente/index.ts`
+- `web/frontend-astro/src/pages/cliente/login.astro`
+- `web/frontend-astro/src/pages/cliente/login/entrar.ts`
+- `web/frontend-astro/src/pages/cliente/logout.ts`
+- `web/frontend-astro/src/pages/cliente/painel.astro`
+- `web/frontend-astro/src/pages/cliente/trocar-senha.astro`
+- `web/frontend-astro/src/pages/cliente/trocar-senha/salvar.ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 exec --yes --package tsx -- tsx -e '...attemptAdminPasswordLogin("admin@tariel.ia")...'`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 exec --yes --package tsx -- tsx -e '...attemptClientPasswordLogin("admin-cliente@tariel.ia")...'`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 exec --yes --package tsx -- tsx -e '...smoke temp user client + completeClientPasswordReset...'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - smoke admin login: `ok=true` para `admin@tariel.ia`
+  - smoke client login: `ok=true` para `admin-cliente@tariel.ia`
+  - smoke fluxo temporario client: `passwordReset=true`, `resetOk=true`, `finalLoginOk=true`
+
+Proximo passo imediato:
+
+- fechar a leitura e as acoes do `Admin-cliente` para equipe, suporte e mesa sem voltar ao template legado;
+- depois abrir a vertical do `Mesa Avaliadora` sobre a mesma base de autenticacao real ja presente em `/revisao/login`;
+- manter o `Inspetor` como fatia seguinte, aproveitando o mesmo padrao de sessao e rollout progressivo do V2.

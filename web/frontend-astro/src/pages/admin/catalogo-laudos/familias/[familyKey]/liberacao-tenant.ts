@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import {
   getAdminErrorMessage,
   getAdminReturnPath,
-  requireAdminSession,
+  requireAdminStepUp,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { updateCompanyCatalogFamilyRelease } from "@/lib/server/admin-mutations";
@@ -19,7 +19,14 @@ export const POST: APIRoute = async (context) => {
         ? `/admin/catalogo-laudos/familias/${familyKey}?tab=liberacao`
         : "/admin/catalogo-laudos";
   const returnTo = getAdminReturnPath(formData, defaultReturnTo);
-  const adminSession = requireAdminSession(context);
+  const adminSession = await requireAdminStepUp(context, {
+    returnTo,
+    message: "Reautenticação necessária para alterar a liberação governada da família.",
+  });
+
+  if (adminSession instanceof Response) {
+    return adminSession;
+  }
 
   try {
     if (!familyKey) {

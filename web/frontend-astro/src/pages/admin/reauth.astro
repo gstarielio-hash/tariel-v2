@@ -1,0 +1,88 @@
+---
+import { KeyRound } from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import AuthShell from "@/components/app/auth/auth-shell.astro";
+import { getAdminReauthMaxAgeMinutes, safeAdminNextPath } from "@/lib/server/admin-auth";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+
+export const prerender = false;
+
+const adminSession = Astro.locals.adminSession;
+
+if (!adminSession) {
+  return Astro.redirect("/admin/login", 303);
+}
+
+const returnTo = safeAdminNextPath(Astro.url.searchParams.get("returnTo"), "/admin/painel");
+const reauthMaxAgeMinutes = await getAdminReauthMaxAgeMinutes();
+const notice = consumeAdminNotice(Astro.cookies);
+---
+
+<AuthShell
+  title="Reautenticar | Admin-CEO"
+  description="Step-up TOTP para acoes criticas do Admin-CEO no Tariel V2."
+  portalLabel="Admin-CEO"
+  heroTitle="As mutacoes sensiveis agora pedem uma confirmacao curta e auditavel."
+  heroCopy="O step-up do Admin-CEO roda no Astro SSR e usa a mesma sessao Prisma do painel. Depois da confirmacao TOTP, a janela critica fica aberta pelo tempo configurado na plataforma."
+  heroItems={[
+    `Janela atual de step-up: ${reauthMaxAgeMinutes} minuto(s).`,
+    "Mesmo mecanismo TOTP do login administrativo principal.",
+    "Auditoria registrada no tenant de plataforma quando a reautenticacao e concluida.",
+    "Apos confirmar, a acao precisa ser reenviada na tela de origem.",
+  ]}
+  supportText="Canal interno da plataforma"
+  submitLabel="Confirmar reautenticacao"
+  previewMessage="Fluxo ligado ao backend real do v2."
+  variant="admin"
+  panelEyebrow="Step-up"
+  panelTitle="Reconfirmar a sessao administrativa"
+  panelCopy="Informe o codigo TOTP atual para liberar a proxima acao critica no Admin-CEO."
+>
+  <Fragment slot="form">
+    <div class="space-y-5">
+      <div class="rounded-[28px] border border-orange-500/15 bg-orange-500/6 p-4 text-orange-950">
+        <div class="flex items-start gap-3">
+          <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+            <KeyRound className="size-4" />
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]">Acao critica</p>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+              O retorno desta confirmacao leva voce de volta para <strong>{returnTo}</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <AdminNotice notice={notice} />
+
+      <form class="space-y-4" method="POST" action="/admin/reauth/confirmar" novalidate>
+        <input type="hidden" name="returnTo" value={returnTo} />
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Codigo TOTP</span>
+          <input
+            type="text"
+            name="codigo"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            minlength="6"
+            maxlength="8"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm tracking-[0.24em] text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-orange-500"
+            placeholder="000000"
+          />
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Confirmar reautenticacao
+        </button>
+      </form>
+    </div>
+  </Fragment>
+</AuthShell>

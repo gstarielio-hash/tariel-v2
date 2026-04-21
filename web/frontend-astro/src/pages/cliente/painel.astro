@@ -1,0 +1,242 @@
+---
+import { Activity, FileStack, ShieldCheck, Users } from "lucide-react";
+
+import ClientShellLayout from "@/layouts/client-shell-layout.astro";
+import { getClientPortalOverview } from "@/lib/server/client-portal";
+
+export const prerender = false;
+
+const clientSession = Astro.locals.clientSession;
+
+if (!clientSession) {
+  return Astro.redirect("/cliente/login", 303);
+}
+
+const detail = await getClientPortalOverview(clientSession.user.companyId);
+
+if (!detail) {
+  throw new Error("Empresa do portal cliente nao encontrada.");
+}
+
+const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+const teamPreview = [...detail.admins, ...detail.operationalUsers].slice(0, 8);
+const kpis = [
+  {
+    label: "Usuarios ativos",
+    value: detail.summary.totalUsuarios,
+    detail: `${detail.summary.adminsTotal} admins, ${detail.summary.inspetoresTotal} inspetores e ${detail.summary.revisoresTotal} revisores.`,
+    icon: Users,
+  },
+  {
+    label: "Sessoes ativas",
+    value: detail.summary.sessoesAtivasTotal,
+    detail: `${detail.summary.usuariosComSessaoAtiva} usuarios com atividade recente no tenant.`,
+    icon: ShieldCheck,
+  },
+  {
+    label: "Laudos totais",
+    value: detail.summary.totalLaudos,
+    detail: detail.summary.usoLabel,
+    icon: FileStack,
+  },
+  {
+    label: "Ultimo acesso",
+    value: detail.summary.ultimoAcessoLabel,
+    detail: `Saude atual: ${detail.health.label}.`,
+    icon: Activity,
+  },
+];
+---
+
+<ClientShellLayout
+  title={`${detail.company.nomeFantasia} | Portal da empresa | Tariel Astro`}
+  description="Painel inicial do admin-cliente no Astro SSR."
+  userName={clientSession.user.name}
+  companyName={detail.company.nomeFantasia}
+  activeItem="dashboard"
+>
+  <Fragment slot="header">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">Portal cliente</p>
+        <h1 class="mt-3 font-display text-3xl tracking-tight text-slate-950 sm:text-4xl">
+          {detail.company.nomeFantasia}
+        </h1>
+        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          Sessao oficial do admin-cliente ativa no Astro SSR. Esta primeira superficie entrega autenticacao,
+          primeiro acesso e uma visao consolidada do tenant sem depender do portal legado.
+        </p>
+      </div>
+
+      <div class="rounded-[28px] border border-sky-500/16 bg-sky-500/6 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Status do tenant</p>
+        <p class="mt-2 text-lg font-semibold text-slate-950">{detail.status.label}</p>
+        <p class="mt-1 text-sm leading-6 text-slate-600">{detail.health.reason}</p>
+      </div>
+    </div>
+  </Fragment>
+
+  {successMessage ? (
+    <div class="mb-6 rounded-[24px] border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm leading-6 text-emerald-900">
+      {successMessage}
+    </div>
+  ) : null}
+
+  <section class="grid gap-4 xl:grid-cols-4">
+    {kpis.map(({ label, value, detail: itemDetail, icon: Icon }) => (
+      <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</p>
+          <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+            <Icon className="size-5" />
+          </div>
+        </div>
+        <p class="mt-5 font-display text-3xl tracking-tight text-slate-950">{value}</p>
+        <p class="mt-3 text-sm leading-6 text-slate-600">{itemDetail}</p>
+      </article>
+    ))}
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+    <article id="equipe" class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Equipe</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Usuarios do tenant</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          {detail.summary.totalUsuarios} pessoas
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        {teamPreview.length > 0 ? teamPreview.map((user) => (
+          <div class="flex flex-col gap-3 rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="font-semibold text-slate-950">{user.nomeCompleto}</p>
+              <p class="mt-1 text-sm text-slate-600">
+                {user.roleLabel} • {user.email}
+              </p>
+            </div>
+
+            <div class="text-sm text-slate-600">
+              {user.senhaTemporariaAtiva ? "Primeiro acesso pendente" : user.ultimoAcessoLabel}
+            </div>
+          </div>
+        )) : (
+          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+            Nenhum usuario foi encontrado para este tenant.
+          </div>
+        )}
+      </div>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Governanca</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Primeiras trilhas portadas</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          Slice 1 do cliente
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-3">
+        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+          <p class="text-sm font-semibold text-slate-950">Autenticacao real no Astro</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Login por senha, sessao persistida em Prisma e logout ja rodam fora do legado para o admin-cliente.
+          </p>
+        </div>
+
+        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+          <p class="text-sm font-semibold text-slate-950">Primeiro acesso migrado</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Senha temporaria agora segue para troca obrigatoria no V2 antes da emissao da sessao final.
+          </p>
+        </div>
+
+        <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+          <p class="text-sm font-semibold text-slate-950">Proximas fatias</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Equipe, mesa do cliente, suporte e governanca detalhada continuam sobre esta mesma base nas proximas
+            rodadas da migracao total.
+          </p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Laudos</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Atividade recente</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          {detail.summary.totalLaudos} no total
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        {detail.recentReports.length > 0 ? detail.recentReports.slice(0, 6).map((report) => (
+          <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="font-semibold text-slate-950">{report.setor}</p>
+                <p class="mt-1 text-sm text-slate-600">
+                  {report.template} • revisao {report.revisao} • {report.conformidade}
+                </p>
+              </div>
+
+              <p class="text-sm text-slate-500">{dateTimeFormatter.format(report.criadoEm)}</p>
+            </div>
+          </div>
+        )) : (
+          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+            Nenhum laudo recente foi encontrado para este tenant.
+          </div>
+        )}
+      </div>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Auditoria</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Eventos recentes</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          Empresa #{detail.company.id}
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        {detail.recentAudit.length > 0 ? detail.recentAudit.slice(0, 6).map((entry) => (
+          <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p class="font-semibold text-slate-950">{entry.resumo}</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{entry.portal}</p>
+            </div>
+            <p class="mt-2 text-sm leading-6 text-slate-600">{entry.acao}</p>
+          </div>
+        )) : (
+          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+            Nenhum evento de auditoria recente foi encontrado para este tenant.
+          </div>
+        )}
+      </div>
+    </article>
+  </section>
+</ClientShellLayout>

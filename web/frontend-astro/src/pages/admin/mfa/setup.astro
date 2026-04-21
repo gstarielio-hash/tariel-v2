@@ -1,0 +1,120 @@
+---
+import { QrCode, ShieldCheck } from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import AuthShell from "@/components/app/auth/auth-shell.astro";
+import {
+  ensureAdminMfaSetupState,
+  getAdminRequiredTransitionPath,
+} from "@/lib/server/admin-auth";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+
+export const prerender = false;
+
+const adminSession = Astro.locals.adminSession;
+
+if (!adminSession) {
+  return Astro.redirect("/admin/login", 303);
+}
+
+const requiredPath = getAdminRequiredTransitionPath(adminSession);
+
+if (requiredPath && requiredPath !== "/admin/mfa/setup") {
+  return Astro.redirect(requiredPath, 303);
+}
+
+const setupState = await ensureAdminMfaSetupState(adminSession);
+const notice = consumeAdminNotice(Astro.cookies);
+---
+
+<AuthShell
+  title="Configurar MFA | Admin-CEO"
+  description="Cadastro do TOTP para concluir a sessao administrativa do Tariel V2."
+  portalLabel="Admin-CEO"
+  heroTitle="O autenticador entra antes do painel para fechar a trilha administrativa."
+  heroCopy="Esta conta precisa cadastrar o TOTP para concluir o acesso no v2. O segredo e emitido no Astro SSR e a sessao so vira oficial depois da validacao do codigo."
+  heroItems={[
+    "Segredo TOTP controlado na mesma conta administrativa usada no painel novo.",
+    "Sessao em Prisma continua pendente ate o codigo ser confirmado.",
+    "Cadastro concluido com auditoria em auditoria_empresas.",
+    "Depois desta etapa, o painel ja nasce com base para step-up critico.",
+  ]}
+  supportText="Canal interno da plataforma"
+  submitLabel="Concluir MFA"
+  previewMessage="Fluxo ligado ao backend real do v2."
+  variant="admin"
+  panelEyebrow="MFA setup"
+  panelTitle="Cadastrar o autenticador"
+  panelCopy="Cadastre o segredo TOTP no aplicativo autenticador e confirme o codigo atual para liberar a sessao administrativa."
+>
+  <Fragment slot="form">
+    <div class="space-y-5">
+      <div class="rounded-[28px] border border-orange-500/15 bg-orange-500/6 p-4 text-orange-950">
+        <div class="flex items-start gap-3">
+          <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+            <QrCode className="size-4" />
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]">Cadastro do TOTP</p>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+              Esta conta ainda nao concluiu o MFA. O segredo abaixo so aparece nesta fase de setup.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <AdminNotice notice={notice} />
+
+      <div class="space-y-3 rounded-[24px] border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-700">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Conta</p>
+          <p class="mt-1 font-medium text-slate-950">{setupState.email}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Segredo TOTP</p>
+          <code class="mt-2 block overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs text-white">
+            {setupState.secretGrouped}
+          </code>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">URI manual</p>
+          <code class="mt-2 block overflow-x-auto rounded-2xl bg-slate-100 px-4 py-3 text-xs text-slate-950">
+            {setupState.otpauthUri}
+          </code>
+        </div>
+      </div>
+
+      <div class="rounded-[24px] border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700">
+        <div class="flex items-start gap-3">
+          <ShieldCheck className="mt-1 size-4 text-orange-500" />
+          <p>Depois de cadastrar o segredo no autenticador, informe o codigo TOTP atual para concluir o acesso.</p>
+        </div>
+      </div>
+
+      <form class="space-y-4" method="POST" action="/admin/mfa/setup/confirmar" novalidate>
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Codigo TOTP</span>
+          <input
+            type="text"
+            name="codigo"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            minlength="6"
+            maxlength="8"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm tracking-[0.24em] text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-orange-500"
+            placeholder="000000"
+          />
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Concluir cadastro do MFA
+        </button>
+      </form>
+    </div>
+  </Fragment>
+</AuthShell>

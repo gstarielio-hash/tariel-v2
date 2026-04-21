@@ -20,16 +20,16 @@ const nextPath = safeAdminNextPath(Astro.url.searchParams.get("next"), "/admin/p
   heroItems={[
     "Sessao administrativa emitida em sessoes_ativas com cookie httpOnly e renovacao controlada.",
     "Mesmo vocabulário visual do Admin-CEO atual, sem depender do CSS antigo.",
-    "Fluxo de senha local ja funcional para a conta de plataforma seed.",
-    "MFA TOTP, step-up e providers corporativos entram na proxima fatia do backend novo.",
+    "Fluxo de senha local, troca obrigatoria e MFA TOTP ja rodam no Astro.",
+    "Step-up critico agora protege as mutacoes administrativas migradas.",
   ]}
   supportText="Quer um acesso? Fale com a Tariel."
   submitLabel="Acessar"
-  previewMessage="Tela pronta. A conexao com autenticacao real do Admin-CEO entra na proxima fase do backend novo."
+  previewMessage="Tela ligada ao backend real do Admin-CEO no v2."
   variant="admin"
   panelEyebrow="Login administrativo"
   panelTitle="Entrar no Admin-CEO"
-  panelCopy="A autenticacao local por senha ja esta ativa no Astro para operadores da plataforma. Desafios de MFA, troca obrigatoria de senha e step-up permanecem separados enquanto a migracao de seguranca avanca em camadas."
+  panelCopy="A autenticacao local do Admin-CEO agora roda no Astro com sessao Prisma, troca obrigatoria de senha, MFA TOTP e reautenticacao para acoes criticas. Providers corporativos seguem como a proxima fatia de identidade."
 >
   <Fragment slot="form">
     <div class="space-y-5">
@@ -110,8 +110,8 @@ const nextPath = safeAdminNextPath(Astro.url.searchParams.get("next"), "/admin/p
       <div class="rounded-[24px] border border-orange-500/18 bg-orange-500/8 px-4 py-3 text-sm leading-6 text-orange-900">
         <strong class="font-semibold">Estado da migracao</strong>
         <p class="mt-1">
-          MFA TOTP, troca obrigatoria de senha e reautenticacao critica ainda estao em migracao. Quando uma conta
-          exigir esses passos, o portal novo responde de forma honesta sem fingir paridade completa.
+          O portal novo ja fecha senha local, senha temporaria, MFA TOTP e reautenticacao critica. A proxima frente
+          desta trilha e ligar os provedores corporativos de identidade sem reabrir dependencia do legado.
         </p>
       </div>
     </div>

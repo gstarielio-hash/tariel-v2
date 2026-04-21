@@ -4,7 +4,7 @@ import {
   getAdminErrorMessage,
   getAdminReturnPath,
   parsePositiveAdminParam,
-  requireAdminSession,
+  requireAdminStepUp,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { syncCompanyCatalogPortfolio } from "@/lib/server/admin-mutations";
@@ -17,7 +17,14 @@ export const POST: APIRoute = async (context) => {
       ? `/admin/clientes/${companyIdFromParams}`
       : "/admin/clientes";
   const returnTo = getAdminReturnPath(formData, defaultReturnTo);
-  const adminSession = requireAdminSession(context);
+  const adminSession = await requireAdminStepUp(context, {
+    returnTo,
+    message: "Reautenticação necessária para sincronizar o portfólio comercial do tenant.",
+  });
+
+  if (adminSession instanceof Response) {
+    return adminSession;
+  }
 
   try {
     const companyId = parsePositiveAdminParam(context, "id", "Empresa");

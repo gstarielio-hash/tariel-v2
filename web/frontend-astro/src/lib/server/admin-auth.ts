@@ -4,15 +4,27 @@ import { verify as verifyArgon2 } from "@node-rs/argon2";
 import type { APIContext } from "astro";
 
 import { prisma } from "@/lib/server/prisma";
+import { hashPassword } from "@/lib/server/passwords";
+import {
+  buildTotpOtpauthUri,
+  generateTotpSecret,
+  normalizeTotpCode,
+  verifyTotp,
+} from "@/lib/server/admin-totp";
 
 const ADMIN_ACCESS_LEVEL = 99;
 const ADMIN_PORTAL = "admin";
 const ADMIN_SESSION_COOKIE = "tariel_admin_session";
+const ADMIN_NEXT_COOKIE = "tariel_admin_next";
 const ADMIN_SESSION_TTL_HOURS = readPositiveIntEnv("SESSAO_TTL_HORAS", 8);
 const ADMIN_SESSION_REMEMBER_DAYS = readPositiveIntEnv("SESSAO_TTL_LEMBRAR_DIAS", 30);
 const ADMIN_SESSION_MAX_PER_USER = readPositiveIntEnv("SESSAO_MAX_POR_USUARIO", 5);
 const ADMIN_SESSION_RENEWAL_ENABLED = readBooleanEnv("SESSAO_RENOVACAO_ATIVA", true);
 const ADMIN_SESSION_RENEWAL_WINDOW_MINUTES = readPositiveIntEnv("SESSAO_JANELA_RENOVACAO_MINUTOS", 30);
+const ADMIN_TOTP_ENABLED = readBooleanEnv("ADMIN_TOTP_ENABLED", true);
+const ADMIN_REAUTH_MAX_AGE_MINUTES = readPositiveIntEnv("ADMIN_REAUTH_MAX_AGE_MINUTES", 10);
+const ADMIN_SESSION_MFA_LEVEL = "totp";
+const ADMIN_SESSION_MFA_DISABLED_LEVEL = "disabled";
 
 export interface AuthenticatedAdminRequest {
   user: {
@@ -28,6 +40,8 @@ export interface AuthenticatedAdminRequest {
     canPasswordLogin: boolean;
     portalAdminAuthorized: boolean;
     mfaRequired: boolean;
+    mfaEnrolled: boolean;
+    mfaSecretPresent: boolean;
     senhaTemporariaAtiva: boolean;
   };
   session: {
@@ -51,6 +65,7 @@ export interface AdminLoginAttemptResult {
   ok: boolean;
   error?: string;
   session?: AuthenticatedAdminRequest;
+  redirectPath?: string;
 }
 
 export function isAdminPath(pathname: string) {
@@ -59,6 +74,35 @@ export function isAdminPath(pathname: string) {
 
 export function isPublicAdminPath(pathname: string) {
   return pathname === "/admin/login" || pathname === "/admin/login/entrar";
+}
+
+export function isAdminLogoutPath(pathname: string) {
+  return pathname === "/admin/logout";
+}
+
+export function isAdminPasswordChangePath(pathname: string) {
+  return pathname === "/admin/trocar-senha" || pathname === "/admin/trocar-senha/confirmar";
+}
+
+export function isAdminMfaSetupPath(pathname: string) {
+  return pathname === "/admin/mfa/setup" || pathname === "/admin/mfa/setup/confirmar";
+}
+
+export function isAdminMfaChallengePath(pathname: string) {
+  return pathname === "/admin/mfa/challenge" || pathname === "/admin/mfa/challenge/confirmar";
+}
+
+export function isAdminReauthPath(pathname: string) {
+  return pathname === "/admin/reauth" || pathname === "/admin/reauth/confirmar";
+}
+
+export function isAdminTransitionPath(pathname: string) {
+  return (
+    isAdminPasswordChangePath(pathname)
+    || isAdminMfaSetupPath(pathname)
+    || isAdminMfaChallengePath(pathname)
+    || isAdminReauthPath(pathname)
+  );
 }
 
 export function safeAdminNextPath(value: string | null | undefined, fallback = "/admin/painel") {
@@ -80,6 +124,10 @@ export function buildAdminLoginPath(nextPath: string) {
   const search = new URLSearchParams({ next: redirectTarget });
 
   return `/admin/login?${search.toString()}`;
+}
+
+export function adminTotpEnabled() {
+  return ADMIN_TOTP_ENABLED;
 }
 
 export function isStateChangingMethod(method: string) {
@@ -126,6 +174,7 @@ export async function loadAdminRequestSession(context: Pick<APIContext, "cookies
 
   if (!sessionRow) {
     clearAdminSessionCookie(context.cookies);
+    clearAdminNextPathCookie(context.cookies);
     return null;
   }
 
@@ -134,6 +183,7 @@ export async function loadAdminRequestSession(context: Pick<APIContext, "cookies
   if (sessionRow.expira_em <= now) {
     await invalidateAdminSessionToken(token);
     clearAdminSessionCookie(context.cookies);
+    clearAdminNextPathCookie(context.cookies);
     return null;
   }
 
@@ -144,11 +194,11 @@ export async function loadAdminRequestSession(context: Pick<APIContext, "cookies
     !isAdminUserEligible(sessionRow.usuarios) ||
     !isAdminIdentityActive(sessionRow.usuarios) ||
     !sessionRow.usuarios.can_password_login ||
-    sessionRow.usuarios.senha_temporaria_ativa ||
     isAdminUserBlocked(sessionRow.usuarios)
   ) {
     await invalidateAdminSessionToken(token);
     clearAdminSessionCookie(context.cookies);
+    clearAdminNextPathCookie(context.cookies);
     return null;
   }
 
@@ -313,27 +363,17 @@ export async function attemptAdminPasswordLogin(
     };
   }
 
-  if (candidate.senha_temporaria_ativa) {
-    return {
-      ok: false,
-      error:
-        "Sua conta exige troca de senha temporaria. Esse fluxo ainda permanece no legado e sera migrado na proxima fatia.",
-    };
-  }
-
-  if (candidate.mfa_required) {
-    return {
-      ok: false,
-      error:
-        "Sua conta exige MFA TOTP. O challenge ainda esta em migracao para o Astro; use temporariamente o fluxo legado ate a proxima fatia.",
-    };
-  }
-
   const now = new Date();
   const sessionToken = randomBytes(48).toString("base64url");
   const sessionExpiration = resolveNewSessionExpiration(input.remember, now);
   const ip = getRequestIp(input.request);
   const userAgent = getRequestUserAgent(input.request);
+  const pendingPasswordChange = Boolean(candidate.senha_temporaria_ativa);
+  const pendingMfaSetup = !pendingPasswordChange && shouldRedirectToAdminMfaSetup(candidate);
+  const pendingMfaChallenge = !pendingPasswordChange && !pendingMfaSetup && shouldRedirectToAdminMfaChallenge(candidate);
+  const fullyAuthenticated = !pendingPasswordChange && !pendingMfaSetup && !pendingMfaChallenge;
+  const initialMfaLevel = fullyAuthenticated ? resolveAuthenticatedMfaLevel(candidate) : null;
+  const initialReauthAt = fullyAuthenticated ? now : null;
 
   await prisma.$transaction(async (tx) => {
     const currentSessions = await tx.sessoes_ativas.findMany({
@@ -385,31 +425,33 @@ export async function attemptAdminPasswordLogin(
         portal: ADMIN_PORTAL,
         account_scope: "platform",
         device_id: getRequestDeviceId(input.request, ip, userAgent),
-        mfa_level: null,
-        reauth_at: null,
+        mfa_level: initialMfaLevel,
+        reauth_at: initialReauthAt,
         ip_hash: null,
         user_agent_hash: null,
       },
     });
 
-    await tx.auditoria_empresas.create({
-      data: {
-        empresa_id: candidate.empresa_id,
-        ator_usuario_id: candidate.id,
-        alvo_usuario_id: candidate.id,
-        portal: ADMIN_PORTAL,
-        acao: "admin_login_authenticated",
-        resumo: "Login password concluido no Admin-CEO",
-        detalhe: "Sessao administrativa emitida no Astro SSR com persistencia em sessoes_ativas.",
-        payload_json: {
-          provider: "password",
-          reason: "login_completed",
-          source_surface: "frontend_astro",
-          next_phase: "admin_mfa_and_reauth",
+    if (fullyAuthenticated) {
+      await tx.auditoria_empresas.create({
+        data: {
+          empresa_id: candidate.empresa_id,
+          ator_usuario_id: candidate.id,
+          alvo_usuario_id: candidate.id,
+          portal: ADMIN_PORTAL,
+          acao: "admin_login_authenticated",
+          resumo: "Login password concluido no Admin-CEO",
+          detalhe: "Sessao administrativa emitida no Astro SSR com persistencia em sessoes_ativas.",
+          payload_json: {
+            provider: "password",
+            reason: "login_completed",
+            source_surface: "frontend_astro",
+            mfa_level: initialMfaLevel,
+          },
+          criado_em: now,
         },
-        criado_em: now,
-      },
-    });
+      });
+    }
   });
 
   const authenticated = toAuthenticatedAdminRequest({
@@ -417,8 +459,8 @@ export async function attemptAdminPasswordLogin(
     expira_em: sessionExpiration,
     ultima_atividade_em: now,
     lembrar: input.remember,
-    mfa_level: null,
-    reauth_at: null,
+    mfa_level: initialMfaLevel,
+    reauth_at: initialReauthAt,
     usuarios: candidate,
   });
 
@@ -429,6 +471,13 @@ export async function attemptAdminPasswordLogin(
   return {
     ok: true,
     session: authenticated,
+    redirectPath: pendingPasswordChange
+      ? "/admin/trocar-senha"
+      : pendingMfaSetup
+        ? "/admin/mfa/setup"
+        : pendingMfaChallenge
+          ? "/admin/mfa/challenge"
+          : undefined,
   };
 }
 
@@ -466,6 +515,7 @@ export async function destroyAdminSession(context: Pick<APIContext, "cookies">, 
   }
 
   clearAdminSessionCookie(context.cookies);
+  clearAdminNextPathCookie(context.cookies);
 }
 
 export function readAdminSessionToken(cookies: APIContext["cookies"]) {
@@ -476,6 +526,33 @@ export function clearAdminSessionCookie(cookies: APIContext["cookies"]) {
   cookies.delete(ADMIN_SESSION_COOKIE, {
     path: "/",
   });
+}
+
+export function setAdminNextPathCookie(cookies: APIContext["cookies"], nextPath: string) {
+  const safePath = safeAdminNextPath(nextPath, "/admin/painel");
+
+  cookies.set(ADMIN_NEXT_COOKIE, safePath, {
+    httpOnly: true,
+    path: "/",
+    sameSite: "lax",
+    maxAge: 20 * 60,
+  });
+}
+
+export function readAdminNextPathCookie(cookies: APIContext["cookies"]) {
+  return safeAdminNextPath(cookies.get(ADMIN_NEXT_COOKIE)?.value ?? "", "/admin/painel");
+}
+
+export function clearAdminNextPathCookie(cookies: APIContext["cookies"]) {
+  cookies.delete(ADMIN_NEXT_COOKIE, {
+    path: "/",
+  });
+}
+
+export function consumeAdminNextPathCookie(cookies: APIContext["cookies"]) {
+  const nextPath = readAdminNextPathCookie(cookies);
+  clearAdminNextPathCookie(cookies);
+  return nextPath;
 }
 
 const adminUserSelect = {
@@ -494,6 +571,8 @@ const adminUserSelect = {
   account_status: true,
   allowed_portals_json: true,
   mfa_required: true,
+  mfa_secret_b32: true,
+  mfa_enrolled_at: true,
   can_password_login: true,
   portal_admin_autorizado: true,
   admin_identity_status: true,
@@ -531,6 +610,8 @@ function toAuthenticatedAdminRequest(
           account_status: string;
           allowed_portals_json: unknown;
           mfa_required: boolean;
+          mfa_secret_b32: string | null;
+          mfa_enrolled_at: Date | null;
           can_password_login: boolean;
           portal_admin_autorizado: boolean;
           admin_identity_status: string;
@@ -563,6 +644,8 @@ function toAuthenticatedAdminRequest(
       canPasswordLogin: Boolean(user.can_password_login),
       portalAdminAuthorized: portalAdminAuthorized(user.portal_admin_autorizado, user.allowed_portals_json),
       mfaRequired: Boolean(user.mfa_required),
+      mfaEnrolled: Boolean(user.mfa_enrolled_at),
+      mfaSecretPresent: Boolean(String(user.mfa_secret_b32 ?? "").trim()),
       senhaTemporariaAtiva: Boolean(user.senha_temporaria_ativa),
     },
     session: {
@@ -574,6 +657,312 @@ function toAuthenticatedAdminRequest(
       reauthAt: sessionRow.reauth_at,
     },
   } satisfies AuthenticatedAdminRequest;
+}
+
+export function getAdminRequiredTransitionPath(adminSession: AuthenticatedAdminRequest) {
+  if (adminSession.user.senhaTemporariaAtiva) {
+    return "/admin/trocar-senha";
+  }
+
+  if (shouldCompleteAdminMfa(adminSession)) {
+    return adminSession.user.mfaEnrolled && adminSession.user.mfaSecretPresent
+      ? "/admin/mfa/challenge"
+      : "/admin/mfa/setup";
+  }
+
+  return null;
+}
+
+export async function getAdminReauthMaxAgeMinutes() {
+  try {
+    const currentSetting = await prisma.configuracoes_plataforma.findUnique({
+      where: {
+        chave: "admin_reauth_max_age_minutes",
+      },
+      select: {
+        valor_json: true,
+      },
+    });
+
+    const storedValue = Number(currentSetting?.valor_json);
+
+    if (Number.isFinite(storedValue) && storedValue > 0) {
+      return Math.trunc(storedValue);
+    }
+  } catch {
+    // Fall back to the environment default when the setting cannot be resolved.
+  }
+
+  return Math.max(ADMIN_REAUTH_MAX_AGE_MINUTES, 1);
+}
+
+export async function adminSessionNeedsStepUp(adminSession: AuthenticatedAdminRequest) {
+  if (!adminTotpEnabled() || adminSession.session.mfaLevel !== ADMIN_SESSION_MFA_LEVEL) {
+    return false;
+  }
+
+  if (!(adminSession.session.reauthAt instanceof Date) || Number.isNaN(adminSession.session.reauthAt.getTime())) {
+    return true;
+  }
+
+  const maxAgeMinutes = await getAdminReauthMaxAgeMinutes();
+
+  return Date.now() - adminSession.session.reauthAt.getTime() > maxAgeMinutes * 60 * 1000;
+}
+
+export async function ensureAdminMfaSetupState(adminSession: AuthenticatedAdminRequest) {
+  const user = await loadAdminSecurityUser(adminSession.user.id);
+
+  if (!user) {
+    throw new Error("Operador administrativo nao encontrado.");
+  }
+
+  if (!user.mfa_required) {
+    throw new Error("Esta conta nao exige MFA TOTP.");
+  }
+
+  if (user.senha_temporaria_ativa) {
+    throw new Error("Conclua a troca obrigatoria de senha antes do MFA.");
+  }
+
+  if (user.mfa_enrolled_at && user.mfa_secret_b32) {
+    throw new Error("MFA TOTP ja configurado para este operador.");
+  }
+
+  const secret = String(user.mfa_secret_b32 ?? "").trim().toUpperCase() || generateTotpSecret();
+
+  if (!user.mfa_secret_b32) {
+    await prisma.usuarios.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        mfa_secret_b32: secret,
+        atualizado_em: new Date(),
+      },
+    });
+  }
+
+  return {
+    secret,
+    secretGrouped: groupTotpSecret(secret),
+    otpauthUri: buildTotpOtpauthUri(secret, user.email),
+    email: user.email,
+    name: user.nome_completo,
+  };
+}
+
+export async function completeAdminPasswordChange(input: {
+  adminSession: AuthenticatedAdminRequest;
+  currentPassword: string;
+  nextPassword: string;
+  confirmPassword: string;
+}) {
+  const user = await loadAdminSecurityUser(input.adminSession.user.id);
+
+  if (!user || !user.senha_temporaria_ativa) {
+    throw new Error("Nao existe troca obrigatoria pendente para esta conta.");
+  }
+
+  const validationError = validateAdminPasswordChange(
+    input.currentPassword,
+    input.nextPassword,
+    input.confirmPassword,
+  );
+
+  if (validationError) {
+    throw new Error(validationError);
+  }
+
+  const passwordMatches = await verifyPasswordHash(input.currentPassword, user.senha_hash);
+
+  if (!passwordMatches) {
+    throw new Error("Senha temporaria invalida.");
+  }
+
+  const now = new Date();
+  const nextPasswordHash = await hashPassword(input.nextPassword);
+
+  await prisma.usuarios.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      senha_hash: nextPasswordHash,
+      senha_temporaria_ativa: false,
+      tentativas_login: 0,
+      bloqueado_ate: null,
+      status_bloqueio: false,
+      ultimo_login: now,
+      atualizado_em: now,
+    },
+  });
+
+  await createAdminIdentityAudit({
+    companyId: user.empresa_id,
+    actorUserId: user.id,
+    targetUserId: user.id,
+    action: "admin_password_changed",
+    summary: "Troca obrigatoria de senha concluida no Admin-CEO",
+    detail: "A senha temporaria foi substituida pela nova credencial definitiva no Astro SSR.",
+    email: user.email,
+    reason: "temporary_password_rotated",
+  });
+
+  const refreshedUser = await loadAdminSecurityUser(user.id);
+
+  if (!refreshedUser) {
+    throw new Error("Falha ao recarregar a identidade administrativa.");
+  }
+
+  if (shouldRedirectToAdminMfaSetup(refreshedUser)) {
+    return {
+      redirectPath: "/admin/mfa/setup",
+      notice: "Senha atualizada. Cadastre o TOTP para concluir o acesso administrativo.",
+    };
+  }
+
+  if (shouldRedirectToAdminMfaChallenge(refreshedUser)) {
+    return {
+      redirectPath: "/admin/mfa/challenge",
+      notice: "Senha atualizada. Confirme o TOTP para concluir o acesso administrativo.",
+    };
+  }
+
+  await finalizeAdminSessionSecurity({
+    adminSession: input.adminSession,
+    provider: "password",
+    reason: "login_completed_after_password_change",
+  });
+
+  return {
+    redirectPath: null,
+    notice: "Senha definitiva salva. O acesso administrativo foi liberado.",
+  };
+}
+
+export async function completeAdminMfaSetup(input: {
+  adminSession: AuthenticatedAdminRequest;
+  code: string;
+}) {
+  const state = await ensureAdminMfaSetupState(input.adminSession);
+  const code = normalizeTotpCode(input.code);
+
+  if (!verifyTotp(state.secret, code)) {
+    throw new Error("Codigo TOTP invalido.");
+  }
+
+  const now = new Date();
+
+  await prisma.usuarios.update({
+    where: {
+      id: input.adminSession.user.id,
+    },
+    data: {
+      mfa_required: true,
+      mfa_enrolled_at: now,
+      atualizado_em: now,
+    },
+  });
+
+  await createAdminIdentityAudit({
+    companyId: input.adminSession.user.companyId,
+    actorUserId: input.adminSession.user.id,
+    targetUserId: input.adminSession.user.id,
+    action: "admin_mfa_enrolled",
+    summary: "MFA cadastrado para operador da plataforma",
+    detail: "Cadastro TOTP concluido durante o acesso ao Admin-CEO no Astro SSR.",
+    email: input.adminSession.user.email,
+    reason: "mfa_setup_completed",
+  });
+
+  await finalizeAdminSessionSecurity({
+    adminSession: input.adminSession,
+    provider: "password",
+    reason: "login_completed",
+  });
+}
+
+export async function completeAdminMfaChallenge(input: {
+  adminSession: AuthenticatedAdminRequest;
+  code: string;
+}) {
+  const user = await loadAdminSecurityUser(input.adminSession.user.id);
+
+  if (!user || !user.mfa_required) {
+    throw new Error("Esta conta nao exige MFA TOTP.");
+  }
+
+  const secret = String(user.mfa_secret_b32 ?? "").trim().toUpperCase();
+
+  if (!secret || !user.mfa_enrolled_at) {
+    throw new Error("MFA ainda nao foi configurado para esta conta.");
+  }
+
+  if (!verifyTotp(secret, normalizeTotpCode(input.code))) {
+    throw new Error("Codigo TOTP invalido.");
+  }
+
+  await finalizeAdminSessionSecurity({
+    adminSession: input.adminSession,
+    provider: "password",
+    reason: "login_completed",
+  });
+}
+
+export async function completeAdminReauth(input: {
+  adminSession: AuthenticatedAdminRequest;
+  code: string;
+}) {
+  const maxAgeMinutes = await getAdminReauthMaxAgeMinutes();
+  const user = await loadAdminSecurityUser(input.adminSession.user.id);
+
+  if (!user) {
+    throw new Error("Operador administrativo nao encontrado.");
+  }
+
+  if (!adminTotpEnabled() || input.adminSession.session.mfaLevel !== ADMIN_SESSION_MFA_LEVEL) {
+    await refreshAdminSessionSecurity(input.adminSession.session.token, {
+      mfaLevel: input.adminSession.session.mfaLevel,
+      reauthAt: new Date(),
+    });
+    return {
+      maxAgeMinutes,
+    };
+  }
+
+  const secret = String(user.mfa_secret_b32 ?? "").trim().toUpperCase();
+
+  if (!secret || !user.mfa_enrolled_at) {
+    throw new Error("MFA TOTP ainda nao foi configurado para esta conta.");
+  }
+
+  if (!verifyTotp(secret, normalizeTotpCode(input.code))) {
+    throw new Error("Codigo TOTP invalido.");
+  }
+
+  const now = new Date();
+
+  await refreshAdminSessionSecurity(input.adminSession.session.token, {
+    mfaLevel: ADMIN_SESSION_MFA_LEVEL,
+    reauthAt: now,
+  });
+
+  await createAdminIdentityAudit({
+    companyId: input.adminSession.user.companyId,
+    actorUserId: input.adminSession.user.id,
+    targetUserId: input.adminSession.user.id,
+    action: "admin_step_up_completed",
+    summary: "Reautenticacao do Admin-CEO concluida",
+    detail: `Step-up valido por ${maxAgeMinutes} minutos para acoes criticas.`,
+    email: input.adminSession.user.email,
+    reason: "step_up_completed",
+    provider: "reauth",
+  });
+
+  return {
+    maxAgeMinutes,
+  };
 }
 
 function isAdminUserEligible(user: {
@@ -640,6 +1029,123 @@ function isAdminUserBlocked(user: {
   return false;
 }
 
+function shouldCompleteAdminMfa(adminSession: AuthenticatedAdminRequest) {
+  return adminTotpEnabled() && adminSession.user.mfaRequired && adminSession.session.mfaLevel !== ADMIN_SESSION_MFA_LEVEL;
+}
+
+function shouldRedirectToAdminMfaSetup(user: {
+  mfa_required: boolean;
+  mfa_secret_b32: string | null;
+  mfa_enrolled_at: Date | null;
+}) {
+  return adminTotpEnabled() && Boolean(user.mfa_required) && !(user.mfa_secret_b32 && user.mfa_enrolled_at);
+}
+
+function shouldRedirectToAdminMfaChallenge(user: {
+  mfa_required: boolean;
+  mfa_secret_b32: string | null;
+  mfa_enrolled_at: Date | null;
+}) {
+  return adminTotpEnabled() && Boolean(user.mfa_required) && Boolean(user.mfa_secret_b32 && user.mfa_enrolled_at);
+}
+
+function resolveAuthenticatedMfaLevel(user: { mfa_required: boolean }) {
+  if (!user.mfa_required) {
+    return null;
+  }
+
+  return adminTotpEnabled() ? ADMIN_SESSION_MFA_LEVEL : ADMIN_SESSION_MFA_DISABLED_LEVEL;
+}
+
+function validateAdminPasswordChange(currentPassword: string, nextPassword: string, confirmPassword: string) {
+  const current = String(currentPassword ?? "");
+  const next = String(nextPassword ?? "");
+  const confirm = String(confirmPassword ?? "");
+
+  if (!current || !next || !confirm) {
+    return "Preencha senha atual, nova senha e confirmacao.";
+  }
+
+  if (next !== confirm) {
+    return "A confirmacao da nova senha nao confere.";
+  }
+
+  if (next.length < 8) {
+    return "A nova senha deve ter no minimo 8 caracteres.";
+  }
+
+  if (next === current) {
+    return "A nova senha deve ser diferente da senha temporaria.";
+  }
+
+  return "";
+}
+
+function groupTotpSecret(secret: string) {
+  const normalized = String(secret ?? "").trim().toUpperCase();
+  return normalized.match(/.{1,4}/g)?.join(" ") ?? normalized;
+}
+
+async function loadAdminSecurityUser(userId: number) {
+  return prisma.usuarios.findUnique({
+    where: {
+      id: userId,
+    },
+    select: adminUserSelect,
+  });
+}
+
+async function refreshAdminSessionSecurity(
+  token: string,
+  input: {
+    mfaLevel: string | null;
+    reauthAt: Date | null;
+  },
+) {
+  await prisma.sessoes_ativas.update({
+    where: {
+      token,
+    },
+    data: {
+      mfa_level: input.mfaLevel,
+      reauth_at: input.reauthAt,
+      ultima_atividade_em: new Date(),
+    },
+  });
+}
+
+async function finalizeAdminSessionSecurity(input: {
+  adminSession: AuthenticatedAdminRequest;
+  provider: string;
+  reason: string;
+}) {
+  const now = new Date();
+  const mfaLevel = input.adminSession.user.mfaRequired
+    ? (adminTotpEnabled() ? ADMIN_SESSION_MFA_LEVEL : ADMIN_SESSION_MFA_DISABLED_LEVEL)
+    : input.adminSession.session.mfaLevel;
+  const reauthAt = adminTotpEnabled() && mfaLevel === ADMIN_SESSION_MFA_LEVEL ? now : input.adminSession.session.reauthAt;
+
+  await refreshAdminSessionSecurity(input.adminSession.session.token, {
+    mfaLevel,
+    reauthAt,
+  });
+
+  await createAdminIdentityAudit({
+    companyId: input.adminSession.user.companyId,
+    actorUserId: input.adminSession.user.id,
+    targetUserId: input.adminSession.user.id,
+    action: "admin_login_authenticated",
+    summary: `Login ${input.provider} concluido no Admin-CEO`,
+    detail: "Sessao administrativa emitida ou concluida no Astro SSR com persistencia em sessoes_ativas.",
+    email: input.adminSession.user.email,
+    reason: input.reason,
+    provider: input.provider,
+    payloadExtra: {
+      mfa_level: mfaLevel,
+    },
+  });
+}
+
 async function verifyPasswordHash(password: string, hash: string) {
   const normalizedHash = String(hash ?? "").trim();
 
@@ -698,6 +1204,8 @@ async function createAdminIdentityAudit({
   detail,
   email,
   reason,
+  provider = "password",
+  payloadExtra,
 }: {
   companyId?: number;
   actorUserId?: number;
@@ -707,6 +1215,8 @@ async function createAdminIdentityAudit({
   detail: string;
   email: string;
   reason: string;
+  provider?: string;
+  payloadExtra?: Record<string, unknown>;
 }) {
   const resolvedCompanyId = companyId ?? (await getPlatformCompanyId());
 
@@ -726,8 +1236,9 @@ async function createAdminIdentityAudit({
       payload_json: {
         email,
         reason,
-        provider: "password",
+        provider,
         source_surface: "frontend_astro",
+        ...payloadExtra,
       },
       criado_em: new Date(),
     },

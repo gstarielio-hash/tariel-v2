@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import {
   getAdminErrorMessage,
   getAdminReturnPath,
-  requireAdminSession,
+  requireAdminStepUp,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { updateAdminDefaultSettings } from "@/lib/server/admin-settings-mutations";
@@ -14,7 +14,14 @@ export const POST: APIRoute = async (context) => {
     formData,
     "/admin/configuracoes?secao=defaults#secao-defaults",
   );
-  const adminSession = requireAdminSession(context);
+  const adminSession = await requireAdminStepUp(context, {
+    returnTo,
+    message: "Reautenticação necessária para alterar os defaults globais da plataforma.",
+  });
+
+  if (adminSession instanceof Response) {
+    return adminSession;
+  }
 
   try {
     const result = await updateAdminDefaultSettings({
@@ -35,7 +42,7 @@ export const POST: APIRoute = async (context) => {
         `Plano inicial efetivo: ${currentValue ?? "n/d"}`,
         `Motivo registrado: ${result.reason}`,
         `Auditoria vinculada a ${adminSession.user.name}.`,
-        "Step-up administrativo ainda entra na proxima fatia.",
+        "Step-up administrativo validado na sessão atual.",
       ],
     });
   } catch (error) {

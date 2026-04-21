@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import {
   getAdminErrorMessage,
   getAdminReturnPath,
-  requireAdminSession,
+  requireAdminStepUp,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { updateAdminAccessSettings } from "@/lib/server/admin-settings-mutations";
@@ -14,7 +14,14 @@ export const POST: APIRoute = async (context) => {
     formData,
     "/admin/configuracoes?secao=access#secao-access",
   );
-  const adminSession = requireAdminSession(context);
+  const adminSession = await requireAdminStepUp(context, {
+    returnTo,
+    message: "Reautenticação necessária para alterar a política de acesso do Admin-CEO.",
+  });
+
+  if (adminSession instanceof Response) {
+    return adminSession;
+  }
 
   try {
     const result = await updateAdminAccessSettings({
@@ -37,7 +44,7 @@ export const POST: APIRoute = async (context) => {
         `Janela efetiva: ${currentValue ?? "n/d"} min`,
         `Motivo registrado: ${result.reason}`,
         `Auditoria vinculada a ${adminSession.user.name}.`,
-        "Step-up administrativo ainda entra na proxima fatia.",
+        "Step-up administrativo validado na sessão atual.",
       ],
     });
   } catch (error) {

@@ -1,6 +1,9 @@
 import type { APIContext } from "astro";
 
-import type { AuthenticatedAdminRequest } from "@/lib/server/admin-auth";
+import {
+  adminSessionNeedsStepUp,
+  type AuthenticatedAdminRequest,
+} from "@/lib/server/admin-auth";
 import {
   safeAdminReturnPath,
   setAdminNotice,
@@ -44,6 +47,33 @@ export function requireAdminSession(context: APIContext): AuthenticatedAdminRequ
   }
 
   return adminSession;
+}
+
+export async function requireAdminStepUp(
+  context: APIContext,
+  input: {
+    returnTo: string;
+    message: string;
+  },
+) {
+  const adminSession = requireAdminSession(context);
+  const needsStepUp = await adminSessionNeedsStepUp(adminSession);
+
+  if (!needsStepUp) {
+    return adminSession;
+  }
+
+  setAdminNotice(context.cookies, {
+    tone: "error",
+    title: "Reautenticação necessária",
+    message: input.message,
+    details: ["Confirme o código TOTP para liberar a próxima ação crítica."],
+  });
+
+  const reauthUrl = new URL("/admin/reauth", context.url);
+  reauthUrl.searchParams.set("returnTo", safeAdminReturnPath(input.returnTo, "/admin/painel"));
+
+  return context.redirect(reauthUrl.toString(), 303);
 }
 
 export function redirectWithAdminNotice(

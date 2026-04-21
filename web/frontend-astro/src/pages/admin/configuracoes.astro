@@ -277,13 +277,13 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
               <div class="max-w-3xl">
                 <div class="flex flex-wrap gap-2">
                   <StatusPill label="Mutacao Astro ativa" tone="success" />
-                  {section.form.requiresStepUp ? <StatusPill label="Step-up pendente" tone="danger" /> : null}
+                  {section.form.requiresStepUp ? <StatusPill label="Step-up obrigatorio" tone="danger" /> : null}
                 </div>
 
                 <h3 class="mt-4 font-display text-2xl tracking-tight">Atualizar esta politica</h3>
                 <p class="mt-3 text-sm leading-7 text-slate-300">
                   Esta etapa ja grava a configuracao em Prisma e registra a auditoria do tenant de plataforma com o
-                  ator autenticado no Astro. O step-up administrativo continua como proxima fatia do backend novo.
+                  ator autenticado no Astro. O step-up administrativo agora ja protege esta mutacao na stack nova.
                 </p>
               </div>
 

@@ -1,14 +1,11 @@
 ---
 import {
-  Boxes,
   Building2,
   Fingerprint,
-  FileSearch,
   LayoutDashboard,
   LogOut,
-  PlusCircle,
-  Settings2,
-  ShieldEllipsis,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 
 import StudioLayout from "@/layouts/studio-layout.astro";
@@ -17,61 +14,40 @@ interface Props {
   title?: string;
   description?: string;
   userName?: string;
-  activeItem?: "dashboard" | "clients" | "catalog" | "audit" | "settings";
+  companyName?: string;
+  activeItem?: "dashboard";
 }
 
 const {
-  title = "Admin-CEO | Tariel Astro",
-  description = "Painel administrativo migrado para Astro SSR com Prisma.",
-  userName = "Admin-CEO",
+  title = "Portal da empresa | Tariel Astro",
+  description = "Portal admin-cliente migrado para Astro SSR com Prisma.",
+  userName = "Admin-cliente",
+  companyName = "Empresa",
   activeItem = "dashboard",
 } = Astro.props;
 
-const sessionUserName = Astro.locals.adminSession?.user.name ?? userName;
+const sessionUserName = Astro.locals.clientSession?.user.name ?? userName;
+const sessionCompanyName = Astro.locals.clientSession?.user.companyName ?? companyName;
 
 const menuItems = [
   {
-    href: "/admin/painel",
+    href: "/cliente/painel",
     label: "Visao geral",
     icon: LayoutDashboard,
     current: activeItem === "dashboard",
   },
   {
-    href: "/admin/clientes",
-    label: "Empresas",
-    icon: Building2,
-    current: activeItem === "clients",
+    href: "#equipe",
+    label: "Equipe",
+    icon: Users,
   },
   {
-    href: "/admin/catalogo-laudos",
-    label: "Catalogo",
-    icon: Boxes,
-    current: activeItem === "catalog",
+    href: "#governanca",
+    label: "Governanca",
+    icon: ShieldCheck,
   },
   {
-    href: "/admin/auditoria",
-    label: "Auditoria",
-    icon: FileSearch,
-    current: activeItem === "audit",
-  },
-  {
-    href: "/admin/configuracoes",
-    label: "Configuracoes",
-    icon: Settings2,
-    current: activeItem === "settings",
-  },
-  {
-    href: "#proxima-fatia",
-    label: "Proxima fatia",
-    icon: PlusCircle,
-  },
-  {
-    href: "#seguranca",
-    label: "Seguranca",
-    icon: ShieldEllipsis,
-  },
-  {
-    href: "/admin/login",
+    href: "/cliente/login",
     label: "Tela de login",
     icon: Fingerprint,
   },
@@ -79,18 +55,18 @@ const menuItems = [
 ---
 
 <StudioLayout title={title} description={description}>
-  <main class="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.14),transparent_28%),radial-gradient(circle_at_90%_0%,rgba(15,23,42,0.08),transparent_24%)] px-4 py-4 sm:px-6 sm:py-6">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.14),transparent_28%),radial-gradient(circle_at_90%_0%,rgba(15,23,42,0.08),transparent_24%)] px-4 py-4 sm:px-6 sm:py-6">
     <div class="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1600px] overflow-hidden rounded-[34px] border border-slate-950/10 bg-white/78 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur lg:grid-cols-[280px_minmax(0,1fr)]">
       <aside class="border-b border-slate-950/8 bg-slate-950 px-6 py-8 text-white lg:border-b-0 lg:border-r">
         <div class="rounded-[28px] border border-white/10 bg-white/6 p-5">
-          <p class="text-xs font-semibold uppercase tracking-[0.26em] text-orange-200">Tariel Astro</p>
-          <h1 class="mt-3 font-display text-3xl tracking-tight">Admin-CEO</h1>
+          <p class="text-xs font-semibold uppercase tracking-[0.26em] text-sky-200">Tariel Astro</p>
+          <h1 class="mt-3 font-display text-3xl tracking-tight">Portal da empresa</h1>
           <p class="mt-3 text-sm leading-6 text-slate-300">
-            Camada administrativa em migração progressiva do legado FastAPI para Astro SSR com Prisma.
+            Base oficial do admin-cliente em Astro SSR com Prisma, sem depender da sessao do legado.
           </p>
         </div>
 
-        <nav class="mt-8 space-y-2" aria-label="Menu administrativo">
+        <nav class="mt-8 space-y-2" aria-label="Menu do portal cliente">
           {menuItems.map(({ href, label, icon: Icon, current }) => (
             <a
               href={href}
@@ -108,21 +84,35 @@ const menuItems = [
           ))}
         </nav>
 
-        <div id="seguranca" class="mt-8 rounded-[28px] border border-white/10 bg-white/6 p-5">
-          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-200">Seguranca</p>
+        <div id="governanca" class="mt-8 rounded-[28px] border border-white/10 bg-white/6 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-200">Governanca</p>
           <p class="mt-3 text-sm leading-6 text-slate-300">
-            Login, troca obrigatoria, MFA TOTP e step-up critico ja rodam no Astro. A proxima frente desta trilha e
-            fechar os providers corporativos de identidade.
+            Login, sessao e troca obrigatoria de senha ja rodam no Astro. Equipe, mesa e suporte entram nas proximas
+            fatias do portal cliente.
           </p>
+        </div>
+
+        <div class="mt-8 rounded-[28px] border border-white/10 bg-white/6 p-5">
+          <div class="flex items-start gap-3">
+            <div class="rounded-2xl bg-white/10 p-3 text-white">
+              <Building2 className="size-5" />
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Empresa</p>
+              <p class="mt-2 font-medium text-white">{sessionCompanyName}</p>
+              <p class="mt-1 text-sm leading-6 text-slate-300">{sessionUserName}</p>
+            </div>
+          </div>
         </div>
 
         <div class="mt-8 flex items-center justify-between rounded-[28px] border border-white/10 bg-white/6 p-5">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Usuario</p>
-            <p class="mt-2 font-medium text-white">{sessionUserName}</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Sessao</p>
+            <p class="mt-2 font-medium text-white">Ativa no portal cliente</p>
           </div>
 
-          <form method="POST" action="/admin/logout">
+          <form method="POST" action="/cliente/logout">
             <button
               type="submit"
               class="inline-flex items-center gap-2 rounded-full border border-white/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-white/28 hover:bg-white/8"

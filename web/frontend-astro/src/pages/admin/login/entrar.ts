@@ -3,7 +3,9 @@ import type { APIRoute } from "astro";
 import {
   applyAdminSessionCookie,
   attemptAdminPasswordLogin,
+  clearAdminNextPathCookie,
   safeAdminNextPath,
+  setAdminNextPathCookie,
 } from "@/lib/server/admin-auth";
 
 export const POST: APIRoute = async (context) => {
@@ -21,6 +23,7 @@ export const POST: APIRoute = async (context) => {
   });
 
   if (!result.ok || !result.session) {
+    clearAdminNextPathCookie(context.cookies);
     loginPath.searchParams.set(
       "erro",
       result.error ?? "Nao foi possivel iniciar a sessao administrativa.",
@@ -33,5 +36,11 @@ export const POST: APIRoute = async (context) => {
     secure: context.url.protocol === "https:",
   });
 
+  if (result.redirectPath) {
+    setAdminNextPathCookie(context.cookies, nextPath);
+    return context.redirect(result.redirectPath, 303);
+  }
+
+  clearAdminNextPathCookie(context.cookies);
   return context.redirect(nextPath, 303);
 };

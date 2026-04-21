@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 
 import {
   getAdminErrorMessage,
-  requireAdminSession,
+  requireAdminStepUp,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { createCompany } from "@/lib/server/admin-mutations";
@@ -10,7 +10,14 @@ import { createCompany } from "@/lib/server/admin-mutations";
 export const POST: APIRoute = async (context) => {
   const formData = await context.request.formData();
   const errorReturnTo = "/admin/novo-cliente";
-  const adminSession = requireAdminSession(context);
+  const adminSession = await requireAdminStepUp(context, {
+    returnTo: errorReturnTo,
+    message: "Reautenticação necessária para provisionar uma nova empresa.",
+  });
+
+  if (adminSession instanceof Response) {
+    return adminSession;
+  }
 
   try {
     const result = await createCompany(

@@ -1,0 +1,110 @@
+---
+import { KeyRound, ShieldCheck } from "lucide-react";
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro";
+import AuthShell from "@/components/app/auth/auth-shell.astro";
+import { consumeAdminNotice } from "@/lib/server/admin-notice";
+
+export const prerender = false;
+
+const adminSession = Astro.locals.adminSession;
+
+if (!adminSession) {
+  return Astro.redirect("/admin/login", 303);
+}
+
+const notice = consumeAdminNotice(Astro.cookies);
+---
+
+<AuthShell
+  title="Troca Obrigatoria | Admin-CEO"
+  description="Troca obrigatoria de senha para liberar a sessao administrativa do Tariel V2."
+  portalLabel="Admin-CEO"
+  heroTitle="A senha temporaria precisa sair do caminho antes da sessao oficial."
+  heroCopy="O portal novo agora fecha a troca obrigatoria de senha no Astro SSR. Depois desta etapa, a conta segue para MFA quando exigido e entra no painel sem depender do fluxo legado."
+  heroItems={[
+    "Senha definitiva gravada com Argon2 na mesma base oficial do v2.",
+    "Sessao administrativa permanece bloqueada ate a troca ser concluida.",
+    "Fluxo compatível com credenciais temporárias emitidas pelo Admin-CEO.",
+    adminSession.user.mfaRequired ? "Depois da senha, o proximo passo e confirmar o MFA TOTP." : "Depois da senha, o acesso segue direto para o painel novo.",
+  ]}
+  supportText="Canal interno da plataforma"
+  submitLabel="Atualizar senha"
+  previewMessage="Fluxo ligado ao backend real do v2."
+  variant="admin"
+  panelEyebrow="Troca obrigatoria"
+  panelTitle="Definir uma senha definitiva"
+  panelCopy="Use a senha temporaria recebida pelo canal seguro e escolha a nova credencial que vai liberar o acesso administrativo."
+>
+  <Fragment slot="form">
+    <div class="space-y-5">
+      <div class="rounded-[28px] border border-orange-500/15 bg-orange-500/6 p-4 text-orange-950">
+        <div class="flex items-start gap-3">
+          <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+            <ShieldCheck className="size-4" />
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]">Sessao pendente</p>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+              A conta de <strong>{adminSession.user.email}</strong> entrou com credencial temporaria e ainda nao pode
+              usar o restante do portal.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <AdminNotice notice={notice} />
+
+      <div class="rounded-[24px] border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700">
+        <strong class="font-semibold text-slate-950">Operador</strong>
+        <p class="mt-1">{adminSession.user.name}</p>
+      </div>
+
+      <form class="space-y-4" method="POST" action="/admin/trocar-senha/confirmar" novalidate>
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Senha temporaria</span>
+          <input
+            type="password"
+            name="senha_atual"
+            autocomplete="current-password"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-orange-500"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Nova senha</span>
+          <div class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+            <KeyRound className="size-4 text-slate-400" />
+            <input
+              type="password"
+              name="nova_senha"
+              autocomplete="new-password"
+              required
+              class="min-w-0 flex-1 bg-transparent text-sm text-slate-950 outline-none"
+            />
+          </div>
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Confirmar nova senha</span>
+          <input
+            type="password"
+            name="confirmar_senha"
+            autocomplete="new-password"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-orange-500"
+          />
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Atualizar senha
+        </button>
+      </form>
+    </div>
+  </Fragment>
+</AuthShell>
