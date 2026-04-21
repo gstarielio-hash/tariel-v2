@@ -97,6 +97,18 @@ export interface AppMesaMessagesPayload {
   resumo?: Record<string, unknown> | null;
 }
 
+export interface AppMesaReplyPayload {
+  laudo_id: number;
+  mensagem: AppMesaMessagePayload;
+  laudo_card?: Record<string, unknown> | null;
+  estado?: string;
+  permite_edicao?: boolean;
+  permite_reabrir?: boolean;
+  resumo?: Record<string, unknown> | null;
+  request_id?: string;
+  idempotent_replay?: boolean;
+}
+
 const DEFAULT_PYTHON_BACKEND_URL = "http://127.0.0.1:8000";
 
 function resolvePythonBackendBaseUrl() {
@@ -171,4 +183,43 @@ export async function fetchAppMesaMessages(
   }
 
   return (await response.json()) as AppMesaMessagesPayload;
+}
+
+export async function replyToAppMesa(
+  appSession: AuthenticatedAppRequest,
+  input: {
+    laudoId: number;
+    texto: string;
+    referenciaMensagemId?: number | null;
+  },
+): Promise<AppMesaReplyPayload> {
+  const normalizedText = String(input.texto ?? "").trim();
+
+  if (!normalizedText) {
+    throw new Error("Escreva uma resposta para a mesa.");
+  }
+
+  const response = await fetch(buildBackendUrl(`/app/api/laudo/${input.laudoId}/mesa/mensagem`), {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${appSession.session.token}`,
+      "Content-Type": "application/json",
+      "X-Client-Request-Id": randomUUID(),
+    },
+    body: JSON.stringify({
+      texto: normalizedText,
+      referencia_mensagem_id: input.referenciaMensagemId ?? null,
+    }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python inspector mesa reply failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return (await response.json()) as AppMesaReplyPayload;
 }

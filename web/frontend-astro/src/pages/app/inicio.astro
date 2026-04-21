@@ -1,5 +1,7 @@
 ---
 import {
+  AlertTriangle,
+  CheckCircle2,
   Clock3,
   FileStack,
   Fingerprint,
@@ -12,6 +14,7 @@ import {
 } from "lucide-react";
 
 import AppShellLayout from "@/layouts/app-shell-layout.astro";
+import { consumeAppNotice } from "@/lib/server/app-notice";
 import { fetchAppMesaMessages, fetchAppMesaSummary } from "@/lib/server/app-mesa-bridge";
 import { getAppPortalOverview } from "@/lib/server/app-portal";
 
@@ -33,6 +36,7 @@ if (!overview) {
 }
 
 const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const notice = consumeAppNotice(Astro.cookies);
 const selectedLaudoId = Number(Astro.url.searchParams.get("laudo") ?? 0) || overview.recentReports[0]?.id || 0;
 const selectedReport = overview.recentReports.find((report) => report.id === selectedLaudoId) ?? overview.recentReports[0] ?? null;
 const selectedSummary = selectedReport
@@ -114,6 +118,34 @@ const cards = [
   {successMessage ? (
     <div class="mb-6 rounded-[24px] border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm leading-6 text-emerald-900">
       {successMessage}
+    </div>
+  ) : null}
+
+  {notice ? (
+    <div
+      class:list={[
+        "mb-6 rounded-[24px] border px-4 py-4 text-sm leading-6",
+        notice.tone === "success"
+          ? "border-emerald-500/18 bg-emerald-500/8 text-emerald-900"
+          : notice.tone === "error"
+            ? "border-rose-500/18 bg-rose-500/8 text-rose-900"
+            : "border-sky-500/18 bg-sky-500/8 text-sky-950",
+      ]}
+    >
+      <div class="flex items-start gap-3">
+        <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+          {notice.tone === "success" ? <CheckCircle2 className="size-4" /> : <AlertTriangle className="size-4" />}
+        </div>
+        <div>
+          <p class="font-semibold">{notice.title}</p>
+          <p class="mt-1">{notice.message}</p>
+          {notice.details && notice.details.length > 0 ? (
+            <div class="mt-2 space-y-1 text-xs">
+              {notice.details.map((detail) => <p>{detail}</p>)}
+            </div>
+          ) : null}
+        </div>
+      </div>
     </div>
   ) : null}
 
@@ -406,6 +438,43 @@ const cards = [
             </div>
           </div>
         </div>
+
+        {selectedReport ? (
+          <form
+            method="POST"
+            action={`/app/inicio/${selectedReport.id}/responder`}
+            class="rounded-[24px] border border-slate-200 bg-slate-50 p-4"
+          >
+            <input type="hidden" name="returnTo" value={`/app/inicio?laudo=${selectedReport.id}`} />
+            <div class="flex items-start gap-3">
+              <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+                <MessageSquareCode className="size-5" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-slate-950">Primeira acao: reply textual</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  Esta primeira acao do Astro envia uma resposta simples para a mesa no laudo selecionado, sem anexo.
+                </p>
+
+                <textarea
+                  name="texto"
+                  rows={4}
+                  placeholder="Escreva a resposta operacional para a mesa"
+                  class="mt-4 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-500"
+                />
+
+                <div class="mt-4 flex justify-end">
+                  <button
+                    type="submit"
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+                  >
+                    Enviar resposta
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        ) : null}
       </div>
     </article>
   </section>

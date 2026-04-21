@@ -3616,3 +3616,52 @@ Proximo passo imediato:
 - com resumo e thread em leitura no Astro, o proximo corte natural e liberar a primeira acao sobre o laudo selecionado;
 - a candidata mais segura e uma acao de pendencia ou um reply simples, porque reutiliza contratos ja expostos e nao exige portar a workspace inteira;
 - seguir mantendo o corte estreito: leitura primeiro, acao unica depois, uploads e fluxo completo so nas rodadas seguintes.
+
+## Ciclo 87 — primeiro reply textual do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- o portal do inspetor ja tinha lista de casos, resumo do caso e thread recente em leitura, mas ainda faltava a primeira acao util diretamente no Astro;
+- isso mantinha a migracao travada no modo read-only, mesmo com o backend ja expondo `/app/api/laudo/{laudo_id}/mesa/mensagem`;
+- o corte seguro era liberar um reply textual simples, sem anexos, preservando o backend Python como dono da transacao e da policy.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/app-notice.ts` para notices curtas por cookie no portal do inspetor;
+- entrou `web/frontend-astro/src/lib/server/app-action-route.ts`, padronizando sessao obrigatoria, retorno seguro e redirect com notice para `/app`;
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a expor `replyToAppMesa`, consumindo o endpoint canonico `/app/api/laudo/{laudo_id}/mesa/mensagem`;
+- entrou a action route `web/frontend-astro/src/pages/app/inicio/[laudoId]/responder.ts`, seguindo o mesmo modelo ja usado em `cliente` e `revisao`;
+- `web/frontend-astro/src/pages/app/inicio.astro` ganhou:
+  - consumo de notice do portal;
+  - formulario de reply textual no laudo selecionado;
+  - redirect de volta para o proprio `/app/inicio?laudo=...` apos sucesso ou erro.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-action-route.ts`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/lib/server/app-notice.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+- `web/frontend-astro/src/pages/app/inicio/[laudoId]/responder.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a primeira acao de reply textual liberada, o proximo corte natural e uma acao de pendencia ou reply com referencia de mensagem;
+- depois disso, a proxima extensao logica e reply com anexo, ainda sem portar a workspace inteira;
+- manter o mesmo ownership: Astro como shell e action route, Python como dono de validacao, auditoria e persistencia da thread.
