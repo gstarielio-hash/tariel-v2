@@ -3792,3 +3792,46 @@ Proximo passo imediato:
 - com texto, referencia, pendencia e anexo ja operando no Astro, o proximo ganho util no `Inspetor` e expor download/visualizacao basica dos anexos da thread;
 - depois disso, a home pode evoluir para uma superficie operacional mais coesa, juntando resumo, thread e composer numa mesa dedicada do laudo;
 - continuar preservando o backend Python como dono dos contratos de operacao e auditoria.
+
+## Ciclo 91 — download basico de anexos no `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a thread do inspetor ja mostrava quando havia anexos, mas ainda nao permitia abrir ou baixar os arquivos pela home do Astro;
+- isso mantinha a leitura operacional incompleta, porque o operador via a existencia do anexo mas precisava voltar ao legado para consumir o conteudo;
+- o corte seguro era expor apenas o proxy autenticado do arquivo e transformar os anexos da thread em links clicaveis, sem abrir ainda preview dedicada.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a expor `fetchAppMesaAttachmentResponse`, reaproveitando o bearer token da sessao do inspetor contra `GET /app/api/laudo/{laudo_id}/mesa/anexos/{anexo_id}`;
+- entrou a route `web/frontend-astro/src/pages/app/inicio/[laudoId]/anexos/[attachmentId].ts`, que faz o proxy autenticado do anexo e preserva os principais headers de download;
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a listar os anexos de cada mensagem da thread recente com links reais de download e exibicao basica de tamanho;
+- o ownership continua o mesmo: Astro serve o arquivo ao portal autenticado, enquanto o backend Python continua dono de autorizacao, persistencia e entrega do blob.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+- `web/frontend-astro/src/pages/app/inicio/[laudoId]/anexos/[attachmentId].ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a thread do inspetor agora lendo e baixando anexos, o proximo corte util e melhorar a navegacao da home para destacar melhor contexto, referencia e anexos da mensagem selecionada;
+- depois disso, a migracao pode abrir uma superficie de mesa mais dedicada no Astro, separando melhor fila, thread e composer;
+- manter o backend Python como dono dos contratos e usar o Astro apenas como shell autenticado e proxy de portal.

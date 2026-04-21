@@ -347,3 +347,28 @@ export async function updateAppMesaPendency(
 
   return (await response.json()) as AppMesaPendencyPayload;
 }
+
+export async function fetchAppMesaAttachmentResponse(
+  appSession: AuthenticatedAppRequest,
+  input: {
+    laudoId: number;
+    anexoId: number;
+  },
+) {
+  const response = await fetchAppMesaBackend(
+    appSession,
+    `/app/api/laudo/${input.laudoId}/mesa/anexos/${input.anexoId}`,
+    {
+      accept: "*/*",
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python inspector mesa attachment failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return response;
+}
