@@ -178,6 +178,31 @@ const lifecycleTransitions = (selectedSummary?.allowed_lifecycle_transitions ?? 
     };
   })
   .filter((item): item is LifecycleTransitionCard => item !== null);
+const recentOperationalTimeline = canonicalHistoryItems
+  .slice()
+  .reverse()
+  .filter(
+    (message) =>
+      message.message_kind === "mesa_pendency" ||
+      Boolean(message.referencia_mensagem_id) ||
+      Boolean(message.anexos && message.anexos.length > 0),
+  )
+  .slice(0, 5);
+const latestPendencySignal =
+  canonicalHistoryItems
+    .slice()
+    .reverse()
+    .find((message) => message.message_kind === "mesa_pendency") ?? null;
+const latestAttachmentSignal =
+  canonicalHistoryItems
+    .slice()
+    .reverse()
+    .find((message) => Boolean(message.anexos && message.anexos.length > 0)) ?? null;
+const latestReferenceSignal =
+  canonicalHistoryItems
+    .slice()
+    .reverse()
+    .find((message) => Boolean(message.referencia_mensagem_id)) ?? null;
 const historyFilterOptions = [
   { key: "todos", label: "Todos", count: canonicalHistoryItems.length },
   {
@@ -595,6 +620,111 @@ function formatBytes(value: number | undefined) {
                         O backend ainda nao expôs transicoes operacionais para este estado do caso.
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid gap-3 xl:grid-cols-[0.9fr_1.1fr]">
+                <div class="grid gap-3">
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Pendencia mais recente</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-950">
+                      {latestPendencySignal ? `Mensagem #${latestPendencySignal.id}` : "Nenhuma pendencia na leitura"}
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      {latestPendencySignal
+                        ? `${latestPendencySignal.pendency_state} • ${latestPendencySignal.data}`
+                        : "A thread atual nao expôs pendencias operacionais."}
+                    </p>
+                  </div>
+
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimo anexo operacional</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-950">
+                      {latestAttachmentSignal
+                        ? `${latestAttachmentSignal.anexos?.length ?? 0} anexos na mensagem #${latestAttachmentSignal.id}`
+                        : "Sem anexo recente"}
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      {latestAttachmentSignal
+                        ? `${latestAttachmentSignal.data} • ${latestAttachmentSignal.texto || "Mensagem com anexo sem texto adicional."}`
+                        : "Nenhum anexo apareceu na trilha canonica do laudo."}
+                    </p>
+                  </div>
+
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultima referencia cruzada</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-950">
+                      {latestReferenceSignal
+                        ? `Mensagem #${latestReferenceSignal.id} respondeu #${latestReferenceSignal.referencia_mensagem_id}`
+                        : "Sem referencia recente"}
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      {latestReferenceSignal
+                        ? latestReferenceSignal.texto || "A resposta referenciada nao trouxe texto adicional."
+                        : "Ainda nao houve reply referenciado na leitura atual do caso."}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Trilha operacional recente</p>
+                    <span class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      {recentOperationalTimeline.length} sinais
+                    </span>
+                  </div>
+
+                  <div class="mt-4 space-y-3">
+                    {recentOperationalTimeline.length > 0 ? recentOperationalTimeline.map((message) => (
+                      <div class="rounded-[20px] border border-slate-200 bg-white px-4 py-4">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span class="rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">
+                            {message.message_kind}
+                          </span>
+                          <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            {message.data}
+                          </span>
+                          {message.pendency_state !== "not_applicable" ? (
+                            <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                              {message.pendency_state}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p class="mt-3 text-sm leading-6 text-slate-700">
+                          {message.texto || "Evento operacional sem texto adicional."}
+                        </p>
+                        <div class="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
+                          {message.referencia_mensagem_id ? <span>Referencia #{message.referencia_mensagem_id}</span> : null}
+                          {message.anexos && message.anexos.length > 0 ? <span>{message.anexos.length} anexos</span> : null}
+                          {message.resolvida_em_label ? <span>Resolvida em {message.resolvida_em_label}</span> : null}
+                        </div>
+                      </div>
+                    )) : (
+                      <div class="rounded-[20px] border border-dashed border-slate-300 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                        A leitura atual ainda nao trouxe sinais operacionais suficientes para compor a trilha do caso.
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="mt-4 rounded-[20px] border border-slate-200 bg-white px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Auditoria do portal</p>
+                    <div class="mt-3 space-y-3">
+                      {overview.recentAudit.length > 0 ? overview.recentAudit.slice(0, 3).map((entry) => (
+                        <div class="rounded-[18px] border border-slate-200 bg-slate-50 px-4 py-3">
+                          <p class="text-sm font-semibold text-slate-950">{entry.summary}</p>
+                          <p class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+                            {entry.portal} • {entry.action}
+                          </p>
+                          {entry.detail ? <p class="mt-2 text-sm leading-6 text-slate-600">{entry.detail}</p> : null}
+                          <p class="mt-2 text-xs text-slate-500">{entry.createdAtLabel}</p>
+                        </div>
+                      )) : (
+                        <p class="text-sm leading-6 text-slate-600">
+                          Ainda nao houve eventos recentes auditados para este portal.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

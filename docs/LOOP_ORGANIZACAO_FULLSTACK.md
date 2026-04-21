@@ -4133,3 +4133,44 @@ Proximo passo imediato:
 - com o contrato de lifecycle ja visivel dentro da mesa Astro, o proximo corte util do `Inspetor` e aproximar a trilha operacional do caso com sinais de decisao e retorno ainda mais proximos do workspace legado;
 - isso pode ser feito com leitura de eventos e estados ja disponiveis no payload, antes de abrir qualquer mutacao nova na interface;
 - seguir reduzindo a dependencia do workspace antigo em camadas pequenas, auditaveis e reversiveis.
+
+## Ciclo 99 — trilha operacional na mesa do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a `view=contexto` ja expunha lifecycle, owner e transicoes do caso, mas ainda faltava uma leitura operacional curta da thread recente;
+- sinais como pendencias, anexos, referencias cruzadas e auditoria do portal continuavam espalhados entre outras views, o que mantinha a consulta do caso menos direta do que no workspace legado;
+- o corte seguro era compor essa trilha apenas com os itens canonicos ja carregados pela mesa Astro.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/mesa.astro` passou a derivar uma `recentOperationalTimeline` a partir da thread canonica do laudo;
+- a `view=contexto` agora mostra pendencia mais recente, ultimo anexo operacional e ultima referencia cruzada do caso ativo;
+- entrou um bloco de `Trilha operacional recente` com sinais recentes da thread e uma faixa acoplada de auditoria do portal, sem fetch adicional;
+- o ownership permanece o mesmo: Astro organiza a leitura da operacao e o backend Python segue como dono da thread, auditoria e estado canonico do caso.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a trilha operacional ja visivel no contexto da mesa, o proximo ganho util do `Inspetor` e aproximar ainda mais a leitura de decisao do caso, reduzindo a distancia para a workspace legada;
+- isso pode vir de estados operacionais derivados da thread ou de mais organizacao da leitura da conversa, sem abrir mutacoes novas cedo demais;
+- seguir em slices pequenos que movam a operacao oficial para o Astro e deixem o legado como referencia residual.
