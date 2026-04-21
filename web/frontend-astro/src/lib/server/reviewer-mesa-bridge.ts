@@ -170,12 +170,80 @@ export interface ReviewerMesaPackagePayload {
     issue_status: string;
     issue_status_label: string;
     ready_for_issue: boolean;
+    requires_human_signature: boolean;
+    compatible_signatory_count: number;
+    eligible_signatory_count: number;
     blocker_count: number;
+    signature_status?: string | null;
+    signature_status_label?: string | null;
+    pdf_present?: boolean;
+    public_verification_present?: boolean;
     already_issued: boolean;
     reissue_recommended: boolean;
     issue_action_label: string | null;
     issue_action_enabled: boolean;
     verification_url: string | null;
+    signatories?: Array<{
+      id: number;
+      nome: string;
+      funcao: string;
+      registro_profissional?: string | null;
+      valid_until?: string | null;
+      status: string;
+      status_label: string;
+      ativo: boolean;
+      allowed_family_keys: string[];
+      observacoes?: string | null;
+    }>;
+    blockers?: Array<{
+      code: string;
+      title: string;
+      message: string;
+      blocking: boolean;
+    }>;
+    audit_trail?: Array<{
+      event_key: string;
+      title: string;
+      status: string;
+      status_label: string;
+      summary?: string | null;
+      blocking: boolean;
+      recorded_at?: string | null;
+    }>;
+    current_issue?: {
+      id: number;
+      issue_number?: string | null;
+      issue_state: string;
+      issue_state_label: string;
+      issued_at?: string | null;
+      superseded_at?: string | null;
+      package_sha256?: string | null;
+      package_filename?: string | null;
+      package_storage_ready: boolean;
+      package_size_bytes?: number | null;
+      verification_hash?: string | null;
+      verification_url?: string | null;
+      approval_snapshot_id?: number | null;
+      approval_version?: number | null;
+      signatory_name?: string | null;
+      signatory_function?: string | null;
+      signatory_registration?: string | null;
+      issued_by_name?: string | null;
+      primary_pdf_sha256?: string | null;
+      primary_pdf_storage_version?: string | null;
+      primary_pdf_storage_version_number?: number | null;
+      current_primary_pdf_sha256?: string | null;
+      current_primary_pdf_storage_version?: string | null;
+      current_primary_pdf_storage_version_number?: number | null;
+      primary_pdf_diverged: boolean;
+      primary_pdf_comparison_status?: string | null;
+      reissue_of_issue_id?: number | null;
+      reissue_of_issue_number?: string | null;
+      reissue_reason_codes: string[];
+      reissue_reason_summary?: string | null;
+      superseded_by_issue_id?: number | null;
+      superseded_by_issue_number?: string | null;
+    } | null;
   } | null;
   tenant_access_policy?: Record<string, unknown> | null;
   pendencias_abertas: ReviewerMesaPackageItemPayload[];
@@ -225,6 +293,21 @@ export interface ReviewerMesaCoverageReturnPayload {
   mensagem?: ReviewerMesaMessagePayload;
   evidence_key: string;
   block_key?: string | null;
+}
+
+export interface ReviewerMesaOfficialIssueResponsePayload {
+  success: boolean;
+  laudo_id: number;
+  issue_number?: string | null;
+  issue_state?: string | null;
+  package_sha256?: string | null;
+  idempotent_replay: boolean;
+  reissued: boolean;
+  superseded_issue_number?: string | null;
+  reissue_reason_codes: string[];
+  reissue_reason_summary?: string | null;
+  download_url?: string | null;
+  record?: Record<string, unknown> | null;
 }
 
 const DEFAULT_PYTHON_BACKEND_URL = "http://127.0.0.1:8000";
@@ -561,6 +644,52 @@ export async function fetchReviewerMesaOfficialZipResponse(
     const detail = await extractBackendError(response);
     throw new Error(
       `Python reviewer mesa official zip failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return response;
+}
+
+export async function issueReviewerMesaOfficially(
+  reviewerSession: AuthenticatedReviewerRequest,
+  input: {
+    laudoId: number;
+    signatoryId?: number | null;
+    expectedCurrentIssueId?: number | null;
+    expectedCurrentIssueNumber?: string | null;
+  },
+) {
+  return expectReviewerMesaJson<ReviewerMesaOfficialIssueResponsePayload>(
+    reviewerSession,
+    `/revisao/api/laudo/${input.laudoId}/emissao-oficial`,
+    {
+      method: "POST",
+      body: {
+        signatory_id: input.signatoryId ?? null,
+        expected_current_issue_id: input.expectedCurrentIssueId ?? null,
+        expected_current_issue_number: input.expectedCurrentIssueNumber ?? null,
+      },
+      errorPrefix: "Python reviewer official issue failed",
+    },
+  );
+}
+
+export async function fetchReviewerMesaFrozenOfficialBundleResponse(
+  reviewerSession: AuthenticatedReviewerRequest,
+  laudoId: number,
+) {
+  const response = await fetchReviewerMesaBackend(
+    reviewerSession,
+    `/revisao/api/laudo/${laudoId}/emissao-oficial/download`,
+    {
+      accept: "application/zip",
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python reviewer frozen official bundle failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
     );
   }
 

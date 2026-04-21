@@ -1,10 +1,12 @@
 import type { AuthenticatedReviewerRequest } from "@/lib/server/reviewer-auth";
 import {
   fetchReviewerMesaAttachmentResponse,
+  fetchReviewerMesaFrozenOfficialBundleResponse,
   fetchReviewerMesaMessages,
   fetchReviewerMesaOfficialZipResponse,
   fetchReviewerMesaPackage,
   fetchReviewerMesaPackagePdfResponse,
+  issueReviewerMesaOfficially,
   markReviewerMesaWhispersRead,
   replyToReviewerMesa,
   replyToReviewerMesaWithAttachment,
@@ -98,6 +100,44 @@ export interface ReviewerMesaCoverageItem {
   failureReasons: string[];
 }
 
+export interface ReviewerMesaOfficialSignatory {
+  id: number;
+  name: string;
+  role: string;
+  registration: string | null;
+  validUntil: Date | null;
+  validUntilLabel: string;
+  status: string;
+  statusLabel: string;
+  active: boolean;
+  notes: string | null;
+}
+
+export interface ReviewerMesaOfficialCurrentIssue {
+  id: number;
+  issueNumber: string | null;
+  issueState: string;
+  issueStateLabel: string;
+  issuedAt: Date | null;
+  issuedAtLabel: string;
+  packageSha256: string | null;
+  packageStorageReady: boolean;
+  signatoryName: string | null;
+  signatoryRegistration: string | null;
+  primaryPdfDiverged: boolean;
+  reissueOfIssueId: number | null;
+  reissueOfIssueNumber: string | null;
+  reissueReasonCodes: string[];
+  reissueReasonSummary: string | null;
+}
+
+export interface ReviewerMesaOfficialBlocker {
+  code: string;
+  title: string;
+  message: string;
+  blocking: boolean;
+}
+
 export interface ReviewerMesaSelectedPackage {
   laudoId: number;
   codeHash: string;
@@ -157,12 +197,20 @@ export interface ReviewerMesaSelectedPackage {
     issueStatus: string;
     issueStatusLabel: string;
     readyForIssue: boolean;
+    requiresHumanSignature: boolean;
+    compatibleSignatoryCount: number;
+    eligibleSignatoryCount: number;
     blockerCount: number;
+    signatureStatus: string | null;
+    signatureStatusLabel: string | null;
     alreadyIssued: boolean;
     reissueRecommended: boolean;
     issueActionLabel: string | null;
     issueActionEnabled: boolean;
     verificationUrl: string | null;
+    signatories: ReviewerMesaOfficialSignatory[];
+    blockers: ReviewerMesaOfficialBlocker[];
+    currentIssue: ReviewerMesaOfficialCurrentIssue | null;
   } | null;
   messageSummary: {
     total: number;
@@ -387,6 +435,25 @@ export async function fetchReviewerMesaOfficialZip(
   return fetchReviewerMesaOfficialZipResponse(reviewerSession, laudoId);
 }
 
+export async function issueReviewerMesaOfficial(
+  reviewerSession: AuthenticatedReviewerRequest,
+  input: {
+    laudoId: number;
+    signatoryId?: number | null;
+    expectedCurrentIssueId?: number | null;
+    expectedCurrentIssueNumber?: string | null;
+  },
+) {
+  return issueReviewerMesaOfficially(reviewerSession, input);
+}
+
+export async function fetchReviewerMesaFrozenOfficialBundle(
+  reviewerSession: AuthenticatedReviewerRequest,
+  laudoId: number,
+) {
+  return fetchReviewerMesaFrozenOfficialBundleResponse(reviewerSession, laudoId);
+}
+
 function resolveSelectedReviewerMesaCase(input: {
   requestedId: number | null;
   activeCases: ReviewQueueItemPayload[];
@@ -494,12 +561,27 @@ function mapReviewerMesaPackage(payload: ReviewerMesaPackagePayload): ReviewerMe
           issueStatus: payload.emissao_oficial.issue_status,
           issueStatusLabel: payload.emissao_oficial.issue_status_label,
           readyForIssue: payload.emissao_oficial.ready_for_issue,
+          requiresHumanSignature: payload.emissao_oficial.requires_human_signature,
+          compatibleSignatoryCount: payload.emissao_oficial.compatible_signatory_count,
+          eligibleSignatoryCount: payload.emissao_oficial.eligible_signatory_count,
           blockerCount: payload.emissao_oficial.blocker_count,
+          signatureStatus: payload.emissao_oficial.signature_status ?? null,
+          signatureStatusLabel: payload.emissao_oficial.signature_status_label ?? null,
           alreadyIssued: payload.emissao_oficial.already_issued,
           reissueRecommended: payload.emissao_oficial.reissue_recommended,
           issueActionLabel: payload.emissao_oficial.issue_action_label,
           issueActionEnabled: payload.emissao_oficial.issue_action_enabled,
           verificationUrl: payload.emissao_oficial.verification_url,
+          signatories: (payload.emissao_oficial.signatories ?? []).map(mapReviewerMesaOfficialSignatory),
+          blockers: (payload.emissao_oficial.blockers ?? []).map((item) => ({
+            code: item.code,
+            title: item.title,
+            message: item.message,
+            blocking: Boolean(item.blocking),
+          })),
+          currentIssue: payload.emissao_oficial.current_issue
+            ? mapReviewerMesaOfficialCurrentIssue(payload.emissao_oficial.current_issue)
+            : null,
         }
       : null,
     messageSummary: {
@@ -561,6 +643,68 @@ function mapReviewerMesaCoverageItem(
     replacementEvidenceKey: item.replacement_evidence_key,
     summary: item.summary,
     failureReasons: [...item.failure_reasons],
+  };
+}
+
+function mapReviewerMesaOfficialSignatory(item: {
+  id: number;
+  nome: string;
+  funcao: string;
+  registro_profissional?: string | null;
+  valid_until?: string | null;
+  status: string;
+  status_label: string;
+  ativo: boolean;
+  observacoes?: string | null;
+}): ReviewerMesaOfficialSignatory {
+  const validUntil = parseDateOrNull(item.valid_until);
+  return {
+    id: item.id,
+    name: item.nome,
+    role: item.funcao,
+    registration: item.registro_profissional ?? null,
+    validUntil,
+    validUntilLabel: formatDateTime(validUntil, "Sem validade informada"),
+    status: item.status,
+    statusLabel: item.status_label,
+    active: Boolean(item.ativo),
+    notes: item.observacoes ?? null,
+  };
+}
+
+function mapReviewerMesaOfficialCurrentIssue(item: {
+  id: number;
+  issue_number?: string | null;
+  issue_state: string;
+  issue_state_label: string;
+  issued_at?: string | null;
+  package_sha256?: string | null;
+  package_storage_ready: boolean;
+  signatory_name?: string | null;
+  signatory_registration?: string | null;
+  primary_pdf_diverged: boolean;
+  reissue_of_issue_id?: number | null;
+  reissue_of_issue_number?: string | null;
+  reissue_reason_codes: string[];
+  reissue_reason_summary?: string | null;
+}): ReviewerMesaOfficialCurrentIssue {
+  const issuedAt = parseDateOrNull(item.issued_at);
+  return {
+    id: item.id,
+    issueNumber: item.issue_number ?? null,
+    issueState: item.issue_state,
+    issueStateLabel: item.issue_state_label,
+    issuedAt,
+    issuedAtLabel: formatDateTime(issuedAt, "Sem emissao registrada"),
+    packageSha256: item.package_sha256 ?? null,
+    packageStorageReady: Boolean(item.package_storage_ready),
+    signatoryName: item.signatory_name ?? null,
+    signatoryRegistration: item.signatory_registration ?? null,
+    primaryPdfDiverged: Boolean(item.primary_pdf_diverged),
+    reissueOfIssueId: item.reissue_of_issue_id ?? null,
+    reissueOfIssueNumber: item.reissue_of_issue_number ?? null,
+    reissueReasonCodes: [...item.reissue_reason_codes],
+    reissueReasonSummary: item.reissue_reason_summary ?? null,
   };
 }
 

@@ -3326,3 +3326,49 @@ Proximo passo imediato:
 - decidir se o proximo corte entra direto em `emissao-oficial` transacional ou se fecha antes o download da emissao congelada e estados de reemissao no shell do Astro;
 - se entrar na emissao, manter a fatia pequena: CTA, conflito `409`, replay idempotente e download congelado, sem tentar redesenhar governanca no frontend;
 - manter `Inspetor` fora da frente principal ate `revisao` fechar tambem esse bloco final com ownership claro entre Astro e Python.
+
+## Ciclo 81 — `Mesa Avaliadora` com emissao oficial transacional no Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- depois do ciclo 80, a mesa avaliadora ja conseguia pedir refazer coverage e exportar o pacote, mas o fechamento documental ainda parava antes da emissao oficial governada;
+- isso deixava a ultima operacao critica da vertical fora do shell novo, mesmo com o backend Python ja expondo o contrato transacional e o download congelado;
+- o corte seguro era pequeno e direto: usar o payload existente de `emissao_oficial`, escolher signatario elegivel, enviar `expected_current_issue_*` para reemissao segura, tratar conflito como erro de action route e expor o bundle congelado no Astro.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/reviewer-mesa-bridge.ts` passou a expor o shape rico de `emissao_oficial`, incluindo `signatories`, `blockers` e `current_issue`, alem das chamadas `emissao-oficial` e `emissao-oficial/download`;
+- `web/frontend-astro/src/lib/server/reviewer-mesa.ts` passou a adaptar signatarios governados, emissao atual congelada, linhagem de reemissao e bloqueios para a workspace SSR da mesa;
+- entrou `web/frontend-astro/src/pages/revisao/painel/[laudoId]/emitir-oficialmente.ts`, mantendo no Astro apenas a action route com redirect/notice e delegando a transacao real ao backend Python;
+- entrou `web/frontend-astro/src/pages/revisao/painel/[laudoId]/emissao-oficial/download.ts`, fechando o proxy do bundle congelado emitido;
+- `web/frontend-astro/src/pages/revisao/painel.astro` ganhou o bloco final de emissao oficial com leitura da emissao atual, aviso de reemissao recomendada, bloqueios, selecao de signatario elegivel, CTA de emitir/reemitir e download do bundle congelado.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/reviewer-mesa-bridge.ts`
+- `web/frontend-astro/src/lib/server/reviewer-mesa.ts`
+- `web/frontend-astro/src/pages/revisao/painel.astro`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/emitir-oficialmente.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/emissao-oficial/download.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- considerar a vertical `/revisao` funcionalmente fechada para o shell Astro e decidir se o proximo ciclo consolida limpeza/refino visual ou ja move o foco para `Inspetor`;
+- antes de sair de `revisao`, vale revisar se ainda existe alguma rota legacy consumida apenas por exportacao ou governanca HTML que ja possa ser aposentada;
+- manter o mesmo criterio de ownership: Astro como shell/SSR/action routes, Python como dono de policy, transacao e auditoria.
