@@ -349,20 +349,62 @@ Regra operacional:
 ### Caixa nova 1 — `Admin-CEO`
 
 - enchimento atual: `alto`
+- percentual aproximado: `90%`
 
 ### Caixa nova 2 — `Admin-cliente`
 
 - enchimento atual: `alto`
+- percentual aproximado: `80%`
 
 ### Caixa nova 3 — `Chat inspetor`
 
 - enchimento atual: `alto`, mas ainda com residuos de shell legado
+- percentual aproximado: `75%`
 
 ### Caixa nova 4 — `Mesa avaliadora`
 
 - enchimento atual: `medio para alto`, com necessidade de fechamento semantico final
+- percentual aproximado: `78%`
 
-## 9. Como usar este quadro no proximo passo
+## 9. Quadro de consolidacao objetiva
+
+### Caixa 1 — `Admin-CEO`
+
+- origem antiga: `web/templates/admin/*`
+- destino novo: `web/frontend-astro/src/pages/admin/*`
+- tipo de migracao ja visivel: autenticacao, leitura, escrita e governanca
+- ja esta dentro da caixa nova: login, MFA, reauth, dashboard, clientes, detalhe do cliente, auditoria, catalogo, onboarding inicial
+- bagunca remanescente: configuracoes e algumas mutacoes ainda precisam fechamento final de ownership
+- estado pratico: `quase fechada`
+
+### Caixa 2 — `Admin-cliente`
+
+- origem antiga: `web/templates/cliente_portal.html` + `web/templates/cliente/*`
+- destino novo: `web/frontend-astro/src/pages/cliente/*`
+- tipo de migracao ja visivel: autenticacao, leitura, escrita e governanca de tenant
+- ja esta dentro da caixa nova: login, painel, equipe, suporte, mesa do cliente, respostas e acoes principais
+- bagunca remanescente: restos do portal antigo ainda precisam ser confirmados e recortes governados precisam continuar separados das superfices operacionais
+- estado pratico: `avancada`
+
+### Caixa 3 — `Chat inspetor`
+
+- origem antiga: `web/templates/index.html` + `web/templates/inspetor/*` + `web/templates/inspetor/workspace/*`
+- destino novo: `web/frontend-astro/src/pages/app/*`
+- tipo de migracao ja visivel: autenticacao, leitura, escrita e operacao do caso
+- ja esta dentro da caixa nova: login, home operacional, mesa, historico, resposta, pendencia, anexo, preview, iniciar inspecao, finalizar e reabrir
+- bagunca remanescente: shell, navegacao e contexto ainda herdados do workspace legado
+- estado pratico: `operacional, em limpeza`
+
+### Caixa 4 — `Mesa avaliadora`
+
+- origem antiga: `web/templates/login_revisor.html` + `web/templates/painel_revisor.html` + biblioteca/editor do revisor
+- destino novo: `web/frontend-astro/src/pages/revisao/*`
+- tipo de migracao ja visivel: autenticacao, leitura, escrita, decisao e emissao
+- ja esta dentro da caixa nova: login, painel, fila, thread, resposta, avaliacao, emissao oficial, exportacoes, whispers lidos
+- bagunca remanescente: falta fechamento semantico final para garantir que a operacao real nao depende mais do painel legado
+- estado pratico: `avancada, precisa fechamento final`
+
+## 10. Como usar este quadro no proximo passo
 
 Antes de abrir qualquer nova tarefa:
 

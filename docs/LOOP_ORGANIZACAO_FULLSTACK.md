@@ -4565,3 +4565,53 @@ Proximo passo imediato:
 - usar o quadro das 4 caixas como filtro obrigatorio antes de abrir qualquer nova fatia de migracao;
 - escolher a proxima tarefa dizendo explicitamente "esta sai da caixa antiga X e entra na caixa nova Y";
 - reduzir o risco de continuar puxando shell/residuo do `Chat inspetor` quando a tarefa real pertencer a `Mesa avaliadora`, e vice-versa.
+
+## Ciclo 109 — consolidacao canonica do que ja foi migrado
+
+Status:
+
+- concluido
+- sem mudanca de runtime
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a organizacao recente das 4 caixas ainda estava espalhada entre mapa mental e quadro de dominio;
+- `docs/STATUS_CANONICO.md` seguia apontando para um estado antigo do projeto, com branch e repositorio que nao representavam mais o `tariel-v2` atual;
+- sem uma referencia curta e atualizada, o trabalho continuaria correto em um documento e confuso em outro.
+
+Corte executado:
+
+- `docs/STATUS_CANONICO.md` foi reescrito para refletir o `tariel-v2` atual, em `main`, com leitura objetiva das 4 caixas oficiais da migracao;
+- o arquivo passou a registrar percentuais aproximados, ownership e baguncas remanescentes por dominio;
+- `docs/CAIXAS_MIGRACAO_POR_DOMINIO.md` ganhou um quadro de consolidacao objetiva, reforcando origem legacy, destino novo, tipo de migracao ja visivel e estado pratico de cada caixa;
+- o efeito do corte e transformar a organizacao das fatias ja migradas em referencia canonica, e nao apenas em nota auxiliar de transicao.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `docs/STATUS_CANONICO.md`
+- `docs/CAIXAS_MIGRACAO_POR_DOMINIO.md`
+
+Base documental usada:
+
+- `docs/MAPA_MENTAL_MIGRACAO_V2.md`
+- `docs/CAIXAS_MIGRACAO_POR_DOMINIO.md`
+- `tariel-v2/web/frontend-astro/src/pages/admin/*`
+- `tariel-v2/web/frontend-astro/src/pages/cliente/*`
+- `tariel-v2/web/frontend-astro/src/pages/app/*`
+- `tariel-v2/web/frontend-astro/src/pages/revisao/*`
+
+Validacao local executada:
+
+- revisao documental cruzada entre `STATUS_CANONICO`, `MAPA_MENTAL_MIGRACAO_V2` e `CAIXAS_MIGRACAO_POR_DOMINIO`
+- `git diff --check -- docs/STATUS_CANONICO.md docs/CAIXAS_MIGRACAO_POR_DOMINIO.md docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- resultado:
+  - reorganizacao somente documental
+  - sem impacto de runtime
+
+Proximo passo imediato:
+
+- usar `STATUS_CANONICO.md` como resposta curta para "onde estamos" e `CAIXAS_MIGRACAO_POR_DOMINIO.md` como quadro operacional;
+- evitar retomar migracao grande antes de fechar residuos semanticos de `Chat inspetor` e `Mesa avaliadora`;
+- quando a proxima fatia abrir, declarar explicitamente a caixa antiga e a caixa nova para nao reintroduzir mistura conceitual.
