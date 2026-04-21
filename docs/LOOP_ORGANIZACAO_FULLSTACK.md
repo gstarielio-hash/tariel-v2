@@ -4050,3 +4050,44 @@ Proximo passo imediato:
 - com a navegacao explicita da mesa ja aberta no Astro, o proximo ganho util do inspetor e introduzir a primeira view de contexto tecnico do laudo ativo, aproximando a superficie do workspace real;
 - isso prepara a migracao de mais estados operacionais sem continuar inflando um unico arquivo legado;
 - seguir reduzindo o papel do `chat_index_page.js` em fatias pequenas, validas e reversiveis.
+
+## Ciclo 97 — contexto tecnico da mesa do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a nova `view=contexto` da mesa do inspetor ja existia, mas ainda repetia quase a mesma leitura resumida do laudo;
+- isso deixava a superficie longe de um contexto operacional real, mesmo com dados tecnicos ja disponiveis no resumo da mesa e no overview do portal;
+- o corte seguro era enriquecer essa view apenas com dados ja carregados pelo Astro, sem exigir contrato novo no backend Python.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/mesa.astro` passou a derivar `contextHighlights` com template, dono atual e ultima mensagem do caso ativo;
+- a `view=contexto` agora abre uma leitura tecnica mais concreta, com cards de sinais operacionais antes do resumo principal;
+- entrou uma segunda faixa de contexto com dados do operador em sessao e do tenant atual, reutilizando o `overview` ja entregue pela app shell;
+- o ownership continua explicito: Astro organiza a leitura e a composicao da workspace, enquanto o backend Python segue dono do resumo canonico, do workflow e do estado do laudo.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a leitura tecnica do contexto ja aberta no Astro, o proximo ganho util do inspetor e migrar mais sinais da operacao ativa para dentro da mesa, reduzindo ainda mais a necessidade do workspace legado;
+- a melhor sequencia e aprofundar estados do caso e a trilha operacional ainda dependentes da interface antiga, sem abrir contrato novo antes da hora;
+- seguir em fatias pequenas, reversiveis e validadas para aproximar o `Inspetor` de uma migracao integral.

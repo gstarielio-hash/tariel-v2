@@ -85,6 +85,23 @@ const filteredHistoryItems = canonicalHistoryItems.filter((message) => {
   return true;
 });
 const currentView = ["conversa", "historico", "contexto"].includes(requestedView) ? requestedView : "conversa";
+const contextHighlights = [
+  {
+    label: "Template",
+    value: selectedReport?.template ?? "Nao definido",
+    detail: selectedSummary?.laudo_card?.entry_mode_effective || "Modo efetivo ainda nao exposto nesta leitura.",
+  },
+  {
+    label: "Dono atual",
+    value: selectedSummary?.active_owner_role ?? "Sem dono ativo",
+    detail: selectedSummary?.case_workflow_mode || "Workflow nao informado.",
+  },
+  {
+    label: "Ultima mensagem",
+    value: selectedSummary?.resumo.ultima_mensagem_tipo ?? "Sem historico",
+    detail: selectedSummary?.resumo.ultima_mensagem_preview || "Nenhum preview operacional disponivel.",
+  },
+] as const;
 const historyFilterOptions = [
   { key: "todos", label: "Todos", count: canonicalHistoryItems.length },
   {
@@ -363,7 +380,7 @@ function formatBytes(value: number | undefined) {
         <div class="flex items-center justify-between gap-4">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Contexto do laudo</p>
-            <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Resumo operacional</h2>
+            <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Leitura tecnica do caso ativo</h2>
           </div>
           <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
             {selectedReport ? `Laudo ${selectedReport.id}` : "Sem selecao"}
@@ -373,6 +390,16 @@ function formatBytes(value: number | undefined) {
         <div class="mt-6 grid gap-3">
           {selectedReport && selectedSummary ? (
             <>
+              <div class="grid gap-3 sm:grid-cols-3">
+                {contextHighlights.map((item) => (
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
+                    <p class="mt-3 font-display text-2xl tracking-tight text-slate-950">{item.value}</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+
               <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
                 <p class="text-sm font-semibold text-slate-950">
                   {selectedSummary.laudo_card?.titulo || selectedReport.sector}
@@ -414,6 +441,28 @@ function formatBytes(value: number | undefined) {
                     ? selectedSummary.allowed_surface_actions.join(", ")
                     : "Nenhuma acao de superficie exposta para este estado."}
                 </p>
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Operador em sessao</p>
+                  <p class="mt-3 text-sm font-semibold text-slate-950">{overview.profile.name}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">{overview.profile.email}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    Ultimo login: {overview.profile.lastLoginLabel}
+                  </p>
+                </div>
+
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Empresa</p>
+                  <p class="mt-3 text-sm font-semibold text-slate-950">{overview.company.name}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">Plano ativo: {overview.company.activePlan}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    {overview.company.blocked
+                      ? `Bloqueio: ${overview.company.blockedReason || "motivo nao informado."}`
+                      : "Tenant operacional sem bloqueio ativo."}
+                  </p>
+                </div>
               </div>
             </>
           ) : (
