@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Regra Astro x Python
+    url: https://github.com/gstarielio-hash/tariel-v2/blob/main/docs/CHECKLIST_ABERTURA_TAREFA_ASTRO_PYTHON.md
+    about: Use este checklist antes de abrir uma tarefa nova.
+  - name: Charter da Migracao V2
+    url: https://github.com/gstarielio-hash/tariel-v2/blob/main/docs/TARIEL_V2_MIGRATION_CHARTER.md
+    about: Consulte a ordem oficial das verticais e a regra de ownership.
