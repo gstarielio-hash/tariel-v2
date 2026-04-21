@@ -4302,3 +4302,45 @@ Proximo passo imediato:
 - com a pre-visualizacao oficial ja dentro da mesa Astro, o `Inspetor` web reduz mais um atalho importante ao shell legado;
 - os proximos gaps relevantes tendem a estar em acoes residuais de shell e navegacao do workspace antigo, nao mais no miolo da operacao de laudo;
 - seguir apenas se o proximo corte realmente diminuir trafego e uso do legado em producao, em vez de apenas reorganizar UI secundaria.
+
+## Ciclo 103 — finalizar e reabrir laudo direto na mesa Astro do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a mesa Astro ja cobria abertura, conversa, historico, contexto e preview de PDF, mas ainda deixava as acoes de `finalizar` e `reabrir` presas ao shell legado;
+- isso mantinha um resquicio funcional relevante do workspace antigo justamente no fim do fluxo do laudo, que e onde o `Inspetor` ainda precisava saltar para a interface velha;
+- o corte seguro era usar apenas os endpoints oficiais ja governados pelo backend Python, sem duplicar regra de gate, decisao final ou politica de reabertura no frontend.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a expor helpers tipados para `POST /app/api/laudo/{laudoId}/finalizar` e `POST /app/api/laudo/{laudoId}/reabrir`;
+- entraram as rotas server-side `web/frontend-astro/src/pages/app/mesa/[laudoId]/finalizar.ts` e `web/frontend-astro/src/pages/app/mesa/[laudoId]/reabrir.ts`, ambas com notice padrao e redirecionamento seguro de volta para a mesa;
+- `web/frontend-astro/src/pages/app/mesa.astro` agora mostra CTAs de `Finalizar fluxo` e `Reabrir caso` no header operacional quando o proprio snapshot do backend indica que a acao esta liberada;
+- a reabertura segue com politica padrao `keep_visible`, preservando o documento emitido no caso ativo ate que um fluxo mais detalhado seja realmente necessario.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/finalizar.ts`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/reabrir.ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+
+Proximo passo imediato:
+
+- com `finalizar` e `reabrir` ja dentro da mesa Astro, o `Inspetor` reduz mais um bloco funcional do shell legado no ponto mais sensivel do fluxo;
+- os proximos cortes restantes tendem a ser residuais de shell, navegacao antiga ou refinamentos de paridade, nao mais a operacao principal do laudo;
+- seguir apenas em fatias que reduzam dependencias reais do workspace antigo e nao reintroduzam dupla manutencao entre Astro e legado.

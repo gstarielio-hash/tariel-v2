@@ -161,6 +161,36 @@ export interface AppInspectionStartPayload {
   laudo_card?: Record<string, unknown> | null;
 }
 
+export interface AppInspectionFinalizePayload {
+  success: boolean;
+  message?: string;
+  laudo_id: number;
+  estado: string;
+  permite_reabrir: boolean;
+  review_mode_final?: string | null;
+  idempotent_replay?: boolean;
+  entry_mode_preference?: string | null;
+  entry_mode_effective?: string | null;
+  entry_mode_reason?: string | null;
+  laudo_card?: Record<string, unknown> | null;
+}
+
+export interface AppInspectionReopenPayload {
+  success: boolean;
+  message?: string;
+  laudo_id: number;
+  estado: string;
+  permite_reabrir: boolean;
+  issued_document_policy_applied?: string | null;
+  had_previous_issued_document?: boolean;
+  previous_issued_document_visible_in_case?: boolean;
+  internal_learning_candidate_registered?: boolean;
+  entry_mode_preference?: string | null;
+  entry_mode_effective?: string | null;
+  entry_mode_reason?: string | null;
+  laudo_card?: Record<string, unknown> | null;
+}
+
 export interface AppInspectionPreviewInput {
   diagnostico: string;
   inspetor: string;
@@ -426,6 +456,42 @@ export async function fetchAppInspectionPreviewResponse(
   }
 
   return response;
+}
+
+export async function finalizeAppInspection(
+  appSession: AuthenticatedAppRequest,
+  input: {
+    laudoId: number;
+  },
+): Promise<AppInspectionFinalizePayload> {
+  return expectAppMesaJson<AppInspectionFinalizePayload>(
+    appSession,
+    `/app/api/laudo/${input.laudoId}/finalizar`,
+    {
+      method: "POST",
+      errorPrefix: "Python inspector finalize failed",
+    },
+  );
+}
+
+export async function reopenAppInspection(
+  appSession: AuthenticatedAppRequest,
+  input: {
+    laudoId: number;
+    issuedDocumentPolicy?: string | null;
+  },
+): Promise<AppInspectionReopenPayload> {
+  const issuedDocumentPolicy = String(input.issuedDocumentPolicy ?? "").trim();
+
+  return expectAppMesaJson<AppInspectionReopenPayload>(
+    appSession,
+    `/app/api/laudo/${input.laudoId}/reabrir`,
+    {
+      method: "POST",
+      body: issuedDocumentPolicy ? { issued_document_policy: issuedDocumentPolicy } : undefined,
+      errorPrefix: "Python inspector reopen failed",
+    },
+  );
 }
 
 export async function replyToAppMesaWithAttachment(

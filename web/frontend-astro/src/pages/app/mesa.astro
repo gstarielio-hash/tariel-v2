@@ -70,6 +70,17 @@ const templateOptionsByGroup = Array.from(
 );
 const canCreateInspection = templateOptions.length > 0;
 const inspectorCurrentState = String(inspectorStatus?.estado ?? "sem_relatorio").trim().toLowerCase() || "sem_relatorio";
+const actionKeySet = new Set((selectedSummary?.allowed_surface_actions ?? []).map((action) => String(action).trim().toLowerCase()));
+const canFinalizeInspection = Boolean(
+  selectedReport
+  && selectedSummary
+  && (selectedSummary.permite_edicao || actionKeySet.has("chat_send_to_review") || actionKeySet.has("chat_finalize")),
+);
+const canReopenInspection = Boolean(
+  selectedReport
+  && selectedSummary
+  && (selectedSummary.permite_reabrir || actionKeySet.has("chat_reopen")),
+);
 const filteredReports = overview.recentReports.filter((report) => {
   if (!currentSearch) {
     return true;
@@ -366,7 +377,7 @@ function formatBytes(value: number | undefined) {
           {" "}pendencias abertas e reply operacional direto pelo portal novo.
         </p>
         {selectedReport ? (
-          <div class="mt-4">
+          <div class="mt-4 flex flex-wrap gap-3">
             <a
               href={`/app/mesa/${selectedReport.id}/preview`}
               target="_blank"
@@ -376,6 +387,31 @@ function formatBytes(value: number | undefined) {
               <FileStack className="size-3.5" />
               Pre-visualizar PDF
             </a>
+            {canFinalizeInspection ? (
+              <form method="POST" action={`/app/mesa/${selectedReport.id}/finalizar`}>
+                <input type="hidden" name="returnTo" value={currentReturnTo} />
+                <button
+                  type="submit"
+                  class="inline-flex items-center gap-2 rounded-full border border-emerald-500/24 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800 transition hover:border-emerald-500/40"
+                >
+                  <CheckCircle2 className="size-3.5" />
+                  Finalizar fluxo
+                </button>
+              </form>
+            ) : null}
+            {canReopenInspection ? (
+              <form method="POST" action={`/app/mesa/${selectedReport.id}/reabrir`}>
+                <input type="hidden" name="returnTo" value={currentReturnTo} />
+                <input type="hidden" name="issuedDocumentPolicy" value="keep_visible" />
+                <button
+                  type="submit"
+                  class="inline-flex items-center gap-2 rounded-full border border-amber-500/24 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-800 transition hover:border-amber-500/40"
+                >
+                  <Clock3 className="size-3.5" />
+                  Reabrir caso
+                </button>
+              </form>
+            ) : null}
           </div>
         ) : null}
       </div>
