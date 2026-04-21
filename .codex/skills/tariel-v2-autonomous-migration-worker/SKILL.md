@@ -22,6 +22,15 @@ Treat the charter as the permanent migration policy until the migration reaches 
 - Treat the legacy Python/Jinja system as backup, reference, or temporary bridge only.
 - Prefer `Astro + React + TypeScript + Prisma` for product-facing web surfaces.
 - Keep Python only where it still acts as specialized runtime or where rewrite is not yet justified.
+- Migrate the whole product, not only `Admin-CEO`.
+
+The target scope includes:
+
+- `Admin-CEO`
+- `Admin-cliente`
+- `Inspetor`
+- `Mesa Avaliadora` / review surface
+- shared cross-portal flows and platform APIs
 
 ## Work rules
 
@@ -39,11 +48,11 @@ Treat the charter as the permanent migration policy until the migration reaches 
 ## Priority order
 
 1. Finish the slice already in progress.
-2. Close the Admin portal end-to-end in V2.
-3. Migrate the Client portal.
-4. Migrate the Reviewer portal.
-5. Migrate the Inspector workspace and remove heavy legacy JS/CSS dependence.
-6. Remove legacy route and template traffic after validation.
+2. Close the `Admin-CEO` portal end-to-end in V2.
+3. Migrate the `Admin-cliente` portal end-to-end in V2.
+4. Migrate the `Mesa Avaliadora` / reviewer portal end-to-end in V2.
+5. Migrate the `Inspetor` workspace and remove heavy legacy JS/CSS dependence.
+6. Remove legacy route and template traffic after validation across the whole product.
 
 When a more specific user directive exists for the current slice, follow it first.
 

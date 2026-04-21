@@ -13,6 +13,18 @@ Status:
 - The main product surface should converge to `Astro + React + TypeScript + Prisma`.
 - Python should remain only where it still acts as specialized runtime or where rewrite is not yet justified.
 
+## Migration Scope
+
+This migration is for the whole product, not only the Admin-CEO surface.
+
+The official V2 path must eventually cover:
+
+- `Admin-CEO`
+- `Admin-cliente` / tenant portal
+- `Inspetor` workspace and related operator surfaces
+- `Mesa Avaliadora` / review surface
+- shared operational flows, platform APIs, session flows, and cross-portal governance
+
 ## Persistence Rule
 
 This file exists so the migration goal is not lost during:
@@ -38,11 +50,11 @@ Every migration cycle must read this file before choosing the next slice.
 ## Priority Order
 
 1. Finish the slice already in progress.
-2. Close the Admin portal end-to-end in v2.
-3. Migrate the Client portal.
-4. Migrate the Reviewer portal.
-5. Migrate the Inspector workspace and remove heavy legacy JS/CSS dependence.
-6. Remove legacy route and template traffic after validation.
+2. Close the `Admin-CEO` portal end-to-end in v2.
+3. Migrate the `Admin-cliente` portal end-to-end in v2.
+4. Migrate the `Mesa Avaliadora` / review portal end-to-end in v2.
+5. Migrate the `Inspetor` workspace and remove heavy legacy JS/CSS dependence.
+6. Remove legacy route and template traffic after validation across the whole product.
 
 ## Current Architectural Stance
 
