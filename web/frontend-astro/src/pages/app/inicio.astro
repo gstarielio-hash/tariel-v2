@@ -650,7 +650,7 @@ const cards = [
                   <div class="mt-4 flex flex-wrap gap-2">
                     {message.anexos.map((attachment) => (
                       <a
-                        href={`/app/inicio/${selectedReport.id}/anexos/${attachment.id}`}
+                        href={`/app/mesa/${selectedReport.id}/anexos/${attachment.id}`}
                         class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                       >
                         <Paperclip className="size-3.5" />
@@ -663,7 +663,7 @@ const cards = [
                 {message.message_kind === "mesa_pendency" && selectedReport ? (
                   <form
                     method="POST"
-                    action={`/app/inicio/${selectedReport.id}/pendencias/${message.id}`}
+                    action={`/app/mesa/${selectedReport.id}/pendencias/${message.id}`}
                     class="mt-4 flex flex-wrap gap-3"
                   >
                     <input type="hidden" name="returnTo" value={`/app/inicio?laudo=${selectedReport.id}`} />
@@ -727,7 +727,7 @@ const cards = [
         {selectedReport ? (
           <form
             method="POST"
-            action={`/app/inicio/${selectedReport.id}/responder`}
+            action={`/app/mesa/${selectedReport.id}/responder`}
             enctype="multipart/form-data"
             class="rounded-[24px] border border-slate-200 bg-slate-50 p-4"
           >
@@ -740,7 +740,7 @@ const cards = [
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-semibold text-slate-950">Responder a thread do laudo</p>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
-                  Esta action route do Astro envia texto e, quando necessario, um anexo opcional para a mesa do laudo selecionado.
+                  Esta action route compartilhada da mesa envia texto e, quando necessario, um anexo opcional para o laudo selecionado.
                 </p>
 
                 {referencedMessage ? (

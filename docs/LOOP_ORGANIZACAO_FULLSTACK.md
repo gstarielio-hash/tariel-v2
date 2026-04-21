@@ -4383,3 +4383,51 @@ Proximo passo imediato:
 - com a home Astro deixando de ser apenas leitura e passando a despachar as acoes principais do caso, o `Inspetor` reduz mais um motivo de retorno mental ao shell legado;
 - os proximos cortes restantes devem mirar paridade residual de navegacao, contexto ou atalhos antigos ligados ao workspace pesado;
 - seguir apenas em fatias que retirem trafego real do legado, nao em reorganizacoes cosmeticas da home.
+
+## Ciclo 105 — remocao das action routes duplicadas de `/app/inicio` no `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a home Astro do `Inspetor` ainda usava rotas proprias de `responder`, `pendencias` e `anexos` em `/app/inicio/**`, apesar de a mesa Astro ja ser a superficie oficial para essas mesmas acoes;
+- isso mantinha duplicacao de handlers, aumentava a area de manutencao e deixava ownership confuso entre a home e a mesa;
+- o corte seguro era fazer a home reaproveitar apenas as rotas da mesa e mover a implementacao definitiva para `/app/mesa/**`.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a apontar anexos, resposta e atualizacao de pendencias para as rotas oficiais de `/app/mesa/**`;
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/responder.ts`, `pendencias/[messageId].ts` e `anexos/[attachmentId].ts` deixaram de ser reexports e passaram a carregar a implementacao real das action routes;
+- foram removidas as rotas transitórias de `/app/inicio/[laudoId]/responder.ts`, `/pendencias/[messageId].ts` e `/anexos/[attachmentId].ts`;
+- o resultado reduz duplicacao e deixa a mesa Astro como ownership unico das mutacoes e downloads da thread do laudo.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/responder.ts`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/pendencias/[messageId].ts`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/anexos/[attachmentId].ts`
+- removidos:
+  - `web/frontend-astro/src/pages/app/inicio/[laudoId]/responder.ts`
+  - `web/frontend-astro/src/pages/app/inicio/[laudoId]/pendencias/[messageId].ts`
+  - `web/frontend-astro/src/pages/app/inicio/[laudoId]/anexos/[attachmentId].ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a home e a mesa apontando para o mesmo conjunto de handlers, o `Inspetor` reduz mais um bloco de manutencao duplicada no V2;
+- os proximos residuos relevantes tendem a estar mais em navegacao/contexto do workspace legado do que em actions Astro duplicadas;
+- seguir apenas em fatias que eliminem superficie antiga de verdade, e nao so aliases de rota.
