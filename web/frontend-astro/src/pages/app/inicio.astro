@@ -38,6 +38,7 @@ if (!overview) {
 const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
 const notice = consumeAppNotice(Astro.cookies);
 const selectedLaudoId = Number(Astro.url.searchParams.get("laudo") ?? 0) || overview.recentReports[0]?.id || 0;
+const selectedReferenceMessageId = Number(Astro.url.searchParams.get("ref") ?? 0) || 0;
 const selectedReport = overview.recentReports.find((report) => report.id === selectedLaudoId) ?? overview.recentReports[0] ?? null;
 const selectedSummary = selectedReport
   ? await fetchAppMesaSummary(appSession, selectedReport.id).catch(() => null)
@@ -46,6 +47,7 @@ const selectedMessages = selectedReport
   ? await fetchAppMesaMessages(appSession, selectedReport.id).catch(() => null)
   : null;
 const threadPreview = selectedMessages?.itens.slice(-6).reverse() ?? [];
+const referencedMessage = threadPreview.find((message) => message.id === selectedReferenceMessageId) ?? null;
 const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
   timeStyle: "short",
@@ -434,6 +436,22 @@ const cards = [
                     </button>
                   </form>
                 ) : null}
+
+                {selectedReport ? (
+                  <div class="mt-3">
+                    <a
+                      href={`/app/inicio?laudo=${selectedReport.id}&ref=${message.id}`}
+                      class:list={[
+                        "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition",
+                        referencedMessage?.id === message.id
+                          ? "border-sky-500/30 bg-sky-500/10 text-sky-800"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300",
+                      ]}
+                    >
+                      {referencedMessage?.id === message.id ? "Respondendo a esta mensagem" : "Responder a esta mensagem"}
+                    </a>
+                  </div>
+                ) : null}
               </div>
 
               <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
@@ -468,6 +486,7 @@ const cards = [
             class="rounded-[24px] border border-slate-200 bg-slate-50 p-4"
           >
             <input type="hidden" name="returnTo" value={`/app/inicio?laudo=${selectedReport.id}`} />
+            <input type="hidden" name="referenciaMensagemId" value={referencedMessage?.id ?? ""} />
             <div class="flex items-start gap-3">
               <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
                 <MessageSquareCode className="size-5" />
@@ -477,6 +496,29 @@ const cards = [
                 <p class="mt-2 text-sm leading-6 text-slate-600">
                   Esta primeira acao do Astro envia uma resposta simples para a mesa no laudo selecionado, sem anexo.
                 </p>
+
+                {referencedMessage ? (
+                  <div class="mt-4 rounded-[20px] border border-sky-500/18 bg-sky-500/8 p-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">
+                          Respondendo a mensagem #{referencedMessage.id}
+                        </p>
+                        <p class="mt-2 text-sm leading-6 text-slate-700">{referencedMessage.texto}</p>
+                        <p class="mt-2 text-xs text-slate-500">
+                          {referencedMessage.data} • {referencedMessage.message_kind}
+                        </p>
+                      </div>
+
+                      <a
+                        href={`/app/inicio?laudo=${selectedReport.id}`}
+                        class="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800 transition hover:border-sky-500/35"
+                      >
+                        Limpar
+                      </a>
+                    </div>
+                  </div>
+                ) : null}
 
                 <textarea
                   name="texto"

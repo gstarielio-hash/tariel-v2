@@ -3708,3 +3708,44 @@ Proximo passo imediato:
 - com reply textual e pendencia resolvida/reaberta no Astro, o proximo corte natural e reply com referencia de mensagem;
 - em seguida, a extensao mais util e o envio com anexo, ainda sem portar a workspace completa;
 - manter o criterio incremental: uma acao operacional por vez, sempre reaproveitando os contratos canonicos do backend.
+
+## Ciclo 89 — reply com referencia de mensagem no `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- o portal do inspetor ja conseguia responder a thread e resolver pendencias, mas o reply ainda era solto, sem ligar explicitamente a resposta a uma mensagem anterior;
+- isso limitava a utilidade da primeira acao no Astro, porque a mesa frequentemente trabalha sobre um item especifico da conversa;
+- o corte seguro era reaproveitar o `referenciaMensagemId` que a action route ja aceitava, sem abrir ainda uploads ou uma composer completa.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a aceitar `?ref=` no laudo selecionado;
+- cada card da thread recente ganhou o CTA `Responder a esta mensagem`, que fixa a mensagem de referencia na propria home;
+- o formulario de reply agora envia `referenciaMensagemId` oculto para a action route existente;
+- a UI do composer mostra um resumo da mensagem referenciada e permite limpar a selecao sem sair do laudo atual.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com reply livre e reply referenciado no Astro, o proximo corte natural e reply com anexo;
+- isso fecha a trilha minima de interacao do inspetor sem exigir ainda uma workspace full-screen;
+- depois desse passo, o proximo ganho estrutural passa a ser unificar melhor resumo, thread e composer numa superficie operacional dedicada.
