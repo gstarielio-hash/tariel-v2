@@ -3475,3 +3475,50 @@ Proximo passo imediato:
 - usar esta base autenticada para migrar a primeira superficie operacional do `/app`, preferencialmente reaproveitando os contratos canonicos ja expostos em `/app/api/*`;
 - manter o criterio de ownership: Astro como shell, sessao e rotas SSR; Python como dono de chat, policy, feed, mesa, pendencias e mutacoes do operador;
 - antes de abrir cortes maiores de UI, vale identificar qual tela inicial do inspetor traz mais valor com menor acoplamento ao legado, para evitar portar a workspace inteira de uma vez.
+
+## Ciclo 84 — overview operacional inicial do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- depois de fechar login, sessao e primeiro acesso do inspetor, a home `/app/inicio` ainda era apenas um shell honesto, mas sem leitura real do dominio do operador;
+- o legado ja mostrava na entrada do portal contexto do usuario, laudos recentes e trilha de atividade, entao continuar com uma home totalmente vazia atrasaria a escolha da primeira tela operacional do `/app`;
+- o corte seguro era portar um overview real do proprio inspetor, sem puxar ainda chat, laudo selecionado ou mutacoes pesadas.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/app-portal.ts`, consolidando a leitura do overview do inspetor em Prisma:
+  - perfil do usuario e da empresa;
+  - contagem de laudos do proprio operador;
+  - sessoes ativas do portal `inspetor`;
+  - laudos recentes do usuario;
+  - auditoria recente do proprio portal;
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a consumir esse helper e deixou de ser apenas um painel de ownership;
+- a home agora mostra cards com contexto real do inspetor, uma lista de laudos recentes do proprio usuario, um bloco de perfil/governanca e uma trilha de eventos recentes do portal;
+- o ownership foi preservado: Astro so le overview e shell; Python continua dono da workspace operacional, do chat, das pendencias e das mutacoes do `/app`.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-portal.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a entrada do inspetor agora autenticada e lendo dados reais, o proximo corte natural e migrar a primeira superficie operacional ligada a `/app/api/*`;
+- a melhor candidata e uma leitura inicial de workspace ou resumo do laudo selecionado, porque reaproveita contratos existentes sem reabrir a sessao;
+- seguir evitando portar o chat inteiro de uma vez, privilegiando uma primeira tela de valor com baixo acoplamento ao legado.
