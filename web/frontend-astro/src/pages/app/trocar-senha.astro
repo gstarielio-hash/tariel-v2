@@ -1,0 +1,112 @@
+---
+import { ArrowRight, KeyRound, ShieldCheck } from "lucide-react";
+
+import AuthShell from "@/components/app/auth/auth-shell.astro";
+
+export const prerender = false;
+
+const errorMessage = String(Astro.url.searchParams.get("erro") ?? "").trim();
+const passwordResetSession = Astro.locals.appPasswordResetSession;
+
+if (!passwordResetSession) {
+  return Astro.redirect("/app/login?erro=Fluxo%20de%20troca%20de%20senha%20invalido%20ou%20expirado.", 303);
+}
+---
+
+<AuthShell
+  title="Troca obrigatoria de senha | Tariel Astro"
+  description="Primeiro acesso do inspetor no Astro SSR."
+  portalLabel="Portal do Inspetor"
+  heroTitle="Senha temporaria validada. Agora falta fechar a rotacao obrigatoria."
+  heroCopy="O primeiro acesso do inspetor no V2 agora ja roda dentro do Astro. Esta tela finaliza a troca da senha temporaria sem voltar para o legado."
+  heroItems={[
+    "Fluxo temporario protegido por sessao curta em Prisma.",
+    "Nova senha passa a valer imediatamente no portal do inspetor do Astro.",
+    "Sessao final do operador so nasce depois da rotacao obrigatoria.",
+    "Base pronta para depois receber politicas extras de identidade sem reabrir o legado.",
+  ]}
+  supportText="Se a senha temporaria nao funcionar, fale com o admin-cliente."
+  submitLabel="Salvar senha"
+  previewMessage="Fluxo de troca conectado."
+  variant="portal"
+  panelEyebrow="Primeiro acesso"
+  panelTitle="Definir nova senha"
+  panelCopy="Esta etapa conclui o primeiro acesso no portal do inspetor. A senha temporaria so libera a emissao da sessao final depois que for substituida."
+>
+  <Fragment slot="form">
+    <div class="space-y-5">
+      <div class="rounded-[28px] border border-sky-500/15 bg-sky-500/6 p-4 text-sky-950">
+        <div class="flex items-start gap-3">
+          <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+            <ShieldCheck className="size-4" />
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]">Identidade confirmada</p>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+              Conta: <strong>{passwordResetSession.user.email}</strong><br />
+              Empresa: <strong>{passwordResetSession.user.companyName}</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {errorMessage ? (
+        <div class="rounded-[24px] border border-rose-500/18 bg-rose-500/8 px-4 py-3 text-sm leading-6 text-rose-900">
+          {errorMessage}
+        </div>
+      ) : null}
+
+      <form class="space-y-4" method="POST" action="/app/trocar-senha/salvar" novalidate>
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Senha temporaria</span>
+          <div class="relative">
+            <input
+              type="password"
+              name="senhaAtual"
+              placeholder="Digite a senha temporaria recebida"
+              autocomplete="current-password"
+              required
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-500"
+            />
+            <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
+              <KeyRound className="size-4" />
+            </span>
+          </div>
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Nova senha</span>
+          <input
+            type="password"
+            name="novaSenha"
+            placeholder="Minimo de 8 caracteres"
+            autocomplete="new-password"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-500"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Confirmar nova senha</span>
+          <input
+            type="password"
+            name="confirmarSenha"
+            placeholder="Repita a nova senha"
+            autocomplete="new-password"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-500"
+          />
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Salvar senha e entrar
+          <ArrowRight className="size-4" />
+        </button>
+      </form>
+    </div>
+  </Fragment>
+</AuthShell>

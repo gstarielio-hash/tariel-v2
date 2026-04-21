@@ -1,23 +1,132 @@
 ---
+import { ArrowRight, LockKeyhole, ShieldCheck } from "lucide-react";
+
 import AuthShell from "@/components/app/auth/auth-shell.astro";
+import { safeAppNextPath } from "@/lib/server/app-auth";
 
 export const prerender = false;
+
+const errorMessage = String(Astro.url.searchParams.get("erro") ?? "").trim();
+const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const prefillEmail = String(Astro.url.searchParams.get("email") ?? "").trim().toLowerCase();
+const firstAccess = new Set(["1", "true", "sim"]).has(
+  String(Astro.url.searchParams.get("primeiro_acesso") ?? "").trim().toLowerCase(),
+);
+const nextPath = safeAppNextPath(Astro.url.searchParams.get("next"), "/app/inicio");
 ---
 
 <AuthShell
   title="Portal do Inspetor | Tariel Astro"
-  description="Tela de autenticacao migrada para o portal do inspetor."
+  description="Login do portal do inspetor com sessao Astro SSR persistida em Prisma."
   portalLabel="Portal do Inspetor"
-  heroTitle="Nova base visual para o workspace do inspetor."
-  heroCopy="A autenticacao do portal operacional agora tem uma base limpa em Astro, preparada para receber sessao, controles de identidade e a futura shell do workspace sem carregar o legado junto."
+  heroTitle="Primeira entrada real do inspetor na stack oficial."
+  heroCopy="O portal operacional agora ganha autenticacao propria no Astro SSR com Prisma, permitindo primeiro acesso com senha temporaria, troca obrigatoria de senha e sessao desacoplada do HTML legado."
   heroItems={[
-    "Mesmo padrao visual do portal atual, mas com composicao moderna e reutilizavel.",
-    "Componente compartilhado para reduzir divergencia entre inspetor, admin e mesa.",
-    "Etapa segura para plugar login real quando o backend Node/TypeScript entrar.",
-    "Serve como ponto de partida antes de migrar home, chat e mesa do inspetor.",
+    "Login password emitido em sessoes_ativas com cookie httpOnly proprio do portal do inspetor.",
+    "Primeiro acesso com senha temporaria agora segue para troca obrigatoria dentro da stack nova.",
+    "A shell inicial autenticada abre no V2 sem carregar a sessao do portal antigo.",
+    "Workspace, chat e mutacoes pesadas seguem como proximas fatias sobre os contratos canonicos do backend.",
   ]}
-  supportText="Quer um acesso? Fale com o administrador."
+  supportText="Precisa de acesso ou apoio no primeiro login? Fale com o admin-cliente."
   submitLabel="Acessar"
-  previewMessage="Layout pronto. Na proxima etapa eu ligo este formulario ao fluxo real de autenticacao e sessao do portal do inspetor."
+  previewMessage="Login pronto para integracao real."
   variant="portal"
-/>
+  panelEyebrow="Portal do Inspetor"
+  panelTitle="Entrar no portal operacional"
+  panelCopy="A autenticacao local do inspetor ja usa Prisma e Astro. A workspace pesada segue em migracao por fatias sobre esta mesma base."
+>
+  <Fragment slot="form">
+    <div class="space-y-5">
+      <div class="rounded-[28px] border border-sky-500/15 bg-sky-500/6 p-4 text-sky-950">
+        <div class="flex items-start gap-3">
+          <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+            <ShieldCheck className="size-4" />
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]">Sessao propria do inspetor</p>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+              Este login ja valida a senha do <strong>inspetor</strong> em <strong>Astro + Prisma</strong> e abre o
+              caminho oficial do portal operacional na V2.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {firstAccess ? (
+        <div class="rounded-[24px] border border-amber-500/18 bg-amber-500/8 px-4 py-3 text-sm leading-6 text-amber-950">
+          Primeiro acesso: entre com o e-mail informado no cadastro da empresa e com a senha temporaria recebida em
+          canal seguro. A nova senha sera definida no proximo passo.
+        </div>
+      ) : null}
+
+      {successMessage ? (
+        <div class="rounded-[24px] border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm leading-6 text-emerald-900">
+          {successMessage}
+        </div>
+      ) : null}
+
+      {errorMessage ? (
+        <div class="rounded-[24px] border border-rose-500/18 bg-rose-500/8 px-4 py-3 text-sm leading-6 text-rose-900">
+          {errorMessage}
+        </div>
+      ) : null}
+
+      <form class="space-y-4" method="POST" action="/app/login/entrar" novalidate>
+        <input type="hidden" name="next" value={nextPath} />
+        <input type="hidden" name="primeiro_acesso" value={firstAccess ? "1" : ""} />
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">E-mail</span>
+          <input
+            type="email"
+            name="email"
+            placeholder="voce@empresa.com"
+            autocomplete="username"
+            value={prefillEmail}
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-500"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Senha</span>
+          <div class="relative">
+            <input
+              type="password"
+              name="senha"
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              required
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-500"
+            />
+            <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
+              <LockKeyhole className="size-4" />
+            </span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+          <input type="checkbox" name="lembrar" value="1" class="size-4 rounded border-slate-300 text-sky-500" />
+          <span>Manter esta sessao neste navegador</span>
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Acessar
+          <ArrowRight className="size-4" />
+        </button>
+      </form>
+
+      <div class="rounded-[24px] border border-sky-500/18 bg-sky-500/8 px-4 py-3 text-sm leading-6 text-sky-950">
+        <strong class="font-semibold">Estado da migracao</strong>
+        <p class="mt-1">
+          Entrada, sessao e primeiro acesso do inspetor ja rodam no V2. As proximas rodadas migram a primeira
+          superficie operacional do `/app` sem reabrir ownership do legado.
+        </p>
+      </div>
+    </div>
+  </Fragment>
+</AuthShell>

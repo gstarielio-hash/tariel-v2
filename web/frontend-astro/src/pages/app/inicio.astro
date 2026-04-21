@@ -1,0 +1,177 @@
+---
+import { Clock3, Fingerprint, MessageSquareCode, ScanSearch, ShieldCheck, Workflow } from "lucide-react";
+
+import AppShellLayout from "@/layouts/app-shell-layout.astro";
+
+export const prerender = false;
+
+const appSession = Astro.locals.appSession;
+
+if (!appSession) {
+  return Astro.redirect("/app/login", 303);
+}
+
+const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const formatter = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+const cards = [
+  {
+    label: "Portal",
+    value: "Inspetor",
+    detail: "Sessao oficial emitida no Astro SSR com persistencia em Prisma.",
+    icon: Fingerprint,
+  },
+  {
+    label: "Empresa",
+    value: appSession.user.companyName,
+    detail: appSession.user.email,
+    icon: ShieldCheck,
+  },
+  {
+    label: "Ultima atividade",
+    value: formatter.format(appSession.session.lastActivityAt),
+    detail: appSession.session.remember ? "Sessao com lembrar ativado." : "Sessao padrao do navegador.",
+    icon: Clock3,
+  },
+  {
+    label: "Expira em",
+    value: formatter.format(appSession.session.expiresAt),
+    detail: "Renovacao automatica segue a politica canonica de sessoes_ativas.",
+    icon: Workflow,
+  },
+];
+---
+
+<AppShellLayout
+  title="Portal do Inspetor | Tariel Astro"
+  description="Home inicial autenticada do inspetor no Astro SSR."
+  userName={appSession.user.name}
+  companyName={appSession.user.companyName}
+  activeItem="dashboard"
+>
+  <Fragment slot="header">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">Portal do inspetor</p>
+        <h1 class="mt-3 font-display text-3xl tracking-tight text-slate-950 sm:text-4xl">
+          {appSession.user.name}
+        </h1>
+        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          Sessao oficial do inspetor ativa no Astro SSR. Esta primeira superficie fecha login, primeiro acesso e uma
+          home autenticada honesta antes da migracao da workspace operacional pesada.
+        </p>
+      </div>
+
+      <div class="rounded-[28px] border border-sky-500/16 bg-sky-500/6 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Status da migracao</p>
+        <p class="mt-2 text-lg font-semibold text-slate-950">Base autenticada entregue</p>
+        <p class="mt-1 text-sm leading-6 text-slate-600">Sessao, guarda de rotas e primeiro acesso ja sairam do legado.</p>
+      </div>
+    </div>
+  </Fragment>
+
+  {successMessage ? (
+    <div class="mb-6 rounded-[24px] border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm leading-6 text-emerald-900">
+      {successMessage}
+    </div>
+  ) : null}
+
+  <section class="grid gap-4 xl:grid-cols-4">
+    {cards.map(({ label, value, detail, icon: Icon }) => (
+      <article class="rounded-[30px] border border-slate-950/8 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</p>
+          <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+            <Icon className="size-5" />
+          </div>
+        </div>
+        <p class="mt-5 font-display text-2xl tracking-tight text-slate-950">{value}</p>
+        <p class="mt-3 text-sm leading-6 text-slate-600">{detail}</p>
+      </article>
+    ))}
+  </section>
+
+  <section class="mt-8 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Ownership</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">O que ja migrou</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          Slice 1 do inspetor
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-3">
+        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+          <p class="text-sm font-semibold text-slate-950">Autenticacao real no Astro</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Login por senha, cookie httpOnly, sessao persistida em Prisma e logout ja rodam fora do portal HTML legado.
+          </p>
+        </div>
+
+        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+          <p class="text-sm font-semibold text-slate-950">Primeiro acesso migrado</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            A senha temporaria agora segue para troca obrigatoria dentro da stack nova antes da emissao da sessao final.
+          </p>
+        </div>
+
+        <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+          <p class="text-sm font-semibold text-slate-950">Shell inicial autenticada</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Esta home valida o ownership do Astro sobre sessao e navegacao sem fingir que a workspace operacional ja foi portada.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Proximas fatias</p>
+          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">O que continua no Python</h2>
+        </div>
+
+        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          Ownership preservado
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-3">
+        <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+          <div class="flex items-start gap-3">
+            <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+              <MessageSquareCode className="size-5" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-950">Workspace e chat operacional</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                O chat, a mesa do laudo, pendencias, feed, stream e mutacoes de operacao continuam no backend Python.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+          <div class="flex items-start gap-3">
+            <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+              <ScanSearch className="size-5" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-950">Proxima entrega natural</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                Migrar a primeira tela operacional do `/app` sobre os contratos canonicos ja expostos em `/app/api/*`.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+</AppShellLayout>

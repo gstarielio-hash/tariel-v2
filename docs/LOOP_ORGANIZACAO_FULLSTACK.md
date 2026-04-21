@@ -3423,3 +3423,55 @@ Proximo passo imediato:
 - com `/revisao` consolidado e funcionalmente fechado, o proximo movimento mais util e sair da vertical para a proxima frente pendente;
 - a prioridade natural passa a ser `Inspetor`, reaproveitando o mesmo criterio de ownership usado aqui;
 - se surgir uma rodada extra de limpeza, ela deve mirar aposentadoria de consumo legacy residual, nao reescrever a superficie ja estabilizada.
+
+## Ciclo 83 — autenticacao real e shell inicial do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a frente `Inspetor` ainda tinha apenas `web/frontend-astro/src/pages/app/login.astro` como preview visual, sem ownership real de sessao, middleware, primeiro acesso ou uma home autenticada no Astro;
+- isso deixava o proximo vertical preso ao legado logo na entrada, ao contrario do que ja estava fechado em `cliente` e `revisao`;
+- antes de migrar workspace, chat e mesas do operador, o corte seguro era fechar autenticacao canonica e uma shell inicial honesta em `/app`.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/app-auth.ts`, espelhando o contrato usado nos outros portais para o `inspetor`: login por senha, sessao em `sessoes_ativas`, primeiro acesso com senha temporaria, renovacao de sessao, logout e auditoria basica de identidade;
+- `web/frontend-astro/src/middleware.ts` e `web/frontend-astro/src/env.d.ts` passaram a reconhecer `appSession` e `appPasswordResetSession`, protegendo `/app/*` com o mesmo criterio de same-origin e redirect usado em `cliente` e `revisao`;
+- `web/frontend-astro/src/pages/app/login.astro` deixou de ser preview e passou a usar o fluxo real do portal do inspetor, com `next`, mensagens de erro/sucesso e CTA de primeiro acesso;
+- entraram as rotas `web/frontend-astro/src/pages/app/login/entrar.ts`, `web/frontend-astro/src/pages/app/trocar-senha.astro`, `web/frontend-astro/src/pages/app/trocar-senha/salvar.ts`, `web/frontend-astro/src/pages/app/logout.ts` e `web/frontend-astro/src/pages/app/index.ts`;
+- entrou `web/frontend-astro/src/layouts/app-shell-layout.astro` e a primeira home autenticada `web/frontend-astro/src/pages/app/inicio.astro`, deixando explicito que Astro agora e dono da entrada/sessao enquanto Python continua dono da workspace operacional e do chat.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/env.d.ts`
+- `web/frontend-astro/src/layouts/app-shell-layout.astro`
+- `web/frontend-astro/src/lib/server/app-auth.ts`
+- `web/frontend-astro/src/middleware.ts`
+- `web/frontend-astro/src/pages/app/index.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+- `web/frontend-astro/src/pages/app/login.astro`
+- `web/frontend-astro/src/pages/app/login/entrar.ts`
+- `web/frontend-astro/src/pages/app/logout.ts`
+- `web/frontend-astro/src/pages/app/trocar-senha.astro`
+- `web/frontend-astro/src/pages/app/trocar-senha/salvar.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- usar esta base autenticada para migrar a primeira superficie operacional do `/app`, preferencialmente reaproveitando os contratos canonicos ja expostos em `/app/api/*`;
+- manter o criterio de ownership: Astro como shell, sessao e rotas SSR; Python como dono de chat, policy, feed, mesa, pendencias e mutacoes do operador;
+- antes de abrir cortes maiores de UI, vale identificar qual tela inicial do inspetor traz mais valor com menor acoplamento ao legado, para evitar portar a workspace inteira de uma vez.

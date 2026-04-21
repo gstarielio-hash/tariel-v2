@@ -1,5 +1,9 @@
 /// <reference types="astro/client" />
 
+import type {
+  AuthenticatedAppPasswordResetRequest,
+  AuthenticatedAppRequest,
+} from "@/lib/server/app-auth";
 import type { AuthenticatedAdminRequest } from "@/lib/server/admin-auth";
 import type {
   AuthenticatedClientPasswordResetRequest,
@@ -13,6 +17,8 @@ import type {
 declare global {
   namespace App {
     interface Locals {
+      appSession: AuthenticatedAppRequest | null;
+      appPasswordResetSession: AuthenticatedAppPasswordResetRequest | null;
       adminSession: AuthenticatedAdminRequest | null;
       clientSession: AuthenticatedClientRequest | null;
       clientPasswordResetSession: AuthenticatedClientPasswordResetRequest | null;

@@ -1,6 +1,14 @@
 import { defineMiddleware } from "astro:middleware";
 
 import {
+  buildAppLoginPath,
+  isAppPath,
+  isPublicAppPath,
+  loadAppPasswordResetSession,
+  loadAppRequestSession,
+  safeAppNextPath,
+} from "@/lib/server/app-auth";
+import {
   buildAdminLoginPath,
   getAdminRequiredTransitionPath,
   isAdminLogoutPath,
@@ -34,11 +42,61 @@ import {
 } from "@/lib/server/reviewer-auth";
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  context.locals.appSession = null;
+  context.locals.appPasswordResetSession = null;
   context.locals.adminSession = null;
   context.locals.clientSession = null;
   context.locals.clientPasswordResetSession = null;
   context.locals.reviewerSession = null;
   context.locals.reviewerPasswordResetSession = null;
+
+  if (isAppPath(context.url.pathname)) {
+    if (isStateChangingMethod(context.request.method) && !isSameOriginRequest(context.request, context.url)) {
+      return new Response("Forbidden", { status: 403 });
+    }
+
+    const appSession = await loadAppRequestSession(context);
+    const appPasswordResetSession = appSession ? null : await loadAppPasswordResetSession(context);
+    context.locals.appSession = appSession;
+    context.locals.appPasswordResetSession = appPasswordResetSession;
+
+    const isAppPasswordChangePath =
+      context.url.pathname === "/app/trocar-senha"
+      || context.url.pathname === "/app/trocar-senha/salvar";
+    const isAppLogoutPath = context.url.pathname === "/app/logout";
+
+    if (appPasswordResetSession) {
+      if (isAppPasswordChangePath || isAppLogoutPath) {
+        return next();
+      }
+
+      return context.redirect("/app/trocar-senha", 303);
+    }
+
+    if (!appSession) {
+      if (isPublicAppPath(context.url.pathname)) {
+        return next();
+      }
+
+      const nextPath = `${context.url.pathname}${context.url.search}`;
+      return context.redirect(buildAppLoginPath(nextPath), 303);
+    }
+
+    if (isPublicAppPath(context.url.pathname)) {
+      if (context.url.pathname === "/app/login") {
+        const nextPath = safeAppNextPath(context.url.searchParams.get("next"), "/app/inicio");
+        return context.redirect(nextPath, 303);
+      }
+
+      return context.redirect("/app/inicio", 303);
+    }
+
+    if (isAppPasswordChangePath) {
+      return context.redirect("/app/inicio", 303);
+    }
+
+    return next();
+  }
 
   if (isClientPath(context.url.pathname)) {
     if (isStateChangingMethod(context.request.method) && !isSameOriginRequest(context.request, context.url)) {
