@@ -54,6 +54,17 @@ const filteredReports = overview.recentReports.filter((report) => {
     .toLowerCase();
   return haystack.includes(currentSearch);
 });
+const threadAttachmentItems = threadPreview.flatMap((message) =>
+  (message.anexos ?? []).map((attachment) => ({
+    attachment,
+    messageId: message.id,
+    messageDate: message.data,
+  })),
+);
+const recentAttachmentItems = threadAttachmentItems.slice(0, 4);
+const threadResolvedCount = threadPreview.filter((message) => message.pendency_state === "resolved").length;
+const threadReferencedCount = threadPreview.filter((message) => Boolean(message.referencia_mensagem_id)).length;
+const currentReturnTo = buildMesaPath({ selectedLaudoId: selectedReport?.id ?? null });
 
 const stats = [
   {
@@ -340,6 +351,114 @@ function formatBytes(value: number | undefined) {
       <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
         <div class="flex items-center justify-between gap-4">
           <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Contexto lateral</p>
+            <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Leitura operacional do caso</h2>
+          </div>
+          <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+            <Workflow className="size-5" />
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-3">
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Thread visivel</p>
+              <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{threadPreview.length}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Mensagens na leitura atual do Astro.</p>
+            </div>
+
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Referencias</p>
+              <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{threadReferencedCount}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Replies que apontam para outra mensagem da thread.</p>
+            </div>
+
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Resolvidas</p>
+              <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{threadResolvedCount}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">Pendencias marcadas como resolvidas nesta leitura.</p>
+            </div>
+          </div>
+
+          {referencedMessage ? (
+            <div class="rounded-[24px] border border-sky-500/18 bg-sky-500/8 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sky-800">Mensagem em foco</p>
+              <p class="mt-3 text-sm font-semibold text-slate-950">#{referencedMessage.id} • {referencedMessage.message_kind}</p>
+              <p class="mt-2 text-sm leading-6 text-slate-700">{referencedMessage.texto}</p>
+              <div class="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                <span>{referencedMessage.data}</span>
+                {referencedMessage.anexos && referencedMessage.anexos.length > 0 ? (
+                  <span>{referencedMessage.anexos.length} anexos</span>
+                ) : null}
+              </div>
+              <div class="mt-4">
+                <a
+                  href={buildMesaPath({ selectedLaudoId: selectedReport?.id ?? null, selectedReferenceMessageId: null })}
+                  class="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800 transition hover:border-sky-500/35"
+                >
+                  Limpar foco
+                </a>
+              </div>
+            </div>
+          ) : null}
+
+          <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-sm font-semibold text-slate-950">Anexos recentes da thread</p>
+              <div class="rounded-2xl bg-white p-2 text-sky-700 shadow-sm">
+                <Paperclip className="size-4" />
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-3">
+              {recentAttachmentItems.length > 0 ? recentAttachmentItems.map(({ attachment, messageId, messageDate }) => (
+                <a
+                  href={selectedReport ? `/app/mesa/${selectedReport.id}/anexos/${attachment.id}` : "#"}
+                  class="flex items-start justify-between gap-4 rounded-[18px] border border-slate-200 bg-white px-4 py-3 transition hover:border-slate-300"
+                >
+                  <div>
+                    <p class="text-sm font-semibold text-slate-950">{attachment.nome}</p>
+                    <p class="mt-1 text-xs text-slate-500">
+                      Mensagem #{messageId} • {messageDate}
+                    </p>
+                  </div>
+                  <span class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    {formatBytes(attachment.tamanho_bytes)}
+                  </span>
+                </a>
+              )) : (
+                <p class="text-sm leading-6 text-slate-600">Nenhum anexo apareceu na leitura atual da mesa.</p>
+              )}
+            </div>
+          </div>
+
+          <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <p class="text-sm font-semibold text-slate-950">Auditoria recente do portal</p>
+              <div class="rounded-2xl bg-white p-2 text-sky-700 shadow-sm">
+                <ShieldCheck className="size-4" />
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-3">
+              {overview.recentAudit.length > 0 ? overview.recentAudit.slice(0, 3).map((entry) => (
+                <div class="rounded-[18px] border border-slate-200 bg-white px-4 py-3">
+                  <p class="text-sm font-semibold text-slate-950">{entry.summary}</p>
+                  <p class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{entry.portal} • {entry.action}</p>
+                  {entry.detail ? <p class="mt-2 text-sm leading-6 text-slate-600">{entry.detail}</p> : null}
+                  <p class="mt-2 text-xs text-slate-500">{entry.createdAtLabel}</p>
+                </div>
+              )) : (
+                <p class="text-sm leading-6 text-slate-600">Ainda nao houve eventos recentes auditados para este portal.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-between gap-4">
+          <div>
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Thread da mesa</p>
             <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Conversa recente do laudo</h2>
           </div>
@@ -441,7 +560,7 @@ function formatBytes(value: number | undefined) {
                       action={`/app/mesa/${selectedReport.id}/pendencias/${message.id}`}
                       class="mt-4 flex flex-wrap gap-3"
                     >
-                      <input type="hidden" name="returnTo" value={buildMesaPath({ selectedLaudoId: selectedReport.id })} />
+                      <input type="hidden" name="returnTo" value={currentReturnTo} />
                       <input type="hidden" name="lida" value={message.pendency_state === "resolved" ? "false" : "true"} />
                       <button
                         type="submit"
@@ -492,7 +611,7 @@ function formatBytes(value: number | undefined) {
               enctype="multipart/form-data"
               class="rounded-[24px] border border-slate-200 bg-slate-50 p-4"
             >
-              <input type="hidden" name="returnTo" value={buildMesaPath({ selectedLaudoId: selectedReport.id })} />
+              <input type="hidden" name="returnTo" value={currentReturnTo} />
               <input type="hidden" name="referenciaMensagemId" value={referencedMessage?.id ?? ""} />
               <div class="flex items-start gap-3">
                 <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
