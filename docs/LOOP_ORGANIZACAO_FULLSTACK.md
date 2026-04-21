@@ -3280,3 +3280,49 @@ Proximo passo imediato:
 - ligar `coverage/solicitar-refazer` e outras mutacoes de refinamento da mesa diretamente nesta workspace, sem abrir novos contratos paralelos;
 - depois entrar em exportacao de pacote e emissao oficial do revisor em fatias separadas para nao misturar fluxos pesados com a thread do caso;
 - manter `Inspetor` fora da frente principal ate `revisao` fechar esse bloco operacional com ownership claro de UI no Astro e regras no Python.
+
+## Ciclo 80 — `Mesa Avaliadora` com coverage return e exportacao do pacote no Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- depois do ciclo 79, a workspace de `/revisao/painel` ja cobria thread, resposta, pendencias e decisao, mas ainda deixava de fora dois blocos importantes do pacote tecnico: o retorno governado de coverage e a exportacao do caso;
+- isso obrigava o operador a sair do fluxo novo justamente quando precisava pedir refazer de evidencia ou baixar o material consolidado do caso;
+- o menor slice seguro era abrir esses pontos no Astro sobre os endpoints canonicos ja existentes, mas ainda sem puxar a emissao oficial transacional, que segue sendo o trecho mais sensivel.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/reviewer-mesa-bridge.ts` passou a expor `coverage/solicitar-refazer`, `pacote/exportar-pdf` e `pacote/exportar-oficial`, mantendo bearer e tratamento de erro no mesmo boundary do portal revisor;
+- `web/frontend-astro/src/lib/server/reviewer-mesa.ts` passou a mapear `documento_estruturado`, `coverage_map`, `anexo_pack`, `verificacao_publica` e `emissao_oficial` para a workspace SSR da mesa;
+- entraram as action/proxy routes `src/pages/revisao/painel/[laudoId]/coverage/refazer.ts`, `pacote/exportar-pdf.ts` e `pacote/exportar-oficial.ts`, deixando no Astro apenas redirect, notice e proxy de download;
+- `web/frontend-astro/src/pages/revisao/painel.astro` ganhou o bloco `Pacote tecnico`, com leitura do documento estruturado, resumo de coverage, CTA de exportar PDF, CTA de exportar pacote oficial e formularios de `Solicitar refazer` para evidencias nao aceitas.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/reviewer-mesa-bridge.ts`
+- `web/frontend-astro/src/lib/server/reviewer-mesa.ts`
+- `web/frontend-astro/src/pages/revisao/painel.astro`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/coverage/refazer.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/pacote/exportar-oficial.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/pacote/exportar-pdf.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- decidir se o proximo corte entra direto em `emissao-oficial` transacional ou se fecha antes o download da emissao congelada e estados de reemissao no shell do Astro;
+- se entrar na emissao, manter a fatia pequena: CTA, conflito `409`, replay idempotente e download congelado, sem tentar redesenhar governanca no frontend;
+- manter `Inspetor` fora da frente principal ate `revisao` fechar tambem esse bloco final com ownership claro entre Astro e Python.

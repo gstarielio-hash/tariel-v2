@@ -2,16 +2,21 @@ import type { AuthenticatedReviewerRequest } from "@/lib/server/reviewer-auth";
 import {
   fetchReviewerMesaAttachmentResponse,
   fetchReviewerMesaMessages,
+  fetchReviewerMesaOfficialZipResponse,
   fetchReviewerMesaPackage,
+  fetchReviewerMesaPackagePdfResponse,
   markReviewerMesaWhispersRead,
   replyToReviewerMesa,
   replyToReviewerMesaWithAttachment,
+  requestReviewerMesaCoverageReturn,
   reviewReviewerMesaCase,
   updateReviewerMesaPendency,
   type ReviewerMesaAttachmentPayload,
+  type ReviewerMesaCoverageItemPayload,
   type ReviewerMesaMessagePayload,
   type ReviewerMesaPackageItemPayload,
   type ReviewerMesaPackagePayload,
+  type ReviewerMesaPackageSectionPayload,
 } from "@/lib/server/reviewer-mesa-bridge";
 import {
   fetchReviewerPanelSnapshot,
@@ -65,6 +70,34 @@ export interface ReviewerMesaPackageMessage {
   attachments: ReviewerMesaAttachment[];
 }
 
+export interface ReviewerMesaStructuredSection {
+  key: string;
+  title: string;
+  status: string;
+  summary: string | null;
+  diffShort: string | null;
+  filledFields: number;
+  totalFields: number;
+}
+
+export interface ReviewerMesaCoverageItem {
+  evidenceKey: string;
+  title: string;
+  kind: string;
+  status: string;
+  required: boolean;
+  sourceStatus: string | null;
+  operationalStatus: string | null;
+  mesaStatus: string | null;
+  componentType: string | null;
+  viewAngle: string | null;
+  qualityScore: number | null;
+  coherenceScore: number | null;
+  replacementEvidenceKey: string | null;
+  summary: string | null;
+  failureReasons: string[];
+}
+
 export interface ReviewerMesaSelectedPackage {
   laudoId: number;
   codeHash: string;
@@ -85,6 +118,52 @@ export interface ReviewerMesaSelectedPackage {
   lastInteractionLabel: string;
   fieldTimeMinutes: number;
   aiSummary: string | null;
+  structuredDocument: {
+    schemaType: string;
+    familyKey: string | null;
+    familyLabel: string | null;
+    summary: string | null;
+    reviewNotes: string | null;
+    sections: ReviewerMesaStructuredSection[];
+  } | null;
+  coverage: {
+    totalRequired: number;
+    totalCollected: number;
+    totalAccepted: number;
+    totalMissing: number;
+    totalIrregular: number;
+    finalValidationMode: string | null;
+    items: ReviewerMesaCoverageItem[];
+  } | null;
+  attachmentPack: {
+    totalItems: number;
+    totalRequired: number;
+    totalPresent: number;
+    missingRequiredCount: number;
+    documentCount: number;
+    imageCount: number;
+    virtualCount: number;
+    readyForIssue: boolean;
+    missingItems: string[];
+  } | null;
+  publicVerification: {
+    verificationUrl: string;
+    hashShort: string;
+    statusVisualLabel: string | null;
+    approvedAt: Date | null;
+    approvedAtLabel: string;
+  } | null;
+  officialIssue: {
+    issueStatus: string;
+    issueStatusLabel: string;
+    readyForIssue: boolean;
+    blockerCount: number;
+    alreadyIssued: boolean;
+    reissueRecommended: boolean;
+    issueActionLabel: string | null;
+    issueActionEnabled: boolean;
+    verificationUrl: string | null;
+  } | null;
   messageSummary: {
     total: number;
     inspector: number;
@@ -274,6 +353,40 @@ export async function fetchReviewerMesaAttachment(
   return fetchReviewerMesaAttachmentResponse(reviewerSession, input);
 }
 
+export async function requestReviewerMesaCoverageRefazer(
+  reviewerSession: AuthenticatedReviewerRequest,
+  input: {
+    laudoId: number;
+    evidenceKey: string;
+    title: string;
+    kind: string;
+    required: boolean;
+    sourceStatus?: string | null;
+    operationalStatus?: string | null;
+    mesaStatus?: string | null;
+    componentType?: string | null;
+    viewAngle?: string | null;
+    summary?: string | null;
+    failureReasons?: string[];
+  },
+) {
+  return requestReviewerMesaCoverageReturn(reviewerSession, input);
+}
+
+export async function fetchReviewerMesaPackagePdf(
+  reviewerSession: AuthenticatedReviewerRequest,
+  laudoId: number,
+) {
+  return fetchReviewerMesaPackagePdfResponse(reviewerSession, laudoId);
+}
+
+export async function fetchReviewerMesaOfficialZip(
+  reviewerSession: AuthenticatedReviewerRequest,
+  laudoId: number,
+) {
+  return fetchReviewerMesaOfficialZipResponse(reviewerSession, laudoId);
+}
+
 function resolveSelectedReviewerMesaCase(input: {
   requestedId: number | null;
   activeCases: ReviewQueueItemPayload[];
@@ -333,6 +446,62 @@ function mapReviewerMesaPackage(payload: ReviewerMesaPackagePayload): ReviewerMe
     lastInteractionLabel: formatDateTime(parseDateOrNull(payload.ultima_interacao_em), "Sem interacao recente"),
     fieldTimeMinutes: payload.tempo_em_campo_minutos,
     aiSummary: payload.parecer_ia || null,
+    structuredDocument: payload.documento_estruturado
+      ? {
+          schemaType: payload.documento_estruturado.schema_type,
+          familyKey: payload.documento_estruturado.family_key,
+          familyLabel: payload.documento_estruturado.family_label,
+          summary: payload.documento_estruturado.summary,
+          reviewNotes: payload.documento_estruturado.review_notes,
+          sections: payload.documento_estruturado.sections.map(mapReviewerMesaStructuredSection),
+        }
+      : null,
+    coverage: payload.coverage_map
+      ? {
+          totalRequired: payload.coverage_map.total_required,
+          totalCollected: payload.coverage_map.total_collected,
+          totalAccepted: payload.coverage_map.total_accepted,
+          totalMissing: payload.coverage_map.total_missing,
+          totalIrregular: payload.coverage_map.total_irregular,
+          finalValidationMode: payload.coverage_map.final_validation_mode,
+          items: payload.coverage_map.items.map(mapReviewerMesaCoverageItem),
+        }
+      : null,
+    attachmentPack: payload.anexo_pack
+      ? {
+          totalItems: payload.anexo_pack.total_items,
+          totalRequired: payload.anexo_pack.total_required,
+          totalPresent: payload.anexo_pack.total_present,
+          missingRequiredCount: payload.anexo_pack.missing_required_count,
+          documentCount: payload.anexo_pack.document_count,
+          imageCount: payload.anexo_pack.image_count,
+          virtualCount: payload.anexo_pack.virtual_count,
+          readyForIssue: payload.anexo_pack.ready_for_issue,
+          missingItems: [...payload.anexo_pack.missing_items],
+        }
+      : null,
+    publicVerification: payload.verificacao_publica
+      ? {
+          verificationUrl: payload.verificacao_publica.verification_url,
+          hashShort: payload.verificacao_publica.hash_short,
+          statusVisualLabel: payload.verificacao_publica.status_visual_label,
+          approvedAt: parseDateOrNull(payload.verificacao_publica.approved_at),
+          approvedAtLabel: formatDateTime(parseDateOrNull(payload.verificacao_publica.approved_at), "Sem aprovacao"),
+        }
+      : null,
+    officialIssue: payload.emissao_oficial
+      ? {
+          issueStatus: payload.emissao_oficial.issue_status,
+          issueStatusLabel: payload.emissao_oficial.issue_status_label,
+          readyForIssue: payload.emissao_oficial.ready_for_issue,
+          blockerCount: payload.emissao_oficial.blocker_count,
+          alreadyIssued: payload.emissao_oficial.already_issued,
+          reissueRecommended: payload.emissao_oficial.reissue_recommended,
+          issueActionLabel: payload.emissao_oficial.issue_action_label,
+          issueActionEnabled: payload.emissao_oficial.issue_action_enabled,
+          verificationUrl: payload.emissao_oficial.verification_url,
+        }
+      : null,
     messageSummary: {
       total: payload.resumo_mensagens.total,
       inspector: payload.resumo_mensagens.inspetor,
@@ -356,6 +525,42 @@ function mapReviewerMesaPackage(payload: ReviewerMesaPackagePayload): ReviewerMe
       mapReviewerMesaPackageMessage(payload.laudo_id, item),
     ),
     recentWhispers: payload.whispers_recentes.map((item) => mapReviewerMesaPackageMessage(payload.laudo_id, item)),
+  };
+}
+
+function mapReviewerMesaStructuredSection(
+  section: ReviewerMesaPackageSectionPayload,
+): ReviewerMesaStructuredSection {
+  return {
+    key: section.key,
+    title: section.title,
+    status: section.status,
+    summary: section.summary,
+    diffShort: section.diff_short,
+    filledFields: section.filled_fields,
+    totalFields: section.total_fields,
+  };
+}
+
+function mapReviewerMesaCoverageItem(
+  item: ReviewerMesaCoverageItemPayload,
+): ReviewerMesaCoverageItem {
+  return {
+    evidenceKey: item.evidence_key,
+    title: item.title,
+    kind: item.kind,
+    status: item.status,
+    required: item.required,
+    sourceStatus: item.source_status,
+    operationalStatus: item.operational_status,
+    mesaStatus: item.mesa_status,
+    componentType: item.component_type,
+    viewAngle: item.view_angle,
+    qualityScore: item.quality_score,
+    coherenceScore: item.coherence_score,
+    replacementEvidenceKey: item.replacement_evidence_key,
+    summary: item.summary,
+    failureReasons: [...item.failure_reasons],
   };
 }
 

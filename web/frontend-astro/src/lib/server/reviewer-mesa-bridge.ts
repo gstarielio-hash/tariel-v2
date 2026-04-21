@@ -220,6 +220,13 @@ export interface ReviewerMesaWhispersReadPayload {
   marcadas: number;
 }
 
+export interface ReviewerMesaCoverageReturnPayload {
+  success: boolean;
+  mensagem?: ReviewerMesaMessagePayload;
+  evidence_key: string;
+  block_key?: string | null;
+}
+
 const DEFAULT_PYTHON_BACKEND_URL = "http://127.0.0.1:8000";
 
 function resolvePythonBackendBaseUrl() {
@@ -466,6 +473,94 @@ export async function fetchReviewerMesaAttachmentResponse(
     const detail = await extractBackendError(response);
     throw new Error(
       `Python reviewer mesa attachment failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return response;
+}
+
+export async function requestReviewerMesaCoverageReturn(
+  reviewerSession: AuthenticatedReviewerRequest,
+  input: {
+    laudoId: number;
+    evidenceKey: string;
+    title: string;
+    kind: string;
+    required: boolean;
+    sourceStatus?: string | null;
+    operationalStatus?: string | null;
+    mesaStatus?: string | null;
+    componentType?: string | null;
+    viewAngle?: string | null;
+    summary?: string | null;
+    failureReasons?: string[];
+    severity?: string | null;
+    requiredAction?: string | null;
+  },
+) {
+  return expectReviewerMesaJson<ReviewerMesaCoverageReturnPayload>(
+    reviewerSession,
+    `/revisao/api/laudo/${input.laudoId}/coverage/solicitar-refazer`,
+    {
+      method: "POST",
+      body: {
+        evidence_key: input.evidenceKey,
+        title: input.title,
+        kind: input.kind,
+        required: input.required,
+        source_status: input.sourceStatus ?? null,
+        operational_status: input.operationalStatus ?? null,
+        mesa_status: input.mesaStatus ?? null,
+        component_type: input.componentType ?? null,
+        view_angle: input.viewAngle ?? null,
+        summary: input.summary ?? null,
+        failure_reasons: input.failureReasons ?? [],
+        severity: input.severity ?? "medium",
+        required_action: input.requiredAction ?? "refazer_evidencia",
+      },
+      errorPrefix: "Python reviewer mesa coverage return failed",
+    },
+  );
+}
+
+export async function fetchReviewerMesaPackagePdfResponse(
+  reviewerSession: AuthenticatedReviewerRequest,
+  laudoId: number,
+) {
+  const response = await fetchReviewerMesaBackend(
+    reviewerSession,
+    `/revisao/api/laudo/${laudoId}/pacote/exportar-pdf`,
+    {
+      accept: "application/pdf",
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python reviewer mesa package pdf failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return response;
+}
+
+export async function fetchReviewerMesaOfficialZipResponse(
+  reviewerSession: AuthenticatedReviewerRequest,
+  laudoId: number,
+) {
+  const response = await fetchReviewerMesaBackend(
+    reviewerSession,
+    `/revisao/api/laudo/${laudoId}/pacote/exportar-oficial`,
+    {
+      accept: "application/zip",
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python reviewer mesa official zip failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
     );
   }
 
