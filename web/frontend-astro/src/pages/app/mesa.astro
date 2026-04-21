@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   ClipboardList,
+  Clock3,
   MessageCircle,
   MessageSquareCode,
   Paperclip,
@@ -26,6 +27,7 @@ if (!appSession) {
 }
 
 const searchTerm = String(Astro.url.searchParams.get("q") ?? "").trim().toLowerCase();
+const historyFilter = String(Astro.url.searchParams.get("hist") ?? "todos").trim().toLowerCase();
 const requestedLaudoId = Number(Astro.url.searchParams.get("laudo") ?? 0);
 const requestedReferenceMessageId = Number(Astro.url.searchParams.get("ref") ?? 0);
 const workspace = await getAppWorkspace(appSession, {
@@ -65,6 +67,40 @@ const recentAttachmentItems = threadAttachmentItems.slice(0, 4);
 const threadResolvedCount = threadPreview.filter((message) => message.pendency_state === "resolved").length;
 const threadReferencedCount = threadPreview.filter((message) => Boolean(message.referencia_mensagem_id)).length;
 const currentReturnTo = buildMesaPath({ selectedLaudoId: selectedReport?.id ?? null });
+const canonicalHistoryItems = selectedMessages?.itens ?? [];
+const normalizedHistoryFilter = ["todos", "pendencias", "anexos", "referencias"].includes(historyFilter)
+  ? historyFilter
+  : "todos";
+const filteredHistoryItems = canonicalHistoryItems.filter((message) => {
+  if (normalizedHistoryFilter === "pendencias") {
+    return message.message_kind === "mesa_pendency";
+  }
+  if (normalizedHistoryFilter === "anexos") {
+    return Boolean(message.anexos && message.anexos.length > 0);
+  }
+  if (normalizedHistoryFilter === "referencias") {
+    return Boolean(message.referencia_mensagem_id);
+  }
+  return true;
+});
+const historyFilterOptions = [
+  { key: "todos", label: "Todos", count: canonicalHistoryItems.length },
+  {
+    key: "pendencias",
+    label: "Pendencias",
+    count: canonicalHistoryItems.filter((message) => message.message_kind === "mesa_pendency").length,
+  },
+  {
+    key: "anexos",
+    label: "Com anexo",
+    count: canonicalHistoryItems.filter((message) => Boolean(message.anexos && message.anexos.length > 0)).length,
+  },
+  {
+    key: "referencias",
+    label: "Referencias",
+    count: canonicalHistoryItems.filter((message) => Boolean(message.referencia_mensagem_id)).length,
+  },
+] as const;
 
 const stats = [
   {
@@ -97,11 +133,13 @@ function buildMesaPath(input: {
   searchTerm?: string;
   selectedLaudoId?: number | null;
   selectedReferenceMessageId?: number | null;
+  historyFilter?: string | null;
 }) {
   const params = new URLSearchParams();
   const nextSearch = String(input.searchTerm ?? currentSearch).trim();
   const nextLaudoId = input.selectedLaudoId ?? null;
   const nextReferenceId = input.selectedReferenceMessageId ?? null;
+  const nextHistoryFilter = String(input.historyFilter ?? normalizedHistoryFilter).trim();
 
   if (nextSearch) {
     params.set("q", nextSearch);
@@ -111,6 +149,9 @@ function buildMesaPath(input: {
   }
   if (nextReferenceId) {
     params.set("ref", String(nextReferenceId));
+  }
+  if (nextHistoryFilter && nextHistoryFilter !== "todos") {
+    params.set("hist", nextHistoryFilter);
   }
 
   const query = params.toString();
@@ -699,6 +740,80 @@ function formatBytes(value: number | undefined) {
               </div>
             </div>
           </div>
+        </div>
+      </article>
+
+      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Historico do laudo</p>
+            <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Primeira leitura dedicada</h2>
+          </div>
+          <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+            <Clock3 className="size-5" />
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-2">
+          {historyFilterOptions.map((option) => (
+            <a
+              href={buildMesaPath({
+                selectedLaudoId: selectedReport?.id ?? null,
+                selectedReferenceMessageId: referencedMessage?.id ?? null,
+                historyFilter: option.key,
+              })}
+              class:list={[
+                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition",
+                normalizedHistoryFilter === option.key
+                  ? "border-sky-500/30 bg-sky-500/10 text-sky-800"
+                  : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-white",
+              ]}
+            >
+              <span>{option.label}</span>
+              <span class="rounded-full bg-white px-2 py-1 text-[10px] font-bold text-slate-600">{option.count}</span>
+            </a>
+          ))}
+        </div>
+
+        <div class="mt-6 space-y-3">
+          {selectedReport ? filteredHistoryItems.length > 0 ? filteredHistoryItems.map((message) => (
+            <article class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      {message.message_kind}
+                    </span>
+                    {message.referencia_mensagem_id ? (
+                      <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        Ref. #{message.referencia_mensagem_id}
+                      </span>
+                    ) : null}
+                    {message.anexos && message.anexos.length > 0 ? (
+                      <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        {message.anexos.length} anexos
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <p class="mt-3 text-sm leading-6 text-slate-700">{message.texto || "Mensagem sem texto visivel."}</p>
+                </div>
+
+                <div class="text-right text-xs text-slate-500">
+                  <p>{message.data}</p>
+                  <p class="mt-2">#{message.id}</p>
+                </div>
+              </div>
+            </article>
+          )) : (
+            <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+              Nenhum item do historico apareceu para o filtro atual.
+            </div>
+          ) : (
+            <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+              Selecione um laudo para abrir a leitura dedicada de historico no Astro.
+            </div>
+          )}
         </div>
       </article>
     </div>

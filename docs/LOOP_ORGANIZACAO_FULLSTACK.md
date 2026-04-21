@@ -3968,3 +3968,44 @@ Proximo passo imediato:
 - com a lateral de contexto ja presente, o proximo corte util do inspetor e abrir a primeira leitura dedicada de historico do laudo dentro de `/app/mesa`, reduzindo mais a dependencia do `chat_index_page.js`;
 - depois disso, a navegacao do workspace pode migrar por estados reais do Astro em vez de permanecer escondida no legado;
 - continuar portando apenas slices coesos e auditaveis, mantendo o backend Python como dono dos contratos operacionais.
+
+## Ciclo 95 — historico dedicado do laudo na mesa do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a mesa dedicada do inspetor ja tinha fila, thread e contexto lateral, mas ainda nao oferecia uma leitura separada do historico do laudo;
+- isso mantinha a consulta historica dependente do workspace legado, mesmo quando a leitura podia ser parcialmente resolvida com os itens ja retornados pelo backend da mesa;
+- o corte seguro era abrir uma primeira secao de historico dentro de `/app/mesa`, usando apenas a thread canônica ja carregada e filtros locais no Astro.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/mesa.astro` passou a aceitar `hist=` para filtrar a leitura de historico entre `todos`, `pendencias`, `anexos` e `referencias`;
+- a pagina agora deriva um historico dedicado a partir de `selectedMessages.itens`, sem duplicar contrato nem introduzir fetch adicional;
+- entrou uma nova secao `Historico do laudo` com chips de filtro, contagens por categoria e listagem dedicada dos registros filtrados;
+- o ownership segue o mesmo: Astro organiza a leitura e a navegacao, enquanto o backend Python continua dono da thread canonica e do estado operacional.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a primeira leitura de historico ja dentro de `/app/mesa`, o proximo ganho util do inspetor e abrir uma navegacao explicita por estados de workspace no Astro, em vez de concentrar tudo em uma pagina longa;
+- depois disso, fica mais seguro migrar trechos de contexto tecnico e a trilha de operacao sem depender do `chat_index_page.js`;
+- seguir priorizando slices que reduzam a dependencia do template legado `index.html` sem inventar novos contratos no backend.
