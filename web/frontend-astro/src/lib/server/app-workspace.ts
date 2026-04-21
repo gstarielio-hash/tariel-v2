@@ -1,7 +1,9 @@
 import type { AuthenticatedAppRequest } from "@/lib/server/app-auth";
 import {
+  fetchAppInspectorStatus,
   fetchAppMesaMessages,
   fetchAppMesaSummary,
+  type AppInspectorStatusPayload,
   type AppMesaMessagePayload,
   type AppMesaMessagesPayload,
   type AppMesaSummaryPayload,
@@ -14,6 +16,7 @@ import {
 
 export interface AppWorkspaceData {
   overview: AppPortalOverview;
+  inspectorStatus: AppInspectorStatusPayload | null;
   selectedReport: AppPortalReportSummary | null;
   selectedSummary: AppMesaSummaryPayload | null;
   selectedMessages: AppMesaMessagesPayload | null;
@@ -29,10 +32,13 @@ export async function getAppWorkspace(
     selectedReferenceMessageId?: number | null;
   } = {},
 ): Promise<AppWorkspaceData | null> {
-  const overview = await getAppPortalOverview({
-    userId: appSession.user.id,
-    companyId: appSession.user.companyId,
-  });
+  const [overview, inspectorStatus] = await Promise.all([
+    getAppPortalOverview({
+      userId: appSession.user.id,
+      companyId: appSession.user.companyId,
+    }),
+    fetchAppInspectorStatus(appSession).catch(() => null),
+  ]);
 
   if (!overview) {
     return null;
@@ -40,9 +46,12 @@ export async function getAppWorkspace(
 
   const requestedLaudoId = Number(input.selectedLaudoId ?? 0) || 0;
   const requestedReferenceMessageId = Number(input.selectedReferenceMessageId ?? 0) || 0;
+  const activeStatusLaudoId = Number(inspectorStatus?.laudo_id ?? 0) || 0;
   const fallbackReport = overview.recentReports[0] ?? null;
   const selectedReport =
-    overview.recentReports.find((report) => report.id === requestedLaudoId) ?? fallbackReport;
+    overview.recentReports.find((report) => report.id === requestedLaudoId)
+    ?? overview.recentReports.find((report) => report.id === activeStatusLaudoId)
+    ?? fallbackReport;
   const selectedSummary = selectedReport
     ? await fetchAppMesaSummary(appSession, selectedReport.id).catch(() => null)
     : null;
@@ -55,6 +64,7 @@ export async function getAppWorkspace(
 
   return {
     overview,
+    inspectorStatus,
     selectedReport,
     selectedSummary,
     selectedMessages,

@@ -56,6 +56,30 @@ export interface AppMesaSummaryPayload {
   };
 }
 
+export interface AppInspectorTemplateOption {
+  value: string;
+  label: string;
+  group_label?: string | null;
+  runtime_template_code?: string | null;
+}
+
+export interface AppInspectorStatusPayload {
+  estado: string;
+  laudo_id: number | null;
+  permite_edicao?: boolean;
+  permite_reabrir?: boolean;
+  status_card?: string | null;
+  tipos_relatorio?: Record<string, string>;
+  tipo_template_options?: AppInspectorTemplateOption[];
+  catalog_governed_mode?: boolean;
+  catalog_state?: string | null;
+  catalog_permissions?: Record<string, unknown> | null;
+  entry_mode_preference?: string | null;
+  entry_mode_effective?: string | null;
+  entry_mode_reason?: string | null;
+  laudo_card?: Record<string, unknown> | null;
+}
+
 export interface AppMesaAttachmentPayload {
   id: number;
   nome: string;
@@ -118,6 +142,23 @@ export interface AppMesaPendencyPayload {
   resolvida_por_id: number | null;
   resolvida_por_nome: string | null;
   resolvida_em: string;
+}
+
+export interface AppInspectionStartPayload {
+  success: boolean;
+  laudo_id: number;
+  hash?: string;
+  message?: string;
+  estado: string;
+  tipo_template?: string;
+  catalog_governed_mode?: boolean;
+  catalog_selection_token?: string | null;
+  catalog_family_key?: string | null;
+  catalog_variant_key?: string | null;
+  entry_mode_preference?: string | null;
+  entry_mode_effective?: string | null;
+  entry_mode_reason?: string | null;
+  laudo_card?: Record<string, unknown> | null;
 }
 
 const DEFAULT_PYTHON_BACKEND_URL = "http://127.0.0.1:8000";
@@ -257,6 +298,15 @@ export async function fetchAppMesaMessages(
   return (await response.json()) as AppMesaMessagesPayload;
 }
 
+export async function fetchAppInspectorStatus(
+  appSession: AuthenticatedAppRequest,
+): Promise<AppInspectorStatusPayload> {
+  return expectAppMesaJson<AppInspectorStatusPayload>(appSession, "/app/api/laudo/status", {
+    method: "GET",
+    errorPrefix: "Python inspector status failed",
+  });
+}
+
 export async function replyToAppMesa(
   appSession: AuthenticatedAppRequest,
   input: {
@@ -283,6 +333,55 @@ export async function replyToAppMesa(
       errorPrefix: "Python inspector mesa reply failed",
     },
   );
+}
+
+export async function startAppInspection(
+  appSession: AuthenticatedAppRequest,
+  input: {
+    tipoTemplate: string;
+    entryModePreference?: string | null;
+    cliente?: string | null;
+    unidade?: string | null;
+    localInspecao?: string | null;
+    objetivo?: string | null;
+    nomeInspecao?: string | null;
+  },
+): Promise<AppInspectionStartPayload> {
+  const tipoTemplate = String(input.tipoTemplate ?? "").trim();
+
+  if (!tipoTemplate) {
+    throw new Error("Selecione um modelo tecnico para iniciar a inspecao.");
+  }
+
+  const formData = new FormData();
+  formData.set("tipo_template", tipoTemplate);
+  formData.set("tipotemplate", tipoTemplate);
+
+  const entryModePreference = String(input.entryModePreference ?? "").trim();
+  if (entryModePreference) {
+    formData.set("entry_mode_preference", entryModePreference);
+  }
+
+  const optionalFields = {
+    cliente: input.cliente,
+    unidade: input.unidade,
+    local_inspecao: input.localInspecao,
+    objetivo: input.objetivo,
+    nome_inspecao: input.nomeInspecao,
+  } as const;
+
+  for (const [field, value] of Object.entries(optionalFields)) {
+    const normalized = String(value ?? "").trim();
+    if (normalized) {
+      formData.set(field, normalized);
+    }
+  }
+
+  return expectAppMesaJson<AppInspectionStartPayload>(appSession, "/app/api/laudo/iniciar", {
+    method: "POST",
+    body: formData,
+    errorPrefix: "Python inspector start inspection failed",
+  });
 }
 
 export async function replyToAppMesaWithAttachment(

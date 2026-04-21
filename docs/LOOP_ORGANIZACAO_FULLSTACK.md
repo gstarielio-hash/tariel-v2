@@ -4215,3 +4215,47 @@ Proximo passo imediato:
 - com o historico agora lendo de fato o recorte filtrado, o proximo ganho util do `Inspetor` e fechar os fluxos residuais que ainda prendem a operacao ao workspace legado;
 - o melhor alvo passa a ser a abertura operacional de novo caso e demais estados que ainda dependem do shell antigo;
 - seguir em fatias pequenas, coerentes e publicadas para empurrar a superficie web do `Inspetor` para uma migracao integral.
+
+## Ciclo 101 — abertura de nova inspecao na mesa Astro do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a mesa Astro ja cobria leitura e operacao de laudos existentes, mas ainda nao oferecia um ponto nativo para iniciar uma nova inspecao;
+- esse fluxo continuava preso ao `assistant_landing` e ao modal do workspace legado, o que impedia chamar a superficie de `Inspetor` realmente fechada no V2;
+- o corte seguro era reaproveitar a mutacao oficial do backend Python e o catalogo governado de templates ja exposto pelo status do inspetor.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a expor leitura de status do inspetor e a mutacao server-side para `POST /app/api/laudo/iniciar`;
+- `web/frontend-astro/src/lib/server/app-workspace.ts` passou a carregar `inspectorStatus`, incluindo o catalogo governado e o laudo ativo vindo do backend;
+- entrou a rota `web/frontend-astro/src/pages/app/mesa/iniciar.ts`, que cria a inspecao no backend Python e redireciona com notice para a mesa do novo laudo;
+- `web/frontend-astro/src/pages/app/mesa.astro` agora renderiza um formulario nativo de `Nova inspecao` com modelo tecnico, equipamento, cliente, unidade, contexto inicial e modo de entrada.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/lib/server/app-workspace.ts`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+- `web/frontend-astro/src/pages/app/mesa/iniciar.ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a abertura de nova inspecao ja dentro da mesa Astro, o `Inspetor` web encosta nos ultimos gaps realmente residuais do workspace legado;
+- o proximo corte precisa decidir se a melhor frente e fechar os estados restantes do shell antigo ou remover dependencias de navegacao/contexto ainda fora do Astro;
+- seguir apenas com cortes que diminuam uso real do `chat_index_page.js`, em vez de ampliar leitura paralela.

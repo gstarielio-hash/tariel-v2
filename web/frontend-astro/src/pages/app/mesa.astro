@@ -43,10 +43,32 @@ if (!workspace) {
   throw new Error("Perfil do portal do inspetor nao encontrado.");
 }
 
-const { overview, selectedMessages, selectedReport, selectedSummary, threadPreview, messageIndex, referencedMessage } =
-  workspace;
+const {
+  overview,
+  inspectorStatus,
+  selectedMessages,
+  selectedReport,
+  selectedSummary,
+  threadPreview,
+  messageIndex,
+  referencedMessage,
+} = workspace;
 const notice = consumeAppNotice(Astro.cookies);
 const currentSearch = searchTerm;
+const templateOptions = (inspectorStatus?.tipo_template_options ?? []).filter((option) =>
+  String(option?.value ?? "").trim() && String(option?.label ?? "").trim(),
+);
+const templateOptionsByGroup = Array.from(
+  templateOptions.reduce((map, option) => {
+    const groupLabel = String(option.group_label ?? "Catalogo oficial").trim() || "Catalogo oficial";
+    const items = map.get(groupLabel) ?? [];
+    items.push(option);
+    map.set(groupLabel, items);
+    return map;
+  }, new Map<string, typeof templateOptions>()),
+);
+const canCreateInspection = templateOptions.length > 0;
+const inspectorCurrentState = String(inspectorStatus?.estado ?? "sem_relatorio").trim().toLowerCase() || "sem_relatorio";
 const filteredReports = overview.recentReports.filter((report) => {
   if (!currentSearch) {
     return true;
@@ -424,7 +446,155 @@ function formatBytes(value: number | undefined) {
         </div>
       </div>
 
+      <div class="mt-6 rounded-[24px] border border-sky-500/18 bg-sky-500/6 p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">Nova inspecao</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">
+              A mesa Astro agora tambem abre uma nova inspecao com o catalogo governado do backend oficial.
+            </p>
+          </div>
+          <span class="rounded-full border border-sky-500/20 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">
+            {inspectorCurrentState === "sem_relatorio" ? "Sem laudo ativo" : "Novo caso"}
+          </span>
+        </div>
+
+        <form method="POST" action="/app/mesa/iniciar" class="mt-4 space-y-4">
+          <input type="hidden" name="returnTo" value={buildMesaPath({ selectedLaudoId: selectedReport?.id ?? null })} />
+
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Modelo tecnico</span>
+              <select
+                name="tipoTemplate"
+                required
+                disabled={!canCreateInspection}
+                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500 disabled:cursor-not-allowed disabled:bg-slate-100"
+              >
+                <option value="">Selecione um modelo...</option>
+                {templateOptionsByGroup.map(([groupLabel, options]) => (
+                  <optgroup label={groupLabel}>
+                    {options.map((option) => (
+                      <option value={option.value}>{option.label}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Nome do equipamento</span>
+              <input
+                type="text"
+                name="localInspecao"
+                required
+                maxlength="160"
+                placeholder="Ex: Caldeira B-202"
+                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+              />
+            </label>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="block space-y-2">
+                <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Cliente</span>
+                <input
+                  type="text"
+                  name="cliente"
+                  required
+                  maxlength="120"
+                  placeholder="Ex: Petrobras"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                />
+              </label>
+
+              <label class="block space-y-2">
+                <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Unidade</span>
+                <input
+                  type="text"
+                  name="unidade"
+                  required
+                  maxlength="120"
+                  placeholder="Ex: REPLAN - Paulinia"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                />
+              </label>
+            </div>
+
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Nome da inspecao</span>
+              <input
+                type="text"
+                name="nomeInspecao"
+                maxlength="180"
+                placeholder="Opcional. Se vazio, o sistema sugere o nome automaticamente."
+                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+              />
+            </label>
+
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Contexto inicial</span>
+              <textarea
+                name="objetivo"
+                rows="4"
+                maxlength="600"
+                placeholder="Descreva brevemente o objetivo da inspecao e observacoes iniciais."
+                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+              ></textarea>
+            </label>
+
+            <fieldset class="space-y-3">
+              <legend class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Modo de entrada</legend>
+              <div class="grid gap-3">
+                {[
+                  {
+                    value: "chat_first",
+                    label: "Chat primeiro",
+                    detail: "Abre a coleta priorizando conversa e narrativa tecnica.",
+                  },
+                  {
+                    value: "evidence_first",
+                    label: "Evidencias primeiro",
+                    detail: "Abre o caso priorizando anexo, foto e prova operacional.",
+                  },
+                  {
+                    value: "auto_recommended",
+                    label: "Automatico",
+                    detail: "Deixa o backend escolher o melhor inicio para o caso.",
+                  },
+                ].map((item) => (
+                  <label class="flex items-start gap-3 rounded-[20px] border border-slate-200 bg-white px-4 py-4">
+                    <input
+                      type="radio"
+                      name="entryModePreference"
+                      value={item.value}
+                      checked={item.value === "auto_recommended"}
+                      class="mt-1"
+                    />
+                    <span class="block">
+                      <span class="text-sm font-semibold text-slate-950">{item.label}</span>
+                      <span class="mt-1 block text-sm leading-6 text-slate-600">{item.detail}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {canCreateInspection ? (
+              <button
+                type="submit"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
+              >
+                Criar inspecao
+              </button>
+            ) : (
+              <div class="rounded-[20px] border border-dashed border-slate-300 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                O catalogo governado ainda nao expôs modelos de inspeção para este tenant.
+              </div>
+            )}
+        </form>
+      </div>
+
       <form method="GET" action="/app/mesa" class="mt-6 space-y-4">
+
         <label class="block space-y-2">
           <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Buscar laudo</span>
           <input
