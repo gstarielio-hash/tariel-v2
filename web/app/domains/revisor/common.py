@@ -49,5 +49,11 @@ def _validar_csrf(request: Request, token_form: str = "") -> bool:
     return bool(token_candidato and secrets.compare_digest(token_sessao, token_candidato))
 
 
+def _validar_csrf_ou_bearer(request: Request, token_form: str = "") -> bool:
+    if bool(getattr(request.state, "autenticacao_bearer", False)):
+        return True
+    return _validar_csrf(request, token_form)
+
+
 def _obter_laudo_empresa(banco: Session, laudo_id: int, empresa_id: int) -> Laudo:
     return obter_laudo_empresa(banco, laudo_id, empresa_id)

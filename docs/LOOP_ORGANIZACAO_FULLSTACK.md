@@ -3112,3 +3112,58 @@ Proximo passo imediato:
 - atacar o proximo slice da issue `#14` removendo o restante da inferencia local que ainda sobrou no portal cliente e consolidando as mutacoes relevantes da mesa como contratos do backend Python;
 - em seguida, reutilizar esse mesmo contrato para abrir a vertical `Mesa Avaliadora` no Astro sem duplicar regra no frontend;
 - manter `Inspetor` fora da frente ativa ate `cliente/mesa` e `revisao` estarem fechados com ownership claro.
+
+## Ciclo 77 — `/cliente/mesa` com thread, pendencias e decisao operacional no Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- depois do snapshot governado do ciclo anterior, `/cliente/mesa` ainda parava na leitura resumida do caso;
+- o tenant continuava sem conseguir operar a thread real da mesa no portal Astro, porque resposta, download de anexos, marcacao de pendencia e decisao ainda nao estavam fechados de ponta a ponta no shell novo;
+- isso mantinha a vertical incompleta e atrasava a reutilizacao do mesmo boundary para a futura migracao de `/revisao`.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/client-mesa-bridge.ts` foi expandido para cobrir mensagens, pacote tecnico, anexo, resposta com ou sem arquivo, pendencias, decisao e sincronizacao de whispers via bearer da sessao oficial do portal cliente;
+- entrou `web/frontend-astro/src/lib/server/client-mesa.ts` para centralizar o workspace SSR da mesa, selecionar o laudo ativo, adaptar mensagens/pacote e encapsular as mutacoes usadas pelas action routes;
+- `web/frontend-astro/src/pages/cliente/mesa.astro` deixou de ser apenas uma vitrine de snapshot e passou a operar como workspace completo de fila, thread, pendencias, reply e decisao, sempre com ownership do dominio permanecendo no backend Python;
+- foram criadas as action routes `web/frontend-astro/src/pages/cliente/mesa/[laudoId]/avaliar.ts`, `responder.ts`, `marcar-whispers-lidos.ts`, `pendencias/[messageId].ts` e `anexos/[attachmentId].ts`, fechando as mutacoes principais do tenant dentro do portal Astro;
+- `web/app/domains/revisor/common.py` e `web/app/domains/revisor/mesa_api.py` passaram a aceitar chamadas autenticadas por bearer alem do fluxo CSRF tradicional, permitindo reaproveitar os handlers canonicos da mesa sem duplicar regra para o portal cliente.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/app/domains/revisor/common.py`
+- `web/app/domains/revisor/mesa_api.py`
+- `web/frontend-astro/src/lib/server/client-mesa-bridge.ts`
+- `web/frontend-astro/src/lib/server/client-mesa.ts`
+- `web/frontend-astro/src/pages/cliente/mesa.astro`
+- `web/frontend-astro/src/pages/cliente/mesa/[laudoId]/anexos/[attachmentId].ts`
+- `web/frontend-astro/src/pages/cliente/mesa/[laudoId]/avaliar.ts`
+- `web/frontend-astro/src/pages/cliente/mesa/[laudoId]/marcar-whispers-lidos.ts`
+- `web/frontend-astro/src/pages/cliente/mesa/[laudoId]/pendencias/[messageId].ts`
+- `web/frontend-astro/src/pages/cliente/mesa/[laudoId]/responder.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `python3 -m py_compile web/app/domains/cliente/chat_routes.py web/app/domains/revisor/common.py web/app/domains/revisor/mesa_api.py`
+- `cd web && AMBIENTE=dev DATABASE_URL=postgresql:///tariel_dev REDIS_URL=redis://127.0.0.1:6379/0 python3 -m pytest tests/test_v2_client_mesa_projection.py -q`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `py_compile`: concluido sem erros
+  - `pytest`: `1 passed`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- consolidar a issue `#14` decidindo se ainda resta alguma mutacao de mesa especifica do tenant fora do boundary novo;
+- em seguida, reaproveitar o mesmo pacote de bridge e contratos para abrir `Mesa Avaliadora` em Astro sem duplicar command handlers ou policy no frontend;
+- manter `Inspetor` fora da frente principal ate `cliente/mesa` e `revisao` estarem fechados com ownership claro e rollout honesto.

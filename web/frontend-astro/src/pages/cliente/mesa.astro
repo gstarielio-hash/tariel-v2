@@ -1,8 +1,29 @@
 ---
-import { ArrowRight, FileStack, LockKeyhole, ShieldCheck, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  FileSearch,
+  FileStack,
+  LockKeyhole,
+  MessageSquare,
+  Paperclip,
+  Search,
+  Send,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 
+import ClientNotice from "@/components/app/client/client-notice.astro";
 import ClientShellLayout from "@/layouts/client-shell-layout.astro";
-import { getClientPortalMesaData } from "@/lib/server/client-portal";
+import { consumeClientNotice } from "@/lib/server/client-notice";
+import {
+  getClientMesaWorkspace,
+  normalizeClientMesaSection,
+  type ClientMesaPackageMessage,
+  type ClientMesaSection,
+  type ClientMesaThreadMessage,
+} from "@/lib/server/client-mesa";
 
 export const prerender = false;
 
@@ -12,76 +33,187 @@ if (!clientSession) {
   return Astro.redirect("/cliente/login", 303);
 }
 
-const mesa = await getClientPortalMesaData(clientSession);
+const searchParams = Astro.url.searchParams;
+const section = normalizeClientMesaSection(searchParams.get("sec"));
+const searchTerm = String(searchParams.get("busca") ?? "").trim();
+const requestedLaudoId = Number(searchParams.get("laudo") ?? 0);
+const workspace = await getClientMesaWorkspace(clientSession, {
+  section,
+  searchTerm,
+  selectedLaudoId: Number.isInteger(requestedLaudoId) && requestedLaudoId > 0 ? requestedLaudoId : null,
+});
 
-if (!mesa) {
+if (!workspace) {
   throw new Error("Empresa do portal cliente nao encontrada.");
 }
 
-const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
-  dateStyle: "short",
-  timeStyle: "short",
+const currentClientUserId = clientSession.user.id;
+const currentSection = workspace.section;
+const currentSearchTerm = workspace.searchTerm;
+const notice = consumeClientNotice(Astro.cookies);
+const selectedCase = workspace.selectedCase;
+const selectedPackage = selectedCase?.package ?? null;
+const defaultSelectedId =
+  selectedCase?.item.id ??
+  workspace.filteredQueueCases[0]?.id ??
+  workspace.pendingCases[0]?.id ??
+  workspace.filteredHistoryCases[0]?.id ??
+  null;
+const currentReturnTo = buildMesaPath({
+  section: workspace.section,
+  searchTerm: workspace.searchTerm,
+  selectedLaudoId: selectedCase?.item.id ?? null,
 });
-
+const canApprove = Boolean(selectedPackage?.allowedSurfaceActions.includes("mesa_approve"));
+const canReturn = Boolean(selectedPackage?.allowedSurfaceActions.includes("mesa_return"));
+const queueCards = [
+  { label: "Rascunhos", value: workspace.snapshot.summary.drafts, tone: "neutral" },
+  { label: "Aguardando avaliacao", value: workspace.snapshot.summary.waitingReview, tone: "warning" },
+  { label: "Aprovados", value: workspace.snapshot.summary.approved, tone: "success" },
+  { label: "Rejeitados", value: workspace.snapshot.summary.rejected, tone: "danger" },
+] as const;
 const summaryCards = [
   {
     label: "Equipe de analise",
-    value: mesa.summary.reviewers,
+    value: workspace.snapshot.summary.reviewers,
     detail:
-      mesa.summary.reviewers > 0
-        ? `${mesa.summary.reviewers} revisores provisionados para a empresa.`
+      workspace.snapshot.summary.reviewers > 0
+        ? `${workspace.snapshot.summary.reviewers} revisores provisionados para a empresa.`
         : "Nenhum revisor provisionado ainda no tenant.",
     icon: Users,
   },
   {
     label: "Sessoes da mesa",
-    value: mesa.summary.reviewerSessions,
+    value: workspace.snapshot.summary.reviewerSessions,
     detail: "Revisores com atividade recente no tenant.",
     icon: ShieldCheck,
   },
   {
     label: "Aguardando avaliacao",
-    value: mesa.summary.waitingReview,
-    detail: "Laudos do tenant atualmente na fila de revisao.",
+    value: workspace.snapshot.summary.waitingReview,
+    detail: "Casos ativos esperando decisao da mesa.",
     icon: FileStack,
   },
   {
     label: "Primeiro acesso",
-    value: mesa.summary.reviewerFirstAccessPending,
-    detail: "Contas de revisao que ainda precisam trocar a senha inicial.",
+    value: workspace.snapshot.summary.reviewerFirstAccessPending,
+    detail: "Contas que ainda precisam trocar a senha inicial.",
     icon: LockKeyhole,
   },
-];
-
-const queueCards = [
-  {
-    label: "Rascunhos",
-    value: mesa.summary.drafts,
-    tone: "neutral",
-  },
-  {
-    label: "Aguardando avaliacao",
-    value: mesa.summary.waitingReview,
-    tone: "warning",
-  },
-  {
-    label: "Aprovados",
-    value: mesa.summary.approved,
-    tone: "success",
-  },
-  {
-    label: "Rejeitados",
-    value: mesa.summary.rejected,
-    tone: "danger",
-  },
 ] as const;
+const tabs = [
+  {
+    key: "overview",
+    label: "Visao geral",
+    detail: `${workspace.snapshot.detail.totalReports} laudos governados no tenant.`,
+  },
+  {
+    key: "queue",
+    label: "Fila",
+    detail: `${workspace.filteredQueueCases.length} casos ativos no recorte atual.`,
+  },
+  {
+    key: "pending",
+    label: "Pendencias",
+    detail: `${workspace.pendingCases.length} casos com whisper, pendencia ou aprendizado.`,
+  },
+  {
+    key: "reply",
+    label: "Responder",
+    detail: selectedCase ? `Laudo ${selectedCase.item.hashShort}` : "Selecione um laudo para agir.",
+  },
+] as const satisfies { key: ClientMesaSection; label: string; detail: string }[];
+
+function buildMesaPath(input: {
+  section?: ClientMesaSection;
+  searchTerm?: string;
+  selectedLaudoId?: number | null;
+}) {
+  const params = new URLSearchParams();
+  const nextSection = input.section ?? currentSection;
+  const nextSearch = String(input.searchTerm ?? currentSearchTerm).trim();
+  const nextLaudoId = input.selectedLaudoId ?? null;
+
+  if (nextSection !== "overview") {
+    params.set("sec", nextSection);
+  }
+  if (nextSearch) {
+    params.set("busca", nextSearch);
+  }
+  if (nextLaudoId) {
+    params.set("laudo", String(nextLaudoId));
+  }
+
+  const query = params.toString();
+  return query ? `/cliente/mesa?${query}` : "/cliente/mesa";
+}
+
+function toneClass(tone: (typeof queueCards)[number]["tone"]) {
+  if (tone === "success") return "border-emerald-200 bg-emerald-50";
+  if (tone === "warning") return "border-amber-200 bg-amber-50";
+  if (tone === "danger") return "border-red-200 bg-red-50";
+  return "border-slate-200 bg-slate-50";
+}
+
+function queueItemClass(itemId: number) {
+  return itemId === selectedCase?.item.id
+    ? "border-sky-400 bg-sky-50 shadow-[0_18px_40px_rgba(14,165,233,0.08)]"
+    : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white";
+}
+
+function messageCardClass(message: ClientMesaThreadMessage | ClientMesaPackageMessage) {
+  if (message.messageKind === "mesa_pendency" && message.pendencyState === "resolved") {
+    return "border-emerald-200 bg-emerald-50";
+  }
+  if (message.messageKind === "mesa_pendency") {
+    return "border-red-200 bg-red-50";
+  }
+  if ("isWhisper" in message && message.isWhisper) {
+    return "border-amber-200 bg-amber-50";
+  }
+  return "border-slate-200 bg-slate-50";
+}
+
+function messageLabel(message: ClientMesaThreadMessage | ClientMesaPackageMessage) {
+  if (message.messageKind === "mesa_pendency") {
+    return message.pendencyState === "resolved" ? "Pendencia resolvida" : "Pendencia aberta";
+  }
+  if ("isWhisper" in message && message.isWhisper) {
+    return message.senderId === currentClientUserId ? "Whisper enviado" : "Whisper do campo";
+  }
+  if (message.senderId === currentClientUserId) {
+    return "Resposta do tenant";
+  }
+  return "Trilha da mesa";
+}
+
+function formatBytes(value: number) {
+  if (value <= 0) {
+    return "0 B";
+  }
+
+  const units = ["B", "KB", "MB", "GB"];
+  let size = value;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+
+  return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+}
+
+const activeListTitle =
+  workspace.section === "pending" ? "Casos com pendencia operacional" : "Fila ativa governada";
+const activeListItems = workspace.section === "pending" ? workspace.pendingCases : workspace.filteredQueueCases;
 ---
 
 <ClientShellLayout
-  title={`Mesa | ${mesa.detail.companyName} | Tariel Astro`}
-  description="Snapshot governado da mesa do cliente no portal Astro."
+  title={`Mesa | ${workspace.snapshot.detail.companyName} | Tariel Astro`}
+  description="Mesa do cliente em Astro SSR com leitura detalhada, resposta, decisão e pendências governadas pelo backend Python."
   userName={clientSession.user.name}
-  companyName={mesa.detail.companyName}
+  companyName={workspace.snapshot.detail.companyName}
   activeItem="mesa"
 >
   <Fragment slot="header">
@@ -89,25 +221,26 @@ const queueCards = [
       <div>
         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">Mesa do cliente</p>
         <h1 class="mt-3 font-display text-3xl tracking-tight text-slate-950 sm:text-4xl">
-          Snapshot governado da analise no V2
+          Fila, thread e decisao no V2
         </h1>
         <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          Este slice faz o portal cliente consumir a fila da mesa por um contrato explicito do backend Python. A
-          interface e o shell seguem no Astro, mas o estado operacional agora vem governado pelos dominios `mesa` e
-          `revisor`.
+          Este slice fecha a operacao principal de <code>/cliente/mesa</code> no Astro: a interface fica no portal
+          novo, mas a leitura, as respostas, as pendencias e a decisao continuam ownership do backend Python.
         </p>
       </div>
 
       <div class="rounded-[28px] border border-sky-500/16 bg-sky-500/6 px-5 py-4">
         <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Estado atual</p>
-        <p class="mt-2 text-lg font-semibold text-slate-950">{mesa.detail.healthLabel}</p>
+        <p class="mt-2 text-lg font-semibold text-slate-950">{workspace.snapshot.detail.healthLabel}</p>
         <p class="mt-1 text-sm leading-6 text-slate-600">
-          {mesa.summary.waitingReview} casos aguardando avaliacao, {mesa.queue.pendingWhispers} whispers pendentes e{" "}
-          {mesa.queue.openPendencies} pendencias abertas no recorte atual.
+          {workspace.snapshot.summary.waitingReview} casos aguardando avaliacao, {workspace.snapshot.queue.pendingWhispers}
+          {" "}whispers pendentes e {workspace.snapshot.queue.openPendencies} pendencias abertas.
         </p>
       </div>
     </div>
   </Fragment>
+
+  <ClientNotice notice={notice} />
 
   <section class="grid gap-4 xl:grid-cols-4">
     {summaryCards.map(({ label, value, detail, icon: Icon }) => (
@@ -124,229 +257,810 @@ const queueCards = [
     ))}
   </section>
 
-  <section class="mt-8 grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Cobertura do slice</p>
-          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">O que ja esta fechado</h2>
-        </div>
-
-        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Slice 2
-        </div>
-      </div>
-
-      <div class="mt-6 grid gap-3">
-        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
-          <p class="text-sm font-semibold text-slate-950">Sessao oficial do portal cliente</p>
-          <p class="mt-2 text-sm leading-6 text-slate-600">
-            O Astro segue usando a sessao real do admin-cliente para autenticar a leitura do snapshot Python sem
-            depender do shell historico.
-          </p>
-        </div>
-
-        <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
-          <p class="text-sm font-semibold text-slate-950">Contrato governado</p>
-          <p class="mt-2 text-sm leading-6 text-slate-600">
-            Fila, auditoria e resumo de revisores agora chegam por um contrato explicito do backend Python, sem o
-            frontend inferir a mesa direto do banco.
-          </p>
-        </div>
-
-        <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-          <p class="text-sm font-semibold text-slate-950">Proxima camada</p>
-          <p class="mt-2 text-sm leading-6 text-slate-600">
-            O proximo slice liga mutacoes da mesa sobre este mesmo boundary sem abrir `/revisao` completo nem o
-            `Inspetor` pesado.
-          </p>
-        </div>
-      </div>
-
-      <div class="mt-6 flex flex-col gap-3 sm:flex-row">
-        <a
-          href="/cliente/equipe"
-          class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
-        >
-          Gerir revisores
-          <ArrowRight className="size-4" />
-        </a>
-
-        <a
-          href="/revisao/login"
-          class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-        >
-          Abrir login da mesa
-          <ArrowRight className="size-4" />
-        </a>
-      </div>
-    </article>
-
-    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fila do tenant</p>
-          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Distribuicao por status</h2>
-        </div>
-
-        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          {mesa.detail.totalReports} laudos
-        </div>
-      </div>
-
-      <div class="mt-6 grid gap-3 sm:grid-cols-2">
-        {queueCards.map((card) => (
-          <div
-            class:list={[
-              "rounded-[24px] border px-4 py-4",
-              card.tone === "success" && "border-emerald-200 bg-emerald-50",
-              card.tone === "warning" && "border-amber-200 bg-amber-50",
-              card.tone === "danger" && "border-red-200 bg-red-50",
-              card.tone === "neutral" && "border-slate-200 bg-slate-50",
-            ]}
-          >
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{card.label}</p>
-            <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{card.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {mesa.summary.otherStatuses > 0 ? (
-        <div class="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
-          Existem {mesa.summary.otherStatuses} laudos em estados adicionais fora do recorte principal da fila.
-        </div>
-      ) : null}
-    </article>
+  <section class="mt-8 grid gap-3 xl:grid-cols-4">
+    {tabs.map((tab) => (
+      <a
+        href={buildMesaPath({
+          section: tab.key,
+          searchTerm: workspace.searchTerm,
+          selectedLaudoId: tab.key === "overview" ? null : defaultSelectedId,
+        })}
+        class:list={[
+          "rounded-[28px] border px-5 py-4 transition",
+          workspace.section === tab.key
+            ? "border-sky-400 bg-sky-50 shadow-[0_18px_40px_rgba(14,165,233,0.08)]"
+            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50",
+        ]}
+      >
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{tab.label}</p>
+        <p class="mt-3 text-base font-semibold text-slate-950">{tab.detail}</p>
+      </a>
+    ))}
   </section>
 
-  <section class="mt-8 grid gap-6 xl:grid-cols-[1.04fr_0.96fr]">
-    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fila governada</p>
-          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Casos mais recentes do snapshot</h2>
-        </div>
-
-        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Python owner
-        </div>
-      </div>
-
-      <div class="mt-6 space-y-3">
-        {mesa.recentCases.length > 0 ? mesa.recentCases.map((report) => (
-          <article class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p class="font-semibold text-slate-950">{report.sector || `Laudo ${report.hashShort}`}</p>
-                <p class="mt-1 text-sm leading-6 text-slate-600">
-                  {report.title} • {report.operationLabel} • inspetor {report.inspectorName}
-                </p>
-                <p class="mt-1 text-sm leading-6 text-slate-500">
-                  {report.whispersPending} whispers • {report.openPendencies} pendencias • {report.pendingLearning}{" "}
-                  aprendizados pendentes
-                </p>
-              </div>
-
-              <div class="flex flex-col items-start gap-2 sm:items-end">
-                <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
-                  {report.statusVisualLabel}
-                </span>
-                <p class="text-sm text-slate-500">{report.updatedAt ? dateTimeFormatter.format(report.updatedAt) : report.updatedAtLabel}</p>
-              </div>
+  {workspace.section === "overview" ? (
+    <>
+      <section class="mt-8 grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Cobertura do slice</p>
+              <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">O que ja esta fechado</h2>
             </div>
-          </article>
-        )) : (
-          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
-            Nenhum laudo recente foi encontrado para a mesa deste tenant.
-          </div>
-        )}
-      </div>
-    </article>
 
-    <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Equipe de revisao</p>
-          <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Pessoas habilitadas para a mesa</h2>
-        </div>
-
-        <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          {mesa.summary.reviewers} revisores
-        </div>
-      </div>
-
-      <div class="mt-6 space-y-3">
-        {mesa.reviewers.length > 0 ? mesa.reviewers.map((reviewer) => (
-          <article class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p class="font-semibold text-slate-950">{reviewer.name}</p>
-                <p class="mt-1 text-sm leading-6 text-slate-600">
-                  {reviewer.email} • {reviewer.portalLabel}
-                </p>
-              </div>
-
-              <div class="flex flex-col items-start gap-2 sm:items-end">
-                {reviewer.temporaryPasswordActive ? (
-                  <span class="rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-800">
-                    Primeiro acesso pendente
-                  </span>
-                ) : reviewer.blocked ? (
-                  <span class="rounded-full border border-red-200 bg-red-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-800">
-                    Bloqueado
-                  </span>
-                ) : (
-                  <span class="rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                    Ativo
-                  </span>
-                )}
-                <p class="text-sm text-slate-500">{reviewer.lastActivityLabel}</p>
-              </div>
+            <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              Slice 3
             </div>
-          </article>
-        )) : (
-          <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
-            Nenhuma pessoa da mesa foi provisionada ainda. Use a tela de equipe para criar o primeiro acesso de
-            revisao.
           </div>
-        )}
-      </div>
-    </article>
-  </section>
 
-  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Auditoria</p>
-        <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Eventos recentes da mesa</h2>
-        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          O portal cliente mostra a trilha recente ligada a revisores e mesa a partir do recorte oficial do backend,
-          sem duplicar regra documental no frontend.
-        </p>
-      </div>
+          <div class="mt-6 grid gap-3">
+            <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+              <p class="text-sm font-semibold text-slate-950">Fila governada no Astro</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                O portal cliente agora navega a fila ativa, o histórico e os casos com pendência sem inferir a mesa
+                direto do banco.
+              </p>
+            </div>
 
-      <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-        {mesa.summary.mesaAuditEvents} eventos
-      </div>
-    </div>
+            <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+              <p class="text-sm font-semibold text-slate-950">Thread operacional e anexos</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                Mensagens, whispers, pendências e download de anexo passam pelo Astro, mas continuam governados pelo
+                contrato Python.
+              </p>
+            </div>
 
-    <div class="mt-6 space-y-3">
-      {mesa.recentAudit.length > 0 ? mesa.recentAudit.map((entry) => (
-        <article class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
-          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p class="font-semibold text-slate-950">{entry.summary}</p>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{entry.portal}</p>
+            <div class="rounded-[24px] border border-sky-500/16 bg-sky-500/6 p-4">
+              <p class="text-sm font-semibold text-slate-950">Mutacoes principais</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                Responder, anexar, resolver pendência, aprovar e devolver agora usam action routes SSR no portal novo.
+              </p>
+            </div>
+
+            <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p class="text-sm font-semibold text-slate-950">Proxima camada</p>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                Depois desta vertical, a migração pode avançar para <code>/revisao</code> sem deixar a mesa do cliente
+                dependente do shell legado.
+              </p>
+            </div>
           </div>
-          <p class="mt-2 text-sm leading-6 text-slate-600">{entry.action}</p>
-          <p class="mt-2 text-sm text-slate-500">
-            {entry.createdAt ? dateTimeFormatter.format(entry.createdAt) : entry.createdAtLabel}
-          </p>
+
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+            <a
+              href={buildMesaPath({ section: "queue", selectedLaudoId: defaultSelectedId })}
+              class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+            >
+              Abrir fila governada
+              <ArrowRight className="size-4" />
+            </a>
+
+            <a
+              href="/cliente/equipe"
+              class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+            >
+              Gerir revisores
+              <ArrowRight className="size-4" />
+            </a>
+          </div>
         </article>
-      )) : (
-        <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
-          Ainda nao ha eventos recentes classificados como mesa ou revisor na trilha do tenant.
-        </div>
-      )}
-    </div>
-  </section>
+
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Distribuicao da fila</p>
+              <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Status do tenant</h2>
+            </div>
+
+            <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              {workspace.snapshot.detail.totalReports} laudos
+            </div>
+          </div>
+
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            {queueCards.map((card) => (
+              <div class:list={["rounded-[24px] border px-4 py-4", toneClass(card.tone)]}>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{card.label}</p>
+                <p class="mt-3 font-display text-3xl tracking-tight text-slate-950">{card.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div class="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+            {workspace.snapshot.queue.inField.length} em andamento, {workspace.snapshot.queue.awaitingReview.length} na
+            fila de avaliacao e {workspace.snapshot.queue.history.length} no historico recente.
+          </div>
+        </article>
+      </section>
+
+      <section class="mt-8 grid gap-6 xl:grid-cols-[1.04fr_0.96fr]">
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fila governada</p>
+              <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Casos recentes</h2>
+            </div>
+
+            <a
+              href={buildMesaPath({ section: "reply", selectedLaudoId: defaultSelectedId })}
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 transition hover:border-slate-300 hover:bg-slate-50"
+            >
+              Abrir thread
+              <ArrowRight className="size-4" />
+            </a>
+          </div>
+
+          <div class="mt-6 space-y-3">
+            {workspace.snapshot.recentCases.length > 0 ? workspace.snapshot.recentCases.map((report) => (
+              <a
+                href={buildMesaPath({ section: "reply", selectedLaudoId: report.id })}
+                class="block rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300 hover:bg-white"
+              >
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p class="font-semibold text-slate-950">{report.sector || `Laudo ${report.hashShort}`}</p>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                      {report.title} • {report.operationLabel} • inspetor {report.inspectorName}
+                    </p>
+                    <p class="mt-1 text-sm leading-6 text-slate-500">
+                      {report.whispersPending} whispers • {report.openPendencies} pendencias • {report.pendingLearning}
+                      {" "}aprendizados pendentes
+                    </p>
+                  </div>
+
+                  <div class="flex flex-col items-start gap-2 sm:items-end">
+                    <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                      {report.statusVisualLabel}
+                    </span>
+                    <p class="text-sm text-slate-500">{report.updatedAtLabel}</p>
+                  </div>
+                </div>
+              </a>
+            )) : (
+              <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                Nenhum laudo recente foi encontrado para a mesa deste tenant.
+              </div>
+            )}
+          </div>
+        </article>
+
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Auditoria da mesa</p>
+              <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Eventos recentes</h2>
+            </div>
+
+            <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              {workspace.snapshot.recentAudit.length} eventos
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-3">
+            {workspace.snapshot.recentAudit.length > 0 ? workspace.snapshot.recentAudit.map((entry) => (
+              <article class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p class="font-semibold text-slate-950">{entry.summary}</p>
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    {entry.portal} • {entry.createdAtLabel}
+                  </p>
+                </div>
+
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  {entry.detail ?? entry.action}
+                </p>
+              </article>
+            )) : (
+              <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                Nenhum evento recente foi encontrado para este tenant.
+              </div>
+            )}
+          </div>
+        </article>
+      </section>
+    </>
+  ) : (
+    <section class="mt-8 grid gap-6 xl:grid-cols-[0.96fr_1.04fr]">
+      <div class="space-y-6">
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">{activeListTitle}</p>
+              <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">
+                {workspace.section === "pending" ? "Casos que pedem retorno" : "Selecione um laudo"}
+              </h2>
+            </div>
+
+            <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+              <Search className="size-5" />
+            </div>
+          </div>
+
+          <form method="GET" action="/cliente/mesa" class="mt-6 space-y-4">
+            <input type="hidden" name="sec" value={workspace.section} />
+            {selectedCase ? <input type="hidden" name="laudo" value={selectedCase.item.id} /> : null}
+
+            <label class="block space-y-2">
+              <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Buscar na fila</span>
+              <div class="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  name="busca"
+                  value={workspace.searchTerm}
+                  placeholder="Hash, setor, inspetor ou proxima acao"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-11 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                />
+              </div>
+            </label>
+
+            <div class="flex gap-3">
+              <button
+                type="submit"
+                class="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+              >
+                Filtrar fila
+              </button>
+              <a
+                href={buildMesaPath({ section: workspace.section, selectedLaudoId: defaultSelectedId, searchTerm: "" })}
+                class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+              >
+                Limpar busca
+              </a>
+            </div>
+          </form>
+
+          <div class="mt-6 space-y-3">
+            {activeListItems.length > 0 ? activeListItems.map((item) => (
+              <a
+                href={buildMesaPath({ section: workspace.section, searchTerm: workspace.searchTerm, selectedLaudoId: item.id })}
+                class:list={["block rounded-[24px] border px-4 py-4 transition", queueItemClass(item.id)]}
+              >
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p class="font-semibold text-slate-950">{item.sector || `Laudo ${item.hashShort}`}</p>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">{item.title}</p>
+                    <p class="mt-1 text-sm leading-6 text-slate-500">
+                      {item.operationLabel} • {item.priorityLabel} • inspetor {item.inspectorName}
+                    </p>
+                  </div>
+
+                  <div class="flex flex-col items-start gap-2 sm:items-end">
+                    <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                      {item.statusVisualLabel}
+                    </span>
+                    <p class="text-xs uppercase tracking-[0.18em] text-slate-400">{item.updatedAtLabel}</p>
+                  </div>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.hashShort}</span>
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.whispersPending} whispers</span>
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.openPendencies} pendencias</span>
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.pendingLearning} aprendizados</span>
+                </div>
+              </a>
+            )) : (
+              <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                Nenhum caso atende ao filtro atual nesta secao.
+              </div>
+            )}
+          </div>
+        </article>
+
+        {workspace.section === "queue" ? (
+          <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Historico</p>
+                <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Casos recentes fora da fila</h2>
+              </div>
+
+              <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {workspace.filteredHistoryCases.length} itens
+              </div>
+            </div>
+
+            <div class="mt-6 space-y-3">
+              {workspace.filteredHistoryCases.length > 0 ? workspace.filteredHistoryCases.map((item) => (
+                <a
+                  href={buildMesaPath({ section: "reply", searchTerm: workspace.searchTerm, selectedLaudoId: item.id })}
+                  class="block rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300 hover:bg-white"
+                >
+                  <p class="font-semibold text-slate-950">{item.sector || `Laudo ${item.hashShort}`}</p>
+                  <p class="mt-1 text-sm leading-6 text-slate-600">
+                    {item.title} • {item.statusVisualLabel}
+                  </p>
+                  <p class="mt-1 text-sm leading-6 text-slate-500">{item.updatedAtLabel}</p>
+                </a>
+              )) : (
+                <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                  Nenhum item do historico atende ao filtro atual.
+                </div>
+              )}
+            </div>
+          </article>
+        ) : null}
+      </div>
+
+      <div class="space-y-6">
+        {selectedCase && selectedPackage ? (
+          <>
+            <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Laudo selecionado</p>
+                  <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">
+                    {selectedCase.item.sector || `Laudo ${selectedCase.item.hashShort}`}
+                  </h2>
+                  <p class="mt-3 text-sm leading-7 text-slate-600">
+                    {selectedCase.item.title}
+                  </p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                    {selectedPackage.statusVisualLabel}
+                  </span>
+                  <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                    Hash {selectedCase.item.hashShort}
+                  </span>
+                </div>
+              </div>
+
+              <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Fluxo</p>
+                  <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.lifecycleStatus || "Sem lifecycle"}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">{selectedPackage.activeOwnerRole || "Owner nao informado"}</p>
+                </div>
+
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Mensagens</p>
+                  <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.messageSummary.total}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    {selectedPackage.messageSummary.inspector} inspetor • {selectedPackage.messageSummary.mesa} mesa
+                  </p>
+                </div>
+
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Pendencias</p>
+                  <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.pendencySummary.open}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    {selectedPackage.pendencySummary.resolved} resolvidas recentemente
+                  </p>
+                </div>
+
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultima interacao</p>
+                  <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.lastInteractionLabel}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-600">
+                    {selectedPackage.fieldTimeMinutes} min em campo • {selectedCase.item.inspectorName}
+                  </p>
+                </div>
+              </div>
+
+              {selectedPackage.humanOverrideLatest ? (
+                <div class="mt-6 rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-6 text-slate-700">
+                  <p class="font-semibold text-slate-950">Override humano auditavel</p>
+                  <p class="mt-2">
+                    {selectedPackage.humanOverrideLatest.actorName} • {selectedPackage.humanOverrideLatest.appliedAtLabel}
+                  </p>
+                  <p class="mt-2">{selectedPackage.humanOverrideLatest.reason}</p>
+                </div>
+              ) : null}
+            </article>
+
+            {workspace.section === "pending" ? (
+              <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Triagem operacional</p>
+                    <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Pendencias e whispers</h2>
+                  </div>
+
+                  {selectedCase.item.whispersPending > 0 ? (
+                    <form method="POST" action={`/cliente/mesa/${selectedCase.item.id}/marcar-whispers-lidos`}>
+                      <input type="hidden" name="returnTo" value={currentReturnTo} />
+                      <button
+                        type="submit"
+                        class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                      >
+                        Marcar whispers lidos
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
+
+                <div class="mt-6 grid gap-6 xl:grid-cols-2">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Pendencias abertas</p>
+                    <div class="mt-4 space-y-3">
+                      {selectedPackage.openPendencies.length > 0 ? selectedPackage.openPendencies.map((message) => (
+                        <article class:list={["rounded-[24px] border px-4 py-4", messageCardClass(message)]}>
+                          <div class="flex items-center justify-between gap-4">
+                            <p class="text-sm font-semibold text-slate-950">{messageLabel(message)}</p>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{message.createdAtLabel}</p>
+                          </div>
+                          <p class="mt-3 text-sm leading-6 text-slate-700">{message.text || "Sem texto adicional."}</p>
+                        </article>
+                      )) : (
+                        <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                          Nenhuma pendencia aberta neste laudo.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Whispers recentes</p>
+                    <div class="mt-4 space-y-3">
+                      {selectedPackage.recentWhispers.length > 0 ? selectedPackage.recentWhispers.map((message) => (
+                        <article class:list={["rounded-[24px] border px-4 py-4", messageCardClass(message)]}>
+                          <div class="flex items-center justify-between gap-4">
+                            <p class="text-sm font-semibold text-slate-950">{messageLabel(message)}</p>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{message.createdAtLabel}</p>
+                          </div>
+                          <p class="mt-3 text-sm leading-6 text-slate-700">{message.text || "Sem texto adicional."}</p>
+                        </article>
+                      )) : (
+                        <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                          Nenhum whisper recente neste laudo.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ) : null}
+
+            <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Thread da mesa</p>
+                  <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Mensagens e anexos</h2>
+                </div>
+
+                <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  {selectedCase.messages.length} mensagens
+                </div>
+              </div>
+
+              <div class="mt-6 space-y-3">
+                {selectedCase.messages.length > 0 ? selectedCase.messages.map((message) => (
+                  <article class:list={["rounded-[24px] border px-4 py-4", messageCardClass(message)]}>
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <p class="text-sm font-semibold text-slate-950">{messageLabel(message)}</p>
+                      <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{message.createdAtLabel}</p>
+                    </div>
+
+                    <p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                      {message.text || "Mensagem sem texto visivel."}
+                    </p>
+
+                    {message.attachments.length > 0 ? (
+                      <div class="mt-4 flex flex-wrap gap-2">
+                        {message.attachments.map((attachment) => (
+                          <a
+                            href={attachment.downloadPath}
+                            class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                          >
+                            <Paperclip className="size-3.5" />
+                            {attachment.name} • {formatBytes(attachment.sizeBytes)}
+                          </a>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {message.canTogglePendency ? (
+                      <form method="POST" action={`/cliente/mesa/${selectedCase.item.id}/pendencias/${message.id}`} class="mt-4">
+                        <input type="hidden" name="returnTo" value={currentReturnTo} />
+                        <input type="hidden" name="lida" value={message.isResolvedPendency ? "false" : "true"} />
+                        <button
+                          type="submit"
+                          class:list={[
+                            "inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold transition",
+                            message.isResolvedPendency
+                              ? "border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                              : "bg-slate-950 text-white hover:bg-slate-800",
+                          ]}
+                        >
+                          {message.isResolvedPendency ? "Reabrir pendencia" : "Marcar como resolvida"}
+                        </button>
+                      </form>
+                    ) : null}
+                  </article>
+                )) : (
+                  <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                    Nenhuma mensagem foi encontrada para este laudo.
+                  </div>
+                )}
+              </div>
+            </article>
+
+            <div class="grid gap-6 xl:grid-cols-[0.98fr_1.02fr]">
+              <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Responder</p>
+                    <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Enviar retorno ao caso</h2>
+                  </div>
+
+                  <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+                    <Send className="size-5" />
+                  </div>
+                </div>
+
+                <form method="POST" action={`/cliente/mesa/${selectedCase.item.id}/responder`} enctype="multipart/form-data" class="mt-6 space-y-4">
+                  <input type="hidden" name="returnTo" value={currentReturnTo} />
+
+                  <label class="block space-y-2">
+                    <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Mensagem</span>
+                    <textarea
+                      name="texto"
+                      rows="5"
+                      maxlength="8000"
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                      placeholder="Descreva o retorno, contexto ou encaminhamento do tenant."
+                    />
+                  </label>
+
+                  <label class="block space-y-2">
+                    <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Anexo opcional</span>
+                    <input
+                      type="file"
+                      name="arquivo"
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
+                    />
+                  </label>
+
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+                    A action route do Astro envia a resposta com a sessao real do portal cliente. O backend Python
+                    continua registrando policy, auditoria e efeitos colaterais da mesa.
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  >
+                    <Send className="size-4" />
+                    Enviar resposta
+                  </button>
+                </form>
+              </article>
+
+              <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Decisao da mesa</p>
+                    <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Aprovar ou devolver</h2>
+                  </div>
+
+                  <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+                    <CheckCircle2 className="size-5" />
+                  </div>
+                </div>
+
+                <div class="mt-6 space-y-4">
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+                    A disponibilidade das decisoes continua governada pelo lifecycle do caso. Os botoes so aparecem
+                    quando o backend expõe <code>allowed_surface_actions</code> compativeis.
+                  </div>
+
+                  {canApprove ? (
+                    <form method="POST" action={`/cliente/mesa/${selectedCase.item.id}/avaliar`} class="space-y-3">
+                      <input type="hidden" name="returnTo" value={currentReturnTo} />
+                      <input type="hidden" name="acao" value="aprovar" />
+                      <button
+                        type="submit"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                      >
+                        <CheckCircle2 className="size-4" />
+                        Aprovar laudo
+                      </button>
+                    </form>
+                  ) : (
+                    <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+                      Aprovacao indisponivel para o estado atual do caso.
+                    </div>
+                  )}
+
+                  {canReturn ? (
+                    <form method="POST" action={`/cliente/mesa/${selectedCase.item.id}/avaliar`} class="space-y-3">
+                      <input type="hidden" name="returnTo" value={currentReturnTo} />
+                      <input type="hidden" name="acao" value="rejeitar" />
+                      <label class="block space-y-2">
+                        <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Motivo da devolucao</span>
+                        <textarea
+                          name="motivo"
+                          rows="4"
+                          required
+                          maxlength="600"
+                          class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                          placeholder="Explique o ajuste que precisa voltar para o campo."
+                        />
+                      </label>
+
+                      <button
+                        type="submit"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-500"
+                      >
+                        <AlertTriangle className="size-4" />
+                        Devolver para correcao
+                      </button>
+                    </form>
+                  ) : (
+                    <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+                      Devolucao indisponivel para o estado atual do caso.
+                    </div>
+                  )}
+                </div>
+              </article>
+            </div>
+
+            <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Pacote tecnico</p>
+                  <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Contexto governado do caso</h2>
+                </div>
+
+                <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+                  <FileSearch className="size-5" />
+                </div>
+              </div>
+
+              <div class="mt-6 grid gap-6 xl:grid-cols-2">
+                <div class="space-y-4">
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Documento estruturado</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-950">
+                      {selectedPackage.structuredDocument?.familyLabel ?? selectedPackage.templateType}
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      {selectedPackage.structuredDocument?.summary ?? "Sem resumo estrutural disponivel."}
+                    </p>
+
+                    {selectedPackage.structuredDocument?.sections.length ? (
+                      <div class="mt-4 space-y-2">
+                        {selectedPackage.structuredDocument.sections.slice(0, 6).map((sectionItem) => (
+                          <div class="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
+                            <div class="flex items-center justify-between gap-4">
+                              <p class="font-semibold text-slate-950">{sectionItem.title}</p>
+                              <span class="text-xs uppercase tracking-[0.18em] text-slate-500">{sectionItem.status}</span>
+                            </div>
+                            <p class="mt-2 leading-6">
+                              {sectionItem.summary ?? `${sectionItem.filledFields} de ${sectionItem.totalFields} campos preenchidos.`}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Coverage</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-950">
+                      {selectedPackage.coverage?.totalAccepted ?? 0} aceitos de {selectedPackage.coverage?.totalRequired ?? 0}
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      {selectedPackage.coverage?.totalMissing ?? 0} faltando • {selectedPackage.coverage?.totalIrregular ?? 0} irregulares
+                    </p>
+
+                    {selectedPackage.coverage?.items.length ? (
+                      <div class="mt-4 space-y-2">
+                        {selectedPackage.coverage.items
+                          .filter((item) => item.status !== "accepted")
+                          .slice(0, 5)
+                          .map((item) => (
+                            <div class="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
+                              <div class="flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-950">{item.title}</p>
+                                <span class="text-xs uppercase tracking-[0.18em] text-slate-500">{item.status}</span>
+                              </div>
+                              <p class="mt-2 leading-6">{item.summary ?? item.kind}</p>
+                            </div>
+                          ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Anexo pack</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-950">
+                      {selectedPackage.attachmentPack?.totalPresent ?? 0} itens presentes
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      {selectedPackage.attachmentPack?.missingRequiredCount ?? 0} obrigatorios ausentes •{" "}
+                      {selectedPackage.attachmentPack?.documentCount ?? 0} documentos •{" "}
+                      {selectedPackage.attachmentPack?.imageCount ?? 0} imagens
+                    </p>
+                    {selectedPackage.attachmentPack?.missingItems.length ? (
+                      <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm leading-6 text-slate-700">
+                        Itens faltantes: {selectedPackage.attachmentPack.missingItems.slice(0, 5).join(", ")}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Emissao e verificacao</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-950">
+                      {selectedPackage.officialIssue?.issueStatusLabel ?? "Sem emissao oficial ativa"}
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                      {selectedPackage.publicVerification
+                        ? `Hash ${selectedPackage.publicVerification.hashShort} • aprovado em ${selectedPackage.publicVerification.approvedAtLabel}`
+                        : "Verificacao publica ainda nao disponivel para este laudo."}
+                    </p>
+
+                    <div class="mt-4 grid gap-3">
+                      {selectedPackage.publicVerification?.verificationUrl ? (
+                        <a
+                          href={selectedPackage.publicVerification.verificationUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                        >
+                          Abrir verificacao publica
+                        </a>
+                      ) : null}
+
+                      {selectedPackage.officialIssue ? (
+                        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                          {selectedPackage.officialIssue.blockerCount} blockers • pronta para emissao:{" "}
+                          {selectedPackage.officialIssue.readyForIssue ? "sim" : "nao"}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Revisoes recentes</p>
+                    <div class="mt-4 space-y-2">
+                      {selectedPackage.recentReviews.length > 0 ? selectedPackage.recentReviews.map((review) => (
+                        <div class="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
+                          <div class="flex items-center justify-between gap-4">
+                            <p class="font-semibold text-slate-950">Versao {review.version}</p>
+                            <span class="text-xs uppercase tracking-[0.18em] text-slate-500">{review.createdAtLabel}</span>
+                          </div>
+                          <p class="mt-2 leading-6">
+                            {review.summary ?? `${review.origin} • ${review.confidenceLabel ?? "sem confianca registrada"}`}
+                          </p>
+                        </div>
+                      )) : (
+                        <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-3 py-4 text-sm leading-6 text-slate-600">
+                          Nenhuma revisao recente registrada no pacote.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {selectedPackage.aiSummary ? (
+                    <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Parecer IA</p>
+                      <p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">{selectedPackage.aiSummary}</p>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </article>
+          </>
+        ) : (
+          <article class="rounded-[32px] border border-dashed border-slate-300 bg-white p-10 text-center shadow-[0_18px_40px_rgba(15,23,42,0.04)]">
+            <div class="mx-auto flex max-w-md flex-col items-center">
+              <div class="rounded-3xl bg-sky-500/10 p-4 text-sky-700">
+                <MessageSquare className="size-8" />
+              </div>
+              <h2 class="mt-6 font-display text-3xl tracking-tight text-slate-950">Selecione um laudo da fila</h2>
+              <p class="mt-4 text-sm leading-7 text-slate-600">
+                A thread, as pendencias e as decisoes aparecem aqui assim que um caso da lista for escolhido.
+              </p>
+            </div>
+          </article>
+        )}
+      </div>
+    </section>
+  )}
 </ClientShellLayout>

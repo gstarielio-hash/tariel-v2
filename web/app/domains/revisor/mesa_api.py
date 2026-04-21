@@ -43,7 +43,7 @@ from app.domains.revisor.command_side_effects import (
     run_review_reply_side_effects,
     run_review_whisper_reply_side_effects,
 )
-from app.domains.revisor.common import _validar_csrf
+from app.domains.revisor.common import _validar_csrf_ou_bearer
 from app.domains.revisor.document_boundary import (
     build_reviewdesk_complete_payload,
     build_reviewdesk_case_package_payload,
@@ -97,10 +97,12 @@ async def avaliar_laudo(
     usuario: Usuario = Depends(exigir_revisor),
     banco: Session = Depends(obter_banco),
 ):
-    resposta_api = bool(request.headers.get("X-CSRF-Token"))
+    resposta_api = bool(request.headers.get("X-CSRF-Token")) or bool(
+        getattr(request.state, "autenticacao_bearer", False)
+    )
     modo_schemathesis = resposta_api and os.getenv("SCHEMATHESIS_TEST_HINTS", "0").strip() == "1"
     token_csrf = str(csrf_token or "").strip() or request.headers.get("X-CSRF-Token", "")
-    if not _validar_csrf(request, token_csrf):
+    if not _validar_csrf_ou_bearer(request, token_csrf):
         raise HTTPException(status_code=403, detail="Token CSRF inválido.")
 
     comando = ReviewDecisionCommand(
@@ -156,7 +158,7 @@ async def whisper_responder(
     usuario: Usuario = Depends(exigir_revisor),
     banco: Session = Depends(obter_banco),
 ):
-    if not _validar_csrf(request):
+    if not _validar_csrf_ou_bearer(request):
         raise HTTPException(status_code=403, detail="CSRF inválido.")
 
     comando = ReviewWhisperReplyCommand(
@@ -188,7 +190,7 @@ async def responder_chat_campo(
     banco: Session = Depends(obter_banco),
 ):
     token = request.headers.get("X-CSRF-Token", "")
-    if not _validar_csrf(request, token):
+    if not _validar_csrf_ou_bearer(request, token):
         raise HTTPException(status_code=403, detail="CSRF inválido.")
 
     comando = ReviewReplyCommand(
@@ -227,7 +229,7 @@ async def responder_chat_campo_com_anexo(
     banco: Session = Depends(obter_banco),
 ):
     token = request.headers.get("X-CSRF-Token", "")
-    if not _validar_csrf(request, token):
+    if not _validar_csrf_ou_bearer(request, token):
         raise HTTPException(status_code=403, detail="CSRF inválido.")
 
     conteudo_arquivo = await arquivo.read()
@@ -303,7 +305,7 @@ async def marcar_whispers_lidos(
     banco: Session = Depends(obter_banco),
 ):
     token = request.headers.get("X-CSRF-Token", "")
-    if not _validar_csrf(request, token):
+    if not _validar_csrf_ou_bearer(request, token):
         raise HTTPException(status_code=403, detail="CSRF inválido.")
 
     total = marcar_whispers_lidos_revisor(
@@ -331,7 +333,7 @@ async def atualizar_pendencia_mesa_revisor(
     banco: Session = Depends(obter_banco),
 ):
     token = request.headers.get("X-CSRF-Token", "")
-    if not _validar_csrf(request, token):
+    if not _validar_csrf_ou_bearer(request, token):
         raise HTTPException(status_code=403, detail="CSRF inválido.")
 
     comando = ReviewPendencyStatusCommand(
@@ -377,7 +379,7 @@ async def solicitar_refazer_item_coverage(
     banco: Session = Depends(obter_banco),
 ):
     token = request.headers.get("X-CSRF-Token", "")
-    if not _validar_csrf(request, token):
+    if not _validar_csrf_ou_bearer(request, token):
         raise HTTPException(status_code=403, detail="CSRF inválido.")
 
     comando = ReviewCoverageReturnCommand(
@@ -668,7 +670,7 @@ async def emitir_oficialmente_laudo(
         method="POST",
     ) as hotspot:
         token = request.headers.get("X-CSRF-Token", "")
-        if not _validar_csrf(request, token):
+        if not _validar_csrf_ou_bearer(request, token):
             raise HTTPException(status_code=403, detail="CSRF inválido.")
         _ensure_reviewer_issue_capability(usuario)
 
