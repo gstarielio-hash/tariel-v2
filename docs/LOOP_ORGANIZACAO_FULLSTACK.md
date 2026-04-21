@@ -4431,3 +4431,44 @@ Proximo passo imediato:
 - com a home e a mesa apontando para o mesmo conjunto de handlers, o `Inspetor` reduz mais um bloco de manutencao duplicada no V2;
 - os proximos residuos relevantes tendem a estar mais em navegacao/contexto do workspace legado do que em actions Astro duplicadas;
 - seguir apenas em fatias que eliminem superficie antiga de verdade, e nao so aliases de rota.
+
+## Ciclo 106 — home do `Inspetor` reduzida a triagem e despacho para a mesa Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a home Astro do `Inspetor` ainda carregava uma mini-superficie de thread, com foco local de mensagem, composer e acoes de pendencia que competiam conceitualmente com a mesa dedicada;
+- isso mantinha estado e contexto duplicados em `/app/inicio`, mesmo depois de a mesa Astro ja concentrar o ownership operacional da conversa;
+- o corte seguro era manter a home como leitura rapida e despacho, empurrando a thread detalhada para `/app/mesa`.
+
+Corte executado:
+
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a abrir referencias e mensagens diretamente na mesa com `view=historico` e foco na mensagem;
+- o atalho de pendencia na home deixou de mutar inline e passou a encaminhar o operador para tratar o item na mesa dedicada;
+- o bloco de composer/resposta foi removido da home e substituido por CTAs para abrir a thread ou o contexto tecnico na mesa Astro;
+- o resultado reduz estado transitório em `/app/inicio` e reforca a home como triagem operacional, nao como segunda mesa paralela.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a home reduzida a triagem, a duplicacao de contexto entre `/app/inicio` e `/app/mesa` cai mais um degrau;
+- os proximos residuos do `Inspetor` tendem a estar em navegacao, atalhos ou shell do workspace legado, nao mais na thread Astro duplicada;
+- seguir apenas em cortes que diminuam dependencia real do `assistant_landing` e do workspace antigo.
