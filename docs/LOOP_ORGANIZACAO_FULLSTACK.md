@@ -2740,3 +2740,45 @@ Próximo passo imediato:
 - decidir se o próximo movimento fecha o pacote local com revisão global ou se ainda vale alternar para um hotspot backend restante antes do push futuro;
 - revisar o pacote local agora com oito cortes acumulados desde o último push, ainda sem publicar nada;
 - manter a estratégia `localhost first`, com push e validação no Render apenas quando o pacote estiver coerente para publicação.
+
+## Ciclo 71 — Migração do console de configurações do Admin-CEO para Astro
+
+Status:
+
+- concluído e validado localmente
+- preparado para publicação no `tariel-v2`
+
+Problema observado:
+
+- a trilha admin já tinha `painel`, `clientes`, `catalogo` e `auditoria` no `frontend-astro`, mas `/admin/configuracoes` seguia apenas no legado FastAPI/Jinja;
+- a tela é um ponto central de governança, porque reúne regras de acesso, suporte excepcional, rollout, observabilidade documental e defaults de onboarding;
+- a migração precisava preservar o contrato visual e o estado efetivo das políticas sem já abrir a superfície sensível dos `POSTs` de alteração.
+
+Corte executado:
+
+- foi criado `web/frontend-astro/src/lib/server/admin-settings.ts`;
+- o módulo novo porta o contrato legado de `summary_cards`, `sections`, itens de runtime e snapshots das `configuracoes_plataforma` via Prisma;
+- a nova página `web/frontend-astro/src/pages/admin/configuracoes.astro` entrega o console em modo leitura, com navegação por seção, cards operacionais e preview dos ajustes que ainda permanecem no fluxo legado;
+- `web/frontend-astro/src/layouts/admin-shell-layout.astro` passou a expor o item de menu de configurações dentro da navegação administrativa.
+
+Arquivos do ciclo:
+
+- `web/frontend-astro/src/lib/server/admin-settings.ts`
+- `web/frontend-astro/src/pages/admin/configuracoes.astro`
+- `web/frontend-astro/src/layouts/admin-shell-layout.astro`
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+
+Validação local executada:
+
+- `git diff --check -- web/frontend-astro`
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluído com adapter `@astrojs/node`
+
+Próximo passo imediato:
+
+- migrar a primeira fatia de escrita de `/admin/configuracoes`, começando por `acesso` e `defaults`, que têm payload menor e trilha de auditoria bem delimitada;
+- manter `suporte-excepcional` e `rollout` como segunda etapa, porque carregam combinações de flags mais sensíveis;
+- seguir publicando em cortes estreitos no `tariel-v2`, preservando a leitura já portada no Astro enquanto a escrita sai do legado.

@@ -2,6 +2,7 @@
 import {
   Boxes,
   Building2,
+  Fingerprint,
   FileSearch,
   LayoutDashboard,
   LogOut,
@@ -16,7 +17,7 @@ interface Props {
   title?: string;
   description?: string;
   userName?: string;
-  activeItem?: "dashboard" | "clients" | "catalog" | "audit";
+  activeItem?: "dashboard" | "clients" | "catalog" | "audit" | "settings";
 }
 
 const {
@@ -52,6 +53,12 @@ const menuItems = [
     current: activeItem === "audit",
   },
   {
+    href: "/admin/configuracoes",
+    label: "Configuracoes",
+    icon: Settings2,
+    current: activeItem === "settings",
+  },
+  {
     href: "#proxima-fatia",
     label: "Proxima fatia",
     icon: PlusCircle,
@@ -64,7 +71,7 @@ const menuItems = [
   {
     href: "/admin/login",
     label: "Tela de login",
-    icon: Settings2,
+    icon: Fingerprint,
   },
 ];
 ---

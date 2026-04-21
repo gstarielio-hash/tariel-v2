@@ -1,0 +1,301 @@
+---
+import {
+  Eye,
+  Gauge,
+  Orbit,
+  Router,
+  ShieldCheck,
+} from "lucide-react"
+
+import AdminNotice from "@/components/app/admin/admin-notice.astro"
+import KpiCard from "@/components/app/admin/kpi-card.astro"
+import StatusPill from "@/components/app/admin/status-pill.astro"
+import {
+  getAdminSettingsData,
+  type AdminSettingsFormField,
+  type AdminSettingsSection,
+} from "@/lib/server/admin-settings"
+import { consumeAdminNotice } from "@/lib/server/admin-notice"
+import AdminShellLayout from "@/layouts/admin-shell-layout.astro"
+
+export const prerender = false
+
+const data = await getAdminSettingsData()
+const notice = consumeAdminNotice(Astro.cookies)
+const requestedSection = String(Astro.url.searchParams.get("secao") ?? "").trim()
+const activeSectionKey = data.sections.some((section) => section.key === requestedSection)
+  ? requestedSection
+  : data.sections[0]?.key
+
+const cardIcons = [Orbit, Router, ShieldCheck, Gauge] as const
+const cardTones = ["orange", "sky", "emerald", "slate"] as const
+
+function sectionHref(sectionKey: string) {
+  return `/admin/configuracoes?secao=${sectionKey}#secao-${sectionKey}`
+}
+
+function itemTone(tone: string): "success" | "warning" | "danger" | "info" | "neutral" {
+  const map = {
+    positive: "success",
+    neutral: "neutral",
+    warning: "warning",
+    critical: "danger",
+  } as const
+
+  return map[tone as keyof typeof map] ?? "neutral"
+}
+
+function sectionMetaTone(section: AdminSettingsSection): "warning" | "neutral" {
+  return section.form ? "warning" : "neutral"
+}
+
+function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "danger" | "info" | "neutral" {
+  if (field.type === "checkbox") {
+    return Boolean(field.value) ? "success" : "neutral"
+  }
+
+  return "info"
+}
+---
+
+<AdminShellLayout
+  title="Configuracoes | Tariel Astro"
+  activeItem="settings"
+  userName="Admin-CEO"
+>
+  <Fragment slot="header">
+    <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+      <div class="max-w-4xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-orange-700">Configuracoes migradas</p>
+        <h1 class="mt-3 font-display text-4xl tracking-tight text-slate-950 sm:text-5xl">
+          Governanca da plataforma
+        </h1>
+        <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+          Console de politicas do Admin-CEO portado para Astro SSR com leitura do estado atual, contexto de runtime
+          e preview das mutacoes que ainda seguem no legado.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <StatusPill label={`${data.metrics.totalItems} politicas mapeadas`} tone="info" />
+        <StatusPill label={`${data.metrics.editableSections} secoes com POST legado`} tone="warning" />
+        <StatusPill label={`${data.metrics.readOnlySections} secoes consulta`} tone="neutral" />
+      </div>
+    </div>
+  </Fragment>
+
+  <AdminNotice notice={notice} />
+  <div id="topo"></div>
+
+  <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+    {data.summaryCards.map((card, index) => (
+      <KpiCard
+        label={card.label}
+        value={card.value}
+        detail={card.hint}
+        icon={cardIcons[index] ?? Gauge}
+        tone={cardTones[index] ?? "slate"}
+      />
+    ))}
+  </section>
+
+  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Navegacao interna</p>
+        <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Abrir uma frente por vez</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">
+          Esta fatia migra o console em modo leitura. As secoes abaixo mostram a regra efetiva, a origem e o caminho
+          que ainda permanece no fluxo legado para alteracoes.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <StatusPill label={data.metrics.environmentLabel} tone="info" />
+        <StatusPill label={`${data.metrics.operatorCount} operadores`} tone="neutral" />
+        <StatusPill label="Mutacoes ainda fora desta fatia" tone="warning" />
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+      {data.sections.map((section) => (
+        <a
+          href={sectionHref(section.key)}
+          class:list={[
+            "rounded-[28px] border px-5 py-4 transition",
+            activeSectionKey === section.key
+              ? "border-orange-500/40 bg-orange-50 shadow-[0_16px_50px_rgba(249,115,22,0.12)]"
+              : "border-slate-950/8 bg-slate-50 hover:border-slate-950/16 hover:bg-white",
+          ]}
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold text-slate-950">{section.title}</p>
+              <p class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{section.badge}</p>
+            </div>
+
+            <StatusPill
+              label={section.form ? "Preview de ajuste" : "Somente leitura"}
+              tone={sectionMetaTone(section)}
+            />
+          </div>
+
+          <p class="mt-3 text-sm leading-6 text-slate-600">{section.description}</p>
+          <p class="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {section.items.length} cards operacionais
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="mt-8 space-y-5">
+    {data.sections.map((section) => (
+      <article
+        id={`secao-${section.key}`}
+        class:list={[
+          "scroll-mt-8 rounded-[32px] border bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]",
+          activeSectionKey === section.key ? "border-orange-500/30" : "border-slate-950/8",
+        ]}
+      >
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div class="max-w-4xl">
+            <div class="flex flex-wrap gap-2">
+              <StatusPill label={section.badge} tone="info" />
+              <StatusPill
+                label={section.form ? "Recorte migrado em leitura" : "Origem controlada pelo ambiente"}
+                tone={sectionMetaTone(section)}
+              />
+              {activeSectionKey === section.key ? <StatusPill label="Secao ativa" tone="success" /> : null}
+            </div>
+
+            <h2 class="mt-4 font-display text-3xl tracking-tight text-slate-950">{section.title}</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-600">{section.description}</p>
+          </div>
+
+          <a
+            href="#topo"
+            class="inline-flex items-center gap-2 rounded-full border border-slate-950/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950/18 hover:bg-slate-50"
+          >
+            Voltar ao topo
+          </a>
+        </div>
+
+        <div class="mt-6 grid gap-4 xl:grid-cols-2">
+          {section.items.map((item) => (
+            <article class="rounded-[28px] border border-slate-950/8 bg-slate-50 p-5">
+              <div class="flex flex-wrap gap-2">
+                <StatusPill label={item.valueLabel} tone={itemTone(item.statusTone)} />
+                <StatusPill label={item.sourceLabel} tone="neutral" />
+                <StatusPill label={item.scopeLabel} tone="info" />
+              </div>
+
+              <h3 class="mt-4 font-display text-2xl tracking-tight text-slate-950">{item.title}</h3>
+              <p class="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
+
+              <div class="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
+                <div class="rounded-[22px] border border-slate-950/8 bg-white px-4 py-3">
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Valor efetivo</p>
+                  <p class="mt-1 font-medium text-slate-950">{item.valueLabel}</p>
+                </div>
+                <div class="rounded-[22px] border border-slate-950/8 bg-white px-4 py-3">
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Ultima mudanca</p>
+                  <p class="mt-1 font-medium text-slate-950">{item.lastChangedLabel}</p>
+                </div>
+                <div class="rounded-[22px] border border-slate-950/8 bg-white px-4 py-3">
+                  <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Responsavel</p>
+                  <p class="mt-1 font-medium text-slate-950">{item.lastChangedByLabel}</p>
+                </div>
+              </div>
+
+              {item.reason ? (
+                <div class="mt-4 rounded-[22px] border border-amber-500/20 bg-amber-50 px-4 py-3 text-sm leading-7 text-amber-900">
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Motivo registrado</p>
+                  <p class="mt-2">{item.reason}</p>
+                </div>
+              ) : null}
+
+              {item.impact ? (
+                <div class="mt-4 rounded-[22px] border border-slate-950/8 bg-white px-4 py-3 text-sm leading-7 text-slate-700">
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Impacto operacional</p>
+                  <p class="mt-2">{item.impact}</p>
+                </div>
+              ) : null}
+
+              {item.technicalPath ? (
+                <details class="mt-4 rounded-[22px] border border-slate-950/8 bg-white px-4 py-3">
+                  <summary class="cursor-pointer text-sm font-semibold text-slate-950">Caminho interno</summary>
+                  <code class="mt-3 block overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs text-slate-100">
+                    {item.technicalPath}
+                  </code>
+                </details>
+              ) : null}
+            </article>
+          ))}
+        </div>
+
+        {section.readOnlyNote ? (
+          <div class="mt-6 flex items-start gap-3 rounded-[26px] border border-sky-500/18 bg-sky-50 px-5 py-4 text-sm leading-7 text-sky-900">
+            <Eye className="mt-1 size-4 shrink-0" />
+            <p>{section.readOnlyNote}</p>
+          </div>
+        ) : null}
+
+        {section.form ? (
+          <div class="mt-6 rounded-[28px] border border-slate-950/8 bg-slate-950 p-5 text-white">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div class="max-w-3xl">
+                <div class="flex flex-wrap gap-2">
+                  <StatusPill label="Mutacao ainda no legado" tone="warning" />
+                  {section.form.requiresStepUp ? <StatusPill label="Step-up obrigatorio" tone="danger" /> : null}
+                </div>
+
+                <h3 class="mt-4 font-display text-2xl tracking-tight">Preview do ajuste operacional</h3>
+                <p class="mt-3 text-sm leading-7 text-slate-300">
+                  O contrato de edicao ja foi portado para leitura, mas o POST desta area segue temporariamente fora do
+                  Astro enquanto a trilha de seguranca e auditoria e migrada.
+                </p>
+              </div>
+
+              <div class="rounded-[22px] border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-orange-200">Endpoint legado</p>
+                <code class="mt-2 block text-xs text-white">{section.form.action}</code>
+                <p class="mt-3 text-xs uppercase tracking-[0.18em] text-slate-400">{section.form.submitLabel}</p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {section.form.fields.map((field) => (
+                <article class="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{field.label}</p>
+                      <p class="mt-3 font-display text-2xl tracking-tight text-white">{field.displayValue}</p>
+                    </div>
+
+                    <StatusPill label={field.type} tone={fieldTone(field)} />
+                  </div>
+
+                  <p class="mt-3 text-sm leading-6 text-slate-300">{field.hint}</p>
+
+                  {field.options?.length ? (
+                    <details class="mt-4 rounded-[20px] border border-white/10 bg-slate-950/35 px-4 py-3">
+                      <summary class="cursor-pointer text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                        Opcoes disponiveis
+                      </summary>
+                      <ul class="mt-3 space-y-2 text-sm text-slate-200">
+                        {field.options.map((option) => (
+                          <li>{option.label}</li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </article>
+    ))}
+  </section>
+</AdminShellLayout>
