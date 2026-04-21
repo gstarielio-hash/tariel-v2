@@ -3228,3 +3228,55 @@ Proximo passo imediato:
 - abrir a thread detalhada de `/revisao` no Astro reaproveitando o mesmo token do revisor e os endpoints canonicos de mesa ja existentes em `web/app/domains/revisor/mesa_api.py`;
 - depois ligar resposta, pendencias, exportacao de pacote e emissao oficial em slices separados para manter a vertical deployavel;
 - manter `Inspetor` fora da frente principal ate `revisao` ganhar leitura detalhada e mutacoes principais com ownership claro.
+
+## Ciclo 79 — `Mesa Avaliadora` com thread detalhada e mutacoes principais no Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- depois do ciclo 78, `/revisao/painel` ja autenticava e lia a fila oficial, mas ainda parava num shell sem thread detalhada nem mutacoes principais;
+- isso mantinha a mesa avaliadora parcialmente dependente do legado justamente no ponto de maior uso operacional: leitura do caso, resposta, pendencias e decisao;
+- o proximo slice seguro era aproveitar o mesmo bearer do revisor para abrir a workspace real em Astro sobre os endpoints canonicos ja existentes em `web/app/domains/revisor/mesa_api.py`, sem puxar ainda exportacao pesada, emissao oficial e coverage return.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/reviewer-mesa-bridge.ts`, espelhando o padrao de `client-mesa-bridge` para consumir `mensagens`, `pacote`, `avaliar`, `responder`, `responder-anexo`, `marcar-whispers-lidos`, `pendencias` e `mesa/anexos` via sessao real do revisor;
+- entrou `web/frontend-astro/src/lib/server/reviewer-mesa.ts`, concentrando o mapeamento da projection da fila para a workspace selecionada, a selecao do laudo ativo e a normalizacao de mensagens, pendencias e anexos para a UI;
+- entrou `web/frontend-astro/src/lib/server/reviewer-notice.ts`, `reviewer-action-route.ts` e `src/components/app/reviewer/reviewer-notice.astro`, fechando o mesmo padrao de action routes e notices ja usado em `admin` e `cliente`;
+- `web/frontend-astro/src/pages/revisao/painel.astro` deixou de ser um painel de fila-only e passou a abrir a workspace operacional com selecao de caso, resumo do laudo, triagem de whispers e pendencias, thread detalhada com anexos, formulario de resposta e blocos de aprovacao/devolucao;
+- entraram as action routes `src/pages/revisao/painel/[laudoId]/responder.ts`, `avaliar.ts`, `marcar-whispers-lidos.ts`, `pendencias/[messageId].ts` e `anexos/[attachmentId].ts`, mantendo no Astro apenas shell, redirects e notices, enquanto o Python continua dono das regras e efeitos colaterais.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/components/app/reviewer/reviewer-notice.astro`
+- `web/frontend-astro/src/lib/server/reviewer-action-route.ts`
+- `web/frontend-astro/src/lib/server/reviewer-mesa-bridge.ts`
+- `web/frontend-astro/src/lib/server/reviewer-mesa.ts`
+- `web/frontend-astro/src/lib/server/reviewer-notice.ts`
+- `web/frontend-astro/src/pages/revisao/painel.astro`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/anexos/[attachmentId].ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/avaliar.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/marcar-whispers-lidos.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/pendencias/[messageId].ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/responder.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- ligar `coverage/solicitar-refazer` e outras mutacoes de refinamento da mesa diretamente nesta workspace, sem abrir novos contratos paralelos;
+- depois entrar em exportacao de pacote e emissao oficial do revisor em fatias separadas para nao misturar fluxos pesados com a thread do caso;
+- manter `Inspetor` fora da frente principal ate `revisao` fechar esse bloco operacional com ownership claro de UI no Astro e regras no Python.

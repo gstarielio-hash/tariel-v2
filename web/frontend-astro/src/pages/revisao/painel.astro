@@ -3,18 +3,19 @@ import {
   AlertTriangle,
   CheckCircle2,
   ClipboardList,
-  FileStack,
   MessageSquareReply,
+  Paperclip,
   Search,
+  Send,
   ShieldCheck,
   Workflow,
 } from "lucide-react";
 
+import ReviewerNotice from "@/components/app/reviewer/reviewer-notice.astro";
 import ReviewerShellLayout from "@/layouts/reviewer-shell-layout.astro";
-import {
-  fetchReviewerPanelSnapshot,
-  type ReviewQueueItemPayload,
-} from "@/lib/server/reviewer-panel-bridge";
+import { getReviewerMesaWorkspace } from "@/lib/server/reviewer-mesa";
+import { consumeReviewerNotice } from "@/lib/server/reviewer-notice";
+import type { ReviewQueueItemPayload } from "@/lib/server/reviewer-panel-bridge";
 
 export const prerender = false;
 
@@ -23,18 +24,30 @@ if (!reviewerSession) {
   return Astro.redirect("/revisao/login", 303);
 }
 
-const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
 const searchTerm = String(Astro.url.searchParams.get("q") ?? "").trim();
 const operationFilter = String(Astro.url.searchParams.get("operacao") ?? "").trim().toLowerCase();
 const learningFilter = String(Astro.url.searchParams.get("aprendizados") ?? "").trim().toLowerCase();
+const requestedLaudoId = Number(Astro.url.searchParams.get("laudo") ?? 0);
+const workspace = await getReviewerMesaWorkspace(reviewerSession, {
+  searchTerm,
+  operationFilter,
+  learningFilter,
+  selectedLaudoId: Number.isInteger(requestedLaudoId) && requestedLaudoId > 0 ? requestedLaudoId : null,
+});
 
-const snapshotParams = new URLSearchParams();
-if (searchTerm) snapshotParams.set("q", searchTerm);
-if (operationFilter) snapshotParams.set("operacao", operationFilter);
-if (learningFilter) snapshotParams.set("aprendizados", learningFilter);
-
-const projection = await fetchReviewerPanelSnapshot(reviewerSession, snapshotParams);
-const payload = projection.payload;
+const currentReviewerUserId = reviewerSession.user.id;
+const notice = consumeReviewerNotice(Astro.cookies);
+const payload = workspace.projection.payload;
+const selectedCase = workspace.selectedCase;
+const selectedPackage = selectedCase?.package ?? null;
+const currentReturnTo = buildPanelPath({
+  q: workspace.searchTerm,
+  operacao: workspace.operationFilter,
+  aprendizados: workspace.learningFilter,
+  laudo: selectedCase?.item.id ?? null,
+});
+const canApprove = Boolean(selectedPackage?.allowedSurfaceActions.includes("mesa_approve"));
+const canReturn = Boolean(selectedPackage?.allowedSurfaceActions.includes("mesa_return"));
 
 const statCards = [
   {
@@ -71,11 +84,17 @@ const operationCards = [
   { label: "Acompanhamento", key: "acompanhamento", value: payload.operation_totals.acompanhamento },
 ] as const;
 
-function sectionPath(input: { q?: string; operacao?: string; aprendizados?: string }) {
+function buildPanelPath(input: {
+  q?: string | null;
+  operacao?: string | null;
+  aprendizados?: string | null;
+  laudo?: number | null;
+}) {
   const params = new URLSearchParams();
-  if (input.q?.trim()) params.set("q", input.q.trim());
-  if (input.operacao?.trim()) params.set("operacao", input.operacao.trim());
-  if (input.aprendizados?.trim()) params.set("aprendizados", input.aprendizados.trim());
+  if (String(input.q ?? "").trim()) params.set("q", String(input.q).trim());
+  if (String(input.operacao ?? "").trim()) params.set("operacao", String(input.operacao).trim());
+  if (String(input.aprendizados ?? "").trim()) params.set("aprendizados", String(input.aprendizados).trim());
+  if (input.laudo) params.set("laudo", String(input.laudo));
   const query = params.toString();
   return query ? `/revisao/painel?${query}` : "/revisao/painel";
 }
@@ -86,11 +105,69 @@ function statusTone(item: ReviewQueueItemPayload) {
   if (item.queue_section === "historico") return "border-slate-200 bg-slate-50";
   return "border-emerald-200 bg-emerald-50";
 }
+
+function queueItemClass(itemId: number) {
+  return itemId === selectedCase?.item.id
+    ? "border-emerald-400 bg-emerald-50 shadow-[0_18px_40px_rgba(16,185,129,0.08)]"
+    : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white";
+}
+
+function messageCardClass(message: {
+  messageKind: string;
+  pendencyState: string;
+  isWhisper?: boolean;
+}) {
+  if (message.messageKind === "mesa_pendency" && message.pendencyState === "resolved") {
+    return "border-emerald-200 bg-emerald-50";
+  }
+  if (message.messageKind === "mesa_pendency") {
+    return "border-red-200 bg-red-50";
+  }
+  if (message.isWhisper) {
+    return "border-amber-200 bg-amber-50";
+  }
+  return "border-slate-200 bg-slate-50";
+}
+
+function messageLabel(message: {
+  messageKind: string;
+  pendencyState: string;
+  isWhisper?: boolean;
+  senderId: number | null;
+}) {
+  if (message.messageKind === "mesa_pendency") {
+    return message.pendencyState === "resolved" ? "Pendencia resolvida" : "Pendencia aberta";
+  }
+  if (message.isWhisper) {
+    return message.senderId === currentReviewerUserId ? "Whisper da mesa" : "Whisper do campo";
+  }
+  if (message.senderId === currentReviewerUserId) {
+    return "Resposta da mesa";
+  }
+  return "Trilha operacional";
+}
+
+function formatBytes(value: number) {
+  if (value <= 0) {
+    return "0 B";
+  }
+
+  const units = ["B", "KB", "MB", "GB"];
+  let size = value;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+
+  return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+}
 ---
 
 <ReviewerShellLayout
   title={`Mesa Avaliadora | ${reviewerSession.user.companyName} | Tariel Astro`}
-  description="Fila inicial da mesa avaliadora em Astro SSR sobre o contrato canonico de review queue."
+  description="Mesa avaliadora em Astro SSR com fila, thread, respostas e decisao governadas pelo backend Python."
   userName={reviewerSession.user.name}
   companyName={reviewerSession.user.companyName}
   activeItem="dashboard"
@@ -100,11 +177,11 @@ function statusTone(item: ReviewQueueItemPayload) {
       <div>
         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-600">Mesa Avaliadora</p>
         <h1 class="mt-3 font-display text-3xl tracking-tight text-slate-950 sm:text-4xl">
-          Fila governada da revisao no V2
+          Fila, thread e decisao no V2
         </h1>
         <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          Este corte abre a entrada oficial do portal revisor no Astro e consome a fila pelo contrato canonicamente
-          owned pelo backend Python. A thread detalhada continua na proxima fatia.
+          Este slice abre a workspace principal de <code>/revisao/painel</code> no Astro: o shell fica no portal novo,
+          mas a fila, a thread, as pendencias e as decisoes continuam ownership do backend Python.
         </p>
       </div>
 
@@ -119,12 +196,7 @@ function statusTone(item: ReviewQueueItemPayload) {
     </div>
   </Fragment>
 
-  {successMessage ? (
-    <section class="mb-6 rounded-[30px] border border-emerald-500/16 bg-emerald-500/10 p-5 text-emerald-950">
-      <p class="text-xs font-semibold uppercase tracking-[0.22em]">Operacao concluida</p>
-      <p class="mt-3 text-sm leading-7">{successMessage}</p>
-    </section>
-  ) : null}
+  <ReviewerNotice notice={notice} />
 
   <section class="grid gap-4 xl:grid-cols-4">
     {statCards.map(({ label, value, detail, icon: Icon }) => (
@@ -159,7 +231,7 @@ function statusTone(item: ReviewQueueItemPayload) {
           <input
             type="text"
             name="q"
-            value={searchTerm}
+            value={workspace.searchTerm}
             placeholder="Hash, setor, inspetor ou mensagem inicial"
             class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500"
           />
@@ -173,11 +245,11 @@ function statusTone(item: ReviewQueueItemPayload) {
               class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <option value="">Todas</option>
-              <option value="responder_agora" selected={operationFilter === "responder_agora"}>Responder agora</option>
-              <option value="validar_aprendizado" selected={operationFilter === "validar_aprendizado"}>Validar aprendizado</option>
-              <option value="aguardando_inspetor" selected={operationFilter === "aguardando_inspetor"}>Aguardando campo</option>
-              <option value="fechamento_mesa" selected={operationFilter === "fechamento_mesa"}>Fechamento</option>
-              <option value="acompanhamento" selected={operationFilter === "acompanhamento"}>Acompanhamento</option>
+              <option value="responder_agora" selected={workspace.operationFilter === "responder_agora"}>Responder agora</option>
+              <option value="validar_aprendizado" selected={workspace.operationFilter === "validar_aprendizado"}>Validar aprendizado</option>
+              <option value="aguardando_inspetor" selected={workspace.operationFilter === "aguardando_inspetor"}>Aguardando campo</option>
+              <option value="fechamento_mesa" selected={workspace.operationFilter === "fechamento_mesa"}>Fechamento</option>
+              <option value="acompanhamento" selected={workspace.operationFilter === "acompanhamento"}>Acompanhamento</option>
             </select>
           </label>
 
@@ -188,7 +260,7 @@ function statusTone(item: ReviewQueueItemPayload) {
               class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <option value="">Todos</option>
-              <option value="pendentes" selected={learningFilter === "pendentes"}>Somente pendentes</option>
+              <option value="pendentes" selected={workspace.learningFilter === "pendentes"}>Somente pendentes</option>
             </select>
           </label>
         </div>
@@ -212,7 +284,12 @@ function statusTone(item: ReviewQueueItemPayload) {
       <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {operationCards.map((card) => (
           <a
-            href={sectionPath({ q: searchTerm, operacao: card.key, aprendizados: learningFilter })}
+            href={buildPanelPath({
+              q: workspace.searchTerm,
+              operacao: card.key,
+              aprendizados: workspace.learningFilter,
+              laudo: selectedCase?.item.id ?? null,
+            })}
             class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300 hover:bg-white"
           >
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{card.label}</p>
@@ -235,7 +312,15 @@ function statusTone(item: ReviewQueueItemPayload) {
 
       <div class="mt-6 space-y-3">
         {payload.pending_whispers_preview.length > 0 ? payload.pending_whispers_preview.map((item) => (
-          <article class="rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4">
+          <a
+            href={buildPanelPath({
+              q: workspace.searchTerm,
+              operacao: workspace.operationFilter,
+              aprendizados: workspace.learningFilter,
+              laudo: item.laudo_id,
+            })}
+            class="block rounded-[24px] border border-amber-200 bg-amber-50 px-4 py-4 transition hover:border-amber-300 hover:bg-amber-100/70"
+          >
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <p class="font-semibold text-slate-950">Laudo {item.hash}</p>
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.status_visual_label}</p>
@@ -244,7 +329,7 @@ function statusTone(item: ReviewQueueItemPayload) {
             <p class="mt-2 text-sm leading-6 text-slate-500">
               {item.collaboration_summary?.unread_whisper_count ?? 0} nao lidos • {item.collaboration_summary?.open_pendency_count ?? 0} pendencias abertas
             </p>
-          </article>
+          </a>
         )) : (
           <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
             Nenhum whisper pendente apareceu no recorte atual da fila.
@@ -254,75 +339,392 @@ function statusTone(item: ReviewQueueItemPayload) {
     </article>
   </section>
 
-  <section class="mt-8 grid gap-6 xl:grid-cols-3">
-    {[
-      { title: "Em andamento", items: payload.queue_sections.em_andamento, icon: Workflow },
-      { title: "Aguardando avaliacao", items: payload.queue_sections.aguardando_avaliacao, icon: FileStack },
-      { title: "Historico recente", items: payload.queue_sections.historico, icon: CheckCircle2 },
-    ].map(({ title, items, icon: Icon }) => (
-      <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fila</p>
-            <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">{title}</h2>
+  <section class="mt-8 grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
+    <div class="space-y-6">
+      {[
+        { title: "Em andamento", items: payload.queue_sections.em_andamento },
+        { title: "Aguardando avaliacao", items: payload.queue_sections.aguardando_avaliacao },
+        { title: "Historico recente", items: payload.queue_sections.historico },
+      ].map(({ title, items }) => (
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fila</p>
+              <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">{title}</h2>
+            </div>
+            <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              {items.length} itens
+            </div>
           </div>
-          <div class="rounded-2xl bg-emerald-500/10 p-3 text-emerald-700">
-            <Icon className="size-5" />
-          </div>
-        </div>
 
-        <div class="mt-6 space-y-3">
-          {items.length > 0 ? items.map((item) => (
-            <article class:list={["rounded-[24px] border px-4 py-4", statusTone(item)]}>
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p class="font-semibold text-slate-950">{item.setor_industrial || `Laudo ${item.hash_curto}`}</p>
-                  <p class="mt-1 text-sm leading-6 text-slate-600">{item.primeira_mensagem}</p>
-                  <p class="mt-1 text-sm leading-6 text-slate-500">
-                    {item.inspetor_nome} • {item.tempo_em_campo} • {item.proxima_acao}
-                  </p>
+          <div class="mt-6 space-y-3">
+            {items.length > 0 ? items.map((item) => (
+              <a
+                href={buildPanelPath({
+                  q: workspace.searchTerm,
+                  operacao: workspace.operationFilter,
+                  aprendizados: workspace.learningFilter,
+                  laudo: item.id,
+                })}
+                class:list={["block rounded-[24px] border px-4 py-4 transition", queueItemClass(item.id), statusTone(item)]}
+              >
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p class="font-semibold text-slate-950">{item.setor_industrial || `Laudo ${item.hash_curto}`}</p>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">{item.primeira_mensagem}</p>
+                    <p class="mt-1 text-sm leading-6 text-slate-500">
+                      {item.inspetor_nome} • {item.tempo_em_campo} • {item.proxima_acao}
+                    </p>
+                  </div>
+
+                  <div class="flex flex-col items-start gap-2 sm:items-end">
+                    <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                      {item.status_visual_label}
+                    </span>
+                    <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                      {item.fila_operacional_label}
+                    </span>
+                  </div>
                 </div>
 
-                <div class="flex flex-col items-start gap-2 sm:items-end">
-                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
-                    {item.status_visual_label}
-                  </span>
-                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
-                    {item.fila_operacional_label}
-                  </span>
+                <div class="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.hash_curto}</span>
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.whispers_nao_lidos} whispers</span>
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.pendencias_abertas} pendencias</span>
+                  <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.aprendizados_pendentes} aprendizados</span>
+                </div>
+              </a>
+            )) : (
+              <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                Nenhum caso encontrado nesta secao para o filtro atual.
+              </div>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="space-y-6">
+      {selectedCase && selectedPackage ? (
+        <>
+          <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Laudo selecionado</p>
+                <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">
+                  {selectedCase.item.setor_industrial || `Laudo ${selectedCase.item.hash_curto}`}
+                </h2>
+                <p class="mt-3 text-sm leading-7 text-slate-600">{selectedCase.item.primeira_mensagem}</p>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                  {selectedPackage.statusVisualLabel}
+                </span>
+                <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                  Hash {selectedCase.item.hash_curto}
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Fluxo</p>
+                <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.lifecycleStatus || "Sem lifecycle"}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">{selectedPackage.activeOwnerRole || "Owner nao informado"}</p>
+              </div>
+
+              <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Mensagens</p>
+                <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.messageSummary.total}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  {selectedPackage.messageSummary.inspector} inspetor • {selectedPackage.messageSummary.mesa} mesa
+                </p>
+              </div>
+
+              <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Pendencias</p>
+                <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.pendencySummary.open}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  {selectedPackage.pendencySummary.resolved} resolvidas recentemente
+                </p>
+              </div>
+
+              <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultima interacao</p>
+                <p class="mt-3 text-sm font-semibold text-slate-950">{selectedPackage.lastInteractionLabel}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                  {selectedPackage.fieldTimeMinutes} min em campo • {selectedCase.item.inspetor_nome}
+                </p>
+              </div>
+            </div>
+
+            {selectedPackage.aiSummary ? (
+              <div class="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-700">
+                <p class="font-semibold text-slate-950">Resumo de apoio</p>
+                <p class="mt-2 whitespace-pre-wrap">{selectedPackage.aiSummary}</p>
+              </div>
+            ) : null}
+          </article>
+
+          <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Triagem operacional</p>
+                <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Pendencias e whispers</h2>
+              </div>
+
+              {selectedCase.item.whispers_nao_lidos > 0 ? (
+                <form method="POST" action={`/revisao/painel/${selectedCase.item.id}/marcar-whispers-lidos`}>
+                  <input type="hidden" name="returnTo" value={currentReturnTo} />
+                  <button
+                    type="submit"
+                    class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    Marcar whispers lidos
+                  </button>
+                </form>
+              ) : null}
+            </div>
+
+            <div class="mt-6 grid gap-6 xl:grid-cols-2">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Pendencias abertas</p>
+                <div class="mt-4 space-y-3">
+                  {selectedPackage.openPendencies.length > 0 ? selectedPackage.openPendencies.map((message) => (
+                    <article class:list={["rounded-[24px] border px-4 py-4", messageCardClass(message)]}>
+                      <div class="flex items-center justify-between gap-4">
+                        <p class="text-sm font-semibold text-slate-950">{messageLabel({ ...message, isWhisper: false })}</p>
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{message.createdAtLabel}</p>
+                      </div>
+                      <p class="mt-3 text-sm leading-6 text-slate-700">{message.text || "Sem texto adicional."}</p>
+                    </article>
+                  )) : (
+                    <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                      Nenhuma pendencia aberta neste laudo.
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div class="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.hash_curto}</span>
-                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.whispers_nao_lidos} whispers</span>
-                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.pendencias_abertas} pendencias</span>
-                <span class="rounded-full border border-slate-200 bg-white px-3 py-1">{item.aprendizados_pendentes} aprendizados</span>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Whispers recentes</p>
+                <div class="mt-4 space-y-3">
+                  {selectedPackage.recentWhispers.length > 0 ? selectedPackage.recentWhispers.map((message) => (
+                    <article class:list={["rounded-[24px] border px-4 py-4", messageCardClass({ ...message, isWhisper: true })]}>
+                      <div class="flex items-center justify-between gap-4">
+                        <p class="text-sm font-semibold text-slate-950">{messageLabel({ ...message, isWhisper: true })}</p>
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{message.createdAtLabel}</p>
+                      </div>
+                      <p class="mt-3 text-sm leading-6 text-slate-700">{message.text || "Sem texto adicional."}</p>
+                    </article>
+                  )) : (
+                    <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                      Nenhum whisper recente neste laudo.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Thread da mesa</p>
+                <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Mensagens e anexos</h2>
+              </div>
+
+              <div class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {selectedCase.messages.length} mensagens
+              </div>
+            </div>
+
+            <div class="mt-6 space-y-3">
+              {selectedCase.messages.length > 0 ? selectedCase.messages.map((message) => (
+                <article class:list={["rounded-[24px] border px-4 py-4", messageCardClass(message)]}>
+                  <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm font-semibold text-slate-950">{messageLabel(message)}</p>
+                    <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{message.createdAtLabel}</p>
+                  </div>
+
+                  <p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                    {message.text || "Mensagem sem texto visivel."}
+                  </p>
+
+                  {message.attachments.length > 0 ? (
+                    <div class="mt-4 flex flex-wrap gap-2">
+                      {message.attachments.map((attachment) => (
+                        <a
+                          href={attachment.downloadPath}
+                          class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                        >
+                          <Paperclip className="size-3.5" />
+                          {attachment.name} • {formatBytes(attachment.sizeBytes)}
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {message.canTogglePendency ? (
+                    <form method="POST" action={`/revisao/painel/${selectedCase.item.id}/pendencias/${message.id}`} class="mt-4">
+                      <input type="hidden" name="returnTo" value={currentReturnTo} />
+                      <input type="hidden" name="lida" value={message.isResolvedPendency ? "false" : "true"} />
+                      <button
+                        type="submit"
+                        class:list={[
+                          "inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold transition",
+                          message.isResolvedPendency
+                            ? "border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                            : "bg-slate-950 text-white hover:bg-slate-800",
+                        ]}
+                      >
+                        {message.isResolvedPendency ? "Reabrir pendencia" : "Marcar como resolvida"}
+                      </button>
+                    </form>
+                  ) : null}
+                </article>
+              )) : (
+                <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                  Nenhuma mensagem foi encontrada para este laudo.
+                </div>
+              )}
+            </div>
+          </article>
+
+          <div class="grid gap-6 xl:grid-cols-[0.98fr_1.02fr]">
+            <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Responder</p>
+                  <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Enviar retorno ao caso</h2>
+                </div>
+
+                <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+                  <Send className="size-5" />
+                </div>
+              </div>
+
+              <form method="POST" action={`/revisao/painel/${selectedCase.item.id}/responder`} enctype="multipart/form-data" class="mt-6 space-y-4">
+                <input type="hidden" name="returnTo" value={currentReturnTo} />
+
+                <label class="block space-y-2">
+                  <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Mensagem</span>
+                  <textarea
+                    name="texto"
+                    rows="5"
+                    maxlength="8000"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-sky-500"
+                    placeholder="Descreva o retorno, contexto ou encaminhamento da mesa."
+                  />
+                </label>
+
+                <label class="block space-y-2">
+                  <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Anexo opcional</span>
+                  <input
+                    type="file"
+                    name="arquivo"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
+                  />
+                </label>
+
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+                  A action route do Astro envia a resposta com a sessao real do revisor. O backend Python continua
+                  registrando policy, auditoria e efeitos colaterais da mesa.
+                </div>
+
+                <button
+                  type="submit"
+                  class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                >
+                  <Send className="size-4" />
+                  Enviar resposta
+                </button>
+              </form>
+            </article>
+
+            <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Decisao da mesa</p>
+                  <h2 class="mt-2 font-display text-2xl tracking-tight text-slate-950">Aprovar ou devolver</h2>
+                </div>
+
+                <div class="rounded-2xl bg-sky-500/10 p-3 text-sky-700">
+                  <CheckCircle2 className="size-5" />
+                </div>
+              </div>
+
+              <div class="mt-6 space-y-4">
+                <div class="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+                  A disponibilidade das decisoes continua governada pelo lifecycle do caso. Os botoes so aparecem
+                  quando o backend expoe <code>allowed_surface_actions</code> compativeis.
+                </div>
+
+                {canApprove ? (
+                  <form method="POST" action={`/revisao/painel/${selectedCase.item.id}/avaliar`} class="space-y-3">
+                    <input type="hidden" name="returnTo" value={currentReturnTo} />
+                    <input type="hidden" name="acao" value="aprovar" />
+                    <button
+                      type="submit"
+                      class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                    >
+                      <CheckCircle2 className="size-4" />
+                      Aprovar laudo
+                    </button>
+                  </form>
+                ) : null}
+
+                {canReturn ? (
+                  <form method="POST" action={`/revisao/painel/${selectedCase.item.id}/avaliar`} class="space-y-3">
+                    <input type="hidden" name="returnTo" value={currentReturnTo} />
+                    <input type="hidden" name="acao" value="rejeitar" />
+                    <label class="block space-y-2">
+                      <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Motivo</span>
+                      <textarea
+                        name="motivo"
+                        rows="4"
+                        maxlength="4000"
+                        class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus-visible:ring-2 focus-visible:ring-amber-500"
+                        placeholder="Explique o que precisa voltar para o campo."
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-400"
+                    >
+                      <AlertTriangle className="size-4" />
+                      Devolver para correcao
+                    </button>
+                  </form>
+                ) : null}
+
+                {!canApprove && !canReturn ? (
+                  <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
+                    Este caso ainda nao liberou acao de decisao para a mesa neste ponto do lifecycle.
+                  </div>
+                ) : null}
               </div>
             </article>
-          )) : (
-            <div class="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm leading-6 text-slate-600">
-              Nenhum caso encontrado nesta secao para o filtro atual.
+          </div>
+        </>
+      ) : (
+        <article class="rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <div class="flex items-center gap-3">
+            <div class="rounded-2xl bg-amber-500/10 p-3 text-amber-700">
+              <AlertTriangle className="size-5" />
             </div>
-          )}
-        </div>
-      </article>
-    ))}
-  </section>
-
-  <section class="mt-8 rounded-[32px] border border-slate-950/8 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-    <div class="flex items-center gap-3">
-      <div class="rounded-2xl bg-amber-500/10 p-3 text-amber-700">
-        <AlertTriangle className="size-5" />
-      </div>
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Proxima fatia</p>
-        <h2 class="mt-1 font-display text-2xl tracking-tight text-slate-950">Thread detalhada e mutacoes da mesa</h2>
-      </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Workspace vazia</p>
+              <h2 class="mt-1 font-display text-2xl tracking-tight text-slate-950">Selecione um caso da fila</h2>
+            </div>
+          </div>
+          <p class="mt-4 text-sm leading-7 text-slate-600">
+            O recorte atual nao trouxe nenhum laudo elegivel para abrir a thread detalhada. Ajuste os filtros ou limpe
+            a busca para carregar um caso ativo da mesa.
+          </p>
+        </article>
+      )}
     </div>
-    <p class="mt-4 text-sm leading-7 text-slate-600">
-      Este painel fecha autenticacao e leitura inicial da fila no Astro. A proxima rodada reaproveita o mesmo token
-      e o mesmo ownership Python para abrir a thread detalhada, pendencias, respostas e exportacoes do revisor.
-    </p>
   </section>
 </ReviewerShellLayout>

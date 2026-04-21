@@ -1,0 +1,68 @@
+---
+import type { ReviewerNotice } from "@/lib/server/reviewer-notice";
+
+interface Props {
+  notice?: ReviewerNotice | null;
+}
+
+const { notice = null } = Astro.props;
+
+const tones = {
+  success: "border-emerald-500/16 bg-emerald-500/10 text-emerald-950",
+  error: "border-red-500/16 bg-red-500/10 text-red-950",
+  info: "border-sky-500/16 bg-sky-500/10 text-sky-950",
+} as const;
+---
+
+{notice ? (
+  <section class={`mb-6 rounded-[30px] border p-5 shadow-[0_18px_60px_rgba(15,23,42,0.06)] ${tones[notice.tone]}`} role="status" aria-live="polite">
+    <p class="text-xs font-semibold uppercase tracking-[0.22em]">{notice.title}</p>
+    <p class="mt-3 text-sm leading-7">{notice.message}</p>
+
+    {notice.details && notice.details.length > 0 ? (
+      <ul class="mt-4 grid gap-2 text-sm leading-6">
+        {notice.details.map((detail) => (
+          <li class="rounded-2xl border border-black/6 bg-white/50 px-4 py-3">{detail}</li>
+        ))}
+      </ul>
+    ) : null}
+
+    {notice.credentials && notice.credentials.length > 0 ? (
+      <div class="mt-5 grid gap-4 lg:grid-cols-2">
+        {notice.credentials.map((credential) => (
+          <article class="rounded-[24px] border border-black/6 bg-white/70 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{credential.label}</p>
+            <dl class="mt-4 space-y-3 text-sm">
+              {credential.portal ? (
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="text-slate-500">Portal</dt>
+                  <dd class="text-right font-medium text-slate-950">{credential.portal}</dd>
+                </div>
+              ) : null}
+              {credential.email ? (
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="text-slate-500">Login</dt>
+                  <dd class="text-right font-medium text-slate-950">{credential.email}</dd>
+                </div>
+              ) : null}
+              {credential.password ? (
+                <div class="flex items-start justify-between gap-4">
+                  <dt class="text-slate-500">Senha</dt>
+                  <dd class="rounded-xl bg-slate-950 px-3 py-1.5 font-mono text-sm text-white">{credential.password}</dd>
+                </div>
+              ) : null}
+            </dl>
+
+            {credential.notes && credential.notes.length > 0 ? (
+              <ul class="mt-4 grid gap-2 text-xs leading-5 text-slate-600">
+                {credential.notes.map((note) => (
+                  <li class="rounded-xl border border-black/6 bg-white/70 px-3 py-2">{note}</li>
+                ))}
+              </ul>
+            ) : null}
+          </article>
+        ))}
+      </div>
+    ) : null}
+  </section>
+) : null}
