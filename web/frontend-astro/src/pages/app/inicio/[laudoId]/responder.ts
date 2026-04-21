@@ -6,7 +6,7 @@ import {
   redirectWithAppNotice,
   requireAppSession,
 } from "@/lib/server/app-action-route";
-import { replyToAppMesa } from "@/lib/server/app-mesa-bridge";
+import { replyToAppMesa, replyToAppMesaWithAttachment } from "@/lib/server/app-mesa-bridge";
 
 function resolveLaudoId(value: string | undefined) {
   const parsed = Number(value ?? 0);
@@ -29,22 +29,40 @@ export const POST: APIRoute = async (context) => {
   }
 
   try {
+    const rawFile = formData.get("arquivo");
+    const file = rawFile instanceof File && rawFile.size > 0 ? rawFile : null;
     const text = String(formData.get("texto") ?? "");
     const referenceMessageId = Number(formData.get("referenciaMensagemId") ?? 0) || null;
+    const normalizedText = text.trim();
 
-    await replyToAppMesa(appSession, {
-      laudoId,
-      texto: text,
-      referenciaMensagemId: referenceMessageId,
-    });
+    if (!normalizedText && !file) {
+      throw new Error("Escreva uma resposta ou selecione um anexo.");
+    }
+
+    if (file) {
+      await replyToAppMesaWithAttachment(appSession, {
+        laudoId,
+        arquivo: file,
+        texto: normalizedText,
+        referenciaMensagemId: referenceMessageId,
+      });
+    } else {
+      await replyToAppMesa(appSession, {
+        laudoId,
+        texto: normalizedText,
+        referenciaMensagemId: referenceMessageId,
+      });
+    }
 
     return redirectWithAppNotice(context, returnTo, {
       tone: "success",
-      title: "Resposta enviada",
-      message: "A resposta operacional foi registrada na thread da mesa.",
+      title: file ? "Resposta com anexo enviada" : "Resposta enviada",
+      message: file
+        ? "A mesa recebeu a resposta operacional com o anexo informado."
+        : "A resposta operacional foi registrada na thread da mesa.",
       details: [
         `Laudo: ${laudoId}`,
-        "A trilha auditavel foi atualizada no backend Python.",
+        file ? `Arquivo: ${file.name}` : "A trilha auditavel foi atualizada no backend Python.",
       ],
     });
   } catch (error) {

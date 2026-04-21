@@ -473,7 +473,7 @@ const cards = [
             <div>
               <p class="text-sm font-semibold text-slate-950">Proxima fatia natural</p>
               <p class="mt-2 text-sm leading-6 text-slate-600">
-                Com resumo e thread em leitura no Astro, o proximo corte mais util e liberar a primeira acao de pendencia ou reply sobre o laudo selecionado.
+                Com reply referenciado ja liberado no Astro, o proximo ganho estrutural passa a ser ampliar anexos e evoluir a superficie operacional do laudo.
               </p>
             </div>
           </div>
@@ -483,6 +483,7 @@ const cards = [
           <form
             method="POST"
             action={`/app/inicio/${selectedReport.id}/responder`}
+            enctype="multipart/form-data"
             class="rounded-[24px] border border-slate-200 bg-slate-50 p-4"
           >
             <input type="hidden" name="returnTo" value={`/app/inicio?laudo=${selectedReport.id}`} />
@@ -492,9 +493,9 @@ const cards = [
                 <MessageSquareCode className="size-5" />
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold text-slate-950">Primeira acao: reply textual</p>
+                <p class="text-sm font-semibold text-slate-950">Responder a thread do laudo</p>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
-                  Esta primeira acao do Astro envia uma resposta simples para a mesa no laudo selecionado, sem anexo.
+                  Esta action route do Astro envia texto e, quando necessario, um anexo opcional para a mesa do laudo selecionado.
                 </p>
 
                 {referencedMessage ? (
@@ -526,6 +527,20 @@ const cards = [
                   placeholder="Escreva a resposta operacional para a mesa"
                   class="mt-4 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-500"
                 />
+
+                <label class="mt-4 block space-y-2">
+                  <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Anexo opcional</span>
+                  <input
+                    type="file"
+                    name="arquivo"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
+                  />
+                </label>
+
+                <div class="mt-4 rounded-[20px] border border-slate-200 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                  O Astro continua apenas como shell autenticado e action route. Validacao, auditoria, persistencia e
+                  tratamento do anexo seguem no backend Python.
+                </div>
 
                 <div class="mt-4 flex justify-end">
                   <button

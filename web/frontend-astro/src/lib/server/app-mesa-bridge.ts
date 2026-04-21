@@ -130,6 +130,14 @@ function buildBackendUrl(pathname: string) {
   return new URL(pathname, resolvePythonBackendBaseUrl()).toString();
 }
 
+function isFormDataBody(body: unknown): body is FormData {
+  return typeof FormData !== "undefined" && body instanceof FormData;
+}
+
+function isPlainJsonBody(body: unknown): body is Record<string, unknown> {
+  return Boolean(body) && typeof body === "object" && !isFormDataBody(body) && !(body instanceof URLSearchParams);
+}
+
 async function extractBackendError(response: Response) {
   const contentType = response.headers.get("content-type") ?? "";
 
@@ -145,6 +153,59 @@ async function extractBackendError(response: Response) {
 
   const detail = await response.text().catch(() => "");
   return detail.trim();
+}
+
+async function fetchAppMesaBackend(
+  appSession: AuthenticatedAppRequest,
+  pathname: string,
+  init: {
+    method?: string;
+    body?: BodyInit | FormData | Record<string, unknown>;
+    accept?: string;
+  } = {},
+) {
+  const headers = new Headers({
+    Accept: init.accept ?? "application/json",
+    Authorization: `Bearer ${appSession.session.token}`,
+    "X-Client-Request-Id": randomUUID(),
+  });
+
+  let body: BodyInit | undefined;
+  if (isPlainJsonBody(init.body)) {
+    headers.set("Content-Type", "application/json");
+    body = JSON.stringify(init.body);
+  } else if (init.body !== undefined) {
+    body = init.body;
+  }
+
+  return fetch(buildBackendUrl(pathname), {
+    method: init.method ?? "GET",
+    headers,
+    body,
+    cache: "no-store",
+  });
+}
+
+async function expectAppMesaJson<T>(
+  appSession: AuthenticatedAppRequest,
+  pathname: string,
+  init: {
+    method?: string;
+    body?: BodyInit | FormData | Record<string, unknown>;
+    accept?: string;
+    errorPrefix: string;
+  },
+): Promise<T> {
+  const response = await fetchAppMesaBackend(appSession, pathname, init);
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `${init.errorPrefix} (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return (await response.json()) as T;
 }
 
 export async function fetchAppMesaSummary(
@@ -209,29 +270,47 @@ export async function replyToAppMesa(
     throw new Error("Escreva uma resposta para a mesa.");
   }
 
-  const response = await fetch(buildBackendUrl(`/app/api/laudo/${input.laudoId}/mesa/mensagem`), {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${appSession.session.token}`,
-      "Content-Type": "application/json",
-      "X-Client-Request-Id": randomUUID(),
-    },
-    body: JSON.stringify({
+  return expectAppMesaJson<AppMesaReplyPayload>(
+    appSession,
+    `/app/api/laudo/${input.laudoId}/mesa/mensagem`,
+    {
+      method: "POST",
+      body: {
       texto: normalizedText,
       referencia_mensagem_id: input.referenciaMensagemId ?? null,
-    }),
-    cache: "no-store",
-  });
+      },
+      errorPrefix: "Python inspector mesa reply failed",
+    },
+  );
+}
 
-  if (!response.ok) {
-    const detail = await extractBackendError(response);
-    throw new Error(
-      `Python inspector mesa reply failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
-    );
+export async function replyToAppMesaWithAttachment(
+  appSession: AuthenticatedAppRequest,
+  input: {
+    laudoId: number;
+    arquivo: File;
+    texto?: string;
+    referenciaMensagemId?: number | null;
+  },
+) {
+  const formData = new FormData();
+  formData.set("arquivo", input.arquivo);
+  if (input.texto?.trim()) {
+    formData.set("texto", input.texto.trim());
+  }
+  if (input.referenciaMensagemId) {
+    formData.set("referencia_mensagem_id", String(input.referenciaMensagemId));
   }
 
-  return (await response.json()) as AppMesaReplyPayload;
+  return expectAppMesaJson<AppMesaReplyPayload>(
+    appSession,
+    `/app/api/laudo/${input.laudoId}/mesa/anexo`,
+    {
+      method: "POST",
+      body: formData,
+      errorPrefix: "Python inspector mesa attachment reply failed",
+    },
+  );
 }
 
 export async function updateAppMesaPendency(

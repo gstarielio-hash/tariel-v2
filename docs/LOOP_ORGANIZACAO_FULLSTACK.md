@@ -3749,3 +3749,46 @@ Proximo passo imediato:
 - com reply livre e reply referenciado no Astro, o proximo corte natural e reply com anexo;
 - isso fecha a trilha minima de interacao do inspetor sem exigir ainda uma workspace full-screen;
 - depois desse passo, o proximo ganho estrutural passa a ser unificar melhor resumo, thread e composer numa superficie operacional dedicada.
+
+## Ciclo 90 — reply com anexo no `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- o portal do inspetor ja conseguia responder a thread com texto livre e referencia de mensagem, mas ainda ficava abaixo dos fluxos de `cliente` e `revisao` por nao aceitar anexos;
+- isso deixava a trilha minima de operacao incompleta no Astro, mesmo com o backend Python ja expondo o endpoint canonico de upload para a mesa;
+- o corte seguro era habilitar apenas o envio opcional de arquivo no reply existente, sem abrir ainda download de anexos nem uma workspace mais pesada.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a compartilhar um helper de fetch tipado e a expor `replyToAppMesaWithAttachment`, consumindo `POST /app/api/laudo/{laudo_id}/mesa/anexo`;
+- `web/frontend-astro/src/pages/app/inicio/[laudoId]/responder.ts` agora detecta `arquivo` no `FormData`, rejeita submit vazio e escolhe entre reply textual e reply com anexo;
+- `web/frontend-astro/src/pages/app/inicio.astro` passou a enviar `multipart/form-data`, exibir campo opcional de upload e ajustar a copy do composer para refletir o novo contrato;
+- o ownership segue o mesmo: Astro como shell autenticado e action route, Python como dono de validacao, auditoria, persistencia e tratamento do anexo.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+- `web/frontend-astro/src/pages/app/inicio/[laudoId]/responder.ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com texto, referencia, pendencia e anexo ja operando no Astro, o proximo ganho util no `Inspetor` e expor download/visualizacao basica dos anexos da thread;
+- depois disso, a home pode evoluir para uma superficie operacional mais coesa, juntando resumo, thread e composer numa mesa dedicada do laudo;
+- continuar preservando o backend Python como dono dos contratos de operacao e auditoria.
