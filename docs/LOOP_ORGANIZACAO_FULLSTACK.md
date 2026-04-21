@@ -4472,3 +4472,49 @@ Proximo passo imediato:
 - com a home reduzida a triagem, a duplicacao de contexto entre `/app/inicio` e `/app/mesa` cai mais um degrau;
 - os proximos residuos do `Inspetor` tendem a estar em navegacao, atalhos ou shell do workspace legado, nao mais na thread Astro duplicada;
 - seguir apenas em cortes que diminuam dependencia real do `assistant_landing` e do workspace antigo.
+
+## Ciclo 107 — reorganizacao canonica da migracao por dominio e autoridade
+
+Status:
+
+- concluido
+- sem mudanca de runtime
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a migracao vinha usando `Inspetor` como rotulo amplo demais, misturando login, home, chat, mesa e shell legado dentro da mesma frente;
+- isso conflitou com a hierarquia canonica dos documentos do `Tariel Control Consolidado`, onde `Admin-CEO` governa `Admin-cliente`, e `Admin-cliente` governa `Chat inspetor` e `Mesa Avaliadora`;
+- sem reorganizar essa leitura, o codigo continuaria avancando com classificacao errada das proximas fatias.
+
+Corte executado:
+
+- `docs/MAPA_MENTAL_MIGRACAO_V2.md` foi reescrito para refletir a hierarquia de autoridade canônica e separar explicitamente `Admin-CEO`, `Admin-cliente`, `Chat inspetor` e `Mesa Avaliadora`;
+- o mapa passou a tratar `Chat inspetor` e `Mesa Avaliadora` como verticais irmas do mesmo caso tecnico, em vez de colapsar tudo em um "portal do inspetor";
+- o estado atual do V2 foi reclassificado por dominio, preservando o que ja esta real no Astro e o que ainda continua apenas como shell, ponte ou entrada visual;
+- o objetivo deste corte foi organizacional: alinhar a execucao com a semantica correta antes de seguir abrindo mais slices de codigo.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `docs/MAPA_MENTAL_MIGRACAO_V2.md`
+
+Base documental usada:
+
+- `Tariel Control Consolidado/docs/TARIEL_CONTEXT.md`
+- `Tariel Control Consolidado/docs/STATUS_CANONICO.md`
+- `Tariel Control Consolidado/docs/restructuring-roadmap/19_frontend_entrypoints_matrix.md`
+
+Validacao local executada:
+
+- revisao documental cruzada entre `tariel-v2` e `Tariel Control Consolidado`
+- `git diff --check -- .`
+- resultado:
+  - reorganizacao somente documental
+  - sem impacto de runtime
+
+Proximo passo imediato:
+
+- usar esta classificacao corrigida para parar de abrir tarefas ambigüas sob o rotulo generico de `Inspetor`;
+- tratar o que resta como backlog separado de `Chat inspetor` e de `Mesa Avaliadora`;
+- priorizar as proximas fatias por vertical real, nao por agrupamento informal de telas.
