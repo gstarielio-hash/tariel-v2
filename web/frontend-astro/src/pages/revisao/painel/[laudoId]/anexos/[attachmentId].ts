@@ -1,17 +1,17 @@
 import type { APIRoute } from "astro";
 
 import { requireReviewerSession } from "@/lib/server/reviewer-action-route";
+import {
+  buildReviewerMesaProxyError,
+  buildReviewerMesaProxyResponse,
+  resolveReviewerMesaInt,
+} from "@/lib/server/reviewer-mesa-route";
 import { fetchReviewerMesaAttachment } from "@/lib/server/reviewer-mesa";
-
-function resolvePositiveInt(value: string | undefined) {
-  const parsed = Number(value ?? 0);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-}
 
 export const GET: APIRoute = async (context) => {
   const reviewerSession = requireReviewerSession(context);
-  const laudoId = resolvePositiveInt(context.params.laudoId);
-  const attachmentId = resolvePositiveInt(context.params.attachmentId);
+  const laudoId = resolveReviewerMesaInt(context.params.laudoId);
+  const attachmentId = resolveReviewerMesaInt(context.params.attachmentId);
 
   if (!laudoId || !attachmentId) {
     return new Response("Anexo invalido.", { status: 400 });
@@ -22,28 +22,8 @@ export const GET: APIRoute = async (context) => {
       laudoId,
       anexoId: attachmentId,
     });
-
-    const headers = new Headers();
-    for (const headerName of [
-      "content-type",
-      "content-length",
-      "content-disposition",
-      "cache-control",
-      "etag",
-      "last-modified",
-    ]) {
-      const value = upstream.headers.get(headerName);
-      if (value) {
-        headers.set(headerName, value);
-      }
-    }
-
-    return new Response(upstream.body, {
-      status: upstream.status,
-      headers,
-    });
+    return buildReviewerMesaProxyResponse(upstream);
   } catch (error) {
-    const detail = error instanceof Error && error.message.trim() ? error.message : "Falha ao baixar o anexo.";
-    return new Response(detail, { status: 502 });
+    return buildReviewerMesaProxyError(error, "Falha ao baixar o anexo.");
   }
 };

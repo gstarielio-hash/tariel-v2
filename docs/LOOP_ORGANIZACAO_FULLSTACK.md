@@ -3372,3 +3372,54 @@ Proximo passo imediato:
 - considerar a vertical `/revisao` funcionalmente fechada para o shell Astro e decidir se o proximo ciclo consolida limpeza/refino visual ou ja move o foco para `Inspetor`;
 - antes de sair de `revisao`, vale revisar se ainda existe alguma rota legacy consumida apenas por exportacao ou governanca HTML que ja possa ser aposentada;
 - manter o mesmo criterio de ownership: Astro como shell/SSR/action routes, Python como dono de policy, transacao e auditoria.
+
+## Ciclo 82 — consolidacao das action routes de `/revisao`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- depois de fechar a vertical `/revisao`, as action routes e os proxies de download ficaram corretos, mas com repeticao mecanica de parsing de IDs, fallback de retorno e montagem de `Response` para downloads;
+- esse tipo de duplicacao nao muda produto agora, mas aumenta o custo de manter a vertical exatamente no momento em que ela passa a ser a referencia para os proximos portais;
+- antes de seguir para a proxima frente, o ajuste seguro era consolidar esse codigo repetido sem alterar contrato nem comportamento.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/reviewer-mesa-route.ts`, centralizando `resolveReviewerMesaInt`, `getReviewerMesaReturnFallback`, `buildReviewerMesaProxyResponse` e `buildReviewerMesaProxyError`;
+- as action routes de `/revisao/painel/[laudoId]/*` passaram a usar esse helper comum em vez de manter parse e fallback local em cada arquivo;
+- os proxies de download de anexos, PDF do pacote, ZIP oficial e bundle congelado passaram a compartilhar a mesma montagem de headers e resposta, reduzindo divergencia futura entre rotas irmas;
+- o comportamento funcional foi preservado: mesma navegacao de retorno, mesmas mensagens de erro e mesmo repasse de headers dos downloads.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/reviewer-mesa-route.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/anexos/[attachmentId].ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/avaliar.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/coverage/refazer.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/emissao-oficial/download.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/emitir-oficialmente.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/marcar-whispers-lidos.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/pacote/exportar-oficial.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/pacote/exportar-pdf.ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/pendencias/[messageId].ts`
+- `web/frontend-astro/src/pages/revisao/painel/[laudoId]/responder.ts`
+
+Validacao local executada:
+
+- `npm run check`
+- `DATABASE_URL='postgresql:///tariel_dev' npm run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com `/revisao` consolidado e funcionalmente fechado, o proximo movimento mais util e sair da vertical para a proxima frente pendente;
+- a prioridade natural passa a ser `Inspetor`, reaproveitando o mesmo criterio de ownership usado aqui;
+- se surgir uma rodada extra de limpeza, ela deve mirar aposentadoria de consumo legacy residual, nao reescrever a superficie ja estabilizada.
