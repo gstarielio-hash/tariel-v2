@@ -99,7 +99,12 @@ export interface CreateCompanyInput {
   revisorCrea?: string;
 }
 
-export async function toggleCompanyBlockStatus(companyId: number, motivo: string, confirmUnblock: boolean) {
+export async function toggleCompanyBlockStatus(
+  companyId: number,
+  motivo: string,
+  confirmUnblock: boolean,
+  actorUserId?: number | null,
+) {
   const result = await prisma.$transaction(async (tx) => {
     const company = await tx.empresas.findUnique({
       where: { id: companyId },
@@ -133,6 +138,7 @@ export async function toggleCompanyBlockStatus(companyId: number, motivo: string
 
       await createAudit(tx, {
         companyId,
+        actorUserId,
         action: "empresa_desbloqueada",
         summary: "Empresa desbloqueada pelo painel Astro.",
         detail: `Empresa ${company.nome_fantasia} foi desbloqueada no Admin-CEO migrado.`,
@@ -172,6 +178,7 @@ export async function toggleCompanyBlockStatus(companyId: number, motivo: string
 
     await createAudit(tx, {
       companyId,
+      actorUserId,
       action: "empresa_bloqueada",
       summary: "Empresa bloqueada pelo painel Astro.",
       detail: normalizedReason,
@@ -191,7 +198,7 @@ export async function toggleCompanyBlockStatus(companyId: number, motivo: string
   return result;
 }
 
-export async function changeCompanyPlan(companyId: number, requestedPlan: string) {
+export async function changeCompanyPlan(companyId: number, requestedPlan: string, actorUserId?: number | null) {
   const nextPlan = normalizePlan(requestedPlan);
 
   const result = await prisma.$transaction(async (tx) => {
@@ -246,6 +253,7 @@ export async function changeCompanyPlan(companyId: number, requestedPlan: string
 
     await createAudit(tx, {
       companyId,
+      actorUserId,
       action: "empresa_plano_alterado",
       summary: `Plano alterado de ${company.plano_ativo} para ${nextPlan}.`,
       payload: {
@@ -266,7 +274,7 @@ export async function changeCompanyPlan(companyId: number, requestedPlan: string
   return result;
 }
 
-export async function resetCompanyUserPassword(companyId: number, userId: number) {
+export async function resetCompanyUserPassword(companyId: number, userId: number, actorUserId?: number | null) {
   const nextPassword = generateStrongPassword();
   const passwordHash = await hashPassword(nextPassword);
 
@@ -294,6 +302,7 @@ export async function resetCompanyUserPassword(companyId: number, userId: number
 
     await createAudit(tx, {
       companyId,
+      actorUserId,
       action: "usuario_senha_resetada",
       targetUserId: userId,
       summary: `Senha resetada para ${user.nome_completo}.`,
@@ -312,7 +321,7 @@ export async function resetCompanyUserPassword(companyId: number, userId: number
   return result;
 }
 
-export async function toggleCompanyUserStatus(companyId: number, userId: number) {
+export async function toggleCompanyUserStatus(companyId: number, userId: number, actorUserId?: number | null) {
   const result = await prisma.$transaction(async (tx) => {
     const user = await getCompanyUserOrThrow(tx, companyId, userId);
     const nextActive = !user.ativo;
@@ -337,6 +346,7 @@ export async function toggleCompanyUserStatus(companyId: number, userId: number)
 
     await createAudit(tx, {
       companyId,
+      actorUserId,
       action: "usuario_status_alterado",
       targetUserId: userId,
       summary: `${user.nome_completo} foi ${nextActive ? "reativado" : "bloqueado"} pelo painel Astro.`,
@@ -352,7 +362,11 @@ export async function toggleCompanyUserStatus(companyId: number, userId: number)
   return result;
 }
 
-export async function addCompanyAdmin(companyId: number, input: { nome: string; email: string }) {
+export async function addCompanyAdmin(
+  companyId: number,
+  input: { nome: string; email: string },
+  actorUserId?: number | null,
+) {
   const email = normalizeEmail(input.email);
   const name = normalizeRequiredText(input.nome, "Nome do administrador", 150);
   const nextPassword = generateStrongPassword();
@@ -395,6 +409,7 @@ export async function addCompanyAdmin(companyId: number, input: { nome: string; 
 
     await createAudit(tx, {
       companyId,
+      actorUserId,
       action: "admin_cliente_adicionado",
       targetUserId: user.id,
       summary: `Administrador ${user.nome_completo} adicionado à empresa.`,
@@ -413,7 +428,7 @@ export async function addCompanyAdmin(companyId: number, input: { nome: string; 
   return result;
 }
 
-export async function createCompany(input: CreateCompanyInput) {
+export async function createCompany(input: CreateCompanyInput, actorUserId?: number | null) {
   const companyName = normalizeRequiredText(input.nome, "Nome da empresa", 200);
   const cnpj = normalizeCnpj(input.cnpj);
   const plan = normalizePlan(input.plano);
@@ -594,6 +609,7 @@ export async function createCompany(input: CreateCompanyInput) {
 
     await createAudit(tx, {
       companyId: company.id,
+      actorUserId,
       action: "empresa_criada",
       targetUserId: adminUser.id,
       summary: "Empresa provisionada pelo fluxo de onboarding Astro.",
@@ -614,7 +630,11 @@ export async function createCompany(input: CreateCompanyInput) {
   return result;
 }
 
-export async function syncCompanyCatalogPortfolio(companyId: number, selectionTokens: string[]) {
+export async function syncCompanyCatalogPortfolio(
+  companyId: number,
+  selectionTokens: string[],
+  actorUserId?: number | null,
+) {
   const snapshot = await getAdminTenantCatalogSnapshot(companyId);
   const governedByRelease = snapshot.families.some(
     (family) => family.releaseStatus.key !== "draft",
@@ -792,6 +812,7 @@ export async function syncCompanyCatalogPortfolio(companyId: number, selectionTo
 
     await createAudit(tx, {
       companyId,
+      actorUserId,
       action: "tenant_report_catalog_synced",
       summary: "Portfólio comercial de laudos sincronizado para a empresa.",
       detail: `${normalizedSelections.size} variantes ativas no catálogo operacional do cliente.`,
@@ -825,6 +846,7 @@ export async function updateCompanyCatalogFamilyRelease(input: {
   observacoes?: string | null;
   allowedTemplates?: string[];
   allowedVariants?: string[];
+  actorUserId?: number | null;
 }) {
   const companyId = input.companyId;
   const familyKey = normalizeCatalogKey(input.familyKey, 120);
@@ -1061,6 +1083,7 @@ export async function updateCompanyCatalogFamilyRelease(input: {
 
     await createAudit(tx, {
       companyId,
+      actorUserId: input.actorUserId,
       action: "tenant_family_release_updated",
       summary: `Liberação da família ${family.familyLabel} atualizada para a empresa.`,
       detail: `${releaseStatus} com ${activeTargetKeys.size} variantes ativas.`,
@@ -1289,6 +1312,7 @@ async function createAudit(
   tx: PrismaTransaction,
   {
     companyId,
+    actorUserId,
     action,
     summary,
     detail,
@@ -1296,6 +1320,7 @@ async function createAudit(
     targetUserId,
   }: {
     companyId: number;
+    actorUserId?: number | null;
     action: string;
     summary: string;
     detail?: string;
@@ -1306,6 +1331,7 @@ async function createAudit(
   await tx.auditoria_empresas.create({
     data: {
       empresa_id: companyId,
+      ator_usuario_id: actorUserId ?? null,
       alvo_usuario_id: targetUserId ?? null,
       portal: "admin",
       acao: action,

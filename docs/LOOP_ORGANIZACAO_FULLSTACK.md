@@ -2841,3 +2841,75 @@ Próximo passo imediato:
 - atacar a autenticação admin no `tariel-v2`, começando por login/sessão/logout e o vínculo real do ator administrativo nas trilhas auditáveis;
 - manter `support` e `rollout` ainda em bridge até a fatia de auth eliminar o `pending_admin_auth_migration`;
 - depois retomar a escrita restante de `/admin/configuracoes` com step-up honesto dentro do V2.
+
+## Ciclo 73 — Login/sessao admin no Astro e auditoria com ator autenticado
+
+Status:
+
+- concluído e validado localmente
+- preparado para publicação no `tariel-v2`
+
+Problema observado:
+
+- o `frontend-astro` já cobria `login`, `painel`, `clientes`, `catalogo`, `auditoria` e a primeira escrita de `configuracoes`, mas a autenticação administrativa ainda era apenas preview visual;
+- isso mantinha o portal novo sem sessão real, sem proteção centralizada por request e com trilhas de auditoria ainda sem `ator_usuario_id` nos fluxos já migrados;
+- a migração precisava ligar senha local, `sessoes_ativas`, logout, proteção de `/admin/*` e binding do ator sem fingir que MFA TOTP e step-up já estavam concluídos.
+
+Corte executado:
+
+- foi criado `web/frontend-astro/src/lib/server/admin-auth.ts`;
+- o novo módulo valida a conta `Admin-CEO` com Prisma, verifica senha local, cria sessão em `sessoes_ativas`, renova atividade, encerra sessão e normaliza `next`/cookies do portal admin;
+- foi criado `web/frontend-astro/src/middleware.ts` para proteger `/admin/*`, manter a sessão em `Astro.locals`, redirecionar não autenticados para `/admin/login` e bloquear `POST`s fora da mesma origem quando o header existir;
+- `web/frontend-astro/src/pages/admin/login.astro` deixou de ser preview e passou a renderizar um formulário real; também foram criados `web/frontend-astro/src/pages/admin/login/entrar.ts` e `web/frontend-astro/src/pages/admin/logout.ts`;
+- `web/frontend-astro/src/layouts/admin-shell-layout.astro` passou a exibir o nome do admin autenticado e a fazer logout real por `POST`;
+- `web/frontend-astro/src/lib/server/admin-settings-mutations.ts` agora grava `ator_usuario_id` e substitui `pending_admin_auth_migration` por `actor_binding=admin_session`;
+- `web/frontend-astro/src/lib/server/admin-mutations.ts` e os handlers admin já migrados passaram a propagar `actorUserId` para `auditoria_empresas`, incluindo onboarding, bloqueio, troca de plano, reset de senha, catálogo e liberação por família;
+- `web/frontend-astro/src/pages/admin/configuracoes.astro` e os handlers de `acesso/defaults` foram atualizados para refletir o novo estado honesto: sessão admin ativa no Astro, mas `step-up` ainda pendente;
+- `web/frontend-astro/src/lib/server/prisma.ts` passou a tolerar execução direta no Node fora do runtime do Astro, o que permitiu smoke de helper para login/sessão/logout.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/components/app/auth/auth-shell.astro`
+- `web/frontend-astro/src/env.d.ts`
+- `web/frontend-astro/src/layouts/admin-shell-layout.astro`
+- `web/frontend-astro/src/lib/server/admin-action-route.ts`
+- `web/frontend-astro/src/lib/server/admin-auth.ts`
+- `web/frontend-astro/src/lib/server/admin-mutations.ts`
+- `web/frontend-astro/src/lib/server/admin-settings-mutations.ts`
+- `web/frontend-astro/src/lib/server/prisma.ts`
+- `web/frontend-astro/src/middleware.ts`
+- `web/frontend-astro/src/pages/admin/catalogo-laudos/familias/[familyKey]/liberacao-tenant.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/adicionar-admin-cliente.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/bloquear.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/catalogo-laudos.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/resetar-senha/[usuarioId].ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/trocar-plano.ts`
+- `web/frontend-astro/src/pages/admin/clientes/[id]/usuarios/[usuarioId]/bloquear.ts`
+- `web/frontend-astro/src/pages/admin/configuracoes.astro`
+- `web/frontend-astro/src/pages/admin/configuracoes/acesso.ts`
+- `web/frontend-astro/src/pages/admin/configuracoes/defaults.ts`
+- `web/frontend-astro/src/pages/admin/login.astro`
+- `web/frontend-astro/src/pages/admin/login/entrar.ts`
+- `web/frontend-astro/src/pages/admin/logout.ts`
+- `web/frontend-astro/src/pages/admin/novo-cliente/criar.ts`
+
+Validação local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `curl -sS -I http://127.0.0.1:4322/admin/painel`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 exec --yes --package tsx -- tsx /tmp/tariel_admin_smoke.mts`
+- `git diff --check -- web/frontend-astro/...`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluído com adapter `@astrojs/node`
+  - `GET /admin/painel`: `303` para `/admin/login?next=%2Fadmin%2Fpainel`
+  - smoke helper: `loginOk=true`, `userEmail=admin@tariel.ia`, `afterLogout=true`
+  - `git diff --check`: limpo
+
+Próximo passo imediato:
+
+- migrar o restante sensível da trilha de segurança admin no `tariel-v2`, começando por MFA TOTP, troca obrigatória de senha e `reauth/step-up` para eliminar o `step-up pendente` das ações críticas;
+- depois retomar `support` e `rollout` em `/admin/configuracoes`, agora já com sessão e `ator_usuario_id` reais;
+- manter os providers corporativos (`google` e `microsoft`) como fatia seguinte da identidade admin, sem reabrir bridge desnecessária para o legado.

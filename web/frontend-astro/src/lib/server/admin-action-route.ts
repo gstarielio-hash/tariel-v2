@@ -1,5 +1,6 @@
 import type { APIContext } from "astro";
 
+import type { AuthenticatedAdminRequest } from "@/lib/server/admin-auth";
 import {
   safeAdminReturnPath,
   setAdminNotice,
@@ -33,6 +34,16 @@ export function getAdminErrorMessage(
   fallback = "Falha ao processar a operação.",
 ) {
   return error instanceof Error && error.message.trim() ? error.message : fallback;
+}
+
+export function requireAdminSession(context: APIContext): AuthenticatedAdminRequest {
+  const adminSession = context.locals.adminSession;
+
+  if (!adminSession) {
+    throw new Error("Sessão administrativa inválida.");
+  }
+
+  return adminSession;
 }
 
 export function redirectWithAdminNotice(

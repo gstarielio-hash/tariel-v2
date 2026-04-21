@@ -3,6 +3,7 @@ import type { APIRoute } from "astro";
 import {
   getAdminErrorMessage,
   getAdminReturnPath,
+  requireAdminSession,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { updateCompanyCatalogFamilyRelease } from "@/lib/server/admin-mutations";
@@ -18,6 +19,7 @@ export const POST: APIRoute = async (context) => {
         ? `/admin/catalogo-laudos/familias/${familyKey}?tab=liberacao`
         : "/admin/catalogo-laudos";
   const returnTo = getAdminReturnPath(formData, defaultReturnTo);
+  const adminSession = requireAdminSession(context);
 
   try {
     if (!familyKey) {
@@ -42,6 +44,7 @@ export const POST: APIRoute = async (context) => {
         .getAll("allowed_variants")
         .map((value) => String(value ?? "").trim())
         .filter(Boolean),
+      actorUserId: adminSession.user.id,
     });
 
     return redirectWithAdminNotice(context, returnTo, {

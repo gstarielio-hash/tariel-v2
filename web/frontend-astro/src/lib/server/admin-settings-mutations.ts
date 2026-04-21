@@ -32,10 +32,12 @@ export interface UpdateAdminPlatformSettingsResult {
 export async function updateAdminAccessSettings(input: {
   adminReauthMaxAgeMinutes: string;
   reason: string;
+  actorUserId: number;
 }) {
   return updatePlatformSettings({
     groupKey: "access",
     reason: input.reason,
+    actorUserId: input.actorUserId,
     updates: {
       admin_reauth_max_age_minutes: input.adminReauthMaxAgeMinutes,
     },
@@ -45,10 +47,12 @@ export async function updateAdminAccessSettings(input: {
 export async function updateAdminDefaultSettings(input: {
   defaultNewTenantPlan: string;
   reason: string;
+  actorUserId: number;
 }) {
   return updatePlatformSettings({
     groupKey: "defaults",
     reason: input.reason,
+    actorUserId: input.actorUserId,
     updates: {
       default_new_tenant_plan: input.defaultNewTenantPlan,
     },
@@ -58,13 +62,19 @@ export async function updateAdminDefaultSettings(input: {
 async function updatePlatformSettings({
   groupKey,
   reason,
+  actorUserId,
   updates,
 }: {
   groupKey: MutablePlatformSettingGroup;
   reason: string;
+  actorUserId: number;
   updates: Partial<Record<MutablePlatformSettingKey, string | number>>;
 }) {
   const justification = normalizeRequiredText(reason, "Motivo da alteracao", 300);
+
+  if (!Number.isInteger(actorUserId) || actorUserId <= 0) {
+    throw new Error("Sessao administrativa invalida para auditar a alteracao.");
+  }
 
   return prisma.$transaction(async (tx) => {
     const platformCompany = await tx.empresas.findFirst({
@@ -150,6 +160,7 @@ async function updatePlatformSettings({
     await tx.auditoria_empresas.create({
       data: {
         empresa_id: platformCompany.id,
+        ator_usuario_id: actorUserId,
         portal: "admin",
         acao: "platform_setting_updated",
         resumo: groupSummary(groupKey),
@@ -159,7 +170,8 @@ async function updatePlatformSettings({
           reason: justification,
           changes,
           source_surface: "frontend_astro",
-          actor_binding: "pending_admin_auth_migration",
+          actor_binding: "admin_session",
+          actor_user_id: actorUserId,
         } as Prisma.InputJsonObject,
         criado_em: now,
       },

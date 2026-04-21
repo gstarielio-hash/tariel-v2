@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 
 import {
   getAdminErrorMessage,
+  requireAdminSession,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { createCompany } from "@/lib/server/admin-mutations";
@@ -9,27 +10,31 @@ import { createCompany } from "@/lib/server/admin-mutations";
 export const POST: APIRoute = async (context) => {
   const formData = await context.request.formData();
   const errorReturnTo = "/admin/novo-cliente";
+  const adminSession = requireAdminSession(context);
 
   try {
-    const result = await createCompany({
-      nome: String(formData.get("nome") ?? ""),
-      cnpj: String(formData.get("cnpj") ?? ""),
-      emailAdmin: String(formData.get("emailAdmin") ?? ""),
-      plano: String(formData.get("plano") ?? ""),
-      segmento: String(formData.get("segmento") ?? ""),
-      cidadeEstado: String(formData.get("cidadeEstado") ?? ""),
-      nomeResponsavel: String(formData.get("nomeResponsavel") ?? ""),
-      observacoes: String(formData.get("observacoes") ?? ""),
-      provisionarInspetor: formData.has("provisionarInspetor"),
-      inspetorNome: String(formData.get("inspetorNome") ?? ""),
-      inspetorEmail: String(formData.get("inspetorEmail") ?? ""),
-      inspetorTelefone: String(formData.get("inspetorTelefone") ?? ""),
-      provisionarRevisor: formData.has("provisionarRevisor"),
-      revisorNome: String(formData.get("revisorNome") ?? ""),
-      revisorEmail: String(formData.get("revisorEmail") ?? ""),
-      revisorTelefone: String(formData.get("revisorTelefone") ?? ""),
-      revisorCrea: String(formData.get("revisorCrea") ?? ""),
-    });
+    const result = await createCompany(
+      {
+        nome: String(formData.get("nome") ?? ""),
+        cnpj: String(formData.get("cnpj") ?? ""),
+        emailAdmin: String(formData.get("emailAdmin") ?? ""),
+        plano: String(formData.get("plano") ?? ""),
+        segmento: String(formData.get("segmento") ?? ""),
+        cidadeEstado: String(formData.get("cidadeEstado") ?? ""),
+        nomeResponsavel: String(formData.get("nomeResponsavel") ?? ""),
+        observacoes: String(formData.get("observacoes") ?? ""),
+        provisionarInspetor: formData.has("provisionarInspetor"),
+        inspetorNome: String(formData.get("inspetorNome") ?? ""),
+        inspetorEmail: String(formData.get("inspetorEmail") ?? ""),
+        inspetorTelefone: String(formData.get("inspetorTelefone") ?? ""),
+        provisionarRevisor: formData.has("provisionarRevisor"),
+        revisorNome: String(formData.get("revisorNome") ?? ""),
+        revisorEmail: String(formData.get("revisorEmail") ?? ""),
+        revisorTelefone: String(formData.get("revisorTelefone") ?? ""),
+        revisorCrea: String(formData.get("revisorCrea") ?? ""),
+      },
+      adminSession.user.id,
+    );
 
     return redirectWithAdminNotice(
       context,

@@ -27,6 +27,8 @@ const {
   activeItem = "dashboard",
 } = Astro.props;
 
+const sessionUserName = Astro.locals.adminSession?.user.name ?? userName;
+
 const menuItems = [
   {
     href: "/admin/painel",
@@ -109,23 +111,26 @@ const menuItems = [
         <div id="seguranca" class="mt-8 rounded-[28px] border border-white/10 bg-white/6 p-5">
           <p class="text-xs font-semibold uppercase tracking-[0.22em] text-orange-200">Seguranca</p>
           <p class="mt-3 text-sm leading-6 text-slate-300">
-            Login, sessao e MFA ficam desacoplados do layout nesta fase para permitir a migracao por partes.
+            Login e sessao ja rodam no Astro. MFA TOTP e step-up seguem como proxima fatia para fechar a trilha de
+            seguranca do Admin-CEO.
           </p>
         </div>
 
         <div class="mt-8 flex items-center justify-between rounded-[28px] border border-white/10 bg-white/6 p-5">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Usuario</p>
-            <p class="mt-2 font-medium text-white">{userName}</p>
+            <p class="mt-2 font-medium text-white">{sessionUserName}</p>
           </div>
 
-          <a
-            href="/admin/login"
-            class="inline-flex items-center gap-2 rounded-full border border-white/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-white/28 hover:bg-white/8"
-          >
-            <LogOut className="size-4" />
-            Sair
-          </a>
+          <form method="POST" action="/admin/logout">
+            <button
+              type="submit"
+              class="inline-flex items-center gap-2 rounded-full border border-white/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-white/28 hover:bg-white/8"
+            >
+              <LogOut className="size-4" />
+              Sair
+            </button>
+          </form>
         </div>
       </aside>
 

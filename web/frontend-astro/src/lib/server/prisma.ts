@@ -19,6 +19,6 @@ function createPrismaClient() {
 
 export const prisma = globalThis.__tarielPrisma ?? createPrismaClient();
 
-if (import.meta.env.DEV) {
+if (import.meta.env?.DEV) {
   globalThis.__tarielPrisma = prisma;
 }

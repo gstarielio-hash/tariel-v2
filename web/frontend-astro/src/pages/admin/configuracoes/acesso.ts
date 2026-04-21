@@ -3,6 +3,7 @@ import type { APIRoute } from "astro";
 import {
   getAdminErrorMessage,
   getAdminReturnPath,
+  requireAdminSession,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { updateAdminAccessSettings } from "@/lib/server/admin-settings-mutations";
@@ -13,6 +14,7 @@ export const POST: APIRoute = async (context) => {
     formData,
     "/admin/configuracoes?secao=access#secao-access",
   );
+  const adminSession = requireAdminSession(context);
 
   try {
     const result = await updateAdminAccessSettings({
@@ -20,6 +22,7 @@ export const POST: APIRoute = async (context) => {
         formData.get("admin_reauth_max_age_minutes") ?? "",
       ),
       reason: String(formData.get("motivo_alteracao") ?? ""),
+      actorUserId: adminSession.user.id,
     });
 
     const currentValue = result.changes.find(
@@ -33,8 +36,8 @@ export const POST: APIRoute = async (context) => {
       details: [
         `Janela efetiva: ${currentValue ?? "n/d"} min`,
         `Motivo registrado: ${result.reason}`,
-        "Auditoria salva no tenant de plataforma.",
-        "Vinculo de ator ainda pendente ate a migracao da autenticacao admin.",
+        `Auditoria vinculada a ${adminSession.user.name}.`,
+        "Step-up administrativo ainda entra na proxima fatia.",
       ],
     });
   } catch (error) {

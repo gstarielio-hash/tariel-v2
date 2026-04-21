@@ -4,6 +4,7 @@ import {
   getAdminErrorMessage,
   getAdminReturnPath,
   parsePositiveAdminParam,
+  requireAdminSession,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { syncCompanyCatalogPortfolio } from "@/lib/server/admin-mutations";
@@ -16,6 +17,7 @@ export const POST: APIRoute = async (context) => {
       ? `/admin/clientes/${companyIdFromParams}`
       : "/admin/clientes";
   const returnTo = getAdminReturnPath(formData, defaultReturnTo);
+  const adminSession = requireAdminSession(context);
 
   try {
     const companyId = parsePositiveAdminParam(context, "id", "Empresa");
@@ -23,7 +25,7 @@ export const POST: APIRoute = async (context) => {
       .getAll("catalog_variant")
       .map((value) => String(value ?? "").trim())
       .filter(Boolean);
-    const result = await syncCompanyCatalogPortfolio(companyId, selectionTokens);
+    const result = await syncCompanyCatalogPortfolio(companyId, selectionTokens, adminSession.user.id);
 
     return redirectWithAdminNotice(context, returnTo, {
       tone: "success",

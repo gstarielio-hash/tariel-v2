@@ -282,8 +282,8 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
 
                 <h3 class="mt-4 font-display text-2xl tracking-tight">Atualizar esta politica</h3>
                 <p class="mt-3 text-sm leading-7 text-slate-300">
-                  Esta etapa ja grava a configuracao em Prisma e registra a auditoria do tenant de plataforma. O
-                  vinculo de sessao autenticada do Admin-CEO ainda entra na proxima fatia do backend novo.
+                  Esta etapa ja grava a configuracao em Prisma e registra a auditoria do tenant de plataforma com o
+                  ator autenticado no Astro. O step-up administrativo continua como proxima fatia do backend novo.
                 </p>
               </div>
 
@@ -373,7 +373,7 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
             <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex items-center gap-2 text-sm text-slate-300">
                 <KeyRound className="size-4 text-orange-200" />
-                <span>Sem sessao admin vinculada nesta fase. A auditoria registra a origem Astro.</span>
+                <span>Sessao admin ativa no Astro. A auditoria ja registra o ator autenticado.</span>
               </div>
 
               <button

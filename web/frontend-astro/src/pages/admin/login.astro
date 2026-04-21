@@ -1,23 +1,119 @@
 ---
+import { ArrowRight, LockKeyhole, ShieldCheck } from "lucide-react";
+
 import AuthShell from "@/components/app/auth/auth-shell.astro";
+import { safeAdminNextPath } from "@/lib/server/admin-auth";
 
 export const prerender = false;
+
+const errorMessage = String(Astro.url.searchParams.get("erro") ?? "").trim();
+const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
+const nextPath = safeAdminNextPath(Astro.url.searchParams.get("next"), "/admin/painel");
 ---
 
 <AuthShell
   title="Admin-CEO | Tariel Astro"
-  description="Tela de autenticacao migrada para o portal administrativo."
+  description="Login administrativo com sessao Astro SSR persistida em Prisma."
   portalLabel="Admin-CEO"
-  heroTitle="Login administrativo isolado do legado e pronto para a nova stack."
-  heroCopy="Esta fatia entrega o shell de autenticacao do admin em Astro + React, preservando a leitura executiva da interface atual e abrindo caminho para MFA, sessao e auditoria sobre a nova camada Node/TypeScript."
+  heroTitle="Login administrativo isolado do legado e agora conectado a sessao real."
+  heroCopy="Esta fatia fecha o primeiro fluxo de autenticacao do Admin-CEO em Astro SSR com verificacao de senha, emissao de sessao em Prisma e protecao do portal novo sem depender do request.session do legado."
   heroItems={[
-    "Estrutura pronta para encaixar CSRF, MFA e providers de identidade corporativa.",
+    "Sessao administrativa emitida em sessoes_ativas com cookie httpOnly e renovacao controlada.",
     "Mesmo vocabulário visual do Admin-CEO atual, sem depender do CSS antigo.",
-    "Base reutilizavel para futuras telas de configuracao e seguranca.",
-    "Facilita migrar o painel administrativo por partes, sem big bang.",
+    "Fluxo de senha local ja funcional para a conta de plataforma seed.",
+    "MFA TOTP, step-up e providers corporativos entram na proxima fatia do backend novo.",
   ]}
   supportText="Quer um acesso? Fale com a Tariel."
   submitLabel="Acessar"
   previewMessage="Tela pronta. A conexao com autenticacao real do Admin-CEO entra na proxima fase do backend novo."
   variant="admin"
-/>
+  panelEyebrow="Login administrativo"
+  panelTitle="Entrar no Admin-CEO"
+  panelCopy="A autenticacao local por senha ja esta ativa no Astro para operadores da plataforma. Desafios de MFA, troca obrigatoria de senha e step-up permanecem separados enquanto a migracao de seguranca avanca em camadas."
+>
+  <Fragment slot="form">
+    <div class="space-y-5">
+      <div class="rounded-[28px] border border-orange-500/15 bg-orange-500/6 p-4 text-orange-950">
+        <div class="flex items-start gap-3">
+          <div class="rounded-2xl bg-white/80 p-2 text-slate-950 shadow-sm">
+            <ShieldCheck className="size-4" />
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]">Primeira autenticacao ativa</p>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+              Este login ja verifica a senha da conta de plataforma em <strong>Astro + Prisma</strong> e protege as
+              rotas administrativas migradas.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {successMessage ? (
+        <div class="rounded-[24px] border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm leading-6 text-emerald-900">
+          {successMessage}
+        </div>
+      ) : null}
+
+      {errorMessage ? (
+        <div class="rounded-[24px] border border-rose-500/18 bg-rose-500/8 px-4 py-3 text-sm leading-6 text-rose-900">
+          {errorMessage}
+        </div>
+      ) : null}
+
+      <form class="space-y-4" method="POST" action="/admin/login/entrar" novalidate>
+        <input type="hidden" name="next" value={nextPath} />
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">E-mail</span>
+          <input
+            type="email"
+            name="email"
+            placeholder="voce@empresa.com"
+            autocomplete="username"
+            required
+            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-orange-500"
+          />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Senha</span>
+          <div class="relative">
+            <input
+              type="password"
+              name="senha"
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              required
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-orange-500"
+            />
+            <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
+              <LockKeyhole className="size-4" />
+            </span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+          <input type="checkbox" name="lembrar" value="1" class="size-4 rounded border-slate-300 text-orange-500" />
+          <span>Manter esta sessao neste navegador</span>
+        </label>
+
+        <button
+          type="submit"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+        >
+          Acessar
+          <ArrowRight className="size-4" />
+        </button>
+      </form>
+
+      <div class="rounded-[24px] border border-orange-500/18 bg-orange-500/8 px-4 py-3 text-sm leading-6 text-orange-900">
+        <strong class="font-semibold">Estado da migracao</strong>
+        <p class="mt-1">
+          MFA TOTP, troca obrigatoria de senha e reautenticacao critica ainda estao em migracao. Quando uma conta
+          exigir esses passos, o portal novo responde de forma honesta sem fingir paridade completa.
+        </p>
+      </div>
+    </div>
+  </Fragment>
+</AuthShell>

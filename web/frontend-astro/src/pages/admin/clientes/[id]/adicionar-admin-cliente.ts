@@ -4,6 +4,7 @@ import {
   getAdminErrorMessage,
   getAdminReturnPath,
   parsePositiveAdminParam,
+  requireAdminSession,
   redirectWithAdminNotice,
 } from "@/lib/server/admin-action-route";
 import { addCompanyAdmin } from "@/lib/server/admin-mutations";
@@ -16,13 +17,14 @@ export const POST: APIRoute = async (context) => {
       ? `/admin/clientes/${companyIdFromParams}`
       : "/admin/clientes";
   const returnTo = getAdminReturnPath(formData, defaultReturnTo);
+  const adminSession = requireAdminSession(context);
 
   try {
     const companyId = parsePositiveAdminParam(context, "id", "Empresa");
     const result = await addCompanyAdmin(companyId, {
       nome: String(formData.get("nome") ?? ""),
       email: String(formData.get("email") ?? ""),
-    });
+    }, adminSession.user.id);
 
     return redirectWithAdminNotice(context, returnTo, {
       tone: "success",
