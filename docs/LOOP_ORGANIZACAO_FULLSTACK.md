@@ -2662,6 +2662,18 @@ Problema observado:
 
 Corte executado:
 
+## Diretriz Permanente — Tariel V2 Oficial
+
+Esta diretriz fica ativa ate a migracao chegar a 100%.
+
+- `tariel-v2` e o sistema oficial em construcao e deve ser tratado como caminho principal;
+- o legado e `tariel-web` passam a ser backup, referencia e ponte temporaria apenas quando necessario;
+- a direcao arquitetural principal e `Astro + React + TypeScript + Prisma`;
+- Python deve permanecer somente onde ainda for motor especializado ou onde a reescrita ainda nao se justifica;
+- toda nova decisao de migracao deve ser tomada para aproximar o produto final desse estado, mesmo apos compactacao de contexto ou handoff.
+
+Consulte tambem `docs/TARIEL_V2_MIGRATION_CHARTER.md` antes de escolher o proximo corte.
+
 - foi criado `web/app/domains/admin/admin_dashboard_services.py`;
 - `buscar_metricas_ia_painel` foi movido para o novo módulo;
 - `web/app/domains/admin/services.py` foi mantido como fachada compatível, apenas injetando clause de tenants, ordenação por plano, relógio UTC e builders de rollup do catálogo;
@@ -2782,3 +2794,50 @@ Próximo passo imediato:
 - migrar a primeira fatia de escrita de `/admin/configuracoes`, começando por `acesso` e `defaults`, que têm payload menor e trilha de auditoria bem delimitada;
 - manter `suporte-excepcional` e `rollout` como segunda etapa, porque carregam combinações de flags mais sensíveis;
 - seguir publicando em cortes estreitos no `tariel-v2`, preservando a leitura já portada no Astro enquanto a escrita sai do legado.
+
+## Ciclo 72 — Escrita de acesso/defaults do console de configuracoes no Astro
+
+Status:
+
+- concluído e validado localmente
+- preparado para publicação no `tariel-v2`
+
+Problema observado:
+
+- `/admin/configuracoes` já existia no Astro em modo leitura, mas `acesso` e `defaults` ainda dependiam exclusivamente dos `POSTs` do legado FastAPI;
+- isso mantinha a governança de reautenticação e o plano padrão de onboarding fora da trilha oficial em TypeScript/Prisma;
+- a migração precisava gravar em `configuracoes_plataforma` e `auditoria_empresas` sem fingir que a autenticação admin nova já estava concluída.
+
+Corte executado:
+
+- foi criado `web/frontend-astro/src/lib/server/admin-settings-mutations.ts`;
+- o novo módulo salva `admin_reauth_max_age_minutes` e `default_new_tenant_plan` via Prisma transaction, registra motivo de alteração e escreve auditoria com `source_surface=frontend_astro` e `actor_binding=pending_admin_auth_migration`;
+- foram criados os handlers `web/frontend-astro/src/pages/admin/configuracoes/acesso.ts` e `web/frontend-astro/src/pages/admin/configuracoes/defaults.ts`;
+- `web/frontend-astro/src/pages/admin/configuracoes.astro` passou a renderizar formulários reais para essas duas seções, exibindo quais áreas já escrevem no Astro e quais ainda seguem em bridge;
+- foi registrada a skill local `.codex/skills/tariel-v2-autonomous-migration-worker/` para manter o loop autônomo alinhado ao charter do `tariel-v2`.
+
+Arquivos do ciclo:
+
+- `.codex/skills/tariel-v2-autonomous-migration-worker/SKILL.md`
+- `.codex/skills/tariel-v2-autonomous-migration-worker/agents/openai.yaml`
+- `docs/TARIEL_V2_MIGRATION_CHARTER.md`
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/admin-settings-mutations.ts`
+- `web/frontend-astro/src/pages/admin/configuracoes.astro`
+- `web/frontend-astro/src/pages/admin/configuracoes/acesso.ts`
+- `web/frontend-astro/src/pages/admin/configuracoes/defaults.ts`
+
+Validação local executada:
+
+- `git diff --check`
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluído com adapter `@astrojs/node`
+
+Próximo passo imediato:
+
+- atacar a autenticação admin no `tariel-v2`, começando por login/sessão/logout e o vínculo real do ator administrativo nas trilhas auditáveis;
+- manter `support` e `rollout` ainda em bridge até a fatia de auth eliminar o `pending_admin_auth_migration`;
+- depois retomar a escrita restante de `/admin/configuracoes` com step-up honesto dentro do V2.

@@ -2,6 +2,8 @@
 import {
   Eye,
   Gauge,
+  KeyRound,
+  PencilLine,
   Orbit,
   Router,
   ShieldCheck,
@@ -29,9 +31,16 @@ const activeSectionKey = data.sections.some((section) => section.key === request
 
 const cardIcons = [Orbit, Router, ShieldCheck, Gauge] as const
 const cardTones = ["orange", "sky", "emerald", "slate"] as const
+const astroWritableSections = new Set(["access", "defaults"])
+const astroWritableCount = data.sections.filter((section) => section.form && sectionRunsInAstro(section)).length
+const legacyWritableCount = data.sections.filter((section) => section.form && !sectionRunsInAstro(section)).length
 
 function sectionHref(sectionKey: string) {
   return `/admin/configuracoes?secao=${sectionKey}#secao-${sectionKey}`
+}
+
+function sectionRunsInAstro(section: AdminSettingsSection) {
+  return astroWritableSections.has(section.key)
 }
 
 function itemTone(tone: string): "success" | "warning" | "danger" | "info" | "neutral" {
@@ -45,8 +54,28 @@ function itemTone(tone: string): "success" | "warning" | "danger" | "info" | "ne
   return map[tone as keyof typeof map] ?? "neutral"
 }
 
-function sectionMetaTone(section: AdminSettingsSection): "warning" | "neutral" {
-  return section.form ? "warning" : "neutral"
+function sectionMetaTone(section: AdminSettingsSection): "success" | "warning" | "neutral" {
+  if (!section.form) {
+    return "neutral"
+  }
+
+  return sectionRunsInAstro(section) ? "success" : "warning"
+}
+
+function sectionModeLabel(section: AdminSettingsSection) {
+  if (!section.form) {
+    return "Somente leitura"
+  }
+
+  return sectionRunsInAstro(section) ? "Edicao Astro" : "Preview de ajuste"
+}
+
+function sectionScopeLabel(section: AdminSettingsSection) {
+  if (!section.form) {
+    return "Origem controlada pelo ambiente"
+  }
+
+  return sectionRunsInAstro(section) ? "Leitura e escrita no Astro" : "Recorte migrado em leitura"
 }
 
 function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "danger" | "info" | "neutral" {
@@ -72,13 +101,14 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
         </h1>
         <p class="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
           Console de politicas do Admin-CEO portado para Astro SSR com leitura do estado atual, contexto de runtime
-          e preview das mutacoes que ainda seguem no legado.
+          e escrita ativa nas regras que ja sairam do legado.
         </p>
       </div>
 
       <div class="flex flex-wrap gap-2">
         <StatusPill label={`${data.metrics.totalItems} politicas mapeadas`} tone="info" />
-        <StatusPill label={`${data.metrics.editableSections} secoes com POST legado`} tone="warning" />
+        <StatusPill label={`${astroWritableCount} secoes com POST Astro`} tone="success" />
+        <StatusPill label={`${legacyWritableCount} secoes em bridge`} tone="warning" />
         <StatusPill label={`${data.metrics.readOnlySections} secoes consulta`} tone="neutral" />
       </div>
     </div>
@@ -105,15 +135,15 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Navegacao interna</p>
         <h2 class="mt-2 font-display text-3xl tracking-tight text-slate-950">Abrir uma frente por vez</h2>
         <p class="mt-3 text-sm leading-7 text-slate-600">
-          Esta fatia migra o console em modo leitura. As secoes abaixo mostram a regra efetiva, a origem e o caminho
-          que ainda permanece no fluxo legado para alteracoes.
+          Esta fatia ja move acesso e defaults para leitura e escrita no Astro. As outras secoes continuam mostrando
+          a regra efetiva, a origem do valor e o caminho que ainda permanece no fluxo legado.
         </p>
       </div>
 
       <div class="flex flex-wrap gap-2">
         <StatusPill label={data.metrics.environmentLabel} tone="info" />
         <StatusPill label={`${data.metrics.operatorCount} operadores`} tone="neutral" />
-        <StatusPill label="Mutacoes ainda fora desta fatia" tone="warning" />
+        <StatusPill label={`${legacyWritableCount} mutacoes ainda no legado`} tone="warning" />
       </div>
     </div>
 
@@ -134,10 +164,7 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
               <p class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{section.badge}</p>
             </div>
 
-            <StatusPill
-              label={section.form ? "Preview de ajuste" : "Somente leitura"}
-              tone={sectionMetaTone(section)}
-            />
+            <StatusPill label={sectionModeLabel(section)} tone={sectionMetaTone(section)} />
           </div>
 
           <p class="mt-3 text-sm leading-6 text-slate-600">{section.description}</p>
@@ -162,10 +189,7 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
           <div class="max-w-4xl">
             <div class="flex flex-wrap gap-2">
               <StatusPill label={section.badge} tone="info" />
-              <StatusPill
-                label={section.form ? "Recorte migrado em leitura" : "Origem controlada pelo ambiente"}
-                tone={sectionMetaTone(section)}
-              />
+              <StatusPill label={sectionScopeLabel(section)} tone={sectionMetaTone(section)} />
               {activeSectionKey === section.key ? <StatusPill label="Secao ativa" tone="success" /> : null}
             </div>
 
@@ -241,7 +265,126 @@ function fieldTone(field: AdminSettingsFormField): "success" | "warning" | "dang
           </div>
         ) : null}
 
-        {section.form ? (
+        {section.form && sectionRunsInAstro(section) ? (
+          <form
+            method="POST"
+            action={section.form.action}
+            class="mt-6 rounded-[28px] border border-slate-950/8 bg-slate-950 p-5 text-white"
+          >
+            <input type="hidden" name="returnTo" value={sectionHref(section.key)} />
+
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div class="max-w-3xl">
+                <div class="flex flex-wrap gap-2">
+                  <StatusPill label="Mutacao Astro ativa" tone="success" />
+                  {section.form.requiresStepUp ? <StatusPill label="Step-up pendente" tone="danger" /> : null}
+                </div>
+
+                <h3 class="mt-4 font-display text-2xl tracking-tight">Atualizar esta politica</h3>
+                <p class="mt-3 text-sm leading-7 text-slate-300">
+                  Esta etapa ja grava a configuracao em Prisma e registra a auditoria do tenant de plataforma. O
+                  vinculo de sessao autenticada do Admin-CEO ainda entra na proxima fatia do backend novo.
+                </p>
+              </div>
+
+              <div class="rounded-[22px] border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200">Endpoint Astro</p>
+                <code class="mt-2 block text-xs text-white">{section.form.action}</code>
+                <p class="mt-3 text-xs uppercase tracking-[0.18em] text-slate-400">{section.form.submitLabel}</p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {section.form.fields.map((field) => (
+                <article class="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{field.label}</p>
+                      <p class="mt-3 font-display text-2xl tracking-tight text-white">{field.displayValue}</p>
+                    </div>
+
+                    <StatusPill label={field.type} tone={fieldTone(field)} />
+                  </div>
+
+                  <p class="mt-3 text-sm leading-6 text-slate-300">{field.hint}</p>
+
+                  {field.type === "select" ? (
+                    <label class="mt-4 block space-y-2">
+                      <span class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Novo valor</span>
+                      <select
+                        name={field.name}
+                        class="w-full rounded-[20px] border border-white/12 bg-slate-900 px-4 py-3 text-sm text-white outline-none transition focus:border-orange-300"
+                      >
+                        {field.options?.map((option) => (
+                          <option value={option.value} selected={option.value === field.value}>{option.label}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : field.type === "number" ? (
+                    <label class="mt-4 block space-y-2">
+                      <span class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Novo valor</span>
+                      <input
+                        type="number"
+                        name={field.name}
+                        value={String(field.value)}
+                        min={field.min}
+                        max={field.max}
+                        required
+                        class="w-full rounded-[20px] border border-white/12 bg-slate-900 px-4 py-3 text-sm text-white outline-none transition focus:border-orange-300"
+                      />
+                    </label>
+                  ) : (
+                    <label class="mt-4 flex items-center gap-3 rounded-[20px] border border-white/12 bg-slate-900 px-4 py-3 text-sm text-white">
+                      <input
+                        type="checkbox"
+                        name={field.name}
+                        value="1"
+                        checked={Boolean(field.value)}
+                        class="size-4 rounded border-white/20 bg-slate-950"
+                      />
+                      <span>Manter habilitado</span>
+                    </label>
+                  )}
+                </article>
+              ))}
+
+              <article class="rounded-[24px] border border-white/10 bg-white/5 p-4 md:col-span-2 xl:col-span-3">
+                <div class="flex items-start gap-3">
+                  <PencilLine className="mt-1 size-4 shrink-0 text-orange-200" />
+                  <div class="min-w-0 flex-1">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Motivo da alteracao</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-300">
+                      O motivo entra na trilha auditavel da plataforma e ajuda a diferenciar ajustes operacionais de
+                      mudancas permanentes de governanca.
+                    </p>
+                    <textarea
+                      name="motivo_alteracao"
+                      rows="4"
+                      maxlength="300"
+                      required
+                      placeholder="Explique por que esta mudanca esta sendo feita."
+                      class="mt-4 w-full rounded-[20px] border border-white/12 bg-slate-900 px-4 py-3 text-sm text-white outline-none transition focus:border-orange-300"
+                    ></textarea>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex items-center gap-2 text-sm text-slate-300">
+                <KeyRound className="size-4 text-orange-200" />
+                <span>Sem sessao admin vinculada nesta fase. A auditoria registra a origem Astro.</span>
+              </div>
+
+              <button
+                type="submit"
+                class="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-400"
+              >
+                {section.form.submitLabel}
+              </button>
+            </div>
+          </form>
+        ) : section.form ? (
           <div class="mt-6 rounded-[28px] border border-slate-950/8 bg-slate-950 p-5 text-white">
             <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
               <div class="max-w-3xl">

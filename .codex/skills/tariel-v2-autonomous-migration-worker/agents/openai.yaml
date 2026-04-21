@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tariel V2 Migration Worker"
+  short_description: "Run the Tariel V2 migration in autonomous slices."
+  default_prompt: "Use $tariel-v2-autonomous-migration-worker to continue the Tariel V2 migration autonomously in validated, publishable slices."
+
+policy:
+  allow_implicit_invocation: true
