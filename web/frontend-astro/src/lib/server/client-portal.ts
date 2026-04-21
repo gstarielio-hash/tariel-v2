@@ -81,6 +81,24 @@ export interface ClientPortalSupportData {
   planCards: ClientPortalSupportPlanCard[];
 }
 
+export interface ClientPortalMesaData {
+  detail: AdminClientDetailData;
+  reviewers: ClientPortalTeamMember[];
+  recentCases: AdminClientDetailData["recentReports"];
+  recentAudit: AdminClientDetailData["recentAudit"];
+  summary: {
+    reviewers: number;
+    reviewerSessions: number;
+    reviewerFirstAccessPending: number;
+    waitingReview: number;
+    approved: number;
+    rejected: number;
+    drafts: number;
+    otherStatuses: number;
+    mesaAuditEvents: number;
+  };
+}
+
 export interface ClientCreateOperationalUserInput {
   companyId: number;
   actorUserId: number;
@@ -261,6 +279,76 @@ export async function getClientPortalSupportData(companyId: number): Promise<Cli
       movement: describePlanMovement(detail.company.planoAtivo, plan),
       summary: summarizePlanMovement(detail.company.planoAtivo, plan),
     })),
+  };
+}
+
+export async function getClientPortalMesaData(companyId: number): Promise<ClientPortalMesaData | null> {
+  const [detail, team, reviewBuckets] = await Promise.all([
+    getAdminClientDetail(companyId),
+    getClientPortalTeamData(companyId),
+    prisma.laudos.groupBy({
+      by: ["status_revisao"],
+      where: {
+        empresa_id: companyId,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+  ]);
+
+  if (!detail || !team) {
+    return null;
+  }
+
+  const reviewers = team.members.filter((member) => member.role === "revisor");
+  const mesaAudit = detail.recentAudit.filter((entry) => isMesaAuditEntry(entry));
+  const reviewCounts = {
+    drafts: 0,
+    waitingReview: 0,
+    approved: 0,
+    rejected: 0,
+    otherStatuses: 0,
+  };
+
+  for (const bucket of reviewBuckets) {
+    const count = Number(bucket._count?._all ?? 0);
+
+    switch (normalizeMesaReviewBucket(bucket.status_revisao)) {
+      case "draft":
+        reviewCounts.drafts += count;
+        break;
+      case "waiting":
+        reviewCounts.waitingReview += count;
+        break;
+      case "approved":
+        reviewCounts.approved += count;
+        break;
+      case "rejected":
+        reviewCounts.rejected += count;
+        break;
+      default:
+        reviewCounts.otherStatuses += count;
+        break;
+    }
+  }
+
+  return {
+    detail,
+    reviewers,
+    recentCases: detail.recentReports,
+    recentAudit: mesaAudit,
+    summary: {
+      reviewers: reviewers.length,
+      reviewerSessions: reviewers.filter((member) => member.sessionCount > 0).length,
+      reviewerFirstAccessPending: reviewers.filter((member) => member.temporaryPasswordActive).length,
+      waitingReview: reviewCounts.waitingReview,
+      approved: reviewCounts.approved,
+      rejected: reviewCounts.rejected,
+      drafts: reviewCounts.drafts,
+      otherStatuses: reviewCounts.otherStatuses,
+      mesaAuditEvents: mesaAudit.length,
+    },
   };
 }
 
@@ -666,6 +754,44 @@ function normalizeSupportOrigin(value: string | null | undefined): ClientSupport
   }
 
   return "admin";
+}
+
+function normalizeMesaReviewBucket(value: string | null | undefined) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+
+  if (!normalized || normalized === "rascunho") {
+    return "draft";
+  }
+
+  if (normalized.includes("aguard")) {
+    return "waiting";
+  }
+
+  if (normalized.includes("aprov")) {
+    return "approved";
+  }
+
+  if (normalized.includes("rejeit")) {
+    return "rejected";
+  }
+
+  return "other";
+}
+
+function isMesaAuditEntry(entry: AdminClientDetailData["recentAudit"][number]) {
+  const portal = String(entry.portal ?? "").trim().toLowerCase();
+  const action = String(entry.acao ?? "").trim().toLowerCase();
+  const summary = String(entry.resumo ?? "").trim().toLowerCase();
+
+  return (
+    portal === "mesa" ||
+    portal === "revisor" ||
+    action.includes("mesa") ||
+    action.includes("revisor") ||
+    summary.includes("mesa") ||
+    summary.includes("revisor") ||
+    summary.includes("analise")
+  );
 }
 
 function roleFromAccessLevel(value: number): ClientTeamRole {

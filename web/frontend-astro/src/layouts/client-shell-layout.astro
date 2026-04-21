@@ -1,6 +1,7 @@
 ---
 import {
   Building2,
+  FileStack,
   Fingerprint,
   LayoutDashboard,
   LogOut,
@@ -15,7 +16,7 @@ interface Props {
   description?: string;
   userName?: string;
   companyName?: string;
-  activeItem?: "dashboard" | "team" | "support";
+  activeItem?: "dashboard" | "team" | "mesa" | "support";
 }
 
 const {
@@ -41,6 +42,12 @@ const menuItems = [
     label: "Equipe",
     icon: Users,
     current: activeItem === "team",
+  },
+  {
+    href: "/cliente/mesa",
+    label: "Mesa",
+    icon: FileStack,
+    current: activeItem === "mesa",
   },
   {
     href: "/cliente/suporte",
@@ -90,7 +97,7 @@ const menuItems = [
           <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-200">Governanca</p>
           <p class="mt-3 text-sm leading-6 text-slate-300">
             Login, sessao e troca obrigatoria de senha ja rodam no Astro. Equipe e suporte agora usam leitura e
-            escrita reais no V2; a mesa entra na proxima vertical sem voltar ao template legado.
+            escrita reais no V2; a mesa agora tem superficie oficial no portal cliente sem voltar ao template legado.
           </p>
         </div>
 
