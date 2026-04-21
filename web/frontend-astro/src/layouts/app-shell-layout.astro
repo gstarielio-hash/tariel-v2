@@ -16,7 +16,7 @@ interface Props {
   description?: string;
   userName?: string;
   companyName?: string;
-  activeItem?: "dashboard";
+  activeItem?: "dashboard" | "mesa";
 }
 
 const {
@@ -36,6 +36,12 @@ const menuItems = [
     label: "Inicio",
     icon: Activity,
     current: activeItem === "dashboard",
+  },
+  {
+    href: "/app/mesa",
+    label: "Mesa",
+    icon: MessageSquareMore,
+    current: activeItem === "mesa",
   },
   {
     href: "/app/login",

@@ -16,8 +16,7 @@ import {
 
 import AppShellLayout from "@/layouts/app-shell-layout.astro";
 import { consumeAppNotice } from "@/lib/server/app-notice";
-import { fetchAppMesaMessages, fetchAppMesaSummary } from "@/lib/server/app-mesa-bridge";
-import { getAppPortalOverview } from "@/lib/server/app-portal";
+import { getAppWorkspace } from "@/lib/server/app-workspace";
 
 export const prerender = false;
 
@@ -27,29 +26,19 @@ if (!appSession) {
   return Astro.redirect("/app/login", 303);
 }
 
-const overview = await getAppPortalOverview({
-  userId: appSession.user.id,
-  companyId: appSession.user.companyId,
+const workspace = await getAppWorkspace(appSession, {
+  selectedLaudoId: Number(Astro.url.searchParams.get("laudo") ?? 0) || null,
+  selectedReferenceMessageId: Number(Astro.url.searchParams.get("ref") ?? 0) || null,
 });
 
-if (!overview) {
+if (!workspace) {
   throw new Error("Perfil do portal do inspetor nao encontrado.");
 }
 
+const { overview, selectedMessages, selectedReport, selectedSummary, threadPreview, messageIndex, referencedMessage } =
+  workspace;
 const successMessage = String(Astro.url.searchParams.get("sucesso") ?? "").trim();
 const notice = consumeAppNotice(Astro.cookies);
-const selectedLaudoId = Number(Astro.url.searchParams.get("laudo") ?? 0) || overview.recentReports[0]?.id || 0;
-const selectedReferenceMessageId = Number(Astro.url.searchParams.get("ref") ?? 0) || 0;
-const selectedReport = overview.recentReports.find((report) => report.id === selectedLaudoId) ?? overview.recentReports[0] ?? null;
-const selectedSummary = selectedReport
-  ? await fetchAppMesaSummary(appSession, selectedReport.id).catch(() => null)
-  : null;
-const selectedMessages = selectedReport
-  ? await fetchAppMesaMessages(appSession, selectedReport.id).catch(() => null)
-  : null;
-const threadPreview = selectedMessages?.itens.slice(-6).reverse() ?? [];
-const messageIndex = new Map((selectedMessages?.itens ?? []).map((message) => [message.id, message]));
-const referencedMessage = messageIndex.get(selectedReferenceMessageId) ?? null;
 const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
   timeStyle: "short",
@@ -200,7 +189,7 @@ const cards = [
       <div class="mt-6 space-y-3">
         {overview.recentReports.length > 0 ? overview.recentReports.map((report) => (
           <a
-            href={`/app/inicio?laudo=${report.id}`}
+            href={`/app/mesa?laudo=${report.id}`}
             class:list={[
               "block rounded-[24px] border px-4 py-4 transition",
               report.id === selectedReport?.id
@@ -223,7 +212,12 @@ const cards = [
                 </p>
               </div>
 
-              <p class="text-sm text-slate-500">{report.updatedAtLabel}</p>
+              <div class="text-right">
+                <p class="text-sm text-slate-500">{report.updatedAtLabel}</p>
+                <span class="mt-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
+                  Abrir mesa
+                </span>
+              </div>
             </div>
           </a>
         )) : (
@@ -298,6 +292,17 @@ const cards = [
                   ? selectedSummary.allowed_surface_actions.join(", ")
                   : "Nenhuma acao de superficie exposta para este estado."}
               </p>
+
+              {selectedReport ? (
+                <div class="mt-4">
+                  <a
+                    href={`/app/mesa?laudo=${selectedReport.id}`}
+                    class="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  >
+                    Abrir mesa dedicada
+                  </a>
+                </div>
+              ) : null}
             </div>
           </>
         ) : selectedReport ? (

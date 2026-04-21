@@ -3876,3 +3876,51 @@ Proximo passo imediato:
 - com o contexto de referencia ja visivel na home, o proximo ganho util no `Inspetor` e aproximar resumo, thread e composer numa leitura mais focada do laudo selecionado;
 - isso pode incluir um painel de contexto do item ativo ou uma separacao mais clara entre fila de laudos e conversa operacional;
 - manter o backend Python como dono do estado e usar o Astro apenas para melhorar leitura, navegacao e mutacoes autenticadas.
+
+## Ciclo 93 — mesa dedicada do `Inspetor` no Astro
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a home `/app/inicio` ja concentrava overview, fila pessoal, resumo do laudo, thread e composer, o que era util para os primeiros cortes mas ruim como base para continuar a migracao do workspace;
+- isso mantinha a mesa do inspetor presa a uma tela de dashboard e impedia evoluir navegacao, historico e contexto do laudo sem inflar ainda mais a home;
+- o corte seguro era abrir uma superficie dedicada `/app/mesa`, reaproveitando os contratos canonicos ja validados e sem tocar ainda na workspace pesada do legado.
+
+Corte executado:
+
+- entrou `web/frontend-astro/src/lib/server/app-workspace.ts`, consolidando a leitura de overview, laudo selecionado, resumo, thread recente e referencia de mensagem para o portal do inspetor;
+- `web/frontend-astro/src/layouts/app-shell-layout.astro` passou a expor o item de navegacao `Mesa`, preparando o shell do portal para mais de uma superficie real;
+- entrou `web/frontend-astro/src/pages/app/mesa.astro`, com fila pessoal do inspetor, contexto operacional do laudo, thread recente, reply com anexo e toggle de pendencia numa tela dedicada;
+- `web/frontend-astro/src/pages/app/inicio.astro` foi mantida como dashboard e passou a apontar os laudos recentes para a nova mesa dedicada;
+- entraram aliases de rotas em `web/frontend-astro/src/pages/app/mesa/[laudoId]/...`, preservando URLs operacionais coerentes no portal novo sem duplicar logica de mutacao.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-workspace.ts`
+- `web/frontend-astro/src/layouts/app-shell-layout.astro`
+- `web/frontend-astro/src/pages/app/inicio.astro`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/responder.ts`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/pendencias/[messageId].ts`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/anexos/[attachmentId].ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com `/app/mesa` agora oficial no Astro, o proximo ganho estrutural do inspetor e portar para essa superficie a navegacao e o contexto mais ricos da workspace, em vez de continuar dependente do `chat_index_page.js`;
+- isso abre caminho para migrar historico do laudo, contexto lateral e trilha de operacao sem reabrir a home;
+- seguir reduzindo a dependencia do template legado `index.html` por fatias coesas e validaveis.
