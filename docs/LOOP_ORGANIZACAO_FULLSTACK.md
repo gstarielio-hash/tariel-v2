@@ -4518,3 +4518,50 @@ Proximo passo imediato:
 - usar esta classificacao corrigida para parar de abrir tarefas ambigüas sob o rotulo generico de `Inspetor`;
 - tratar o que resta como backlog separado de `Chat inspetor` e de `Mesa Avaliadora`;
 - priorizar as proximas fatias por vertical real, nao por agrupamento informal de telas.
+
+## Ciclo 108 — quadro das 4 caixas da migracao por dominio
+
+Status:
+
+- concluido
+- sem mudanca de runtime
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- mesmo com a hierarquia de autoridade corrigida, ainda faltava um quadro operacional simples mostrando o que ja foi puxado de cada caixa antiga para cada caixa nova;
+- sem isso, as proximas fatias poderiam continuar saindo da caixa errada ou entrar na caixa nova errada;
+- a organizacao por "4 cheias antigas" e "4 vazias novas" era a melhor forma de tornar o backlog visual e objetivo.
+
+Corte executado:
+
+- entrou `docs/CAIXAS_MIGRACAO_POR_DOMINIO.md` consolidando as 4 caixas antigas e as 4 caixas novas;
+- o quadro delimita, para cada dominio, a origem legacy, as rotas Astro atuais, o que ja foi migrado e o que ainda falta puxar;
+- a leitura agora separa explicitamente `Admin-CEO`, `Admin-cliente`, `Chat inspetor` e `Mesa avaliadora`, sem misturar comunicacao entre elas com ownership;
+- o documento tambem corrige a percepcao de enchimento das caixas novas, mostrando que `revisao` e `cliente/mesa` ja estao mais avancadas do que o discurso anterior sugeria.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `docs/CAIXAS_MIGRACAO_POR_DOMINIO.md`
+
+Base documental usada:
+
+- `Tariel Control Consolidado/web/templates/*`
+- `tariel-v2/web/frontend-astro/src/pages/*`
+- `docs/restructuring-roadmap/19_frontend_entrypoints_matrix.md`
+- `docs/MAPA_MENTAL_MIGRACAO_V2.md`
+
+Validacao local executada:
+
+- revisao documental cruzada entre rotas do V2 e templates do legado
+- `git diff --check -- docs/CAIXAS_MIGRACAO_POR_DOMINIO.md docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- resultado:
+  - reorganizacao somente documental
+  - sem impacto de runtime
+
+Proximo passo imediato:
+
+- usar o quadro das 4 caixas como filtro obrigatorio antes de abrir qualquer nova fatia de migracao;
+- escolher a proxima tarefa dizendo explicitamente "esta sai da caixa antiga X e entra na caixa nova Y";
+- reduzir o risco de continuar puxando shell/residuo do `Chat inspetor` quando a tarefa real pertencer a `Mesa avaliadora`, e vice-versa.
