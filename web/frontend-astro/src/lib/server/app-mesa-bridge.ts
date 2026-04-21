@@ -161,6 +161,16 @@ export interface AppInspectionStartPayload {
   laudo_card?: Record<string, unknown> | null;
 }
 
+export interface AppInspectionPreviewInput {
+  diagnostico: string;
+  inspetor: string;
+  empresa?: string;
+  setor?: string;
+  data?: string;
+  laudoId?: number | null;
+  tipoTemplate?: string | null;
+}
+
 const DEFAULT_PYTHON_BACKEND_URL = "http://127.0.0.1:8000";
 
 function resolvePythonBackendBaseUrl() {
@@ -382,6 +392,40 @@ export async function startAppInspection(
     body: formData,
     errorPrefix: "Python inspector start inspection failed",
   });
+}
+
+export async function fetchAppInspectionPreviewResponse(
+  appSession: AuthenticatedAppRequest,
+  input: AppInspectionPreviewInput,
+) {
+  const diagnostico = String(input.diagnostico ?? "").trim();
+
+  if (!diagnostico) {
+    throw new Error("Ainda nao ha diagnostico suficiente para gerar a pre-visualizacao.");
+  }
+
+  const response = await fetchAppMesaBackend(appSession, "/app/api/gerar_pdf", {
+    method: "POST",
+    body: {
+      diagnostico,
+      inspetor: String(input.inspetor ?? "").trim() || "Inspetor",
+      empresa: String(input.empresa ?? "").trim(),
+      setor: String(input.setor ?? "").trim() || "geral",
+      data: String(input.data ?? "").trim(),
+      laudo_id: input.laudoId ?? null,
+      tipo_template: String(input.tipoTemplate ?? "").trim(),
+    },
+    accept: "application/pdf",
+  });
+
+  if (!response.ok) {
+    const detail = await extractBackendError(response);
+    throw new Error(
+      `Python inspector preview failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return response;
 }
 
 export async function replyToAppMesaWithAttachment(

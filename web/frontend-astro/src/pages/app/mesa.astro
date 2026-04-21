@@ -11,6 +11,7 @@ import {
   Search,
   Send,
   ShieldCheck,
+  FileStack,
   Workflow,
 } from "lucide-react";
 
@@ -364,6 +365,19 @@ function formatBytes(value: number | undefined) {
           {selectedSummary?.resumo.mensagens_nao_lidas ?? 0} nao lidas, {selectedSummary?.resumo.pendencias_abertas ?? 0}
           {" "}pendencias abertas e reply operacional direto pelo portal novo.
         </p>
+        {selectedReport ? (
+          <div class="mt-4">
+            <a
+              href={`/app/mesa/${selectedReport.id}/preview`}
+              target="_blank"
+              rel="noreferrer"
+              class="inline-flex items-center gap-2 rounded-full border border-sky-500/24 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800 transition hover:border-sky-500/40"
+            >
+              <FileStack className="size-3.5" />
+              Pre-visualizar PDF
+            </a>
+          </div>
+        ) : null}
       </div>
     </div>
   </Fragment>

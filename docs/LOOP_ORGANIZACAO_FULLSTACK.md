@@ -4259,3 +4259,46 @@ Proximo passo imediato:
 - com a abertura de nova inspecao ja dentro da mesa Astro, o `Inspetor` web encosta nos ultimos gaps realmente residuais do workspace legado;
 - o proximo corte precisa decidir se a melhor frente e fechar os estados restantes do shell antigo ou remover dependencias de navegacao/contexto ainda fora do Astro;
 - seguir apenas com cortes que diminuam uso real do `chat_index_page.js`, em vez de ampliar leitura paralela.
+
+## Ciclo 102 — pre-visualizacao de PDF na mesa Astro do `Inspetor`
+
+Status:
+
+- concluido e validado localmente
+- preparado para publicacao no `tariel-v2`
+
+Problema observado:
+
+- a mesa Astro ja permitia iniciar e operar laudos, mas a acao de pre-visualizar o PDF ainda seguia presa ao shell legado do workspace;
+- isso mantinha um ponto relevante da operacao tecnica fora do V2, apesar de o backend oficial ja expor a geracao do preview em `/app/api/gerar_pdf`;
+- o corte seguro era criar uma rota server-side no Astro que montasse o diagnostico minimo do laudo e reaproveitasse o endpoint oficial sem reimplementar a geracao do PDF.
+
+Corte executado:
+
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts` passou a expor `fetchAppInspectionPreviewResponse`, reaproveitando o endpoint oficial do backend Python;
+- entrou a rota `web/frontend-astro/src/pages/app/mesa/[laudoId]/preview.ts`, que monta um diagnostico a partir do resumo e da thread canonica recente do laudo;
+- `web/frontend-astro/src/pages/app/mesa.astro` agora mostra um CTA de `Pre-visualizar PDF` no header operacional da mesa quando existe laudo ativo;
+- o ownership permanece correto: Astro orquestra a acao e o backend Python continua dono da geracao documental e das regras do preview.
+
+Arquivos do ciclo:
+
+- `docs/LOOP_ORGANIZACAO_FULLSTACK.md`
+- `web/frontend-astro/src/lib/server/app-mesa-bridge.ts`
+- `web/frontend-astro/src/pages/app/mesa.astro`
+- `web/frontend-astro/src/pages/app/mesa/[laudoId]/preview.ts`
+
+Validacao local executada:
+
+- `./bin/npm22 run check`
+- `DATABASE_URL='postgresql:///tariel_dev' ./bin/npm22 run build`
+- `git diff --check -- . ':(exclude)web/frontend-astro/.astro/**'`
+- resultado:
+  - `astro check`: `0 errors`
+  - `astro build`: concluido com adapter `@astrojs/node`
+  - `git diff --check`: limpo fora dos artefatos gerados do Astro
+
+Proximo passo imediato:
+
+- com a pre-visualizacao oficial ja dentro da mesa Astro, o `Inspetor` web reduz mais um atalho importante ao shell legado;
+- os proximos gaps relevantes tendem a estar em acoes residuais de shell e navegacao do workspace antigo, nao mais no miolo da operacao de laudo;
+- seguir apenas se o proximo corte realmente diminuir trafego e uso do legado em producao, em vez de apenas reorganizar UI secundaria.
